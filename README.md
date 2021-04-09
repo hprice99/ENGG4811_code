@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # xilinx-risc-v
 
 ## Building the project with Vivado 2020 (webpack edition works as well)
@@ -30,3 +31,6 @@ If you own a CMOD-A7 board you can use the example project for this board direct
 
 The complete guide for building the software is here:
 [Porting RISC-V to Xilinx Kintex 7 and Spartan 7](https://www.irmo.de/2020/06/18/porting-risc-v-to-xilinx-kintex-7-and-spartan-7/)
+=======
+# ENGG4811_code
+>>>>>>> cb9e8e658c04f03823f943e4e2216fcebe0b60be
