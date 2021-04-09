@@ -3,7 +3,11 @@
 module system (
 	input            clk,
 	input            resetn,
-	output reg led1
+	output wire[15:0] led,
+	output reg       RGB_LED,
+	output reg[7:0]  out_byte,
+	output reg[0:0]  out_byte_en,
+	output wire      trap
 );
 	// set this to 0 for better timing but less performance/MHz
 	parameter FAST_MEMORY = 1;
@@ -46,22 +50,19 @@ module system (
 	);
 
 
-   reg [23:0] led_cnt = {24{1'b0}};
+   reg [15:0] led_cnt = {16{1'b0}};
 
    always @(posedge clk)
    begin
       led_cnt <= led_cnt - 1'b1;
-      
-      if (led_cnt[23] == 1) 
-        led1 <= 0;
-      else
-        led1 <= 1;
     end
+    
+    assign led = led_cnt;
 
 
-	wire           trap;
-	reg [7:0] out_byte;
-	reg [0:0]      out_byte_en;
+	// wire           trap;
+	// reg [7:0] out_byte;
+	// reg [0:0]      out_byte_en;
     wire [0:0]  trap_ila;
     
     assign trap_ila[0] = trap;
@@ -80,6 +81,7 @@ module system (
 			mem_ready <= 1;
 			out_byte_en[0] <= 0;
 			mem_rdata <= memory[mem_la_addr >> 2];
+			
 			if (mem_la_write && (mem_la_addr >> 2) < MEM_SIZE) begin
 				if (mem_la_wstrb[0]) memory[mem_la_addr >> 2][ 7: 0] <= mem_la_wdata[ 7: 0];
 				if (mem_la_wstrb[1]) memory[mem_la_addr >> 2][15: 8] <= mem_la_wdata[15: 8];
@@ -87,9 +89,16 @@ module system (
 				if (mem_la_wstrb[3]) memory[mem_la_addr >> 2][31:24] <= mem_la_wdata[31:24];
 			end
 			else
-			if (mem_la_write && mem_la_addr == 32'h1000_0000) begin
-				out_byte_en[0] <= 1;
-				out_byte <= mem_la_wdata;
+			if (mem_la_write) begin
+			case(mem_la_addr)
+			     32'h1000_0000: begin
+				    out_byte_en[0] <= 1;
+				    out_byte <= mem_la_wdata;
+				    end
+				 32'h2000_0000: begin
+				    RGB_LED <= mem_la_wdata;
+				    end
+		      endcase
 			end
 		end
 	end else begin

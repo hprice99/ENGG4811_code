@@ -1,6 +1,11 @@
+#define CHAR_OUTPUT (*(volatile char*)0x10000000)
+#define LED (*(volatile char*)0x20000000)
+
+#define LOOP_COUNTER 10
+
 void putc(char c)
 {
-	*(volatile char*)0x10000000 = c;
+	CHAR_OUTPUT = c;
 }
 
 void puts(const char *s)
@@ -19,6 +24,12 @@ void *memcpy(void *dest, const void *src, int n)
 
 void main()
 {
+    int ledValue = 0;
+
+    LED = ledValue;
+
+    puts("ENGG4811 PicoRV32 test\n");
+
 	char message[] = "$Uryyb+Jbeyq!+Vs+lbh+pna+ernq+guvf+zrffntr+gura$gur+CvpbEI32+PCH"
 			"+frrzf+gb+or+jbexvat+whfg+svar.$$++++++++++++++++GRFG+CNFFRQ!$$";
 	for (int i = 0; message[i]; i++)
@@ -40,4 +51,21 @@ void main()
 			break;
 		}
 	puts(message);
+
+    while (1) {
+
+        LED = ledValue;
+
+        if (ledValue) {
+            puts("LED on");
+        } else {
+            puts("LED off");
+        }
+
+        for (int i = 0; i < LOOP_COUNTER; i++) {
+
+        }
+
+        ledValue = 1 - ledValue;
+    }
 }
