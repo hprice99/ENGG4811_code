@@ -32,18 +32,23 @@ use IEEE.STD_LOGIC_1164.ALL;
 --use UNISIM.VComponents.all;
 
 entity top is
-    Port ( btnCpuReset  : in STD_LOGIC;
+    Port ( 
+           btnCpuReset  : in STD_LOGIC;
            clk          : in STD_LOGIC;
            led          : out STD_LOGIC_VECTOR(15 downto 0);
            RGB1_Red     : out STD_LOGIC;
            RGB1_Green   : out STD_LOGIC;
            RGB1_Blue    : out STD_LOGIC;
-           RGB2_Red     : out STD_LOGIC);
+           RGB2_Red     : out STD_LOGIC
+    );
 end top;
 
 architecture Behavioral of top is
 
     component system
+        generic (
+             USE_ILA : integer := 1
+        );
         port (
             clk         : in std_logic;
             resetn      : in std_logic;
@@ -58,6 +63,9 @@ architecture Behavioral of top is
 begin
 
     CORE_1 : system
+        generic map(
+           USE_ILA     => 0
+        )
         port map (
             clk         => clk,
             resetn      => btnCpuReset,
@@ -69,6 +77,9 @@ begin
         );
         
     CORE_2 : system
+        generic map(
+           USE_ILA     => 0
+        )
         port map (
             clk         => clk,
             resetn      => btnCpuReset,
@@ -80,6 +91,9 @@ begin
         );
         
     CORE_3 : system
+        generic map(
+           USE_ILA     => 0
+        )
         port map (
             clk         => clk,
             resetn      => btnCpuReset,
@@ -91,6 +105,9 @@ begin
         );
         
     CORE_4 : system
+        generic map(
+           USE_ILA     => 0
+        )
         port map (
             clk         => clk,
             resetn      => btnCpuReset,
