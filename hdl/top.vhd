@@ -36,6 +36,7 @@ entity top is
     Port ( 
            btnCpuReset  : in STD_LOGIC;
            clk          : in STD_LOGIC;
+           sw           : in STD_LOGIC_VECTOR(3 downto 0);
            led          : out STD_LOGIC_VECTOR(15 downto 0);
            RGB1_Red     : out STD_LOGIC;
            RGB1_Green   : out STD_LOGIC;
@@ -53,6 +54,7 @@ architecture Behavioral of top is
         port (
             clk         : in std_logic;
             resetn      : in std_logic;
+            sw          : in std_logic;
             led         : out std_logic_vector(15 downto 0);
             RGB_LED     : out std_logic;
             out_byte_en : out std_logic;
@@ -74,6 +76,7 @@ begin
         port map (
             clk         => clk,
             resetn      => btnCpuReset,
+            sw          => sw(0),
             led         => led,
             RGB_LED     => RGB1_Red,
             -- out_byte_en => core1_out_byte_en,
@@ -89,6 +92,7 @@ begin
         port map (
             clk         => clk,
             resetn      => btnCpuReset,
+            sw          => sw(1),
             led         => open,
             -- RGB_LED     => green_1_led,
             RGB_LED     => RGB1_Green,
@@ -106,6 +110,7 @@ begin
         port map (
             clk         => clk,
             resetn      => btnCpuReset,
+            sw          => sw(2),
             led         => open,
             -- RGB_LED     => blue_1_led,
             RGB_LED     => RGB1_Blue,
@@ -123,6 +128,7 @@ begin
         port map (
             clk         => clk,
             resetn      => btnCpuReset,
+            sw          => sw(3),
             led         => open,
             -- RGB_LED     => red_2_led,
             RGB_LED     => RGB2_Red,

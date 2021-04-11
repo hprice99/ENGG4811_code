@@ -23,8 +23,12 @@ module system_tb;
     
     reg sw = 0;
     
+    integer switchCount = 0;
+    
     always @(posedge clk) begin
-        if (led1) begin
+        switchCount <= switchCount + 1;
+        
+        if (switchCount % 7 > 3) begin
             sw <= ~sw;
         end
     end

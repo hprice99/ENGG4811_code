@@ -73,10 +73,9 @@ void main()
 
         if (switchValue) {
             puts("Switch on\n");
+            ledValue = 1 - ledValue;
         } else {
             puts("Switch off\n");
         }
-
-        ledValue = 1 - ledValue;
     }
 }
