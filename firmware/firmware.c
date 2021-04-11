@@ -1,5 +1,6 @@
 #define CHAR_OUTPUT (*(volatile char*)0x10000000)
 #define LED (*(volatile char*)0x20000000)
+#define SWITCH (*(volatile char*)0x30000000)
 
 #define LOOP_COUNTER 10
 
@@ -25,6 +26,8 @@ void *memcpy(void *dest, const void *src, int n)
 void main()
 {
     int ledValue = 0;
+
+    int switchValue = 0;
 
     LED = ledValue;
 
@@ -57,13 +60,21 @@ void main()
         LED = ledValue;
 
         if (ledValue) {
-            puts("LED on");
+            puts("LED on\n");
         } else {
-            puts("LED off");
+            puts("LED off\n");
         }
 
         for (int i = 0; i < LOOP_COUNTER; i++) {
 
+        }
+
+        switchValue = SWITCH;
+
+        if (switchValue) {
+            puts("Switch on\n");
+        } else {
+            puts("Switch off\n");
         }
 
         ledValue = 1 - ledValue;

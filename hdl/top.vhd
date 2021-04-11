@@ -24,7 +24,8 @@ use IEEE.STD_LOGIC_1164.ALL;
 
 -- Uncomment the following library declaration if using
 -- arithmetic functions with Signed or Unsigned values
---use IEEE.NUMERIC_STD.ALL;
+-- use IEEE.NUMERIC_STD.ALL;
+-- use ieee.std_logic_unsigned.all;
 
 -- Uncomment the following library declaration if instantiating
 -- any Xilinx leaf cells in this code.
@@ -59,18 +60,23 @@ architecture Behavioral of top is
             trap        : out std_logic
         );
     end component system;
+    
+    -- signal core1_out_byte_en : std_logic;
+    
+    -- signal green_1_led, blue_1_led, red_2_led : std_logic;
 
 begin
 
     CORE_1 : system
         generic map(
-           USE_ILA     => 0
+           USE_ILA     => 1
         )
         port map (
             clk         => clk,
             resetn      => btnCpuReset,
             led         => led,
             RGB_LED     => RGB1_Red,
+            -- out_byte_en => core1_out_byte_en,
             out_byte_en => open,
             out_byte    => open,
             trap        => open
@@ -78,44 +84,53 @@ begin
         
     CORE_2 : system
         generic map(
-           USE_ILA     => 0
+           USE_ILA     => 1
         )
         port map (
             clk         => clk,
             resetn      => btnCpuReset,
             led         => open,
+            -- RGB_LED     => green_1_led,
             RGB_LED     => RGB1_Green,
             out_byte_en => open,
             out_byte    => open,
             trap        => open
         );
         
+    -- RGB1_Green <= core1_out_byte_en and green_1_led;
+        
     CORE_3 : system
         generic map(
-           USE_ILA     => 0
+           USE_ILA     => 1
         )
         port map (
             clk         => clk,
             resetn      => btnCpuReset,
             led         => open,
+            -- RGB_LED     => blue_1_led,
             RGB_LED     => RGB1_Blue,
             out_byte_en => open,
             out_byte    => open,
             trap        => open
         );
         
+    -- RGB1_Blue <= core1_out_byte_en and blue_1_led;
+        
     CORE_4 : system
         generic map(
-           USE_ILA     => 0
+           USE_ILA     => 1
         )
         port map (
             clk         => clk,
             resetn      => btnCpuReset,
             led         => open,
+            -- RGB_LED     => red_2_led,
             RGB_LED     => RGB2_Red,
             out_byte_en => open,
             out_byte    => open,
             trap        => open
         );
+    
+    -- RGB2_Red <= core1_out_byte_en and red_2_led;
 
 end Behavioral;

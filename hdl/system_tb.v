@@ -20,12 +20,19 @@ module system_tb;
 
     wire led1;
     wire[15:0] leds;
-
-
+    
+    reg sw = 0;
+    
+    always @(posedge clk) begin
+        if (led1) begin
+            sw <= ~sw;
+        end
+    end
 
 	system uut (
 		.clk          (clk),
 		.resetn       (resetn),
+		.sw           (sw),
 		.led          (leds),
 		.RGB_LED      (led1),
 		.trap         (trap),

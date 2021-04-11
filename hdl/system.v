@@ -5,6 +5,7 @@ module system #(
 ) (
 	input            clk,
 	input            resetn,
+	input            sw,
 	output wire[15:0] led,
 	output reg       RGB_LED,
 	output reg[7:0]  out_byte,
@@ -95,6 +96,7 @@ module system #(
 				if (mem_la_wstrb[3]) memory[mem_la_addr >> 2][31:24] <= mem_la_wdata[31:24];
 			end
 			else
+			
 			if (mem_la_write) begin
 			case(mem_la_addr)
 			     32'h1000_0000: begin
@@ -103,6 +105,14 @@ module system #(
 				    end
 				 32'h2000_0000: begin
 				    RGB_LED <= mem_la_wdata;
+				    end
+		      endcase
+			end
+			
+			if (mem_la_read) begin
+			case(mem_la_addr)
+			     32'h3000_0000: begin
+				    mem_rdata <= sw;
 				    end
 		      endcase
 			end
