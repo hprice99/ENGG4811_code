@@ -62,16 +62,12 @@ architecture Behavioral of top is
             trap        : out std_logic
         );
     end component system;
-    
-    -- signal core1_out_byte_en : std_logic;
-    
-    -- signal green_1_led, blue_1_led, red_2_led : std_logic;
 
 begin
 
     CORE_1 : system
         generic map(
-           USE_ILA     => 1
+           USE_ILA     => 0
         )
         port map (
             clk         => clk,
@@ -79,64 +75,57 @@ begin
             sw          => sw(0),
             led         => led,
             RGB_LED     => RGB1_Red,
-            -- out_byte_en => core1_out_byte_en,
             out_byte_en => open,
             out_byte    => open,
             trap        => open
         );
         
-    CORE_2 : system
-        generic map(
-           USE_ILA     => 1
-        )
-        port map (
-            clk         => clk,
-            resetn      => btnCpuReset,
-            sw          => sw(1),
-            led         => open,
-            -- RGB_LED     => green_1_led,
-            RGB_LED     => RGB1_Green,
-            out_byte_en => open,
-            out_byte    => open,
-            trap        => open
-        );
+--    CORE_2 : system
+--        generic map(
+--           USE_ILA     => 0
+--        )
+--        port map (
+--            clk         => clk,
+--            resetn      => btnCpuReset,
+--            -- sw          => sw(1),
+--            sw          => '0',
+--            led         => open,
+--            RGB_LED     => RGB1_Green,
+--            out_byte_en => open,
+--            out_byte    => open,
+--            trap        => open
+--        );
         
-    -- RGB1_Green <= core1_out_byte_en and green_1_led;
+--    CORE_3 : system
+--        generic map(
+--           USE_ILA     => 0
+--        )
+--        port map (
+--            clk         => clk,
+--            resetn      => btnCpuReset,
+--            -- sw          => sw(2),
+--            sw          => '0',
+--            led         => open,
+--            RGB_LED     => RGB1_Blue,
+--            out_byte_en => open,
+--            out_byte    => open,
+--            trap        => open
+--        );
         
-    CORE_3 : system
-        generic map(
-           USE_ILA     => 1
-        )
-        port map (
-            clk         => clk,
-            resetn      => btnCpuReset,
-            sw          => sw(2),
-            led         => open,
-            -- RGB_LED     => blue_1_led,
-            RGB_LED     => RGB1_Blue,
-            out_byte_en => open,
-            out_byte    => open,
-            trap        => open
-        );
-        
-    -- RGB1_Blue <= core1_out_byte_en and blue_1_led;
-        
-    CORE_4 : system
-        generic map(
-           USE_ILA     => 1
-        )
-        port map (
-            clk         => clk,
-            resetn      => btnCpuReset,
-            sw          => sw(3),
-            led         => open,
-            -- RGB_LED     => red_2_led,
-            RGB_LED     => RGB2_Red,
-            out_byte_en => open,
-            out_byte    => open,
-            trap        => open
-        );
-    
-    -- RGB2_Red <= core1_out_byte_en and red_2_led;
+--    CORE_4 : system
+--        generic map(
+--           USE_ILA     => 0
+--        )
+--        port map (
+--            clk         => clk,
+--            resetn      => btnCpuReset,
+--            -- sw          => sw(3),
+--            sw          => '0',
+--            led         => open,
+--            RGB_LED     => RGB2_Red,
+--            out_byte_en => open,
+--            out_byte    => open,
+--            trap        => open
+--        );
 
 end Behavioral;

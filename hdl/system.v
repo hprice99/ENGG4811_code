@@ -70,11 +70,11 @@ module system #(
     
     assign trap_ila[0] = trap;
 
-    generate 
-        if (USE_ILA) begin
-            ila_0 inst_ila_0 (.clk(clk), .probe0(out_byte), .probe1(trap_ila), .probe2(out_byte_en));
-        end 
-    endgenerate
+//    generate 
+//        if (USE_ILA) begin
+//            ila_0 inst_ila_0 (.clk(clk), .probe0(out_byte), .probe1(trap_ila), .probe2(out_byte_en));
+//        end 
+//    endgenerate
 
 
 	reg [31:0] memory [0:MEM_SIZE-1];
