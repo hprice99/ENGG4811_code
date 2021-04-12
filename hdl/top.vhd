@@ -65,19 +65,27 @@ architecture Behavioral of top is
         );
     end component system;
     
-    component pipeline_10_stage
+    component pipeline
+        generic (
+            STAGES  : integer := 10
+        );
         port (
             clk     : in STD_LOGIC;
             d_in    : in STD_LOGIC;
             d_out   : out STD_LOGIC
         );
-    end component pipeline_10_stage;
+    end component pipeline;
     
     signal sw0_pipelined, sw1_pipelined, sw2_pipelined, sw3_pipelined : std_logic;
+    
+    constant switch_pipeline_stages : integer := 20;
 
 begin
 
-    SW0_PIPELINE : pipeline_10_stage
+    SW0_PIPELINE : pipeline
+        generic map (
+            STAGES  => switch_pipeline_stages
+        )
         port map (
             clk         => clk,
             d_in        => sw(0),
@@ -87,7 +95,7 @@ begin
     CORE_1 : system
         generic map(
            USE_ILA          => '0',
-           DIVIDE_ENABLED   => '1',
+           DIVIDE_ENABLED   => '0',
            MULTIPLY_ENABLED => '1'
         )
         port map (
@@ -102,7 +110,10 @@ begin
             trap        => open
         );
         
-    SW1_PIPELINE : pipeline_10_stage
+    SW1_PIPELINE : pipeline
+        generic map (
+            STAGES  => switch_pipeline_stages
+        )
         port map (
             clk         => clk,
             d_in        => sw(1),
@@ -112,7 +123,7 @@ begin
     CORE_2 : system
         generic map(
            USE_ILA          => '0',
-           DIVIDE_ENABLED   => '1',
+           DIVIDE_ENABLED   => '0',
            MULTIPLY_ENABLED => '1'
         )
         port map (
@@ -127,7 +138,10 @@ begin
             trap        => open
         );
         
-    SW2_PIPELINE : pipeline_10_stage
+    SW2_PIPELINE : pipeline
+        generic map (
+            STAGES  => switch_pipeline_stages
+        )
         port map (
             clk         => clk,
             d_in        => sw(2),
@@ -137,7 +151,7 @@ begin
     CORE_3 : system
         generic map(
            USE_ILA          => '0',
-           DIVIDE_ENABLED   => '1',
+           DIVIDE_ENABLED   => '0',
            MULTIPLY_ENABLED => '1'
         )
         port map (
@@ -152,7 +166,10 @@ begin
             trap        => open
         );
         
-    SW3_PIPELINE : pipeline_10_stage
+    SW3_PIPELINE : pipeline
+        generic map (
+            STAGES  => switch_pipeline_stages
+        )
         port map (
             clk         => clk,
             d_in        => sw(3),
@@ -162,7 +179,7 @@ begin
     CORE_4 : system
         generic map(
            USE_ILA          => '0',
-           DIVIDE_ENABLED   => '1',
+           DIVIDE_ENABLED   => '0',
            MULTIPLY_ENABLED => '1'
         )
         port map (
