@@ -65,6 +65,10 @@ architecture Behavioral of top is
         );
     end component system;
     
+    constant ila_parameter : std_logic := '0';
+    constant divide_parameter : std_logic := '0';
+    constant multiply_parameter : std_logic := '1';
+    
     component pipeline
         generic (
             STAGES  : integer := 10
@@ -77,7 +81,6 @@ architecture Behavioral of top is
     end component pipeline;
     
     signal sw0_pipelined, sw1_pipelined, sw2_pipelined, sw3_pipelined : std_logic;
-    
     constant switch_pipeline_stages : integer := 20;
 
 begin
@@ -92,11 +95,11 @@ begin
             d_out       => sw0_pipelined
         );
 
-    CORE_1 : system
+    CORE_0 : system
         generic map(
-           USE_ILA          => '0',
-           DIVIDE_ENABLED   => '0',
-           MULTIPLY_ENABLED => '1'
+           USE_ILA          => ila_parameter, 
+           DIVIDE_ENABLED   => divide_parameter,
+           MULTIPLY_ENABLED => multiply_parameter
         )
         port map (
             clk         => clk,
@@ -120,11 +123,11 @@ begin
             d_out       => sw1_pipelined
         );
         
-    CORE_2 : system
+    CORE_1 : system
         generic map(
-           USE_ILA          => '0',
-           DIVIDE_ENABLED   => '0',
-           MULTIPLY_ENABLED => '1'
+           USE_ILA          => ila_parameter, 
+           DIVIDE_ENABLED   => divide_parameter,
+           MULTIPLY_ENABLED => multiply_parameter
         )
         port map (
             clk         => clk,
@@ -148,11 +151,11 @@ begin
             d_out       => sw2_pipelined
         );
         
-    CORE_3 : system
+    CORE_2 : system
         generic map(
-           USE_ILA          => '0',
-           DIVIDE_ENABLED   => '0',
-           MULTIPLY_ENABLED => '1'
+           USE_ILA          => ila_parameter, 
+           DIVIDE_ENABLED   => divide_parameter,
+           MULTIPLY_ENABLED => multiply_parameter
         )
         port map (
             clk         => clk,
@@ -176,11 +179,11 @@ begin
             d_out       => sw3_pipelined
         );
         
-    CORE_4 : system
+    CORE_3 : system
         generic map(
-           USE_ILA          => '0',
-           DIVIDE_ENABLED   => '0',
-           MULTIPLY_ENABLED => '1'
+           USE_ILA          => ila_parameter, 
+           DIVIDE_ENABLED   => divide_parameter,
+           MULTIPLY_ENABLED => multiply_parameter
         )
         port map (
             clk         => clk,
