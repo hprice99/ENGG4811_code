@@ -80,52 +80,52 @@ begin
             trap        => open
         );
         
---    CORE_2 : system
---        generic map(
---           USE_ILA     => 0
---        )
---        port map (
---            clk         => clk,
---            resetn      => btnCpuReset,
---            -- sw          => sw(1),
---            sw          => '0',
---            led         => open,
---            RGB_LED     => RGB1_Green,
---            out_byte_en => open,
---            out_byte    => open,
---            trap        => open
---        );
+    CORE_2 : system
+        generic map(
+           USE_ILA     => 0
+        )
+        port map (
+            clk         => clk,
+            resetn      => btnCpuReset,
+            -- sw          => sw(1),
+            sw          => '0',
+            led         => open,
+            RGB_LED     => RGB1_Green,
+            out_byte_en => open,
+            out_byte    => open,
+            trap        => open
+        );
         
---    CORE_3 : system
---        generic map(
---           USE_ILA     => 0
---        )
---        port map (
---            clk         => clk,
---            resetn      => btnCpuReset,
---            -- sw          => sw(2),
---            sw          => '0',
---            led         => open,
---            RGB_LED     => RGB1_Blue,
---            out_byte_en => open,
---            out_byte    => open,
---            trap        => open
---        );
+    CORE_3 : system
+        generic map(
+           USE_ILA     => 0
+        )
+        port map (
+            clk         => clk,
+            resetn      => btnCpuReset,
+            -- sw          => sw(2),
+            sw          => '0',
+            led         => open,
+            RGB_LED     => RGB1_Blue,
+            out_byte_en => open,
+            out_byte    => open,
+            trap        => open
+        );
         
---    CORE_4 : system
---        generic map(
---           USE_ILA     => 0
---        )
---        port map (
---            clk         => clk,
---            resetn      => btnCpuReset,
---            -- sw          => sw(3),
---            sw          => '0',
---            led         => open,
---            RGB_LED     => RGB2_Red,
---            out_byte_en => open,
---            out_byte    => open,
---            trap        => open
---        );
+    CORE_4 : system
+        generic map(
+           USE_ILA     => 0
+        )
+        port map (
+            clk         => clk,
+            resetn      => btnCpuReset,
+            -- sw          => sw(3),
+            sw          => '0',
+            led         => open,
+            RGB_LED     => RGB2_Red,
+            out_byte_en => open,
+            out_byte    => open,
+            trap        => open
+        );
 
 end Behavioral;
