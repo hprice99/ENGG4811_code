@@ -1,7 +1,9 @@
 `timescale 1 ns / 1 ps
 
 module system #(
-	parameter USE_ILA = 1
+	parameter USE_ILA = 1,
+	parameter DIVIDE_ENABLED = 0,
+	parameter MULTIPLY_ENABLED = 1
 ) (
 	input            clk,
 	input            resetn,
@@ -34,7 +36,10 @@ module system #(
 	wire [31:0] mem_la_wdata;
 	wire [3:0] mem_la_wstrb;
 
-	picorv32 picorv32_core (
+	picorv32 #(
+	   .ENABLE_MUL (MULTIPLY_ENABLED),
+	   .ENABLE_DIV (DIVIDE_ENABLED)
+	) picorv32_core (
 		.clk         (clk         ),
 		.resetn      (resetn      ),
 		.trap        (trap        ),

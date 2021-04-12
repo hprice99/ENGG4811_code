@@ -49,7 +49,9 @@ architecture Behavioral of top is
 
     component system
         generic (
-             USE_ILA : integer := 1
+             USE_ILA            : std_logic := '1';
+             DIVIDE_ENABLED     : std_logic := '0';
+             MULTIPLY_ENABLED   : std_logic := '1'
         );
         port (
             clk         : in std_logic;
@@ -84,7 +86,9 @@ begin
 
     CORE_1 : system
         generic map(
-           USE_ILA     => 0
+           USE_ILA          => '0',
+           DIVIDE_ENABLED   => '1',
+           MULTIPLY_ENABLED => '1'
         )
         port map (
             clk         => clk,
@@ -107,7 +111,9 @@ begin
         
     CORE_2 : system
         generic map(
-           USE_ILA     => 0
+           USE_ILA          => '0',
+           DIVIDE_ENABLED   => '1',
+           MULTIPLY_ENABLED => '1'
         )
         port map (
             clk         => clk,
@@ -130,7 +136,9 @@ begin
         
     CORE_3 : system
         generic map(
-           USE_ILA     => 0
+           USE_ILA          => '0',
+           DIVIDE_ENABLED   => '1',
+           MULTIPLY_ENABLED => '1'
         )
         port map (
             clk         => clk,
@@ -153,7 +161,9 @@ begin
         
     CORE_4 : system
         generic map(
-           USE_ILA     => 0
+           USE_ILA          => '0',
+           DIVIDE_ENABLED   => '1',
+           MULTIPLY_ENABLED => '1'
         )
         port map (
             clk         => clk,
