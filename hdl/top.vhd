@@ -62,8 +62,25 @@ architecture Behavioral of top is
             trap        : out std_logic
         );
     end component system;
+    
+    component pipeline_10_stage
+        port (
+            clk     : in STD_LOGIC;
+            d_in    : in STD_LOGIC;
+            d_out   : out STD_LOGIC
+        );
+    end component pipeline_10_stage;
+    
+    signal sw0_pipelined, sw1_pipelined, sw2_pipelined, sw3_pipelined : std_logic;
 
 begin
+
+    SW0_PIPELINE : pipeline_10_stage
+        port map (
+            clk         => clk,
+            d_in        => sw(0),
+            d_out       => sw0_pipelined
+        );
 
     CORE_1 : system
         generic map(
@@ -72,12 +89,20 @@ begin
         port map (
             clk         => clk,
             resetn      => btnCpuReset,
-            sw          => sw(0),
+            -- sw          => sw(0),
+            sw          => sw0_pipelined,
             led         => led,
             RGB_LED     => RGB1_Red,
             out_byte_en => open,
             out_byte    => open,
             trap        => open
+        );
+        
+    SW1_PIPELINE : pipeline_10_stage
+        port map (
+            clk         => clk,
+            d_in        => sw(1),
+            d_out       => sw1_pipelined
         );
         
     CORE_2 : system
@@ -88,12 +113,19 @@ begin
             clk         => clk,
             resetn      => btnCpuReset,
             -- sw          => sw(1),
-            sw          => '0',
+            sw          => sw1_pipelined,
             led         => open,
             RGB_LED     => RGB1_Green,
             out_byte_en => open,
             out_byte    => open,
             trap        => open
+        );
+        
+    SW2_PIPELINE : pipeline_10_stage
+        port map (
+            clk         => clk,
+            d_in        => sw(2),
+            d_out       => sw2_pipelined
         );
         
     CORE_3 : system
@@ -104,12 +136,19 @@ begin
             clk         => clk,
             resetn      => btnCpuReset,
             -- sw          => sw(2),
-            sw          => '0',
+            sw          => sw2_pipelined,
             led         => open,
             RGB_LED     => RGB1_Blue,
             out_byte_en => open,
             out_byte    => open,
             trap        => open
+        );
+        
+    SW3_PIPELINE : pipeline_10_stage
+        port map (
+            clk         => clk,
+            d_in        => sw(3),
+            d_out       => sw3_pipelined
         );
         
     CORE_4 : system
@@ -120,7 +159,7 @@ begin
             clk         => clk,
             resetn      => btnCpuReset,
             -- sw          => sw(3),
-            sw          => '0',
+            sw          => sw3_pipelined,
             led         => open,
             RGB_LED     => RGB2_Red,
             out_byte_en => open,
