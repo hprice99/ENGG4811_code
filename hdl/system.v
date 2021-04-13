@@ -3,7 +3,8 @@
 module system #(
 	parameter USE_ILA = 1,
 	parameter DIVIDE_ENABLED = 0,
-	parameter MULTIPLY_ENABLED = 1
+	parameter MULTIPLY_ENABLED = 1,
+	parameter FIRMWARE = "firmware.hex"
 ) (
 	input              clk,
 	input              resetn,
@@ -85,7 +86,7 @@ module system #(
 
 
 	reg [31:0] memory [0:MEM_SIZE-1];
-	initial $readmemh("firmware.hex", memory);
+	initial $readmemh(FIRMWARE, memory);
 
 	reg [31:0] m_read_data;
 	reg m_read_en;

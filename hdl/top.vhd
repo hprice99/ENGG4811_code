@@ -51,7 +51,8 @@ architecture Behavioral of top is
         generic (
              USE_ILA            : std_logic := '1';
              DIVIDE_ENABLED     : std_logic := '0';
-             MULTIPLY_ENABLED   : std_logic := '1'
+             MULTIPLY_ENABLED   : std_logic := '1';
+             FIRMWARE           : string    := "firmware.hex"
         );
         port (
             clk                 : in std_logic;
@@ -103,7 +104,8 @@ begin
         generic map(
            USE_ILA          => ila_parameter, 
            DIVIDE_ENABLED   => divide_parameter,
-           MULTIPLY_ENABLED => multiply_parameter
+           MULTIPLY_ENABLED => multiply_parameter,
+           FIRMWARE         => "firmware.hex"
         )
         port map (
             clk                 => clk,
@@ -135,7 +137,8 @@ begin
         generic map(
            USE_ILA          => ila_parameter, 
            DIVIDE_ENABLED   => divide_parameter,
-           MULTIPLY_ENABLED => multiply_parameter
+           MULTIPLY_ENABLED => multiply_parameter,
+           FIRMWARE         => "firmware.hex"
         )
         port map (
             clk                 => clk,
@@ -167,7 +170,8 @@ begin
         generic map(
            USE_ILA          => ila_parameter, 
            DIVIDE_ENABLED   => divide_parameter,
-           MULTIPLY_ENABLED => multiply_parameter
+           MULTIPLY_ENABLED => multiply_parameter,
+           FIRMWARE         => "firmware.hex"
         )
         port map (
             clk                 => clk,
@@ -199,7 +203,8 @@ begin
         generic map(
            USE_ILA          => ila_parameter, 
            DIVIDE_ENABLED   => divide_parameter,
-           MULTIPLY_ENABLED => multiply_parameter
+           MULTIPLY_ENABLED => multiply_parameter,
+           FIRMWARE         => "firmware.hex"
         )
         port map (
             clk                 => clk,
