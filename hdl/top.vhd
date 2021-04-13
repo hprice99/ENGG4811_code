@@ -61,6 +61,8 @@ architecture Behavioral of top is
             RGB_LED     : out std_logic;
             out_byte_en : out std_logic;
             out_byte    : out std_logic_vector(7 downto 0);
+            out_matrix_en : out std_logic;
+            out_matrix  : out std_logic_vector(7 downto 0);
             trap        : out std_logic
         );
     end component system;
@@ -110,6 +112,8 @@ begin
             RGB_LED     => RGB1_Red,
             out_byte_en => open,
             out_byte    => open,
+            out_matrix_en => open,
+            out_matrix  => open,
             trap        => open
         );
         
@@ -138,6 +142,8 @@ begin
             RGB_LED     => RGB1_Green,
             out_byte_en => open,
             out_byte    => open,
+            out_matrix_en => open,
+            out_matrix  => open,
             trap        => open
         );
         
@@ -166,6 +172,8 @@ begin
             RGB_LED     => RGB1_Blue,
             out_byte_en => open,
             out_byte    => open,
+            out_matrix_en => open,
+            out_matrix  => open,
             trap        => open
         );
         
@@ -194,6 +202,8 @@ begin
             RGB_LED     => RGB2_Red,
             out_byte_en => open,
             out_byte    => open,
+            out_matrix_en => open,
+            out_matrix  => open,
             trap        => open
         );
 

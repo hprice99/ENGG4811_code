@@ -17,6 +17,11 @@ module system_tb;
 	wire trap;
 	wire [7:0] out_byte;
 	wire out_byte_en;
+	
+	wire [7:0] out_matrix;
+	wire out_matrix_en;
+	wire out_matrix_end_row;
+	wire out_matrix_end;
 
     wire led1;
     wire[15:0] leds;
@@ -41,7 +46,11 @@ module system_tb;
 		.RGB_LED      (led1),
 		.trap         (trap),
 		.out_byte_en  (out_byte_en),
-		.out_byte     (out_byte)
+		.out_byte     (out_byte),
+		.out_matrix_en (out_matrix_en),
+		.out_matrix   (out_matrix),
+		.out_matrix_end_row   (out_matrix_end_row),
+		.out_matrix_end       (out_matrix_end)
 	);
 
 	always @(posedge clk) begin
@@ -49,8 +58,25 @@ module system_tb;
 			$write("%c", out_byte);
 			$fflush;
 		end
+		
+		if (resetn && out_matrix_en) begin
+			$write("%d", out_matrix);
+			$fflush;
+		end
+		
+		if (resetn && out_matrix_end_row) begin
+			$write(" ; \n");
+			$fflush;
+		end
+		
+		if (resetn && out_matrix_end) begin
+			$write("\n\n");
+			$fflush;
+		end
+		/*
 		if (resetn && trap) begin
 			$finish;
 		end
+		*/
 	end
 endmodule

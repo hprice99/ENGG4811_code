@@ -1,17 +1,35 @@
 #define CHAR_OUTPUT (*(volatile char*)0x10000000)
 #define LED (*(volatile char*)0x20000000)
 #define SWITCH (*(volatile char*)0x30000000)
+#define MATRIX_OUTPUT (*(volatile char*)0x40000000)
+#define MATRIX_ROW_END (*(volatile char*)0x50000000)
+#define MATRIX_END (*(volatile char*)0x60000000)
 
 #define LOOP_COUNTER 10
 
-void putc(char c)
-{
-	CHAR_OUTPUT = c;
+#define MATRIX_SIZE 3
+
+// https://man7.org/linux/man-pages/man3/rand.3.html
+static unsigned long next = 1;
+
+/* RAND_MAX assumed to be 32767 */
+int myrand(void) {
+    next = next * 1103515245 + 12345;
+    return((unsigned)(next/65536) % 32768);
 }
 
-void puts(const char *s)
+void mysrand(unsigned int seed) {
+    next = seed;
+}
+
+void print_char(char c)
 {
-	while (*s) putc(*s++);
+    CHAR_OUTPUT = c;
+}
+
+void print_string(const char *s)
+{
+	while (*s) print_char(*s++);
 }
 
 void *memcpy(void *dest, const void *src, int n)
@@ -23,15 +41,147 @@ void *memcpy(void *dest, const void *src, int n)
 	return dest;
 }
 
+/* reverse:  reverse string s in place */
+void reverse(char* s, int length)
+{
+    int i, j;
+    char c;
+
+    // Reverse the string
+    for (i = 0, j = length - 1; i < j; i++, j--) {
+        c = s[i];
+        s[i] = s[j];
+        s[j] = c;
+    }
+}
+
+/* itoa:  convert n to characters in s */
+void itoa(int n, char s[]) {
+    int i, sign;
+
+    print_string("Sign ");
+
+    if ((sign = n) < 0) { /* record sign */
+        n = -n;          /* make n positive */
+    }
+
+    i = 0;
+
+    print_string("Digits ");
+
+    do {       /* generate digits in reverse order */
+        s[i++] = n % 10 + '0';   /* get next digit */
+    } while ((n /= 10) > 0);     /* delete it */
+
+    if (sign < 0) {
+        s[i++] = '-';
+    }
+
+    s[i] = '\0';
+
+    print_string("Reverse ");
+    reverse(s, i);
+}
+
+void print_matrix(int* matrix, int rows, int cols) {
+
+    char digit[7];
+
+    for (int row = 0; row < rows; row++) {
+        for (int col = 0; col < cols; col++) {
+            print_string("itoa ");
+            itoa(*((matrix + row * rows) + col), digit);
+
+            print_string("Print ");
+            print_string(digit);
+        }
+        print_string(" ; \n");
+    }
+}
+
+void output_digit(int digit) {
+
+    MATRIX_OUTPUT = digit;
+}
+
+void output_matrix(int* matrix, int rows, int cols) {
+
+    for (int row = 0; row < rows; row++) {
+        for (int col = 0; col < cols; col++) {
+            
+            output_digit(*((matrix + row * rows) + col));
+        }
+        MATRIX_ROW_END = 1;
+    }
+
+    MATRIX_END = 1;
+}
+
+void multiply_matrices(void) {
+    // Create matrices
+    int A[MATRIX_SIZE][MATRIX_SIZE];
+    int B[MATRIX_SIZE][MATRIX_SIZE];
+    int C[MATRIX_SIZE][MATRIX_SIZE];
+
+    // Create random matrices
+    /*
+    for (int row = 0; row < MATRIX_SIZE; row++) {
+        for (int col = 0; col < MATRIX_SIZE; col++) {
+            A[row][col] = myrand();
+            B[row][col] = myrand();
+            C[row][col] = 0;
+        }
+    }
+    */
+
+    // Create fixed matrices
+    for (int row = 0; row < MATRIX_SIZE; row++) {
+        for (int col = 0; col < MATRIX_SIZE; col++) {
+            A[row][col] = row;
+            B[row][col] = col;
+            C[row][col] = 0;
+        }
+    }
+
+    // Print A and B
+    /*
+    print_string("A = ");
+    print_matrix((int*)A, MATRIX_SIZE, MATRIX_SIZE);
+
+    print_string("B = ");
+    print_matrix((int*)B, MATRIX_SIZE, MATRIX_SIZE);
+    */
+
+    output_matrix((int*)A, MATRIX_SIZE, MATRIX_SIZE);
+    output_matrix((int*)B, MATRIX_SIZE, MATRIX_SIZE);
+
+    for (int i = 0; i < MATRIX_SIZE; i++) {
+        for (int j = 0; j < MATRIX_SIZE; j++) {
+            for (int k = 0; k < MATRIX_SIZE; k++) {
+                C[i][j] = C[i][j] + A[i][k] * B[k][j];
+            }
+        }
+    }
+
+    /*
+    print_string("C = ");
+    print_matrix((int*)C, MATRIX_SIZE, MATRIX_SIZE);
+    */
+
+    output_matrix((int*)C, MATRIX_SIZE, MATRIX_SIZE);
+}
+
 void main()
 {
     int ledValue = 0;
 
     int switchValue = 0;
 
+    int i = 0;
+
     LED = ledValue;
 
-    puts("ENGG4811 PicoRV32 test\n");
+    print_string("ENGG4811 PicoRV32 test\n");
 
 	char message[] = "$Uryyb+Jbeyq!+Vs+lbh+pna+ernq+guvf+zrffntr+gura$gur+CvpbEI32+PCH"
 			"+frrzf+gb+or+jbexvat+whfg+svar.$$++++++++++++++++GRFG+CNFFRQ!$$";
@@ -53,29 +203,33 @@ void main()
 			message[i] = ' ';
 			break;
 		}
-	puts(message);
+	print_string(message);
+
+    multiply_matrices();
 
     while (1) {
 
         LED = ledValue;
 
         if (ledValue) {
-            puts("LED on\n");
+            print_string("LED on\n");
         } else {
-            puts("LED off\n");
+            print_string("LED off\n");
         }
 
-        for (int i = 0; i < LOOP_COUNTER; i++) {
-
+        while (i < LOOP_COUNTER) {
+            i++;
         }
+        
+        i = 0;
 
         switchValue = SWITCH;
 
         if (switchValue) {
-            puts("Switch on\n");
+            print_string("Switch on\n");
             ledValue = 1 - ledValue;
         } else {
-            puts("Switch off\n");
+            print_string("Switch off\n");
         }
     }
 }

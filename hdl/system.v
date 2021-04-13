@@ -12,6 +12,10 @@ module system #(
 	output reg       RGB_LED,
 	output reg[7:0]  out_byte,
 	output reg[0:0]  out_byte_en,
+	output reg[7:0]  out_matrix,
+	output reg       out_matrix_end_row,
+	output reg       out_matrix_end,
+	output reg       out_matrix_en,
 	output wire      trap
 );
 	// set this to 0 for better timing but less performance/MHz
@@ -92,6 +96,9 @@ module system #(
 		always @(posedge clk) begin
 			mem_ready <= 1;
 			out_byte_en[0] <= 0;
+			out_matrix_en <= 0;
+			out_matrix_end_row <= 0;
+			out_matrix_end <= 0;
 			mem_rdata <= memory[mem_la_addr >> 2];
 			
 			if (mem_la_write && (mem_la_addr >> 2) < MEM_SIZE) begin
@@ -110,6 +117,16 @@ module system #(
 				    end
 				 32'h2000_0000: begin
 				    RGB_LED <= mem_la_wdata;
+				    end
+				 32'h4000_0000: begin
+				    out_matrix_en <= 1;
+				    out_matrix <= mem_la_wdata;
+				    end
+				 32'h5000_0000: begin
+				    out_matrix_end_row <= mem_la_wdata;
+				    end
+				 32'h6000_0000: begin
+				    out_matrix_end <= mem_la_wdata;
 				    end
 		      endcase
 			end
