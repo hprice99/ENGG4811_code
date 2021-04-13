@@ -27,28 +27,28 @@ module system_tb;
     wire[15:0] leds;
     
     reg sw = 0;
-    
     integer switchCount = 0;
     
     always @(posedge clk) begin
         switchCount <= switchCount + 1;
         
+        // Pseudo-randomly change the switch state
         if (switchCount % 7 > 3) begin
             sw <= ~sw;
         end
     end
 
 	system uut (
-		.clk          (clk),
-		.resetn       (resetn),
-		.sw           (sw),
-		.led          (leds),
-		.RGB_LED      (led1),
-		.trap         (trap),
-		.out_byte_en  (out_byte_en),
-		.out_byte     (out_byte),
-		.out_matrix_en (out_matrix_en),
-		.out_matrix   (out_matrix),
+		.clk                  (clk),
+		.resetn               (resetn),
+		.sw                   (sw),
+		.led                  (leds),
+		.RGB_LED              (led1),
+		.trap                 (trap),
+		.out_byte_en          (out_byte_en),
+		.out_byte             (out_byte),
+		.out_matrix_en        (out_matrix_en),
+		.out_matrix           (out_matrix),
 		.out_matrix_end_row   (out_matrix_end_row),
 		.out_matrix_end       (out_matrix_end)
 	);
@@ -73,6 +73,7 @@ module system_tb;
 			$write("\n\n");
 			$fflush;
 		end
+		
 		/*
 		if (resetn && trap) begin
 			$finish;

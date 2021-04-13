@@ -5,18 +5,18 @@ module system #(
 	parameter DIVIDE_ENABLED = 0,
 	parameter MULTIPLY_ENABLED = 1
 ) (
-	input            clk,
-	input            resetn,
-	input            sw,
-	output wire[15:0] led,
-	output reg       RGB_LED,
-	output reg[7:0]  out_byte,
-	output reg[0:0]  out_byte_en,
-	output reg[7:0]  out_matrix,
-	output reg       out_matrix_end_row,
-	output reg       out_matrix_end,
-	output reg       out_matrix_en,
-	output wire      trap
+	input              clk,
+	input              resetn,
+	input              sw,
+	output wire[15:0]  led,
+	output reg         RGB_LED,
+	output reg[7:0]    out_byte,
+	output reg[0:0]    out_byte_en,
+	output reg[7:0]    out_matrix,
+	output reg         out_matrix_end_row,
+	output reg         out_matrix_end,
+	output reg         out_matrix_en,
+	output wire        trap
 );
 	// set this to 0 for better timing but less performance/MHz
 	parameter FAST_MEMORY = 1;
@@ -31,8 +31,6 @@ module system #(
 	wire [31:0] mem_wdata;
 	wire [3:0] mem_wstrb;
 	reg [31:0] mem_rdata;
-
-    
 
 	wire mem_la_read;
 	wire mem_la_write;
