@@ -9,13 +9,15 @@
 
 #define MATRIX_SIZE 3
 
+#define MAX_ENTRY 10
+
 // https://man7.org/linux/man-pages/man3/rand.3.html
 static unsigned long next = 1;
 
 /* RAND_MAX assumed to be 32767 */
 int myrand(void) {
     next = next * 1103515245 + 12345;
-    return((unsigned)(next/65536) % 32768);
+    return((unsigned)(next/65536) % MAX_ENTRY);
 }
 
 void mysrand(unsigned int seed) {
