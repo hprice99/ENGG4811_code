@@ -22,8 +22,8 @@ module system #(
 	// set this to 0 for better timing but less performance/MHz
 	parameter FAST_MEMORY = 1;
 
-	// 4096 32bit words = 16kB memory
-	parameter MEM_SIZE = 4096;
+	// 1024 32bit words = 4kB memory
+	parameter MEM_SIZE = 1024;
 
 	wire mem_valid;
 	wire mem_instr;
