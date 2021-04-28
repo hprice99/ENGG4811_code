@@ -4,10 +4,11 @@
 #define MATRIX_OUTPUT (*(volatile char*)0x40000000)
 #define MATRIX_ROW_END (*(volatile char*)0x50000000)
 #define MATRIX_END (*(volatile char*)0x60000000)
+#define MATRIX_POSITION (*(volatile char*)0x70000000)
 
 #define LOOP_COUNTER 10
 
-#define MATRIX_SIZE 3
+#define MATRIX_SIZE 5
 
 #define MAX_ENTRY 10
 
@@ -139,11 +140,24 @@ void multiply_matrices(void) {
     // Create fixed matrices
     for (int row = 0; row < MATRIX_SIZE; row++) {
         for (int col = 0; col < MATRIX_SIZE; col++) {
-            A[row][col] = row;
-            B[row][col] = col;
+            A[row][col] = row + 1;
+            B[row][col] = col + 1;
             C[row][col] = 0;
         }
+
+        MATRIX_POSITION = row;
+
+        // print_string("Row done ");
+
+        /*
+        char message[200];
+        itoa(row, message);
+        print_string(message);
+        */
+
+        // print_string("\n");
     }
+    MATRIX_END = 1;
 
     // Print A and B
     /*
@@ -154,6 +168,8 @@ void multiply_matrices(void) {
     print_matrix((int*)B, MATRIX_SIZE, MATRIX_SIZE);
     */
 
+    // print_string("A and B created\n");
+
     output_matrix((int*)A, MATRIX_SIZE, MATRIX_SIZE);
     output_matrix((int*)B, MATRIX_SIZE, MATRIX_SIZE);
 
@@ -163,6 +179,8 @@ void multiply_matrices(void) {
                 C[i][j] = C[i][j] + A[i][k] * B[k][j];
             }
         }
+
+        MATRIX_POSITION = i;
     }
 
     /*

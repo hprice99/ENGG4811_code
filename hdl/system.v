@@ -1,10 +1,12 @@
 `timescale 1 ns / 1 ps
 
+// MEM_SIZE = Number of 32 bit words (multiply by 4 to get byte count)
 module system #(
-	parameter USE_ILA = 1,
-	parameter DIVIDE_ENABLED = 0,
+	parameter USE_ILA          = 1,
+	parameter DIVIDE_ENABLED   = 0,
 	parameter MULTIPLY_ENABLED = 1,
-	parameter FIRMWARE = "firmware.hex"
+	parameter FIRMWARE         = "firmware.hex",
+	parameter MEM_SIZE         = 4096
 ) (
 	input              clk,
 	input              resetn,
@@ -17,13 +19,12 @@ module system #(
 	output reg         out_matrix_end_row,
 	output reg         out_matrix_end,
 	output reg         out_matrix_en,
+	output reg[7:0]    out_matrix_position,
+	output reg         out_matrix_position_en,
 	output wire        trap
 );
 	// set this to 0 for better timing but less performance/MHz
 	parameter FAST_MEMORY = 1;
-
-	// 1024 32bit words = 4kB memory
-	parameter MEM_SIZE = 1024;
 
 	wire mem_valid;
 	wire mem_instr;
@@ -96,6 +97,7 @@ module system #(
 			mem_ready <= 1;
 			out_byte_en[0] <= 0;
 			out_matrix_en <= 0;
+			out_matrix_position_en <= 0;
 			out_matrix_end_row <= 0;
 			out_matrix_end <= 0;
 			mem_rdata <= memory[mem_la_addr >> 2];
@@ -126,6 +128,10 @@ module system #(
 				    end
 				 32'h6000_0000: begin
 				    out_matrix_end <= mem_la_wdata;
+				    end
+				 32'h7000_0000: begin
+				    out_matrix_position_en <= 1;
+				    out_matrix_position <= mem_la_wdata;
 				    end
 		      endcase
 			end

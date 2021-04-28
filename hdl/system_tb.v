@@ -22,6 +22,9 @@ module system_tb;
 	wire out_matrix_en;
 	wire out_matrix_end_row;
 	wire out_matrix_end;
+	
+	wire [7:0] out_matrix_position;
+	wire out_matrix_position_en;
 
     wire led1;
     wire[15:0] leds;
@@ -38,7 +41,9 @@ module system_tb;
         end
     end
 
-	system uut (
+	system #(
+	   .MEM_SIZE               (4096)
+	) uut (
 		.clk                  (clk),
 		.resetn               (resetn),
 		.sw                   (sw),
@@ -50,7 +55,9 @@ module system_tb;
 		.out_matrix_en        (out_matrix_en),
 		.out_matrix           (out_matrix),
 		.out_matrix_end_row   (out_matrix_end_row),
-		.out_matrix_end       (out_matrix_end)
+		.out_matrix_end       (out_matrix_end),
+		.out_matrix_position_en (out_matrix_position_en),
+		.out_matrix_position  (out_matrix_position)
 	);
 
 	always @(posedge clk) begin
@@ -72,6 +79,11 @@ module system_tb;
 		if (resetn && out_matrix_end) begin
 			$write("\n\n");
 			$fflush;
+		end
+		
+		if (resetn && out_matrix_position_en) begin
+		      $write("%d", out_matrix_position);
+			 $fflush;
 		end
 		
 		/*

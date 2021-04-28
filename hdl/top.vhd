@@ -52,26 +52,29 @@ architecture Behavioral of top is
              USE_ILA            : std_logic := '1';
              DIVIDE_ENABLED     : std_logic := '0';
              MULTIPLY_ENABLED   : std_logic := '1';
-             FIRMWARE           : string    := "firmware.hex"
+             FIRMWARE           : string    := "firmware.hex";
+             MEM_SIZE           : integer   := 4096
         );
         port (
-            clk                 : in std_logic;
-            resetn              : in std_logic;
-            sw                  : in std_logic;
-            led                 : out std_logic_vector(15 downto 0);
-            RGB_LED             : out std_logic;
-            out_byte_en         : out std_logic;
-            out_byte            : out std_logic_vector(7 downto 0);
-            out_matrix_en       : out std_logic;
-            out_matrix          : out std_logic_vector(7 downto 0);
-            out_matrix_end_row  : out std_logic;
-            out_matrix_end      : out std_logic;
-            trap                : out std_logic
+            clk                     : in std_logic;
+            resetn                  : in std_logic;
+            sw                      : in std_logic;
+            led                     : out std_logic_vector(15 downto 0);
+            RGB_LED                 : out std_logic;
+            out_byte_en             : out std_logic;
+            out_byte                : out std_logic_vector(7 downto 0);
+            out_matrix_en           : out std_logic;
+            out_matrix              : out std_logic_vector(7 downto 0);
+            out_matrix_end_row      : out std_logic;
+            out_matrix_end          : out std_logic;
+            out_matrix_position_en  : out std_logic;
+            out_matrix_position     : out std_logic_vector(7 downto 0);
+            trap                    : out std_logic
         );
     end component system;
     
-    constant ila_parameter : std_logic := '0';
-    constant divide_parameter : std_logic := '0';
+    constant ila_parameter      : std_logic := '0';
+    constant divide_parameter   : std_logic := '0';
     constant multiply_parameter : std_logic := '1';
     
     component pipeline
@@ -105,22 +108,25 @@ begin
            USE_ILA          => ila_parameter, 
            DIVIDE_ENABLED   => divide_parameter,
            MULTIPLY_ENABLED => multiply_parameter,
-           FIRMWARE         => "firmware.hex"
+           FIRMWARE         => "firmware.hex",
+           MEM_SIZE         => 4096
         )
         port map (
-            clk                 => clk,
-            resetn              => btnCpuReset,
+            clk                         => clk,
+            resetn                      => btnCpuReset,
             -- sw                 => sw(0),
-            sw                  => sw0_pipelined,
-            led                 => led,
-            RGB_LED             => RGB1_Red,
-            out_byte_en         => open,
-            out_byte            => open,
-            out_matrix_en       => open,
-            out_matrix          => open,
-            out_matrix_end_row  => open,
-            out_matrix_end      => open,
-            trap                => open
+            sw                          => sw0_pipelined,
+            led                         => led,
+            RGB_LED                     => RGB1_Red,
+            out_byte_en                 => open,
+            out_byte                    => open,
+            out_matrix_en               => open,
+            out_matrix                  => open,
+            out_matrix_end_row          => open,
+            out_matrix_end              => open,
+            out_matrix_position_en      => open,
+            out_matrix_position         => open,
+            trap                        => open
         );
         
     SW1_PIPELINE : pipeline
@@ -138,22 +144,25 @@ begin
            USE_ILA          => ila_parameter, 
            DIVIDE_ENABLED   => divide_parameter,
            MULTIPLY_ENABLED => multiply_parameter,
-           FIRMWARE         => "firmware.hex"
+           FIRMWARE         => "firmware.hex",
+           MEM_SIZE         => 4096
         )
         port map (
-            clk                 => clk,
-            resetn              => btnCpuReset,
+            clk                         => clk,
+            resetn                      => btnCpuReset,
             -- sw                 => sw(1),
-            sw                  => sw1_pipelined,
-            led                 => open,
-            RGB_LED             => RGB1_Green,
-            out_byte_en         => open,
-            out_byte            => open,
-            out_matrix_en       => open,
-            out_matrix          => open,
-            out_matrix_end_row  => open,
-            out_matrix_end      => open,
-            trap                => open
+            sw                          => sw1_pipelined,
+            led                         => open,
+            RGB_LED                     => RGB1_Green,
+            out_byte_en                 => open,
+            out_byte                    => open,
+            out_matrix_en               => open,
+            out_matrix                  => open,
+            out_matrix_end_row          => open,
+            out_matrix_end              => open,
+            out_matrix_position_en      => open,
+            out_matrix_position         => open,
+            trap                        => open
         );
         
     SW2_PIPELINE : pipeline
@@ -171,22 +180,25 @@ begin
            USE_ILA          => ila_parameter, 
            DIVIDE_ENABLED   => divide_parameter,
            MULTIPLY_ENABLED => multiply_parameter,
-           FIRMWARE         => "firmware.hex"
+           FIRMWARE         => "firmware.hex",
+           MEM_SIZE         => 4096
         )
         port map (
-            clk                 => clk,
-            resetn              => btnCpuReset,
+            clk                         => clk,
+            resetn                      => btnCpuReset,
             -- sw                 => sw(2),
-            sw                  => sw2_pipelined,
-            led                 => open,
-            RGB_LED             => RGB1_Blue,
-            out_byte_en         => open,
-            out_byte            => open,
-            out_matrix_en       => open,
-            out_matrix          => open,
-            out_matrix_end_row  => open,
-            out_matrix_end      => open,
-            trap                => open
+            sw                          => sw2_pipelined,
+            led                         => open,
+            RGB_LED                     => RGB1_Blue,
+            out_byte_en                 => open,
+            out_byte                    => open,
+            out_matrix_en               => open,
+            out_matrix                  => open,
+            out_matrix_end_row          => open,
+            out_matrix_end              => open,
+            out_matrix_position_en      => open,
+            out_matrix_position         => open,
+            trap                        => open
         );
         
     SW3_PIPELINE : pipeline
@@ -204,22 +216,25 @@ begin
            USE_ILA          => ila_parameter, 
            DIVIDE_ENABLED   => divide_parameter,
            MULTIPLY_ENABLED => multiply_parameter,
-           FIRMWARE         => "firmware.hex"
+           FIRMWARE         => "firmware.hex",
+           MEM_SIZE         => 4096
         )
         port map (
-            clk                 => clk,
-            resetn              => btnCpuReset,
+            clk                         => clk,
+            resetn                      => btnCpuReset,
             -- sw                 => sw(3),
-            sw                  => sw3_pipelined,
-            led                 => open,
-            RGB_LED             => RGB2_Red,
-            out_byte_en         => open,
-            out_byte            => open,
-            out_matrix_en       => open,
-            out_matrix          => open,
-            out_matrix_end_row  => open,
-            out_matrix_end      => open,
-            trap                => open
+            sw                          => sw3_pipelined,
+            led                         => open,
+            RGB_LED                     => RGB2_Red,
+            out_byte_en                 => open,
+            out_byte                    => open,
+            out_matrix_en               => open,
+            out_matrix                  => open,
+            out_matrix_end_row          => open,
+            out_matrix_end              => open,
+            out_matrix_position_en      => open,
+            out_matrix_position         => open,
+            trap                        => open
         );
 
 end Behavioral;
