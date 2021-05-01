@@ -54,3 +54,6 @@ dkms.conf
 
 # Vivado IP
 *.xcix
+
+# Vivado projects
+/vivado/*/
