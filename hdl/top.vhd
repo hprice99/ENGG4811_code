@@ -34,14 +34,14 @@ use IEEE.STD_LOGIC_1164.ALL;
 
 entity top is
     Port ( 
-           btnCpuReset  : in STD_LOGIC;
-           clk          : in STD_LOGIC;
-           sw           : in STD_LOGIC_VECTOR(3 downto 0);
-           led          : out STD_LOGIC_VECTOR(15 downto 0);
-           RGB1_Red     : out STD_LOGIC;
-           RGB1_Green   : out STD_LOGIC;
-           RGB1_Blue    : out STD_LOGIC;
-           RGB2_Red     : out STD_LOGIC
+           CPU_RESETN   : in STD_LOGIC;
+           CLK_100MHZ   : in STD_LOGIC;
+           SW           : in STD_LOGIC_VECTOR(3 downto 0);
+           LED          : out STD_LOGIC_VECTOR(15 downto 0);
+           LED16_B      : out STD_LOGIC;
+           LED16_G      : out STD_LOGIC;
+           LED17_R      : out STD_LOGIC;
+           LED17_B      : out STD_LOGIC
     );
 end top;
 
@@ -89,7 +89,8 @@ architecture Behavioral of top is
     end component pipeline;
     
     signal sw0_pipelined, sw1_pipelined, sw2_pipelined, sw3_pipelined : std_logic;
-    constant switch_pipeline_stages : integer := 20;
+    constant switch_pipeline_stages : integer := 30;
+    constant mem_size : integer := 1024;
 
 begin
 
@@ -98,8 +99,8 @@ begin
             STAGES  => switch_pipeline_stages
         )
         port map (
-            clk         => clk,
-            d_in        => sw(0),
+            clk         => CLK_100MHZ,
+            d_in        => SW(0),
             d_out       => sw0_pipelined
         );
 
@@ -109,15 +110,15 @@ begin
            DIVIDE_ENABLED   => divide_parameter,
            MULTIPLY_ENABLED => multiply_parameter,
            FIRMWARE         => "firmware.hex",
-           MEM_SIZE         => 4096
+           MEM_SIZE         => mem_size
         )
         port map (
-            clk                         => clk,
-            resetn                      => btnCpuReset,
+            clk                         => CLK_100MHZ,
+            resetn                      => CPU_RESETN,
             -- sw                 => sw(0),
             sw                          => sw0_pipelined,
             led                         => led,
-            RGB_LED                     => RGB1_Red,
+            RGB_LED                     => LED16_B,
             out_byte_en                 => open,
             out_byte                    => open,
             out_matrix_en               => open,
@@ -134,8 +135,8 @@ begin
             STAGES  => switch_pipeline_stages
         )
         port map (
-            clk         => clk,
-            d_in        => sw(1),
+            clk         => CLK_100MHZ,
+            d_in        => SW(1),
             d_out       => sw1_pipelined
         );
         
@@ -145,15 +146,15 @@ begin
            DIVIDE_ENABLED   => divide_parameter,
            MULTIPLY_ENABLED => multiply_parameter,
            FIRMWARE         => "firmware.hex",
-           MEM_SIZE         => 4096
+           MEM_SIZE         => mem_size
         )
         port map (
-            clk                         => clk,
-            resetn                      => btnCpuReset,
+            clk                         => CLK_100MHZ,
+            resetn                      => CPU_RESETN,
             -- sw                 => sw(1),
             sw                          => sw1_pipelined,
             led                         => open,
-            RGB_LED                     => RGB1_Green,
+            RGB_LED                     => LED16_G,
             out_byte_en                 => open,
             out_byte                    => open,
             out_matrix_en               => open,
@@ -170,8 +171,8 @@ begin
             STAGES  => switch_pipeline_stages
         )
         port map (
-            clk         => clk,
-            d_in        => sw(2),
+            clk         => CLK_100MHZ,
+            d_in        => SW(2),
             d_out       => sw2_pipelined
         );
         
@@ -181,15 +182,15 @@ begin
            DIVIDE_ENABLED   => divide_parameter,
            MULTIPLY_ENABLED => multiply_parameter,
            FIRMWARE         => "firmware.hex",
-           MEM_SIZE         => 4096
+           MEM_SIZE         => mem_size
         )
         port map (
-            clk                         => clk,
-            resetn                      => btnCpuReset,
+            clk                         => CLK_100MHZ,
+            resetn                      => CPU_RESETN,
             -- sw                 => sw(2),
             sw                          => sw2_pipelined,
             led                         => open,
-            RGB_LED                     => RGB1_Blue,
+            RGB_LED                     => LED17_R,
             out_byte_en                 => open,
             out_byte                    => open,
             out_matrix_en               => open,
@@ -206,8 +207,8 @@ begin
             STAGES  => switch_pipeline_stages
         )
         port map (
-            clk         => clk,
-            d_in        => sw(3),
+            clk         => CLK_100MHZ,
+            d_in        => SW(3),
             d_out       => sw3_pipelined
         );
         
@@ -217,15 +218,15 @@ begin
            DIVIDE_ENABLED   => divide_parameter,
            MULTIPLY_ENABLED => multiply_parameter,
            FIRMWARE         => "firmware.hex",
-           MEM_SIZE         => 4096
+           MEM_SIZE         => mem_size
         )
         port map (
-            clk                         => clk,
-            resetn                      => btnCpuReset,
+            clk                         => CLK_100MHZ,
+            resetn                      => CPU_RESETN,
             -- sw                 => sw(3),
             sw                          => sw3_pipelined,
             led                         => open,
-            RGB_LED                     => RGB2_Red,
+            RGB_LED                     => LED17_B,
             out_byte_en                 => open,
             out_byte                    => open,
             out_matrix_en               => open,

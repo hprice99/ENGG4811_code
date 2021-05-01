@@ -6,7 +6,7 @@
 #define MATRIX_END (*(volatile char*)0x60000000)
 #define MATRIX_POSITION (*(volatile char*)0x70000000)
 
-#define LOOP_COUNTER 10
+#define LOOP_COUNTER 1000000000
 
 #define MATRIX_SIZE 5
 
@@ -237,19 +237,26 @@ void main()
             print_string("LED off\n");
         }
 
+        /*
         while (i < LOOP_COUNTER) {
+
             i++;
         }
         
         i = 0;
+        */
 
         switchValue = SWITCH;
 
         if (switchValue) {
             print_string("Switch on\n");
-            ledValue = 1 - ledValue;
+            // ledValue = 1 - ledValue;
+
+            ledValue = 1;
         } else {
             print_string("Switch off\n");
+
+            ledValue = 0;
         }
     }
 }
