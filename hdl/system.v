@@ -15,7 +15,7 @@ module system #(
 	output reg         RGB_LED,
 	output reg[7:0]    out_byte,
 	output reg[0:0]    out_byte_en,
-	output reg[7:0]    out_matrix,
+	output reg[15:0]   out_matrix,
 	output reg         out_matrix_end_row,
 	output reg         out_matrix_end,
 	output reg         out_matrix_en,
@@ -119,10 +119,23 @@ module system #(
 				 32'h2000_0000: begin
 				    RGB_LED <= mem_la_wdata;
 				    end
-				 32'h4000_0000: begin
-				    out_matrix_en <= 1;
-				    out_matrix <= mem_la_wdata;
+				 32'h4000_0000: begin				    
+				    out_matrix[7:0] <= mem_la_wdata[7:0];
 				    end
+				 32'h4000_0008: begin	
+				    out_matrix_en <= 1;		    
+				    out_matrix[15:8] <= mem_la_wdata[7:0];
+				    end
+				 /*
+				 32'h4000_0016: begin				    
+				    out_matrix[23:16] <= mem_la_wdata[7:0];
+				    end
+				 32'h4000_0024: begin
+				    out_matrix_en <= 1;
+				    
+				    out_matrix[31:24] <= mem_la_wdata[7:0];
+				    end
+				 */
 				 32'h5000_0000: begin
 				    out_matrix_end_row <= mem_la_wdata;
 				    end

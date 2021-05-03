@@ -18,7 +18,7 @@ module system_tb;
 	wire [7:0] out_byte;
 	wire out_byte_en;
 	
-	wire [7:0] out_matrix;
+	wire [15:0] out_matrix;
 	wire out_matrix_en;
 	wire out_matrix_end_row;
 	wire out_matrix_end;
@@ -42,7 +42,8 @@ module system_tb;
     end
 
 	system #(
-	   .MEM_SIZE               (4096)
+	   .MEM_SIZE               (8192),
+	   .FIRMWARE               ("firmware_single_core.hex")
 	) uut (
 		.clk                  (clk),
 		.resetn               (resetn),
@@ -67,7 +68,7 @@ module system_tb;
 		end
 		
 		if (resetn && out_matrix_en) begin
-			$write("%d", out_matrix);
+			$write("%8d", out_matrix);
 			$fflush;
 		end
 		
@@ -81,10 +82,12 @@ module system_tb;
 			$fflush;
 		end
 		
+		/*
 		if (resetn && out_matrix_position_en) begin
-		      $write("%d", out_matrix_position);
+		     $write("%d", out_matrix_position);
 			 $fflush;
 		end
+		*/
 		
 		/*
 		if (resetn && trap) begin

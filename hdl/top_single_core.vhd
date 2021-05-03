@@ -64,7 +64,7 @@ architecture Behavioral of top is
             out_byte_en             : out std_logic;
             out_byte                : out std_logic_vector(7 downto 0);
             out_matrix_en           : out std_logic;
-            out_matrix              : out std_logic_vector(7 downto 0);
+            out_matrix              : out std_logic_vector(15 downto 0);
             out_matrix_end_row      : out std_logic;
             out_matrix_end          : out std_logic;
             out_matrix_position_en  : out std_logic;
@@ -90,7 +90,7 @@ architecture Behavioral of top is
     
     signal sw0_pipelined, sw1_pipelined, sw2_pipelined, sw3_pipelined : std_logic;
     constant switch_pipeline_stages : integer := 30;
-    constant mem_size : integer := 1024;
+    constant mem_size : integer := 8192;
 
 begin
 
@@ -109,7 +109,7 @@ begin
            USE_ILA          => ila_parameter, 
            DIVIDE_ENABLED   => divide_parameter,
            MULTIPLY_ENABLED => multiply_parameter,
-           FIRMWARE         => "firmware.hex",
+           FIRMWARE         => "firmware_single_core.hex",
            MEM_SIZE         => mem_size
         )
         port map (
