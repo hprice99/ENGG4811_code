@@ -109,25 +109,16 @@ void print_matrix(long* matrix, int rows, int cols) {
 
 void output_digit(long digit) {
 
-    /*
-    if (digit <= 255) {
-        digit = digit & 0xFF;
-    } else if (digit <= 65535) {
-        digit = digit & 0xFFFF;
-    } else if (digit <= 16777215) {
-        digit = digit & 0xFFFFFF;
-    }
-    */
-
     MATRIX_OUTPUT_FIRST_BYTE = digit & 0xFF;
     MATRIX_OUTPUT_SECOND_BYTE = (digit >> 8) & 0xFF;
     MATRIX_OUTPUT_THIRD_BYTE = (digit >> 16) & 0xFF;
     MATRIX_OUTPUT_FOURTH_BYTE = (digit >> 24) & 0xFF;
-
-    // MATRIX_OUTPUT_FIRST_BYTE = digit;
 }
 
-void output_matrix(long* matrix, int rows, int cols) {
+void output_matrix(char* label, long* matrix, int rows, int cols) {
+
+    print_string(label);
+    print_string(" = [ \n");
 
     for (long row = 0; row < rows; row++) {
         for (long col = 0; col < cols; col++) {
@@ -138,9 +129,12 @@ void output_matrix(long* matrix, int rows, int cols) {
     }
 
     MATRIX_END = 1;
+
+    print_string("] \n\n");
 }
 
 void multiply_matrices(void) {
+
     // Create matrices
     long A[MATRIX_SIZE][MATRIX_SIZE];
     long B[MATRIX_SIZE][MATRIX_SIZE];
@@ -166,32 +160,11 @@ void multiply_matrices(void) {
         }
 
         MATRIX_POSITION = row;
-
-        // print_string("Row done ");
-
-        /*
-        char message[200];
-        itoa(row, message);
-        print_string(message);
-        */
-
-        // print_string("\n");
     }
-    MATRIX_END = 1;
 
     // Print A and B
-    /*
-    print_string("A = ");
-    print_matrix((int*)A, MATRIX_SIZE, MATRIX_SIZE);
-
-    print_string("B = ");
-    print_matrix((int*)B, MATRIX_SIZE, MATRIX_SIZE);
-    */
-
-    // print_string("A and B created\n");
-
-    output_matrix((long*)A, MATRIX_SIZE, MATRIX_SIZE);
-    output_matrix((long*)B, MATRIX_SIZE, MATRIX_SIZE);
+    output_matrix("A", (long*)A, MATRIX_SIZE, MATRIX_SIZE);
+    output_matrix("B", (long*)B, MATRIX_SIZE, MATRIX_SIZE);
 
     for (long i = 0; i < MATRIX_SIZE; i++) {
         for (long j = 0; j < MATRIX_SIZE; j++) {
@@ -203,12 +176,7 @@ void multiply_matrices(void) {
         MATRIX_POSITION = i;
     }
 
-    /*
-    print_string("C = ");
-    print_matrix((int*)C, MATRIX_SIZE, MATRIX_SIZE);
-    */
-
-    output_matrix((long*)C, MATRIX_SIZE, MATRIX_SIZE);
+    output_matrix("C = A*B", (long*)C, MATRIX_SIZE, MATRIX_SIZE);
 }
 
 void main()
@@ -221,64 +189,12 @@ void main()
 
     LED = ledValue;
 
-    print_string("ENGG4811 PicoRV32 test\n");
-
-	char message[] = "$Uryyb+Jbeyq!+Vs+lbh+pna+ernq+guvf+zrffntr+gura$gur+CvpbEI32+PCH"
-			"+frrzf+gb+or+jbexvat+whfg+svar.$$++++++++++++++++GRFG+CNFFRQ!$$";
-	for (int i = 0; message[i]; i++)
-		switch (message[i])
-		{
-		case 'a' ... 'm':
-		case 'A' ... 'M':
-			message[i] += 13;
-			break;
-		case 'n' ... 'z':
-		case 'N' ... 'Z':
-			message[i] -= 13;
-			break;
-		case '$':
-			message[i] = '\n';
-			break;
-		case '+':
-			message[i] = ' ';
-			break;
-		}
-	print_string(message);
-
     multiply_matrices();
 
     while (1) {
 
         LED = ledValue;
-
-        /*
-        if (ledValue) {
-            print_string("LED on\n");
-        } else {
-            print_string("LED off\n");
-        }
-        */
-
-        /*
-        while (i < LOOP_COUNTER) {
-
-            i++;
-        }
-        
-        i = 0;
-        */
-
         switchValue = SWITCH;
-
-        if (switchValue) {
-            // print_string("Switch on\n");
-            // ledValue = 1 - ledValue;
-
-            ledValue = 1;
-        } else {
-            // print_string("Switch off\n");
-
-            ledValue = 0;
-        }
+        ledValue = switchValue;
     }
 }

@@ -5,11 +5,16 @@ module system_tb;
 	always #5 clk = ~clk;
 
 	reg resetn = 0;
+	
+	integer f;
 	initial begin
 		if ($test$plusargs("vcd")) begin
 			$dumpfile("system.vcd");
 			$dumpvars(0, system_tb);
 		end
+		
+		f = $fopen("system_tb_single_core.txt","w");
+		
 		repeat (100) @(posedge clk);
 		resetn <= 1;
 	end
@@ -65,22 +70,33 @@ module system_tb;
 		if (resetn && out_byte_en) begin
 			$write("%c", out_byte);
 			$fflush;
+			
+			$fwrite(f, "%c", out_byte);
+			$fflush;
 		end
 		
 		if (resetn && out_matrix_en) begin
 			$write("%8d", out_matrix);
+			$fflush;
+			
+			$fwrite(f, "%8d", out_matrix);
 			$fflush;
 		end
 		
 		if (resetn && out_matrix_end_row) begin
 			$write(" ; \n");
 			$fflush;
+			
+			$fwrite(f, " ; \n");
+			$fflush;
 		end
 		
+		/*
 		if (resetn && out_matrix_end) begin
 			$write("\n\n");
 			$fflush;
 		end
+		*/
 		
 		/*
 		if (resetn && out_matrix_position_en) begin
