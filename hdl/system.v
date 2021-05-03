@@ -119,11 +119,13 @@ module system #(
 				 32'h2000_0000: begin
 				    RGB_LED <= mem_la_wdata;
 				    end
+				    
 				 32'h4000_0000: begin				    
 				    out_matrix[7:0] <= mem_la_wdata[7:0];
 				    end
-				 32'h4000_0008: begin	
-				    out_matrix_en <= 1;		    
+				 32'h4000_0008: begin
+				    out_matrix_en <= 1;
+				 		    
 				    out_matrix[15:8] <= mem_la_wdata[7:0];
 				    end
 				 /*

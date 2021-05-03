@@ -64,8 +64,8 @@ void reverse(char* s, int length)
 }
 
 /* itoa:  convert n to characters in s */
-void itoa(int n, char s[]) {
-    int i, sign;
+void itoa(long n, char s[]) {
+    long i, sign;
 
     print_string("Sign ");
 
@@ -91,7 +91,7 @@ void itoa(int n, char s[]) {
     reverse(s, i);
 }
 
-void print_matrix(int* matrix, int rows, int cols) {
+void print_matrix(long* matrix, int rows, int cols) {
 
     char digit[7];
 
@@ -107,7 +107,7 @@ void print_matrix(int* matrix, int rows, int cols) {
     }
 }
 
-void output_digit(int digit) {
+void output_digit(long digit) {
 
     /*
     if (digit <= 255) {
@@ -123,12 +123,14 @@ void output_digit(int digit) {
     MATRIX_OUTPUT_SECOND_BYTE = (digit >> 8) & 0xFF;
     MATRIX_OUTPUT_THIRD_BYTE = (digit >> 16) & 0xFF;
     MATRIX_OUTPUT_FOURTH_BYTE = (digit >> 24) & 0xFF;
+
+    // MATRIX_OUTPUT_FIRST_BYTE = digit;
 }
 
-void output_matrix(int* matrix, int rows, int cols) {
+void output_matrix(long* matrix, int rows, int cols) {
 
-    for (int row = 0; row < rows; row++) {
-        for (int col = 0; col < cols; col++) {
+    for (long row = 0; row < rows; row++) {
+        for (long col = 0; col < cols; col++) {
             
             output_digit(*((matrix + row * rows) + col));
         }
@@ -140,9 +142,9 @@ void output_matrix(int* matrix, int rows, int cols) {
 
 void multiply_matrices(void) {
     // Create matrices
-    int A[MATRIX_SIZE][MATRIX_SIZE];
-    int B[MATRIX_SIZE][MATRIX_SIZE];
-    int C[MATRIX_SIZE][MATRIX_SIZE];
+    long A[MATRIX_SIZE][MATRIX_SIZE];
+    long B[MATRIX_SIZE][MATRIX_SIZE];
+    long C[MATRIX_SIZE][MATRIX_SIZE];
 
     // Create random matrices
     /*
@@ -156,8 +158,8 @@ void multiply_matrices(void) {
     */
 
     // Create fixed matrices
-    for (int row = 0; row < MATRIX_SIZE; row++) {
-        for (int col = 0; col < MATRIX_SIZE; col++) {
+    for (long row = 0; row < MATRIX_SIZE; row++) {
+        for (long col = 0; col < MATRIX_SIZE; col++) {
             A[row][col] = row + 1;
             B[row][col] = col + 1;
             C[row][col] = 0;
@@ -188,12 +190,12 @@ void multiply_matrices(void) {
 
     // print_string("A and B created\n");
 
-    output_matrix((int*)A, MATRIX_SIZE, MATRIX_SIZE);
-    output_matrix((int*)B, MATRIX_SIZE, MATRIX_SIZE);
+    output_matrix((long*)A, MATRIX_SIZE, MATRIX_SIZE);
+    output_matrix((long*)B, MATRIX_SIZE, MATRIX_SIZE);
 
-    for (int i = 0; i < MATRIX_SIZE; i++) {
-        for (int j = 0; j < MATRIX_SIZE; j++) {
-            for (int k = 0; k < MATRIX_SIZE; k++) {
+    for (long i = 0; i < MATRIX_SIZE; i++) {
+        for (long j = 0; j < MATRIX_SIZE; j++) {
+            for (long k = 0; k < MATRIX_SIZE; k++) {
                 C[i][j] = C[i][j] + A[i][k] * B[k][j];
             }
         }
@@ -206,7 +208,7 @@ void multiply_matrices(void) {
     print_matrix((int*)C, MATRIX_SIZE, MATRIX_SIZE);
     */
 
-    output_matrix((int*)C, MATRIX_SIZE, MATRIX_SIZE);
+    output_matrix((long*)C, MATRIX_SIZE, MATRIX_SIZE);
 }
 
 void main()
