@@ -103,6 +103,18 @@ begin
             clkdiv2 <= not clkdiv2;
         end if;
     end process CLOCK_DIVIDER;
+    
+    -- RESET LED
+    RESET_LED: process (clkdiv2)
+    begin
+        if (rising_edge(clkdiv2)) then
+            if (CPU_RESETN = '1') then
+                LED17_R <= '1';
+            else
+                LED17_R <= '0';
+            end if;
+        end if;
+    end process RESET_LED;
 
     SW0_PIPELINE : pipeline
         generic map (
