@@ -18,7 +18,7 @@ module system_tb;
 	wire [7:0] out_byte;
 	wire out_byte_en;
 	
-	wire [15:0] out_matrix;
+	wire [31:0] out_matrix;
 	wire out_matrix_en;
 	wire out_matrix_end_row;
 	wire out_matrix_end;

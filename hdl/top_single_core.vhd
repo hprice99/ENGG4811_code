@@ -64,7 +64,7 @@ architecture Behavioral of top is
             out_byte_en             : out std_logic;
             out_byte                : out std_logic_vector(7 downto 0);
             out_matrix_en           : out std_logic;
-            out_matrix              : out std_logic_vector(15 downto 0);
+            out_matrix              : out std_logic_vector(31 downto 0);
             out_matrix_end_row      : out std_logic;
             out_matrix_end          : out std_logic;
             out_matrix_position_en  : out std_logic;

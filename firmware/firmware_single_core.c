@@ -3,9 +3,9 @@
 #define SWITCH (*(volatile char*)0x30000000)
 
 #define MATRIX_OUTPUT_FIRST_BYTE (*(volatile char*)0x40000000)
-#define MATRIX_OUTPUT_SECOND_BYTE (*(volatile char*)0x40000008)
-#define MATRIX_OUTPUT_THIRD_BYTE (*(volatile char*)0x40000016)
-#define MATRIX_OUTPUT_FOURTH_BYTE (*(volatile char*)0x40000024)
+#define MATRIX_OUTPUT_SECOND_BYTE (*(volatile char*)0x41000000)
+#define MATRIX_OUTPUT_THIRD_BYTE (*(volatile char*)0x42000000)
+#define MATRIX_OUTPUT_FOURTH_BYTE (*(volatile char*)0x43000000)
 
 #define MATRIX_ROW_END (*(volatile char*)0x50000000)
 #define MATRIX_END (*(volatile char*)0x60000000)
