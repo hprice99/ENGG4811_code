@@ -91,15 +91,25 @@ architecture Behavioral of top is
     signal sw0_pipelined, sw1_pipelined, sw2_pipelined, sw3_pipelined : std_logic;
     constant switch_pipeline_stages : integer := 30;
     constant mem_size : integer := 8192;
+    
+    signal clkdiv2 : std_logic;
 
 begin
+
+    -- Clock divider
+    CLOCK_DIVIDER: process (CLK_100MHZ)
+    begin
+        if (rising_edge(CLK_100MHZ)) then       
+            clkdiv2 <= not clkdiv2;
+        end if;
+    end process CLOCK_DIVIDER;
 
     SW0_PIPELINE : pipeline
         generic map (
             STAGES  => switch_pipeline_stages
         )
         port map (
-            clk         => CLK_100MHZ,
+            clk         => clkdiv2,
             d_in        => SW(0),
             d_out       => sw0_pipelined
         );
@@ -113,7 +123,7 @@ begin
            MEM_SIZE         => mem_size
         )
         port map (
-            clk                         => CLK_100MHZ,
+            clk                         => clkdiv2,
             resetn                      => CPU_RESETN,
             -- sw                 => sw(0),
             sw                          => sw0_pipelined,
