@@ -13,7 +13,7 @@
 
 #define LOOP_COUNTER 1000000000
 
-#define MATRIX_SIZE 100
+#define MATRIX_SIZE 64
 
 #define MAX_ENTRY 10
 

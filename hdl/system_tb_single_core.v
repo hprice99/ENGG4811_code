@@ -47,7 +47,7 @@ module system_tb;
     end
 
 	system #(
-	   .MEM_SIZE               (32768),
+	   .MEM_SIZE               (16384),
 	   .FIRMWARE               ("firmware_single_core.hex")
 	) uut (
 		.clk                  (clk),
