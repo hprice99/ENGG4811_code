@@ -47,7 +47,7 @@ module system_tb;
     end
 
 	system #(
-	   .MEM_SIZE               (16384),
+	   .MEM_SIZE               (32768),
 	   .FIRMWARE               ("firmware_single_core.hex")
 	) uut (
 		.clk                  (clk),
@@ -98,12 +98,10 @@ module system_tb;
 		end
 		*/
 		
-		/*
 		if (resetn && out_matrix_position_en) begin
 		     $write("%d", out_matrix_position);
 			 $fflush;
 		end
-		*/
 		
 		/*
 		if (resetn && trap) begin

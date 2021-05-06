@@ -1,7 +1,7 @@
 TOOLCHAIN_PREFIX = /opt/riscv32i/bin/riscv32-unknown-elf-
 CFLAGS = -march=rv32im
 MEM_SIZE=1024
-SINGLE_CORE_MEM_SIZE=16384
+SINGLE_CORE_MEM_SIZE=32768
 
 .PHONY: all
 all: firmware firmware_single_core

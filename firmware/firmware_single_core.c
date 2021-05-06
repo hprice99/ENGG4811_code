@@ -13,7 +13,7 @@
 
 #define LOOP_COUNTER 1000000000
 
-#define MATRIX_SIZE 64
+#define MATRIX_SIZE 100
 
 #define MAX_ENTRY 10
 
@@ -154,12 +154,20 @@ void multiply_matrices(void) {
     // Create fixed matrices
     for (long row = 0; row < MATRIX_SIZE; row++) {
         for (long col = 0; col < MATRIX_SIZE; col++) {
-            A[row][col] = row + 1;
-            B[row][col] = col + 1;
+            if (row < 50) {
+                A[row][col] = row + 1;
+            } else {
+                A[row][col] = row - 50;
+            }
+            
+            if (col < 50) {
+                B[row][col] = col + 1;
+            } else {
+                B[row][col] = col - 50;
+            }
+            
             C[row][col] = 0;
         }
-
-        MATRIX_POSITION = row;
     }
 
     // Print A and B
@@ -174,6 +182,8 @@ void multiply_matrices(void) {
         }
 
         MATRIX_POSITION = i;
+
+        print_string(" Row done\n");
     }
 
     output_matrix("C = A*B", (long*)C, MATRIX_SIZE, MATRIX_SIZE);
