@@ -59,6 +59,8 @@ architecture Behavioral of top is
             clk                     : in std_logic;
             resetn                  : in std_logic;
             sw                      : in std_logic;
+            in_byte_en              : in std_logic;
+            in_byte                 : in std_logic_vector(7 downto 0);
             led                     : out std_logic_vector(15 downto 0);
             RGB_LED                 : out std_logic;
             out_byte_en             : out std_logic;
@@ -76,6 +78,47 @@ architecture Behavioral of top is
     constant ila_parameter      : std_logic := '0';
     constant divide_parameter   : std_logic := '0';
     constant multiply_parameter : std_logic := '1';
+    
+    component hoplite_router
+        generic (
+            BUS_WIDTH   : integer := 32;
+            X_COORD     : integer := 0;
+            Y_COORD     : integer := 0;
+            COORD_BITS  : integer := 1
+        );
+        port (
+            clk             : in STD_LOGIC;
+            reset_n         : in STD_LOGIC;
+            x_in            : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
+            x_in_valid      : in STD_LOGIC;
+            y_in            : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
+            y_in_valid      : in STD_LOGIC;
+            pe_in           : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
+            pe_in_valid     : in STD_LOGIC;
+            x_out           : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
+            x_out_valid     : out STD_LOGIC;
+            y_out           : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
+            y_out_valid     : out STD_LOGIC;
+            pe_out          : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
+            pe_out_valid    : out STD_LOGIC;
+            pe_backpressure : out STD_LOGIC
+        );
+    end component hoplite_router;
+    
+    constant NETWORK_ROWS   : integer := 2;
+    constant NETWORK_COLS   : integer := 2;
+    constant NETWORK_NODES  : integer := NETWORK_ROWS * NETWORK_COLS;
+    constant COORD_BITS     : integer := 1;
+    constant BUS_WIDTH      : integer := 8 + 2 * COORD_BITS;
+    
+    -- Array of message interfaces between nodes
+    type t_Bytes is array (0 to (NETWORK_ROWS-1), 0 to (NETWORK_COLS-1)) of std_logic_vector(7 downto 0);
+    type t_Message is array (0 to (NETWORK_ROWS-1), 0 to (NETWORK_COLS-1)) of std_logic_vector((BUS_WIDTH-1) downto 0);
+    type t_MessageValid is array (0 to (NETWORK_ROWS-1), 0 to (NETWORK_COLS-1)) of std_logic;
+
+    signal pe_in_bytes, pe_out_bytes : t_Bytes;
+    signal x_messages, y_messages, pe_in_messages, pe_out_messages : t_Message;
+    signal x_messages_valid, y_messages_valid, pe_in_messages_valid, pe_out_messages_valid : t_MessageValid;
     
     component pipeline
         generic (
@@ -115,12 +158,13 @@ begin
         port map (
             clk                         => CLK_100MHZ,
             resetn                      => CPU_RESETN,
-            -- sw                 => sw(0),
             sw                          => sw0_pipelined,
+            in_byte_en                  => pe_out_messages_valid(0, 0),
+            in_byte                     => pe_out_bytes(0, 0),
             led                         => led,
             RGB_LED                     => LED16_B,
-            out_byte_en                 => open,
-            out_byte                    => open,
+            out_byte_en                 => pe_in_messages_valid(0, 0),
+            out_byte                    => pe_in_bytes(0, 0),
             out_matrix_en               => open,
             out_matrix                  => open,
             out_matrix_end_row          => open,
@@ -129,6 +173,34 @@ begin
             out_matrix_position         => open,
             trap                        => open
         );
+    
+    pe_in_messages(0, 0) <= pe_in_bytes(0, 0) & "0" & "0";
+    pe_out_bytes(0, 0) <= pe_out_messages(0, 0)(7 downto 0);
+        
+    ROUTER_0: hoplite_router
+    generic map (
+        BUS_WIDTH   => BUS_WIDTH,
+        X_COORD     => 0,
+        Y_COORD     => 0,
+        COORD_BITS  => COORD_BITS
+    )
+    port map (
+        clk                 => CLK_100MHZ,
+        reset_n             => CPU_RESETN,
+        x_in                => x_messages(1, 0),
+        x_in_valid          => x_messages_valid(1, 0),
+        y_in                => y_messages(0, 1),
+        y_in_valid          => y_messages_valid(0, 1),
+        pe_in               => pe_in_messages(0, 0),
+        pe_in_valid         => pe_in_messages_valid(0, 0),
+        x_out               => x_messages(0, 0),
+        x_out_valid         => x_messages_valid(0, 0),
+        y_out               => y_messages(0, 0),
+        y_out_valid         => y_messages_valid(0, 0),
+        pe_out              => pe_out_messages(0, 0),
+        pe_out_valid        => pe_out_messages_valid(0, 0),
+        pe_backpressure     => open
+    );
         
     SW1_PIPELINE : pipeline
         generic map (
@@ -151,12 +223,13 @@ begin
         port map (
             clk                         => CLK_100MHZ,
             resetn                      => CPU_RESETN,
-            -- sw                 => sw(1),
             sw                          => sw1_pipelined,
+            in_byte_en                  => pe_out_messages_valid(1, 0),
+            in_byte                     => pe_out_bytes(1, 0),
             led                         => open,
             RGB_LED                     => LED16_G,
-            out_byte_en                 => open,
-            out_byte                    => open,
+            out_byte_en                 => pe_in_messages_valid(1, 0),
+            out_byte                    => pe_in_bytes(1, 0),
             out_matrix_en               => open,
             out_matrix                  => open,
             out_matrix_end_row          => open,
@@ -165,6 +238,34 @@ begin
             out_matrix_position         => open,
             trap                        => open
         );
+        
+    pe_in_messages(1, 0) <= pe_in_bytes(1, 0) & "0" & "1";
+    pe_out_bytes(1, 0) <= pe_out_messages(1, 0)(7 downto 0);
+        
+    ROUTER_1: hoplite_router
+    generic map (
+        BUS_WIDTH   => BUS_WIDTH,
+        X_COORD     => 1,
+        Y_COORD     => 0,
+        COORD_BITS  => COORD_BITS
+    )
+    port map (
+        clk                 => CLK_100MHZ,
+        reset_n             => CPU_RESETN,
+        x_in                => x_messages(0, 0),
+        x_in_valid          => x_messages_valid(0, 0),
+        y_in                => y_messages(1, 1),
+        y_in_valid          => y_messages_valid(1, 1),
+        pe_in               => pe_in_messages(1, 0),
+        pe_in_valid         => pe_in_messages_valid(1, 0),
+        x_out               => x_messages(1, 0),
+        x_out_valid         => x_messages_valid(1, 0),
+        y_out               => y_messages(1, 0),
+        y_out_valid         => y_messages_valid(1, 0),
+        pe_out              => pe_out_messages(1, 0),
+        pe_out_valid        => pe_out_messages_valid(1, 0),
+        pe_backpressure     => open
+    );
         
     SW2_PIPELINE : pipeline
         generic map (
@@ -187,12 +288,13 @@ begin
         port map (
             clk                         => CLK_100MHZ,
             resetn                      => CPU_RESETN,
-            -- sw                 => sw(2),
             sw                          => sw2_pipelined,
+            in_byte_en                  => pe_out_messages_valid(0, 1),
+            in_byte                     => pe_out_bytes(0, 1),
             led                         => open,
             RGB_LED                     => LED17_R,
-            out_byte_en                 => open,
-            out_byte                    => open,
+            out_byte_en                 => pe_in_messages_valid(0, 1),
+            out_byte                    => pe_in_bytes(0, 1),
             out_matrix_en               => open,
             out_matrix                  => open,
             out_matrix_end_row          => open,
@@ -201,6 +303,34 @@ begin
             out_matrix_position         => open,
             trap                        => open
         );
+        
+    pe_in_messages(0, 1) <= pe_in_bytes(0, 1) & "1" & "0";
+    pe_out_bytes(0, 1) <= pe_out_messages(0, 1)(7 downto 0);
+        
+    ROUTER_2: hoplite_router
+    generic map (
+        BUS_WIDTH   => BUS_WIDTH,
+        X_COORD     => 0,
+        Y_COORD     => 1,
+        COORD_BITS  => COORD_BITS
+    )
+    port map (
+        clk                 => CLK_100MHZ,
+        reset_n             => CPU_RESETN,
+        x_in                => x_messages(1, 1),
+        x_in_valid          => x_messages_valid(1, 1),
+        y_in                => y_messages(0, 0),
+        y_in_valid          => y_messages_valid(0, 0),
+        pe_in               => pe_in_messages(0, 1),
+        pe_in_valid         => pe_in_messages_valid(0, 1),
+        x_out               => x_messages(0, 1),
+        x_out_valid         => x_messages_valid(0, 1),
+        y_out               => y_messages(0, 1),
+        y_out_valid         => y_messages_valid(0, 1),
+        pe_out              => pe_out_messages(0, 1),
+        pe_out_valid        => pe_out_messages_valid(0, 1),
+        pe_backpressure     => open
+    );
         
     SW3_PIPELINE : pipeline
         generic map (
@@ -223,12 +353,13 @@ begin
         port map (
             clk                         => CLK_100MHZ,
             resetn                      => CPU_RESETN,
-            -- sw                 => sw(3),
             sw                          => sw3_pipelined,
+            in_byte_en                  => pe_out_messages_valid(1, 1),
+            in_byte                     => pe_out_bytes(1, 1),
             led                         => open,
             RGB_LED                     => LED17_B,
-            out_byte_en                 => open,
-            out_byte                    => open,
+            out_byte_en                 => pe_in_messages_valid(1, 1),
+            out_byte                    => pe_in_bytes(1, 1),
             out_matrix_en               => open,
             out_matrix                  => open,
             out_matrix_end_row          => open,
@@ -237,5 +368,33 @@ begin
             out_matrix_position         => open,
             trap                        => open
         );
+
+    pe_in_messages(1, 1) <= pe_in_bytes(1, 1) & "0" & "0";
+    pe_out_bytes(1, 1) <= pe_out_messages(1, 1)(7 downto 0);
+        
+    ROUTER_3: hoplite_router
+    generic map (
+        BUS_WIDTH   => BUS_WIDTH,
+        X_COORD     => 1,
+        Y_COORD     => 1,
+        COORD_BITS  => COORD_BITS
+    )
+    port map (
+        clk                 => CLK_100MHZ,
+        reset_n             => CPU_RESETN,
+        x_in                => x_messages(0, 1),
+        x_in_valid          => x_messages_valid(0, 1),
+        y_in                => y_messages(1, 0),
+        y_in_valid          => y_messages_valid(1, 0),
+        pe_in               => pe_in_messages(1, 1),
+        pe_in_valid         => pe_in_messages_valid(1, 1),
+        x_out               => x_messages(1, 1),
+        x_out_valid         => x_messages_valid(1, 1),
+        y_out               => y_messages(1, 1),
+        y_out_valid         => y_messages_valid(1, 1),
+        pe_out              => pe_out_messages(1, 1),
+        pe_out_valid        => pe_out_messages_valid(1, 1),
+        pe_backpressure     => open
+    );
 
 end Behavioral;

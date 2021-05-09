@@ -11,6 +11,8 @@ module system #(
 	input              clk,
 	input              resetn,
 	input              sw,
+	input              in_byte_en,
+	input  wire[7:0]   in_byte,
 	output wire[15:0]  led,
 	output reg         RGB_LED,
 	output reg[7:0]    out_byte,
@@ -141,6 +143,11 @@ module system #(
 			     32'h3000_0000: begin
 				    mem_rdata <= sw;
 				    end
+				 32'h8000_0000: begin
+				    if (in_byte_en) begin
+				        mem_rdata <= in_byte;
+				    end
+				 end
 		      endcase
 			end
 		end
