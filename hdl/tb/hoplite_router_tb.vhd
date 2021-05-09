@@ -82,8 +82,9 @@ architecture Behavioral of hoplite_router_tb is
     signal x_dest_count : integer;
     signal y_dest_count : integer;
     
-    signal message_b, message_r : std_logic_vector((BUS_WIDTH-1) downto 0);
-    signal message_r_valid : std_logic;
+    signal message_b                            : std_logic_vector((BUS_WIDTH-1) downto 0);
+    signal message_x_r, message_y_r             : std_logic_vector((BUS_WIDTH-1) downto 0);
+    signal message_x_r_valid, message_y_r_valid : std_logic;
     
     signal x_out : std_logic_vector((BUS_WIDTH-1) downto 0);
     signal x_out_valid : std_logic;
@@ -95,7 +96,7 @@ architecture Behavioral of hoplite_router_tb is
     signal pe_out_valid : std_logic;
     
     signal clk          : std_logic := '0';
-    constant clk_period : time := 1 ns;
+    constant clk_period : time := 10 ns;
     
     signal reset_n      : std_logic;
 
@@ -128,6 +129,8 @@ begin
         end if;
     end process CONSTRUCT_MESSAGE;
     
+    
+    -- Packet format LSB x_dest|y_dest|data MSB
 --    message_b <= std_logic_vector(to_unsigned(count, 2*COORD_BITS)) & Y_DEST & X_DEST;
     message_b <= std_logic_vector(to_unsigned(count, 2*COORD_BITS)) & 
                     std_logic_vector(to_unsigned(y_dest_count, COORD_BITS)) & 
@@ -137,11 +140,17 @@ begin
     begin
         if (rising_edge(clk)) then
             if (reset_n = '0') then
-                message_r <= (others => '0');
-                message_r_valid <= '0';
+                message_x_r <= (others => '0');
+                message_x_r_valid <= '0';
+                
+                message_y_r <= (others => '0');
+                message_y_r_valid <= '0';
             else
-                message_r <= message_b;
-                message_r_valid <= '1';
+                message_y_r <= message_x_r;
+                message_y_r_valid <= message_x_r_valid;
+            
+                message_x_r <= message_b;
+                message_x_r_valid <= '1';
             end if;
         end if;
     end process MESSAGE_FF;
@@ -156,10 +165,10 @@ begin
     port map (
         clk                 => clk,
         reset_n             => reset_n,
-        x_in                => message_r,
-        x_in_valid          => message_r_valid,
-        y_in                => (others => '0'),
-        y_in_valid          => '0',
+        x_in                => message_x_r,
+        x_in_valid          => message_x_r_valid,
+        y_in                => message_y_r,
+        y_in_valid          => message_y_r_valid,
         pe_in               => (others => '0'),
         pe_in_valid         => '0',
         x_out               => x_out,
@@ -174,37 +183,78 @@ begin
     MESSAGE_RECEIVED: process (clk)
     variable my_line : line;
     begin
-        if (rising_edge(clk)) then
-            if (message_r_valid = '1') then
-                write(my_line, string'("x_in = "));
-                write(my_line, message_r);
+        if (rising_edge(clk) and reset_n = '1') then
+            write(my_line, string'("Cycle count = "));
+            write(my_line, count);
+            writeline(output, my_line);
+        
+            if (message_x_r_valid = '1') then
+                write(my_line, string'("x_in: destination = ("));
+                write(my_line, to_integer(unsigned(message_x_r((COORD_BITS-1) downto 0))));
+                write(my_line, string'(", "));
+                write(my_line, to_integer(unsigned(message_x_r((2*COORD_BITS-1) downto COORD_BITS))));
+                write(my_line, string'("), data = "));
+                write(my_line, message_x_r((BUS_WIDTH-1) downto 2*COORD_BITS));
+                write(my_line, string'(", raw = "));
+                write(my_line, message_x_r((BUS_WIDTH-1) downto 0));
+                
+                writeline(output, my_line);
+            end if;
+            
+            if (message_y_r_valid = '1') then
+                write(my_line, string'("y_in: destination = ("));
+                write(my_line, to_integer(unsigned(message_y_r((COORD_BITS-1) downto 0))));
+                write(my_line, string'(", "));
+                write(my_line, to_integer(unsigned(message_y_r((2*COORD_BITS-1) downto COORD_BITS))));
+                write(my_line, string'("), data = "));
+                write(my_line, message_y_r((BUS_WIDTH-1) downto 2*COORD_BITS));
+                write(my_line, string'(", raw = "));
+                write(my_line, message_y_r((BUS_WIDTH-1) downto 0));
                 
                 writeline(output, my_line);
             end if;
             
             if (x_out_valid = '1') then
-                write(my_line, string'("x_out = "));
-                write(my_line, x_out);
+                write(my_line, string'("x_out: destination = ("));
+                write(my_line, to_integer(unsigned(x_out((COORD_BITS-1) downto 0))));
+                write(my_line, string'(", "));
+                write(my_line, to_integer(unsigned(x_out((2*COORD_BITS-1) downto COORD_BITS))));
+                write(my_line, string'("), data = "));
+                write(my_line, x_out((BUS_WIDTH-1) downto 2*COORD_BITS));
+                write(my_line, string'(", raw = "));
+                write(my_line, x_out((BUS_WIDTH-1) downto 0));
                 
                 writeline(output, my_line);
             end if;
             
             if (y_out_valid = '1') then
-                write(my_line, string'("y_out = "));
-                write(my_line, y_out);
+                write(my_line, string'("y_out: destination = ("));
+                write(my_line, to_integer(unsigned(y_out((COORD_BITS-1) downto 0))));
+                write(my_line, string'(", "));
+                write(my_line, to_integer(unsigned(y_out((2*COORD_BITS-1) downto COORD_BITS))));
+                write(my_line, string'("), data = "));
+                write(my_line, y_out((BUS_WIDTH-1) downto 2*COORD_BITS));
+                write(my_line, string'(", raw = "));
+                write(my_line, y_out((BUS_WIDTH-1) downto 0));
                 
                 writeline(output, my_line);
             end if;
             
             if (pe_out_valid = '1') then
-                write(my_line, string'("pe_out = "));
-                write(my_line, pe_out);
+                write(my_line, string'("pe_out: destination = ("));
+                write(my_line, to_integer(unsigned(pe_out((COORD_BITS-1) downto 0))));
+                write(my_line, string'(", "));
+                write(my_line, to_integer(unsigned(pe_out((2*COORD_BITS-1) downto COORD_BITS))));
+                write(my_line, string'("), data = "));
+                write(my_line, pe_out((BUS_WIDTH-1) downto 2*COORD_BITS));
+                write(my_line, string'(", raw = "));
+                write(my_line, pe_out((BUS_WIDTH-1) downto 0));
                 
                 writeline(output, my_line);
             end if;
             
+            -- Print a new line
             write(my_line, string'(""));
-            
             writeline(output, my_line);
         end if;
     end process MESSAGE_RECEIVED;
