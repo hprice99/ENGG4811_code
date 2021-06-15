@@ -2,14 +2,10 @@
 #define LED (*(volatile char*)0x20000000)
 #define SWITCH (*(volatile char*)0x30000000)
 
-#define MATRIX_OUTPUT_FIRST_BYTE (*(volatile char*)0x40000000)
-#define MATRIX_OUTPUT_SECOND_BYTE (*(volatile char*)0x41000000)
-#define MATRIX_OUTPUT_THIRD_BYTE (*(volatile char*)0x42000000)
-#define MATRIX_OUTPUT_FOURTH_BYTE (*(volatile char*)0x43000000)
-
 #define MATRIX_ROW_END (*(volatile char*)0x50000000)
 #define MATRIX_END (*(volatile char*)0x60000000)
 #define MATRIX_POSITION (*(volatile char*)0x70000000)
+#define MATRIX_OUTPUT (*(volatile long*)0x80000000)
 
 #define LOOP_COUNTER 1000000000
 
@@ -109,10 +105,7 @@ void print_matrix(long* matrix, int rows, int cols) {
 
 void output_digit(long digit) {
 
-    MATRIX_OUTPUT_FIRST_BYTE = digit & 0xFF;
-    MATRIX_OUTPUT_SECOND_BYTE = (digit >> 8) & 0xFF;
-    MATRIX_OUTPUT_THIRD_BYTE = (digit >> 16) & 0xFF;
-    MATRIX_OUTPUT_FOURTH_BYTE = (digit >> 24) & 0xFF;
+    MATRIX_OUTPUT = digit;
 }
 
 void output_matrix(char* label, long* matrix, int rows, int cols) {
