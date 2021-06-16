@@ -66,7 +66,7 @@ architecture Behavioral of top is
             out_byte_en             : out std_logic;
             out_byte                : out std_logic_vector(7 downto 0);
             out_matrix_en           : out std_logic;
-            out_matrix              : out std_logic_vector(7 downto 0);
+            out_matrix              : out std_logic_vector(31 downto 0);
             out_matrix_end_row      : out std_logic;
             out_matrix_end          : out std_logic;
             out_matrix_position_en  : out std_logic;
@@ -204,7 +204,7 @@ begin
         
     SW1_PIPELINE : pipeline
         generic map (
-            STAGES  => switch_pipeline_stages
+            STAGES  => SWITCH_PIPELINE_STAGES
         )
         port map (
             clk         => CLK_100MHZ,
@@ -217,8 +217,8 @@ begin
            USE_ILA          => ila_parameter, 
            DIVIDE_ENABLED   => divide_parameter,
            MULTIPLY_ENABLED => multiply_parameter,
-           FIRMWARE         => "firmware.hex",
-           MEM_SIZE         => mem_size
+           FIRMWARE         => "firmware_hoplite.hex",
+           MEM_SIZE         => MEM_SIZE
         )
         port map (
             clk                         => CLK_100MHZ,
@@ -269,7 +269,7 @@ begin
         
     SW2_PIPELINE : pipeline
         generic map (
-            STAGES  => switch_pipeline_stages
+            STAGES  => SWITCH_PIPELINE_STAGES
         )
         port map (
             clk         => CLK_100MHZ,
@@ -282,8 +282,8 @@ begin
            USE_ILA          => ila_parameter, 
            DIVIDE_ENABLED   => divide_parameter,
            MULTIPLY_ENABLED => multiply_parameter,
-           FIRMWARE         => "firmware.hex",
-           MEM_SIZE         => mem_size
+           FIRMWARE         => "firmware_hoplite.hex",
+           MEM_SIZE         => MEM_SIZE
         )
         port map (
             clk                         => CLK_100MHZ,
@@ -334,7 +334,7 @@ begin
         
     SW3_PIPELINE : pipeline
         generic map (
-            STAGES  => switch_pipeline_stages
+            STAGES  => SWITCH_PIPELINE_STAGES
         )
         port map (
             clk         => CLK_100MHZ,
@@ -347,8 +347,8 @@ begin
            USE_ILA          => ila_parameter, 
            DIVIDE_ENABLED   => divide_parameter,
            MULTIPLY_ENABLED => multiply_parameter,
-           FIRMWARE         => "firmware.hex",
-           MEM_SIZE         => mem_size
+           FIRMWARE         => "firmware_hoplite.hex",
+           MEM_SIZE         => MEM_SIZE
         )
         port map (
             clk                         => CLK_100MHZ,
