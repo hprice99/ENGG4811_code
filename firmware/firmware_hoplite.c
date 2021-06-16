@@ -1,10 +1,10 @@
 #define CHAR_OUTPUT (*(volatile char*)0x10000000)
 #define LED (*(volatile char*)0x20000000)
 #define SWITCH (*(volatile char*)0x30000000)
-#define MATRIX_OUTPUT (*(volatile char*)0x40000000)
 #define MATRIX_ROW_END (*(volatile char*)0x50000000)
 #define MATRIX_END (*(volatile char*)0x60000000)
 #define MATRIX_POSITION (*(volatile char*)0x70000000)
+#define MATRIX_OUTPUT (*(volatile long*)0x80000000)
 
 #define LOOP_COUNTER 1000000000
 
@@ -86,7 +86,7 @@ void itoa(int n, char s[]) {
     reverse(s, i);
 }
 
-void print_matrix(int* matrix, int rows, int cols) {
+void print_matrix(long* matrix, int rows, int cols) {
 
     char digit[7];
 
@@ -102,12 +102,12 @@ void print_matrix(int* matrix, int rows, int cols) {
     }
 }
 
-void output_digit(int digit) {
+void output_digit(long digit) {
 
     MATRIX_OUTPUT = digit;
 }
 
-void output_matrix(int* matrix, int rows, int cols) {
+void output_matrix(long* matrix, int rows, int cols) {
 
     for (int row = 0; row < rows; row++) {
         for (int col = 0; col < cols; col++) {
@@ -122,9 +122,9 @@ void output_matrix(int* matrix, int rows, int cols) {
 
 void multiply_matrices(void) {
     // Create matrices
-    int A[MATRIX_SIZE][MATRIX_SIZE];
-    int B[MATRIX_SIZE][MATRIX_SIZE];
-    int C[MATRIX_SIZE][MATRIX_SIZE];
+    long A[MATRIX_SIZE][MATRIX_SIZE];
+    long B[MATRIX_SIZE][MATRIX_SIZE];
+    long C[MATRIX_SIZE][MATRIX_SIZE];
 
     // Create random matrices
     /*
@@ -170,8 +170,8 @@ void multiply_matrices(void) {
 
     // print_string("A and B created\n");
 
-    output_matrix((int*)A, MATRIX_SIZE, MATRIX_SIZE);
-    output_matrix((int*)B, MATRIX_SIZE, MATRIX_SIZE);
+    output_matrix((long*)A, MATRIX_SIZE, MATRIX_SIZE);
+    output_matrix((long*)B, MATRIX_SIZE, MATRIX_SIZE);
 
     for (int i = 0; i < MATRIX_SIZE; i++) {
         for (int j = 0; j < MATRIX_SIZE; j++) {
@@ -188,7 +188,7 @@ void multiply_matrices(void) {
     print_matrix((int*)C, MATRIX_SIZE, MATRIX_SIZE);
     */
 
-    output_matrix((int*)C, MATRIX_SIZE, MATRIX_SIZE);
+    output_matrix((long*)C, MATRIX_SIZE, MATRIX_SIZE);
 }
 
 void main()

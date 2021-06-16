@@ -17,7 +17,7 @@ module system #(
 	output reg         RGB_LED,
 	output reg[7:0]    out_byte,
 	output reg[0:0]    out_byte_en,
-	output reg[7:0]   out_matrix,
+	output reg[31:0]   out_matrix,
 	output reg         out_matrix_end_row,
 	output reg         out_matrix_end,
 	output reg         out_matrix_en,
@@ -102,6 +102,9 @@ module system #(
 			out_matrix_position_en <= 0;
 			out_matrix_end_row <= 0;
 			out_matrix_end <= 0;
+			
+			
+			
 			mem_rdata <= memory[mem_la_addr >> 2];
 			
 			if (mem_la_write && (mem_la_addr >> 2) < MEM_SIZE) begin
@@ -121,10 +124,6 @@ module system #(
 				 32'h2000_0000: begin
 				    RGB_LED <= mem_la_wdata;
 				    end
-				 32'h4000_0000: begin	
-				    out_matrix_en <= 1;			    
-				    out_matrix[7:0] <= mem_la_wdata[7:0];
-				    end
 				 32'h5000_0000: begin
 				    out_matrix_end_row <= mem_la_wdata;
 				    end
@@ -135,6 +134,10 @@ module system #(
 				    out_matrix_position_en <= 1;
 				    out_matrix_position <= mem_la_wdata;
 				    end
+				 32'h8000_0000: begin	
+				    out_matrix_en <= 1;			    
+				    out_matrix <= mem_la_wdata;
+				    end
 		      endcase
 			end
 			
@@ -143,7 +146,7 @@ module system #(
 			     32'h3000_0000: begin
 				    mem_rdata <= sw;
 				    end
-				 32'h8000_0000: begin
+				 32'h4000_0000: begin
 				    if (in_byte_en) begin
 				        mem_rdata <= in_byte;
 				    end
