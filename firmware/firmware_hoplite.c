@@ -1,6 +1,7 @@
 #define CHAR_OUTPUT (*(volatile char*)0x10000000)
 #define LED (*(volatile char*)0x20000000)
 #define SWITCH (*(volatile char*)0x30000000)
+
 #define MATRIX_ROW_END (*(volatile char*)0x50000000)
 #define MATRIX_END (*(volatile char*)0x60000000)
 #define MATRIX_POSITION (*(volatile char*)0x70000000)
@@ -107,10 +108,13 @@ void output_digit(long digit) {
     MATRIX_OUTPUT = digit;
 }
 
-void output_matrix(long* matrix, int rows, int cols) {
+void output_matrix(char* label, long* matrix, int rows, int cols) {
 
-    for (int row = 0; row < rows; row++) {
-        for (int col = 0; col < cols; col++) {
+    print_string(label);
+    print_string(" = [ \n");
+
+    for (long row = 0; row < rows; row++) {
+        for (long col = 0; col < cols; col++) {
             
             output_digit(*((matrix + row * rows) + col));
         }
@@ -118,6 +122,8 @@ void output_matrix(long* matrix, int rows, int cols) {
     }
 
     MATRIX_END = 1;
+
+    print_string("] \n\n");
 }
 
 void multiply_matrices(void) {
@@ -170,8 +176,8 @@ void multiply_matrices(void) {
 
     // print_string("A and B created\n");
 
-    output_matrix((long*)A, MATRIX_SIZE, MATRIX_SIZE);
-    output_matrix((long*)B, MATRIX_SIZE, MATRIX_SIZE);
+    output_matrix("A", (long*)A, MATRIX_SIZE, MATRIX_SIZE);
+    output_matrix("B", (long*)B, MATRIX_SIZE, MATRIX_SIZE);
 
     for (int i = 0; i < MATRIX_SIZE; i++) {
         for (int j = 0; j < MATRIX_SIZE; j++) {
@@ -188,7 +194,7 @@ void multiply_matrices(void) {
     print_matrix((int*)C, MATRIX_SIZE, MATRIX_SIZE);
     */
 
-    output_matrix((long*)C, MATRIX_SIZE, MATRIX_SIZE);
+    output_matrix("C = A*B", (long*)C, MATRIX_SIZE, MATRIX_SIZE);
 }
 
 void main()
