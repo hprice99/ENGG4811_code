@@ -132,14 +132,14 @@ architecture Behavioral of top is
     end component pipeline;
     
     signal sw0_pipelined, sw1_pipelined, sw2_pipelined, sw3_pipelined : std_logic;
-    constant switch_pipeline_stages : integer := 30;
-    constant mem_size : integer := 1024;
+    constant SWITCH_PIPELINE_STAGES : integer := 30;
+    constant MEM_SIZE : integer := 1024;
 
 begin
 
     SW0_PIPELINE : pipeline
         generic map (
-            STAGES  => switch_pipeline_stages
+            STAGES  => SWITCH_PIPELINE_STAGES
         )
         port map (
             clk         => CLK_100MHZ,
@@ -152,8 +152,8 @@ begin
            USE_ILA          => ila_parameter, 
            DIVIDE_ENABLED   => divide_parameter,
            MULTIPLY_ENABLED => multiply_parameter,
-           FIRMWARE         => "firmware.hex",
-           MEM_SIZE         => mem_size
+           FIRMWARE         => "firmware_hoplite.hex",
+           MEM_SIZE         => MEM_SIZE
         )
         port map (
             clk                         => CLK_100MHZ,

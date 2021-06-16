@@ -13,7 +13,7 @@ module system_tb;
 			$dumpvars(0, system_tb);
 		end
 		
-		f = $fopen("system_tb_single_core.txt","w");
+		f = $fopen("system_tb_hoplite.txt","w");
 		
 		repeat (100) @(posedge clk);
 		resetn <= 1;
@@ -47,8 +47,8 @@ module system_tb;
     end
 
 	system #(
-	   .MEM_SIZE               (8192),
-	   .FIRMWARE               ("firmware_single_core.hex")
+	   .MEM_SIZE               (1024),
+	   .FIRMWARE               ("firmware_hoplite.hex")
 	) uut (
 		.clk                  (clk),
 		.resetn               (resetn),
