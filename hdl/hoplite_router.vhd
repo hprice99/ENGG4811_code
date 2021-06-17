@@ -125,25 +125,6 @@ begin
     -- Output to X and Y links
     x_out <= x_q;
     y_out <= y_q;
-    -- pe_out <= y_q;
-    
-    -- TODO Assign y_out to pe_out packet if available
-    -- Shared link for y_out and pe_out
---    Y_OUT_SHARED : process(x_in_valid_d, x_in_dest, y_in_valid_d, y_in_dest)
---    begin
---        if (x_in_valid_d = '1' and (to_integer(unsigned(x_in_dest(X_INDEX))) = X_COORD)
---                and (to_integer(unsigned(x_in_dest(Y_INDEX))) = Y_COORD)) then
---            y_out <= y_q;
---            pe_out <= x_q; 
---        elsif (y_in_valid_d = '1' and (to_integer(unsigned(y_in_dest(X_INDEX))) = X_COORD)
---                and (to_integer(unsigned(y_in_dest(Y_INDEX))) = Y_COORD)) then
---            y_out <= y_q;
---            pe_out <= y_q;
---        else
---            y_out <= y_q;
---            pe_out <= y_q;
---        end if;
---    end process Y_OUT_SHARED;
                
     -- Valid signal routing
     x_out_valid <= x_next;
