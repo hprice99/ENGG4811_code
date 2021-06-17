@@ -163,7 +163,14 @@ begin
                     x_next <= pe_in_valid;
                 end if;
                 
-                if (y_in_valid_d = '1' and (to_integer(unsigned(y_in_dest(X_INDEX))) /= X_COORD)
+                
+                if (x_in_valid_d = '1' and (to_integer(unsigned(x_in_dest(X_INDEX))) = X_COORD)
+                        and (to_integer(unsigned(x_in_dest(Y_INDEX))) = Y_COORD)) then
+                    y_next <= '0';
+                elsif (y_in_valid_d = '1' and (to_integer(unsigned(y_in_dest(X_INDEX))) = X_COORD)
+                        and (to_integer(unsigned(y_in_dest(Y_INDEX))) = Y_COORD)) then
+                    y_next <= '0';
+                elsif (y_in_valid_d = '1' and (to_integer(unsigned(y_in_dest(X_INDEX))) /= X_COORD)
                         and (to_integer(unsigned(y_in_dest(Y_INDEX))) /= Y_COORD)) then
                     y_next <= '1';
                 elsif (x_in_valid_d = '1' and (to_integer(unsigned(x_in_dest(X_INDEX))) /= X_COORD)
