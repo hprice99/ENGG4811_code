@@ -34,6 +34,9 @@ use IEEE.std_logic_textio.all;
 --library UNISIM;
 --use UNISIM.VComponents.all;
 
+library xil_defaultlib;
+use xil_defaultlib.random.all;
+
 entity hoplite_router_tb is
 end hoplite_router_tb;
 
@@ -126,10 +129,14 @@ begin
                 count <= 0;
                 x_dest_count <= 0;
                 y_dest_count <= 0;
+                
+                message_b <= (others => '0');
             else
                 count <= count + 1;
                 x_dest_count <= (x_dest_count + 1) mod NETWORK_ROWS;
                 y_dest_count <= (y_dest_count + 2) mod NETWORK_COLS;
+                
+                message_b <= rand_slv(BUS_WIDTH, count);
             end if;
         end if;
     end process CONSTRUCT_MESSAGE;
@@ -139,9 +146,9 @@ begin
     
     -- Packet format LSB x_dest|y_dest|data MSB
 --    message_b <= std_logic_vector(to_unsigned(count, 2*COORD_BITS)) & Y_DEST & X_DEST;
-    message_b <= std_logic_vector(to_unsigned(count, 2*COORD_BITS)) & 
-                    std_logic_vector(to_unsigned(y_dest_count, COORD_BITS)) & 
-                    std_logic_vector(to_unsigned(x_dest_count, COORD_BITS));
+--    message_b <= std_logic_vector(to_unsigned(count, 2*COORD_BITS)) & 
+--                    std_logic_vector(to_unsigned(y_dest_count, COORD_BITS)) & 
+--                    std_logic_vector(to_unsigned(x_dest_count, COORD_BITS));
                     
     x_message_b <= std_logic_vector(to_unsigned(x_data_count, 2*COORD_BITS)) & 
                     std_logic_vector(to_unsigned(y_dest_count, COORD_BITS)) & 
