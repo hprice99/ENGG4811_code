@@ -65,6 +65,8 @@ architecture Behavioral of hoplite_router_tb is
         );
     end component hoplite_router;
     
+    constant MAX_CYCLES : integer := 10;
+    
     constant X_COORD    : integer := 0;
     constant Y_COORD    : integer := 0;
     constant COORD_BITS : integer := 2;
@@ -79,10 +81,13 @@ architecture Behavioral of hoplite_router_tb is
     constant NETWORK_COLS : integer := 3;
     
     signal count        : integer;
+    signal x_data_count : integer;
+    signal y_data_count : integer;
     signal x_dest_count : integer;
     signal y_dest_count : integer;
     
     signal message_b                            : std_logic_vector((BUS_WIDTH-1) downto 0);
+    signal x_message_b, y_message_b             : std_logic_vector((BUS_WIDTH-1) downto 0);
     signal message_x_r, message_y_r             : std_logic_vector((BUS_WIDTH-1) downto 0);
     signal message_x_r_valid, message_y_r_valid : std_logic;
     
@@ -116,7 +121,7 @@ begin
     -- Construct message
     CONSTRUCT_MESSAGE: process (clk)
     begin
-        if (rising_edge(clk)) then
+        if (rising_edge(clk) and count <= MAX_CYCLES) then
             if (reset_n = '0') then
                 count <= 0;
                 x_dest_count <= 0;
@@ -129,16 +134,26 @@ begin
         end if;
     end process CONSTRUCT_MESSAGE;
     
+    x_data_count <= 0;
+    y_data_count <= 1;
     
     -- Packet format LSB x_dest|y_dest|data MSB
 --    message_b <= std_logic_vector(to_unsigned(count, 2*COORD_BITS)) & Y_DEST & X_DEST;
     message_b <= std_logic_vector(to_unsigned(count, 2*COORD_BITS)) & 
                     std_logic_vector(to_unsigned(y_dest_count, COORD_BITS)) & 
                     std_logic_vector(to_unsigned(x_dest_count, COORD_BITS));
+                    
+    x_message_b <= std_logic_vector(to_unsigned(x_data_count, 2*COORD_BITS)) & 
+                    std_logic_vector(to_unsigned(y_dest_count, COORD_BITS)) & 
+                    std_logic_vector(to_unsigned(x_dest_count, COORD_BITS));
+
+    y_message_b <= std_logic_vector(to_unsigned(y_data_count, 2*COORD_BITS)) & 
+                    std_logic_vector(to_unsigned((y_dest_count + 2) mod NETWORK_COLS, COORD_BITS)) & 
+                    std_logic_vector(to_unsigned((x_dest_count + 1) mod NETWORK_ROWS, COORD_BITS));
     
     MESSAGE_FF: process (clk)
     begin
-        if (rising_edge(clk)) then
+        if (rising_edge(clk) and count <= MAX_CYCLES) then
             if (reset_n = '0') then
                 message_x_r <= (others => '0');
                 message_x_r_valid <= '0';
@@ -146,10 +161,12 @@ begin
                 message_y_r <= (others => '0');
                 message_y_r_valid <= '0';
             else
-                message_y_r <= message_x_r;
+                -- message_y_r <= message_x_r;
+                message_y_r <= y_message_b;
                 message_y_r_valid <= message_x_r_valid;
             
-                message_x_r <= message_b;
+                -- message_x_r <= message_b;
+                message_x_r <= x_message_b;
                 message_x_r_valid <= '1';
             end if;
         end if;
@@ -183,7 +200,7 @@ begin
     MESSAGE_RECEIVED: process (clk)
     variable my_line : line;
     begin
-        if (rising_edge(clk) and reset_n = '1') then
+        if (rising_edge(clk) and reset_n = '1' and count <= MAX_CYCLES) then
             write(my_line, string'("Cycle count = "));
             write(my_line, count);
             writeline(output, my_line);
