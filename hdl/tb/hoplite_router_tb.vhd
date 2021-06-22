@@ -37,6 +37,7 @@ use IEEE.std_logic_textio.all;
 
 library xil_defaultlib;
 use xil_defaultlib.random.all;
+use xil_defaultlib.math_functions.all;
 
 entity hoplite_router_tb is
 end hoplite_router_tb;
@@ -69,8 +70,27 @@ architecture Behavioral of hoplite_router_tb is
         );
     end component hoplite_router;
     
-    constant MAX_CYCLES : integer := 100;
-    constant VALID_THRESHOLD : real := 0.75;
+    component synchronous_FIFO_with_block_RAM
+        generic (
+            W   : natural := 16;
+            D   : natural := 65536;
+            B   : natural := 16
+        );
+        port (
+           reset_n  : in  STD_LOGIC;
+           clock    : in  STD_LOGIC;
+           enR      : in  STD_LOGIC;
+           enW      : in  STD_LOGIC;
+           emptyR   : out  STD_LOGIC;
+           fullW    : out  STD_LOGIC;
+           dataR    : out  STD_LOGIC_VECTOR (B-1 downto 0);
+           dataW    : in  STD_LOGIC_VECTOR (B-1 downto 0)
+        );
+    end component synchronous_FIFO_with_block_RAM;
+    
+    constant MAX_CYCLES         : integer := 100;
+    constant VALID_THRESHOLD    : real := 0.75;
+    constant PE_IN_THRESHOLD    : real := 0.10;
     
     constant X_COORD    : integer := 0;
     constant Y_COORD    : integer := 0;
@@ -92,6 +112,7 @@ architecture Behavioral of hoplite_router_tb is
     signal x_message_data, y_message_data : std_logic_vector((DATA_WIDTH-1) downto 0);
     
     signal x_message_b, y_message_b             : std_logic_vector((BUS_WIDTH-1) downto 0);
+    signal x_message_b_valid, y_message_b_valid : std_logic;
     
     signal x_message_r, y_message_r             : std_logic_vector((BUS_WIDTH-1) downto 0);
     signal x_message_r_valid, y_message_r_valid : std_logic;
@@ -109,7 +130,16 @@ architecture Behavioral of hoplite_router_tb is
     constant clk_period : time := 10 ns;
     
     signal reset_n      : std_logic;
-
+        
+    signal fifo_en_w, fifo_en_r     : std_logic;
+    signal fifo_empty, fifo_full    : std_logic;
+    signal fifo_data_w, fifo_data_r : std_logic_vector((BUS_WIDTH-1) downto 0);
+    constant FIFO_ADDRESS_WIDTH     : natural := ceil_log2(MAX_CYCLES);
+    constant FIFO_RAM_DEPTH         : natural := 2 ** FIFO_ADDRESS_WIDTH;
+    constant FIFO_DATA_WIDTH        : natural := BUS_WIDTH; 
+    
+    signal fifo_r_valid : std_logic;
+    
 begin
 
     -- Generate clk and reset_n
@@ -133,20 +163,24 @@ begin
                 x_message_dest(X_INDEX) <= (others => '0');
                 x_message_dest(Y_INDEX) <= (others => '0');
                 x_message_data          <= (others => '0');
+                x_message_b_valid   <= '0';
 
                 y_message_dest(X_INDEX) <= (others => '0');
                 y_message_dest(Y_INDEX) <= (others => '0');
                 y_message_data          <= (others => '0');
+                y_message_b_valid   <= '0';
             else
                 count <= count + 1;
                 
                 x_message_dest(X_INDEX) <= rand_slv(COORD_BITS, count);
                 x_message_dest(Y_INDEX) <= rand_slv(COORD_BITS, 2*count);
                 x_message_data          <= rand_slv(DATA_WIDTH, 3*count);
+                x_message_b_valid       <= rand_logic(VALID_THRESHOLD, count);
                 
                 y_message_dest(X_INDEX) <= rand_slv(COORD_BITS, MAX_CYCLES-count);
                 y_message_dest(Y_INDEX) <= rand_slv(COORD_BITS, 2*MAX_CYCLES-count);
                 y_message_data          <= rand_slv(DATA_WIDTH, 3*MAX_CYCLES-count);
+                y_message_b_valid       <= rand_logic(VALID_THRESHOLD, MAX_CYCLES-count);
             end if;
         end if;
     end process CONSTRUCT_MESSAGE;
@@ -166,15 +200,15 @@ begin
                 y_message_r_valid   <= '0';
             else
                 x_message_r         <= x_message_b;
-                x_message_r_valid   <= rand_logic(VALID_THRESHOLD, count);
+                x_message_r_valid   <= x_message_b_valid;
                 
                 y_message_r         <= y_message_b;
-                y_message_r_valid   <= rand_logic(VALID_THRESHOLD, MAX_CYCLES-count);
+                y_message_r_valid   <= y_message_b_valid;
             end if;
         end if;
     end process MESSAGE_FF;
     
-    ROUTER: hoplite_router
+    DUT: hoplite_router
     generic map (
         BUS_WIDTH   => BUS_WIDTH,
         X_COORD     => X_COORD,
@@ -198,6 +232,70 @@ begin
         pe_out_valid        => pe_out_valid,
         pe_backpressure     => open
     );
+    
+    -- FIFO for checking messages
+    FIFO: synchronous_FIFO_with_block_RAM
+    generic map (
+        W   => FIFO_ADDRESS_WIDTH,
+        D   => FIFO_RAM_DEPTH,
+        B   => FIFO_DATA_WIDTH
+    )
+    port map (
+        reset_n => reset_n,
+        clock   => clk,
+        enR     => fifo_en_r,
+        enW     => fifo_en_w,
+        emptyR  => fifo_empty,
+        fullW   => fifo_full,
+        dataR   => fifo_data_r,
+        dataW   => fifo_data_w
+    );
+    
+    -- Writing to FIFO
+    FIFO_WRITE: process (clk)
+    begin
+        if (rising_edge(clk) and count <= MAX_CYCLES) then
+            if (reset_n = '0') then
+                fifo_data_w <= (others => '0');
+                fifo_en_w   <= '0';
+            elsif (fifo_full = '0') then
+                 if (x_message_b_valid = '1' and 
+                        to_integer(unsigned(x_message_dest(X_INDEX))) = X_COORD and 
+                        to_integer(unsigned(x_message_dest(Y_INDEX))) = Y_COORD) then
+                    fifo_data_w     <= x_message_b;
+                    fifo_en_w       <= '1';
+                 elsif (y_message_b_valid = '1' and 
+                            to_integer(unsigned(y_message_dest(X_INDEX))) = X_COORD and 
+                            to_integer(unsigned(y_message_dest(Y_INDEX))) = Y_COORD) then
+                    fifo_data_w     <= y_message_b;
+                    fifo_en_w       <= '1';
+                 else
+                    fifo_en_w       <= '0';
+                 end if;
+            end if;
+        end if;
+    end process FIFO_WRITE;
+    
+    -- Read from FIFO
+    FIFO_READ_ENABLE: process (fifo_empty, pe_out_valid)
+    begin
+        if (fifo_empty = '0') then
+            fifo_en_r   <= pe_out_valid;
+        else
+            fifo_en_r   <= '0';
+        end if;
+    end process FIFO_READ_ENABLE;
+    
+    FIFO_READ_VALID: process (clk)
+    begin
+        if (rising_edge(clk)) then
+            if (reset_n = '0') then
+                fifo_r_valid    <= '0';
+            else        
+                fifo_r_valid    <= fifo_en_r;
+            end if;
+        end if;
+    end process FIFO_READ_VALID;
     
     MESSAGE_RECEIVED: process (clk)
     variable my_line : line;
@@ -268,6 +366,19 @@ begin
                 write(my_line, pe_out((BUS_WIDTH-1) downto 2*COORD_BITS));
                 write(my_line, string'(", raw = "));
                 write(my_line, pe_out((BUS_WIDTH-1) downto 0));
+                
+                writeline(output, my_line);
+            end if;
+            
+            if (fifo_r_valid = '1') then
+                write(my_line, string'("fifo_out: destination = ("));
+                write(my_line, to_integer(unsigned(fifo_data_r((COORD_BITS-1) downto 0))));
+                write(my_line, string'(", "));
+                write(my_line, to_integer(unsigned(fifo_data_r((2*COORD_BITS-1) downto COORD_BITS))));
+                write(my_line, string'("), data = "));
+                write(my_line, fifo_data_r((BUS_WIDTH-1) downto 2*COORD_BITS));
+                write(my_line, string'(", raw = "));
+                write(my_line, fifo_data_r((BUS_WIDTH-1) downto 0));
                 
                 writeline(output, my_line);
             end if;

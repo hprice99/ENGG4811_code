@@ -1,0 +1,3 @@
+[submodule "hdl/building_blocks/FIFO"]
+	path = hdl/building_blocks/FIFO
+	url = https://github.com/feketebv/FIFO.git
