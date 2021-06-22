@@ -39,6 +39,8 @@ library xil_defaultlib;
 use xil_defaultlib.random.all;
 use xil_defaultlib.math_functions.all;
 
+use std.env.finish;
+
 entity hoplite_router_tb is
 end hoplite_router_tb;
 
@@ -139,6 +141,8 @@ architecture Behavioral of hoplite_router_tb is
     constant FIFO_DATA_WIDTH        : natural := BUS_WIDTH; 
     
     signal fifo_r_valid : std_logic;
+    
+    signal last_pe_message_received : std_logic_vector((BUS_WIDTH-1) downto 0);
     
 begin
 
@@ -297,7 +301,16 @@ begin
         end if;
     end process FIFO_READ_VALID;
     
-    MESSAGE_RECEIVED: process (clk)
+    SAVE_MESSAGE_RECEIVED: process (clk)
+    begin
+        if (rising_edge(clk) and reset_n = '1' and count <= MAX_CYCLES) then
+            if (pe_out_valid = '1') then
+                last_pe_message_received <= pe_out;
+            end if;
+        end if;
+    end process SAVE_MESSAGE_RECEIVED;
+    
+    PRINT_MESSAGE_RECEIVED: process (clk)
     variable my_line : line;
     begin
         if (rising_edge(clk) and reset_n = '1' and count <= MAX_CYCLES) then
@@ -387,6 +400,58 @@ begin
             write(my_line, string'(""));
             writeline(output, my_line);
         end if;
-    end process MESSAGE_RECEIVED;
+    end process PRINT_MESSAGE_RECEIVED;
+    
+    CHECK_MESSAGE: process (clk)
+    variable my_line : line;
+    begin
+        if (rising_edge(clk) and reset_n = '1' and count <= MAX_CYCLES) then
+            if (fifo_r_valid = '1') then
+                if (unsigned(fifo_data_r) /= unsigned(last_pe_message_received)) then
+                    write(my_line, string'("Message "));
+                    write(my_line, count-1);
+                    write(my_line, string'(" does not match"));
+                    writeline(output, my_line);
+                    
+                    write(my_line, string'("pe_out: destination = ("));
+                    write(my_line, to_integer(unsigned(pe_out((COORD_BITS-1) downto 0))));
+                    write(my_line, string'(", "));
+                    write(my_line, to_integer(unsigned(pe_out((2*COORD_BITS-1) downto COORD_BITS))));
+                    write(my_line, string'("), data = "));
+                    write(my_line, pe_out((BUS_WIDTH-1) downto 2*COORD_BITS));
+                    write(my_line, string'(", raw = "));
+                    write(my_line, pe_out((BUS_WIDTH-1) downto 0));
+                    
+                    writeline(output, my_line);
+                    
+                    write(my_line, string'("fifo_out: destination = ("));
+                    write(my_line, to_integer(unsigned(fifo_data_r((COORD_BITS-1) downto 0))));
+                    write(my_line, string'(", "));
+                    write(my_line, to_integer(unsigned(fifo_data_r((2*COORD_BITS-1) downto COORD_BITS))));
+                    write(my_line, string'("), data = "));
+                    write(my_line, fifo_data_r((BUS_WIDTH-1) downto 2*COORD_BITS));
+                    write(my_line, string'(", raw = "));
+                    write(my_line, fifo_data_r((BUS_WIDTH-1) downto 0));
+                    
+                    writeline(output, my_line);
+                    
+                    -- Print a new line
+                    write(my_line, string'(""));
+                    writeline(output, my_line);
+                    
+                    finish;
+                else
+                    write(my_line, string'("Message "));
+                    write(my_line, count-1);
+                    write(my_line, string'(" matches"));
+                    writeline(output, my_line);
+                    
+                    -- Print a new line
+                    write(my_line, string'(""));
+                    writeline(output, my_line);
+                end if;
+            end if;
+        end if;
+    end process CHECK_MESSAGE;
 
 end Behavioral;
