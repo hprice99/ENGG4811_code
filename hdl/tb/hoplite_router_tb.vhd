@@ -161,18 +161,17 @@ architecture Behavioral of hoplite_router_tb is
     constant FIFO_RAM_DEPTH         : natural := 2 ** FIFO_ADDRESS_WIDTH;
     constant FIFO_DATA_WIDTH        : natural := BUS_WIDTH; 
     
-    signal pe_fifo_reset                            : std_logic;
+    signal fifo_reset                               : std_logic;
+    
     signal pe_fifo_en_w, pe_fifo_en_r               : std_logic;
     signal pe_fifo_empty, pe_fifo_full              : std_logic;
     signal pe_fifo_empty_r, pe_fifo_full_r          : std_logic;
     signal pe_fifo_data_w, pe_fifo_data_r           : std_logic_vector((BUS_WIDTH-1) downto 0);
-    signal pe_fifo_r_valid, pe_fifo_r_valid_active  : std_logic;
         
     signal check_dest_fifo_en_w, check_dest_fifo_en_r       : std_logic;
     signal check_dest_fifo_empty, check_dest_fifo_full      : std_logic;
     signal check_dest_fifo_data_w, check_dest_fifo_data_r   : std_logic_vector((BUS_WIDTH-1) downto 0);
     signal check_dest_fifo_r_valid                          : std_logic;
-    signal last_pe_message_received                         : std_logic_vector((BUS_WIDTH-1) downto 0);
     
     signal check_pe_message_fifo_en_w, check_pe_message_fifo_en_r       : std_logic;
     signal check_pe_message_fifo_empty, check_pe_message_fifo_full      : std_logic;
@@ -275,7 +274,7 @@ begin
         end if;
     end process MESSAGE_FF;
     
-    pe_fifo_reset <= not reset_n;
+    fifo_reset <= not reset_n;
     
     -- FIFO for processing element messages
     PE_FIFO: FIFO_Regs_No_Flags
@@ -284,7 +283,7 @@ begin
         g_DEPTH  => FIFO_RAM_DEPTH
     )
     port map (
-        i_rst_sync  => pe_fifo_reset,
+        i_rst_sync  => fifo_reset,
         i_clk       => clk,
         
         i_wr_en     => pe_fifo_en_w,
@@ -329,18 +328,14 @@ begin
     end process PE_FIFO_WRITE;
     
     -- Read from processing element FIFO
-    -- PE_FIFO_READ_ENABLE: process (pe_fifo_empty, pe_backpressure, pe_backpressure_r)
     PE_FIFO_READ_ENABLE: process (pe_fifo_empty, pe_backpressure)
     begin
         if (pe_fifo_empty = '0') then
-            -- pe_fifo_en_r   <= not pe_backpressure and not pe_backpressure_r;
             pe_fifo_en_r   <= not pe_backpressure;
         else
             pe_fifo_en_r   <= '0';
         end if;
     end process PE_FIFO_READ_ENABLE;
-    
-    pe_fifo_r_valid <= not pe_backpressure and not pe_fifo_empty;
     
     DUT: hoplite_router
     generic map (
@@ -357,7 +352,7 @@ begin
         y_in                => y_message_r,
         y_in_valid          => y_message_r_valid,
         pe_in               => pe_fifo_data_r,
-        pe_in_valid         => pe_fifo_r_valid,
+        pe_in_valid         => pe_fifo_en_r,
         x_out               => x_out,
         x_out_valid         => x_out_valid,
         y_out               => y_out,
@@ -367,22 +362,23 @@ begin
         pe_backpressure     => pe_backpressure
     );
     
-    -- FIFO for checking output messages
-    CHECK_DEST_FIFO: synchronous_FIFO_with_block_RAM
+    -- FIFO for checking output messages    
+    CHECK_DEST_FIFO: FIFO_Regs_No_Flags
     generic map (
-        W   => FIFO_ADDRESS_WIDTH,
-        D   => FIFO_RAM_DEPTH,
-        B   => FIFO_DATA_WIDTH
+        g_WIDTH  => FIFO_DATA_WIDTH,
+        g_DEPTH  => FIFO_RAM_DEPTH
     )
     port map (
-        reset_n => reset_n,
-        clock   => clk,
-        enR     => check_dest_fifo_en_r,
-        enW     => check_dest_fifo_en_w,
-        emptyR  => check_dest_fifo_empty,
-        fullW   => check_dest_fifo_full,
-        dataR   => check_dest_fifo_data_r,
-        dataW   => check_dest_fifo_data_w
+        i_rst_sync  => fifo_reset,
+        i_clk       => clk,
+        
+        i_wr_en     => check_dest_fifo_en_w,
+        i_wr_data   => check_dest_fifo_data_w,
+        o_full      => check_dest_fifo_full,
+
+        i_rd_en     => check_dest_fifo_en_r,
+        o_rd_data   => check_dest_fifo_data_r,
+        o_empty     => check_dest_fifo_empty
     );
     
     -- Writing to FIFO
@@ -420,16 +416,18 @@ begin
         end if;
     end process CHECK_DEST_FIFO_READ_ENABLE;
     
-    CHECK_DEST_FIFO_READ_VALID: process (clk)
-    begin
-        if (rising_edge(clk)) then
-            if (reset_n = '0') then
-                check_dest_fifo_r_valid    <= '0';
-            else        
-                check_dest_fifo_r_valid    <= check_dest_fifo_en_r;
-            end if;
-        end if;
-    end process CHECK_DEST_FIFO_READ_VALID;
+--    CHECK_DEST_FIFO_READ_VALID: process (clk)
+--    begin
+--        if (rising_edge(clk)) then
+--            if (reset_n = '0') then
+--                check_dest_fifo_r_valid    <= '0';
+--            else        
+--                check_dest_fifo_r_valid    <= check_dest_fifo_en_r;
+--            end if;
+--        end if;
+--    end process CHECK_DEST_FIFO_READ_VALID;
+
+    check_dest_fifo_r_valid <= check_dest_fifo_en_r;
     
     -- FIFO for checking messages sent from processing element
     CHECK_PE_MESSAGE_FIFO: synchronous_FIFO_with_block_RAM
@@ -468,10 +466,10 @@ begin
     end process CHECK_PE_MESSAGE_FIFO_WRITE;
     
     -- Read from FIFO
-    CHECK_PE_MESSAGE_FIFO_READ_ENABLE: process (check_pe_message_fifo_empty, pe_fifo_r_valid)
+    CHECK_PE_MESSAGE_FIFO_READ_ENABLE: process (check_pe_message_fifo_empty, pe_fifo_en_r)
     begin
         if (check_pe_message_fifo_empty = '0') then
-            check_pe_message_fifo_en_r   <= pe_fifo_r_valid;
+            check_pe_message_fifo_en_r   <= pe_fifo_en_r;
         else
             check_pe_message_fifo_en_r   <= '0';
         end if;
@@ -488,16 +486,7 @@ begin
         end if;
     end process CHECK_PE_MESSAGE_FIFO_READ_VALID;
     
-    -- Check messages received
-    SAVE_MESSAGE_RECEIVED: process (clk)
-    begin
-        if (rising_edge(clk) and reset_n = '1' and count <= MAX_CYCLES) then
-            if (pe_out_valid = '1') then
-                last_pe_message_received <= pe_out;
-            end if;
-        end if;
-    end process SAVE_MESSAGE_RECEIVED;
-    
+    -- Check messages received   
     PRINT_MESSAGE_RECEIVED: process (clk)
     variable my_line : line;
     begin
@@ -548,7 +537,7 @@ begin
                 writeline(output, my_line);
             end if;
             
-            if (pe_fifo_r_valid = '1' and PRINT_PE_FIFO_IN) then
+            if (pe_fifo_en_r = '1' and PRINT_PE_FIFO_IN) then
                 write(my_line, string'("fifo_pe_in: destination = ("));
                 write(my_line, to_integer(unsigned(pe_fifo_data_r((COORD_BITS-1) downto 0))));
                 write(my_line, string'(", "));
@@ -624,7 +613,7 @@ begin
     begin
         if (rising_edge(clk) and reset_n = '1' and count <= MAX_CYCLES) then
             if (check_dest_fifo_r_valid = '1') then
-                if (unsigned(check_dest_fifo_data_r) /= unsigned(last_pe_message_received)) then
+                if (unsigned(check_dest_fifo_data_r) /= unsigned(pe_out)) then
                     write(my_line, string'("pe_out message "));
                     write(my_line, count-1);
                     write(my_line, string'(" does not match"));
@@ -675,7 +664,7 @@ begin
     SAVE_PE_MESSAGE: process (clk)
     begin
         if (rising_edge(clk) and reset_n = '1' and count <= MAX_CYCLES) then
-            if (pe_fifo_r_valid = '1') then
+            if (pe_fifo_en_r = '1') then
                 last_pe_message_sent <= pe_fifo_data_r;
             end if;
         end if;
