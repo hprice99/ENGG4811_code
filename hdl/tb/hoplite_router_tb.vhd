@@ -91,17 +91,28 @@ architecture Behavioral of hoplite_router_tb is
         );
     end component synchronous_FIFO_with_block_RAM;
     
-    component pulse_extender
-        port (
-            clk         : in STD_LOGIC;
-            reset_n     : in STD_LOGIC;
-            trigger     : in STD_LOGIC;
-            release     : in STD_LOGIC;
-            pulse       : out STD_LOGIC
+    component FIFO_Regs_No_Flags
+        generic (
+            g_WIDTH : natural := 8;
+            g_DEPTH : integer := 32
         );
-    end component pulse_extender;
+        port (
+            i_rst_sync : in std_logic;
+            i_clk      : in std_logic;
+         
+            -- FIFO Write Interface
+            i_wr_en   : in  std_logic;
+            i_wr_data : in  std_logic_vector(g_WIDTH-1 downto 0);
+            o_full    : out std_logic;
+         
+            -- FIFO Read Interface
+            i_rd_en   : in  std_logic;
+            o_rd_data : out std_logic_vector(g_WIDTH-1 downto 0);
+            o_empty   : out std_logic
+        );
+    end component FIFO_Regs_No_Flags;
     
-    constant MAX_CYCLES         : integer := 100;
+    constant MAX_CYCLES         : integer := 500;
     constant VALID_THRESHOLD    : real := 0.75;
     constant PE_IN_THRESHOLD    : real := 0.10;
     
@@ -150,14 +161,12 @@ architecture Behavioral of hoplite_router_tb is
     constant FIFO_RAM_DEPTH         : natural := 2 ** FIFO_ADDRESS_WIDTH;
     constant FIFO_DATA_WIDTH        : natural := BUS_WIDTH; 
     
+    signal pe_fifo_reset                            : std_logic;
     signal pe_fifo_en_w, pe_fifo_en_r               : std_logic;
     signal pe_fifo_empty, pe_fifo_full              : std_logic;
     signal pe_fifo_empty_r, pe_fifo_full_r          : std_logic;
     signal pe_fifo_data_w, pe_fifo_data_r           : std_logic_vector((BUS_WIDTH-1) downto 0);
     signal pe_fifo_r_valid, pe_fifo_r_valid_active  : std_logic;
-    
-    signal not_pe_backpressure  : std_logic;
-    signal pe_backpressure_r    : std_logic;
         
     signal check_dest_fifo_en_w, check_dest_fifo_en_r       : std_logic;
     signal check_dest_fifo_empty, check_dest_fifo_full      : std_logic;
@@ -266,22 +275,25 @@ begin
         end if;
     end process MESSAGE_FF;
     
+    pe_fifo_reset <= not reset_n;
+    
     -- FIFO for processing element messages
-    PE_FIFO: synchronous_FIFO_with_block_RAM
+    PE_FIFO: FIFO_Regs_No_Flags
     generic map (
-        W   => FIFO_ADDRESS_WIDTH,
-        D   => FIFO_RAM_DEPTH,
-        B   => FIFO_DATA_WIDTH
+        g_WIDTH  => FIFO_DATA_WIDTH,
+        g_DEPTH  => FIFO_RAM_DEPTH
     )
     port map (
-        reset_n => reset_n,
-        clock   => clk,
-        enR     => pe_fifo_en_r,
-        enW     => pe_fifo_en_w,
-        emptyR  => pe_fifo_empty,
-        fullW   => pe_fifo_full,
-        dataR   => pe_fifo_data_r,
-        dataW   => pe_fifo_data_w
+        i_rst_sync  => pe_fifo_reset,
+        i_clk       => clk,
+        
+        i_wr_en     => pe_fifo_en_w,
+        i_wr_data   => pe_fifo_data_w,
+        o_full      => pe_fifo_full,
+
+        i_rd_en     => pe_fifo_en_r,
+        o_rd_data   => pe_fifo_data_r,
+        o_empty     => pe_fifo_empty
     );
     
     -- Register processing element FIFO control signals
@@ -316,22 +328,11 @@ begin
         end if;
     end process PE_FIFO_WRITE;
     
-    PE_BACKPRESSURE_REG: process (clk)
-    begin
-        if (rising_edge(clk)) then
-            if (reset_n = '0') then
-                pe_backpressure_r <= '0';
-            else
-                pe_backpressure_r <= pe_backpressure;
-            end if;
-        end if;
-    end process PE_BACKPRESSURE_REG;
-    
     -- Read from processing element FIFO
     -- PE_FIFO_READ_ENABLE: process (pe_fifo_empty, pe_backpressure, pe_backpressure_r)
     PE_FIFO_READ_ENABLE: process (pe_fifo_empty, pe_backpressure)
     begin
-        if (pe_fifo_empty_r = '0') then
+        if (pe_fifo_empty = '0') then
             -- pe_fifo_en_r   <= not pe_backpressure and not pe_backpressure_r;
             pe_fifo_en_r   <= not pe_backpressure;
         else
@@ -339,22 +340,7 @@ begin
         end if;
     end process PE_FIFO_READ_ENABLE;
     
-    PE_FIFO_READ_VALID: process (clk)
-    begin
-        if (rising_edge(clk)) then
-            -- if (reset_n = '0' or (pe_fifo_empty = '1')) then
-            if (reset_n = '0' or (pe_fifo_empty = '1' and pe_fifo_empty_r = '1')) then
-                pe_fifo_r_valid_active <= '0';
-            else
-                -- Ignore the first read valid signal
-                if (pe_fifo_r_valid_active = '0' and pe_fifo_en_r = '1') then
-                    pe_fifo_r_valid_active <= '1';
-                end if;
-            end if;
-        end if;
-    end process PE_FIFO_READ_VALID;
-    
-    pe_fifo_r_valid <= pe_fifo_en_r and pe_fifo_r_valid_active;
+    pe_fifo_r_valid <= not pe_backpressure and not pe_fifo_empty;
     
     DUT: hoplite_router
     generic map (
