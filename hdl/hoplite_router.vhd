@@ -75,7 +75,6 @@ architecture Behavioral of hoplite_router is
 
 begin
 
-    -- TODO Handle contention on the input
     -- Assign destination coordinates   
     x_in_dest(X_INDEX) <= x_d((COORD_BITS-1) downto 0);
     x_in_dest(Y_INDEX) <= x_d((2*COORD_BITS-1) downto COORD_BITS);
@@ -99,9 +98,15 @@ begin
     -- Select Y output 
     with sel select
         y_d <= pe_in    when "00",
-               x_in     when "01",
+               x_in     when "01", -- TODO Remove multicast route
                y_in     when "10",
                y_in     when others;
+               
+    -- Apply backpressure to the connected PE
+    with sel select
+        pe_backpressure <=  '0' when "00",
+                            '0' when "10",
+                            '1' when others;
     
     OUTPUT_FF : process (clk)
     begin
@@ -187,6 +192,4 @@ begin
         end if;
     end process PE_OUTPUT_FF;
     
-    -- TODO Handle backpressure
-
 end Behavioral;
