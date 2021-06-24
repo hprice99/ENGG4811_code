@@ -171,13 +171,11 @@ architecture Behavioral of hoplite_router_tb is
     signal check_dest_fifo_en_w, check_dest_fifo_en_r       : std_logic;
     signal check_dest_fifo_empty, check_dest_fifo_full      : std_logic;
     signal check_dest_fifo_data_w, check_dest_fifo_data_r   : std_logic_vector((BUS_WIDTH-1) downto 0);
-    signal check_dest_fifo_r_valid                          : std_logic;
     
     signal check_pe_message_fifo_en_w, check_pe_message_fifo_en_r       : std_logic;
     signal check_pe_message_fifo_empty, check_pe_message_fifo_full      : std_logic;
     signal check_pe_message_fifo_data_w, check_pe_message_fifo_data_r   : std_logic_vector((BUS_WIDTH-1) downto 0);
     signal check_pe_message_fifo_r_valid                                : std_logic;
-    signal last_pe_message_sent                                         : std_logic_vector((BUS_WIDTH-1) downto 0);
     
     constant PRINT_X_IN         : boolean := true;
     constant PRINT_Y_IN         : boolean := true;
@@ -416,35 +414,23 @@ begin
         end if;
     end process CHECK_DEST_FIFO_READ_ENABLE;
     
---    CHECK_DEST_FIFO_READ_VALID: process (clk)
---    begin
---        if (rising_edge(clk)) then
---            if (reset_n = '0') then
---                check_dest_fifo_r_valid    <= '0';
---            else        
---                check_dest_fifo_r_valid    <= check_dest_fifo_en_r;
---            end if;
---        end if;
---    end process CHECK_DEST_FIFO_READ_VALID;
-
-    check_dest_fifo_r_valid <= check_dest_fifo_en_r;
-    
     -- FIFO for checking messages sent from processing element
-    CHECK_PE_MESSAGE_FIFO: synchronous_FIFO_with_block_RAM
+    CHECK_PE_MESSAGE_FIFO: FIFO_Regs_No_Flags
     generic map (
-        W   => FIFO_ADDRESS_WIDTH,
-        D   => FIFO_RAM_DEPTH,
-        B   => FIFO_DATA_WIDTH
+        g_WIDTH  => FIFO_DATA_WIDTH,
+        g_DEPTH  => FIFO_RAM_DEPTH
     )
     port map (
-        reset_n => reset_n,
-        clock   => clk,
-        enR     => check_pe_message_fifo_en_r,
-        enW     => check_pe_message_fifo_en_w,
-        emptyR  => check_pe_message_fifo_empty,
-        fullW   => check_pe_message_fifo_full,
-        dataR   => check_pe_message_fifo_data_r,
-        dataW   => check_pe_message_fifo_data_w
+        i_rst_sync  => fifo_reset,
+        i_clk       => clk,
+        
+        i_wr_en     => check_pe_message_fifo_en_w,
+        i_wr_data   => check_pe_message_fifo_data_w,
+        o_full      => check_pe_message_fifo_full,
+
+        i_rd_en     => check_pe_message_fifo_en_r,
+        o_rd_data   => check_pe_message_fifo_data_r,
+        o_empty     => check_pe_message_fifo_empty
     );
     
     -- Writing to FIFO
@@ -475,16 +461,18 @@ begin
         end if;
     end process CHECK_PE_MESSAGE_FIFO_READ_ENABLE;
     
-    CHECK_PE_MESSAGE_FIFO_READ_VALID: process (clk)
-    begin
-        if (rising_edge(clk)) then
-            if (reset_n = '0') then
-                check_pe_message_fifo_r_valid    <= '0';
-            else        
-                check_pe_message_fifo_r_valid    <= check_pe_message_fifo_en_r;
-            end if;
-        end if;
-    end process CHECK_PE_MESSAGE_FIFO_READ_VALID;
+--    CHECK_PE_MESSAGE_FIFO_READ_VALID: process (clk)
+--    begin
+--        if (rising_edge(clk)) then
+--            if (reset_n = '0') then
+--                check_pe_message_fifo_r_valid    <= '0';
+--            else        
+--                check_pe_message_fifo_r_valid    <= check_pe_message_fifo_en_r;
+--            end if;
+--        end if;
+--    end process CHECK_PE_MESSAGE_FIFO_READ_VALID;
+    
+    check_pe_message_fifo_r_valid    <= check_pe_message_fifo_en_r;
     
     -- Check messages received   
     PRINT_MESSAGE_RECEIVED: process (clk)
@@ -589,7 +577,7 @@ begin
                 writeline(output, my_line);
             end if;
             
-            if (check_dest_fifo_r_valid = '1' and PRINT_CHECK_FIFO_OUT) then
+            if (check_dest_fifo_en_r = '1' and PRINT_CHECK_FIFO_OUT) then
                 write(my_line, string'("check_dest_fifo_out: destination = ("));
                 write(my_line, to_integer(unsigned(check_dest_fifo_data_r((COORD_BITS-1) downto 0))));
                 write(my_line, string'(", "));
@@ -612,7 +600,7 @@ begin
     variable my_line : line;
     begin
         if (rising_edge(clk) and reset_n = '1' and count <= MAX_CYCLES) then
-            if (check_dest_fifo_r_valid = '1') then
+            if (check_dest_fifo_en_r = '1') then
                 if (unsigned(check_dest_fifo_data_r) /= unsigned(pe_out)) then
                     write(my_line, string'("pe_out message "));
                     write(my_line, count-1);
@@ -660,22 +648,13 @@ begin
         end if;
     end process CHECK_DEST_MESSAGE;
     
-    -- Check messages sent from processing element
-    SAVE_PE_MESSAGE: process (clk)
-    begin
-        if (rising_edge(clk) and reset_n = '1' and count <= MAX_CYCLES) then
-            if (pe_fifo_en_r = '1') then
-                last_pe_message_sent <= pe_fifo_data_r;
-            end if;
-        end if;
-    end process SAVE_PE_MESSAGE;
-    
+    -- Check messages sent from processing element   
     CHECK_PE_MESSAGE: process (clk)
     variable my_line : line;
     begin
         if (rising_edge(clk) and reset_n = '1' and count <= MAX_CYCLES) then
             if (check_pe_message_fifo_r_valid = '1') then
-                if (unsigned(check_pe_message_fifo_data_r) /= unsigned(last_pe_message_sent)) then
+                if (unsigned(check_pe_message_fifo_data_r) /= unsigned(pe_fifo_data_r)) then
                     write(my_line, string'("pe_in message "));
                     write(my_line, count-1);
                     write(my_line, string'(" does not match"));
@@ -693,13 +672,13 @@ begin
                     writeline(output, my_line);
                     
                     write(my_line, string'("last_pe_message_sent: destination = ("));
-                    write(my_line, to_integer(unsigned(last_pe_message_sent((COORD_BITS-1) downto 0))));
+                    write(my_line, to_integer(unsigned(pe_fifo_data_r((COORD_BITS-1) downto 0))));
                     write(my_line, string'(", "));
-                    write(my_line, to_integer(unsigned(last_pe_message_sent((2*COORD_BITS-1) downto COORD_BITS))));
+                    write(my_line, to_integer(unsigned(pe_fifo_data_r((2*COORD_BITS-1) downto COORD_BITS))));
                     write(my_line, string'("), data = "));
-                    write(my_line, last_pe_message_sent((BUS_WIDTH-1) downto 2*COORD_BITS));
+                    write(my_line, pe_fifo_data_r((BUS_WIDTH-1) downto 2*COORD_BITS));
                     write(my_line, string'(", raw = "));
-                    write(my_line, last_pe_message_sent((BUS_WIDTH-1) downto 0));
+                    write(my_line, pe_fifo_data_r((BUS_WIDTH-1) downto 0));
                     
                     writeline(output, my_line);
                     
@@ -727,13 +706,13 @@ begin
                     writeline(output, my_line);
                     
                     write(my_line, string'("last_pe_message_sent: destination = ("));
-                    write(my_line, to_integer(unsigned(last_pe_message_sent((COORD_BITS-1) downto 0))));
+                    write(my_line, to_integer(unsigned(pe_fifo_data_r((COORD_BITS-1) downto 0))));
                     write(my_line, string'(", "));
-                    write(my_line, to_integer(unsigned(last_pe_message_sent((2*COORD_BITS-1) downto COORD_BITS))));
+                    write(my_line, to_integer(unsigned(pe_fifo_data_r((2*COORD_BITS-1) downto COORD_BITS))));
                     write(my_line, string'("), data = "));
-                    write(my_line, last_pe_message_sent((BUS_WIDTH-1) downto 2*COORD_BITS));
+                    write(my_line, pe_fifo_data_r((BUS_WIDTH-1) downto 2*COORD_BITS));
                     write(my_line, string'(", raw = "));
-                    write(my_line, last_pe_message_sent((BUS_WIDTH-1) downto 0));
+                    write(my_line, pe_fifo_data_r((BUS_WIDTH-1) downto 0));
                     
                     -- Print a new line
                     write(my_line, string'(""));
