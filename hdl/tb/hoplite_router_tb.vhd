@@ -147,6 +147,15 @@ architecture Behavioral of hoplite_router_tb is
     signal x_message_r, y_message_r, pe_message_r                   : std_logic_vector((BUS_WIDTH-1) downto 0);
     signal x_message_r_valid, y_message_r_valid, pe_message_r_valid : std_logic;
     
+    signal x_in        : std_logic_vector((BUS_WIDTH-1) downto 0);
+    signal x_in_valid  : std_logic;
+    
+    signal y_in        : std_logic_vector((BUS_WIDTH-1) downto 0);
+    signal y_in_valid  : std_logic;
+    
+    signal pe_in           : std_logic_vector((BUS_WIDTH-1) downto 0);
+    signal pe_in_valid     : std_logic;
+    
     signal x_out        : std_logic_vector((BUS_WIDTH-1) downto 0);
     signal x_out_valid  : std_logic;
     
@@ -175,7 +184,6 @@ architecture Behavioral of hoplite_router_tb is
     signal check_pe_message_fifo_en_w, check_pe_message_fifo_en_r       : std_logic;
     signal check_pe_message_fifo_empty, check_pe_message_fifo_full      : std_logic;
     signal check_pe_message_fifo_data_w, check_pe_message_fifo_data_r   : std_logic_vector((BUS_WIDTH-1) downto 0);
-    signal check_pe_message_fifo_r_valid                                : std_logic;
     
     constant PRINT_X_IN         : boolean := true;
     constant PRINT_Y_IN         : boolean := true;
@@ -199,6 +207,8 @@ begin
         clk <= '1';
         wait for clk_period/2;  --for next 0.5 ns signal is '1'.
     end process CLK_PROCESS;
+    
+    fifo_reset <= not reset_n;
     
     -- Construct message
     CONSTRUCT_MESSAGE: process (clk)
@@ -272,7 +282,11 @@ begin
         end if;
     end process MESSAGE_FF;
     
-    fifo_reset <= not reset_n;
+    x_in        <= x_message_r;
+    x_in_valid  <= x_message_r_valid;
+    
+    y_in        <= y_message_r;
+    y_in_valid  <= y_message_r_valid;
     
     -- FIFO for processing element messages
     PE_FIFO: FIFO_Regs_No_Flags
@@ -335,6 +349,9 @@ begin
         end if;
     end process PE_FIFO_READ_ENABLE;
     
+    pe_in       <= pe_fifo_data_r;
+    pe_in_valid <= pe_fifo_en_r;
+    
     DUT: hoplite_router
     generic map (
         BUS_WIDTH   => BUS_WIDTH,
@@ -345,12 +362,12 @@ begin
     port map (
         clk                 => clk,
         reset_n             => reset_n,
-        x_in                => x_message_r,
-        x_in_valid          => x_message_r_valid,
-        y_in                => y_message_r,
-        y_in_valid          => y_message_r_valid,
-        pe_in               => pe_fifo_data_r,
-        pe_in_valid         => pe_fifo_en_r,
+        x_in                => x_in,
+        x_in_valid          => x_in_valid,
+        y_in                => y_in,
+        y_in_valid          => y_in_valid,
+        pe_in               => pe_in,
+        pe_in_valid         => pe_in_valid,
         x_out               => x_out,
         x_out_valid         => x_out_valid,
         y_out               => y_out,
@@ -461,19 +478,6 @@ begin
         end if;
     end process CHECK_PE_MESSAGE_FIFO_READ_ENABLE;
     
---    CHECK_PE_MESSAGE_FIFO_READ_VALID: process (clk)
---    begin
---        if (rising_edge(clk)) then
---            if (reset_n = '0') then
---                check_pe_message_fifo_r_valid    <= '0';
---            else        
---                check_pe_message_fifo_r_valid    <= check_pe_message_fifo_en_r;
---            end if;
---        end if;
---    end process CHECK_PE_MESSAGE_FIFO_READ_VALID;
-    
-    check_pe_message_fifo_r_valid    <= check_pe_message_fifo_en_r;
-    
     -- Check messages received   
     PRINT_MESSAGE_RECEIVED: process (clk)
     variable my_line : line;
@@ -483,28 +487,28 @@ begin
             write(my_line, count);
             writeline(output, my_line);
         
-            if (x_message_r_valid = '1' and PRINT_X_IN) then
+            if (x_in_valid = '1' and PRINT_X_IN) then
                 write(my_line, string'("x_in: destination = ("));
-                write(my_line, to_integer(unsigned(x_message_r((COORD_BITS-1) downto 0))));
+                write(my_line, to_integer(unsigned(x_in((COORD_BITS-1) downto 0))));
                 write(my_line, string'(", "));
-                write(my_line, to_integer(unsigned(x_message_r((2*COORD_BITS-1) downto COORD_BITS))));
+                write(my_line, to_integer(unsigned(x_in((2*COORD_BITS-1) downto COORD_BITS))));
                 write(my_line, string'("), data = "));
-                write(my_line, x_message_r((BUS_WIDTH-1) downto 2*COORD_BITS));
+                write(my_line, x_in((BUS_WIDTH-1) downto 2*COORD_BITS));
                 write(my_line, string'(", raw = "));
-                write(my_line, x_message_r((BUS_WIDTH-1) downto 0));
+                write(my_line, x_in((BUS_WIDTH-1) downto 0));
                 
                 writeline(output, my_line);
             end if;
             
-            if (y_message_r_valid = '1' and PRINT_Y_IN) then
+            if (y_in_valid = '1' and PRINT_Y_IN) then
                 write(my_line, string'("y_in: destination = ("));
-                write(my_line, to_integer(unsigned(y_message_r((COORD_BITS-1) downto 0))));
+                write(my_line, to_integer(unsigned(y_in((COORD_BITS-1) downto 0))));
                 write(my_line, string'(", "));
-                write(my_line, to_integer(unsigned(y_message_r((2*COORD_BITS-1) downto COORD_BITS))));
+                write(my_line, to_integer(unsigned(y_in((2*COORD_BITS-1) downto COORD_BITS))));
                 write(my_line, string'("), data = "));
-                write(my_line, y_message_r((BUS_WIDTH-1) downto 2*COORD_BITS));
+                write(my_line, y_in((BUS_WIDTH-1) downto 2*COORD_BITS));
                 write(my_line, string'(", raw = "));
-                write(my_line, y_message_r((BUS_WIDTH-1) downto 0));
+                write(my_line, y_in((BUS_WIDTH-1) downto 0));
                 
                 writeline(output, my_line);
             end if;
@@ -525,15 +529,15 @@ begin
                 writeline(output, my_line);
             end if;
             
-            if (pe_fifo_en_r = '1' and PRINT_PE_FIFO_IN) then
+            if (pe_in_valid = '1' and PRINT_PE_FIFO_IN) then
                 write(my_line, string'("fifo_pe_in: destination = ("));
-                write(my_line, to_integer(unsigned(pe_fifo_data_r((COORD_BITS-1) downto 0))));
+                write(my_line, to_integer(unsigned(pe_in((COORD_BITS-1) downto 0))));
                 write(my_line, string'(", "));
-                write(my_line, to_integer(unsigned(pe_fifo_data_r((2*COORD_BITS-1) downto COORD_BITS))));
+                write(my_line, to_integer(unsigned(pe_in((2*COORD_BITS-1) downto COORD_BITS))));
                 write(my_line, string'("), data = "));
-                write(my_line, pe_fifo_data_r((BUS_WIDTH-1) downto 2*COORD_BITS));
+                write(my_line, pe_in((BUS_WIDTH-1) downto 2*COORD_BITS));
                 write(my_line, string'(", raw = "));
-                write(my_line, pe_fifo_data_r((BUS_WIDTH-1) downto 0));
+                write(my_line, pe_in((BUS_WIDTH-1) downto 0));
                 
                 writeline(output, my_line);
             end if;
@@ -653,7 +657,7 @@ begin
     variable my_line : line;
     begin
         if (rising_edge(clk) and reset_n = '1' and count <= MAX_CYCLES) then
-            if (check_pe_message_fifo_r_valid = '1') then
+            if (check_pe_message_fifo_en_r = '1') then
                 if (unsigned(check_pe_message_fifo_data_r) /= unsigned(pe_fifo_data_r)) then
                     write(my_line, string'("pe_in message "));
                     write(my_line, count-1);
@@ -671,14 +675,14 @@ begin
                     
                     writeline(output, my_line);
                     
-                    write(my_line, string'("last_pe_message_sent: destination = ("));
-                    write(my_line, to_integer(unsigned(pe_fifo_data_r((COORD_BITS-1) downto 0))));
+                    write(my_line, string'("pe_in: destination = ("));
+                    write(my_line, to_integer(unsigned(pe_in((COORD_BITS-1) downto 0))));
                     write(my_line, string'(", "));
-                    write(my_line, to_integer(unsigned(pe_fifo_data_r((2*COORD_BITS-1) downto COORD_BITS))));
+                    write(my_line, to_integer(unsigned(pe_in((2*COORD_BITS-1) downto COORD_BITS))));
                     write(my_line, string'("), data = "));
-                    write(my_line, pe_fifo_data_r((BUS_WIDTH-1) downto 2*COORD_BITS));
+                    write(my_line, pe_in((BUS_WIDTH-1) downto 2*COORD_BITS));
                     write(my_line, string'(", raw = "));
-                    write(my_line, pe_fifo_data_r((BUS_WIDTH-1) downto 0));
+                    write(my_line, pe_in((BUS_WIDTH-1) downto 0));
                     
                     writeline(output, my_line);
                     
@@ -705,14 +709,14 @@ begin
                     
                     writeline(output, my_line);
                     
-                    write(my_line, string'("last_pe_message_sent: destination = ("));
-                    write(my_line, to_integer(unsigned(pe_fifo_data_r((COORD_BITS-1) downto 0))));
+                    write(my_line, string'("pe_in: destination = ("));
+                    write(my_line, to_integer(unsigned(pe_in((COORD_BITS-1) downto 0))));
                     write(my_line, string'(", "));
-                    write(my_line, to_integer(unsigned(pe_fifo_data_r((2*COORD_BITS-1) downto COORD_BITS))));
+                    write(my_line, to_integer(unsigned(pe_in((2*COORD_BITS-1) downto COORD_BITS))));
                     write(my_line, string'("), data = "));
-                    write(my_line, pe_fifo_data_r((BUS_WIDTH-1) downto 2*COORD_BITS));
+                    write(my_line, pe_in((BUS_WIDTH-1) downto 2*COORD_BITS));
                     write(my_line, string'(", raw = "));
-                    write(my_line, pe_fifo_data_r((BUS_WIDTH-1) downto 0));
+                    write(my_line, pe_in((BUS_WIDTH-1) downto 0));
                     
                     -- Print a new line
                     write(my_line, string'(""));
