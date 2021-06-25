@@ -72,45 +72,26 @@ architecture Behavioral of hoplite_router_tb is
             pe_backpressure : out STD_LOGIC
         );
     end component hoplite_router;
-    
-    component synchronous_FIFO_with_block_RAM
+
+    component fifo_sync
         generic (
-            W   : natural := 16;
-            D   : natural := 65536;
-            B   : natural := 16
+            BUS_WIDTH   : integer := 32;
+            FIFO_DEPTH  : integer := 64
         );
         port (
-           reset_n  : in  STD_LOGIC;
-           clock    : in  STD_LOGIC;
-           enR      : in  STD_LOGIC;
-           enW      : in  STD_LOGIC;
-           emptyR   : out  STD_LOGIC;
-           fullW    : out  STD_LOGIC;
-           dataR    : out  STD_LOGIC_VECTOR (B-1 downto 0);
-           dataW    : in  STD_LOGIC_VECTOR (B-1 downto 0)
+            clk         : in std_logic;
+            reset_n     : in std_logic;
+
+            write_en    : in std_logic;
+            write_data  : in std_logic_vector((BUS_WIDTH-1) downto 0);
+
+            read_en     : in std_logic;
+            read_data   : out std_logic_vector((BUS_WIDTH-1) downto 0);
+
+            full        : out std_logic;
+            empty       : out std_logic
         );
-    end component synchronous_FIFO_with_block_RAM;
-    
-    component FIFO_Regs_No_Flags
-        generic (
-            g_WIDTH : natural := 8;
-            g_DEPTH : integer := 32
-        );
-        port (
-            i_rst_sync : in std_logic;
-            i_clk      : in std_logic;
-         
-            -- FIFO Write Interface
-            i_wr_en   : in  std_logic;
-            i_wr_data : in  std_logic_vector(g_WIDTH-1 downto 0);
-            o_full    : out std_logic;
-         
-            -- FIFO Read Interface
-            i_rd_en   : in  std_logic;
-            o_rd_data : out std_logic_vector(g_WIDTH-1 downto 0);
-            o_empty   : out std_logic
-        );
-    end component FIFO_Regs_No_Flags;
+    end component fifo_sync;
     
     constant MAX_CYCLES         : integer := 500;
     constant VALID_THRESHOLD    : real := 0.75;
@@ -167,10 +148,8 @@ architecture Behavioral of hoplite_router_tb is
     signal pe_backpressure  : std_logic;
     
     constant FIFO_ADDRESS_WIDTH     : natural := ceil_log2(MAX_CYCLES);
-    constant FIFO_RAM_DEPTH         : natural := 2 ** FIFO_ADDRESS_WIDTH;
+    constant FIFO_DEPTH         : natural := 2 ** FIFO_ADDRESS_WIDTH;
     constant FIFO_DATA_WIDTH        : natural := BUS_WIDTH; 
-    
-    signal fifo_reset                               : std_logic;
     
     signal pe_fifo_en_w, pe_fifo_en_r               : std_logic;
     signal pe_fifo_empty, pe_fifo_full              : std_logic;
@@ -207,8 +186,6 @@ begin
         clk <= '1';
         wait for clk_period/2;  --for next 0.5 ns signal is '1'.
     end process CLK_PROCESS;
-    
-    fifo_reset <= not reset_n;
     
     -- Construct message
     CONSTRUCT_MESSAGE: process (clk)
@@ -289,22 +266,23 @@ begin
     y_in_valid  <= y_message_r_valid;
     
     -- FIFO for processing element messages
-    PE_FIFO: FIFO_Regs_No_Flags
+    PE_FIFO: fifo_sync
     generic map (
-        g_WIDTH  => FIFO_DATA_WIDTH,
-        g_DEPTH  => FIFO_RAM_DEPTH
+        BUS_WIDTH   => FIFO_DATA_WIDTH,
+        FIFO_DEPTH  => FIFO_DEPTH
     )
     port map (
-        i_rst_sync  => fifo_reset,
-        i_clk       => clk,
+        clk         => clk,
+        reset_n     => reset_n,
         
-        i_wr_en     => pe_fifo_en_w,
-        i_wr_data   => pe_fifo_data_w,
-        o_full      => pe_fifo_full,
-
-        i_rd_en     => pe_fifo_en_r,
-        o_rd_data   => pe_fifo_data_r,
-        o_empty     => pe_fifo_empty
+        write_en    => pe_fifo_en_w,
+        write_data  => pe_fifo_data_w,
+        
+        read_en     => pe_fifo_en_r,
+        read_data   => pe_fifo_data_r,
+        
+        full        => pe_fifo_full,
+        empty       => pe_fifo_empty
     );
     
     -- Register processing element FIFO control signals
@@ -378,22 +356,23 @@ begin
     );
     
     -- FIFO for checking output messages    
-    CHECK_DEST_FIFO: FIFO_Regs_No_Flags
+    CHECK_DEST_FIFO: fifo_sync
     generic map (
-        g_WIDTH  => FIFO_DATA_WIDTH,
-        g_DEPTH  => FIFO_RAM_DEPTH
+        BUS_WIDTH   => FIFO_DATA_WIDTH,
+        FIFO_DEPTH  => FIFO_DEPTH
     )
-    port map (
-        i_rst_sync  => fifo_reset,
-        i_clk       => clk,
+    port map (        
+        clk         => clk,
+        reset_n     => reset_n,
         
-        i_wr_en     => check_dest_fifo_en_w,
-        i_wr_data   => check_dest_fifo_data_w,
-        o_full      => check_dest_fifo_full,
+        write_en    => check_dest_fifo_en_w,
+        write_data  => check_dest_fifo_data_w,
 
-        i_rd_en     => check_dest_fifo_en_r,
-        o_rd_data   => check_dest_fifo_data_r,
-        o_empty     => check_dest_fifo_empty
+        read_en     => check_dest_fifo_en_r,
+        read_data   => check_dest_fifo_data_r,
+        
+        full        => check_dest_fifo_full,
+        empty       => check_dest_fifo_empty
     );
     
     -- Writing to FIFO
@@ -432,22 +411,23 @@ begin
     end process CHECK_DEST_FIFO_READ_ENABLE;
     
     -- FIFO for checking messages sent from processing element
-    CHECK_PE_MESSAGE_FIFO: FIFO_Regs_No_Flags
+    CHECK_PE_MESSAGE_FIFO: fifo_sync
     generic map (
-        g_WIDTH  => FIFO_DATA_WIDTH,
-        g_DEPTH  => FIFO_RAM_DEPTH
+        BUS_WIDTH   => FIFO_DATA_WIDTH,
+        FIFO_DEPTH  => FIFO_DEPTH
     )
-    port map (
-        i_rst_sync  => fifo_reset,
-        i_clk       => clk,
+    port map (       
+        clk         => clk,
+        reset_n     => reset_n,
         
-        i_wr_en     => check_pe_message_fifo_en_w,
-        i_wr_data   => check_pe_message_fifo_data_w,
-        o_full      => check_pe_message_fifo_full,
+        write_en    => check_pe_message_fifo_en_w,
+        write_data  => check_pe_message_fifo_data_w,
 
-        i_rd_en     => check_pe_message_fifo_en_r,
-        o_rd_data   => check_pe_message_fifo_data_r,
-        o_empty     => check_pe_message_fifo_empty
+        read_en     => check_pe_message_fifo_en_r,
+        read_data   => check_pe_message_fifo_data_r,
+        
+        full        => check_pe_message_fifo_full,
+        empty       => check_pe_message_fifo_empty
     );
     
     -- Writing to FIFO
