@@ -92,7 +92,34 @@ architecture Behavioral of hoplite_router_tb is
             empty       : out std_logic
         );
     end component fifo_sync;
+
+    component nic_testbench
+        generic (
+            BUS_WIDTH   : integer := 32;
+            FIFO_DEPTH  : integer := 64
+        );
+        port (
+            clk                 : in std_logic;
+            reset_n             : in std_logic;
+
+            pe_in_valid         : in std_logic;
+            pe_in_data          : in std_logic_vector((BUS_WIDTH-1) downto 0);
+
+            network_ready       : in std_logic;
+
+            network_out_valid   : out std_logic;
+            network_out_data    : out std_logic_vector((BUS_WIDTH-1) downto 0);
+
+            full           : out std_logic;
+            empty          : out std_logic
+        );
+    end component nic_testbench;
     
+    signal clk          : std_logic := '0';
+    constant clk_period : time := 10 ns;
+    
+    signal reset_n      : std_logic;
+
     constant MAX_CYCLES         : integer := 500;
     constant VALID_THRESHOLD    : real := 0.75;
     constant PE_IN_THRESHOLD    : real := 0.10;
@@ -101,7 +128,7 @@ architecture Behavioral of hoplite_router_tb is
     constant Y_COORD    : integer := 0;
     constant COORD_BITS : integer := 2;
     constant BUS_WIDTH  : integer := 4 * COORD_BITS;
-    constant DATA_WIDTH : integer := BUS_WIDTH-2*COORD_BITS;
+    constant DATA_WIDTH : integer := BUS_WIDTH - 2*COORD_BITS;
     
     constant NETWORK_ROWS   : integer := 2 ** COORD_BITS;
     constant NETWORK_COLS   : integer := 2 ** COORD_BITS;
@@ -111,12 +138,7 @@ architecture Behavioral of hoplite_router_tb is
     
     constant X_INDEX    : integer := 0;
     constant Y_INDEX    : integer := 1;
-    
-    signal clk          : std_logic := '0';
-    constant clk_period : time := 10 ns;
-    
-    signal reset_n      : std_logic;
-    
+
     type t_Coordinate is array (0 to 1) of std_logic_vector((COORD_BITS-1) downto 0);
     signal x_message_dest, y_message_dest, pe_message_dest : t_Coordinate;
     
@@ -143,17 +165,17 @@ architecture Behavioral of hoplite_router_tb is
     signal y_out        : std_logic_vector((BUS_WIDTH-1) downto 0);
     signal y_out_valid  : std_logic;
     
-    signal pe_out           : std_logic_vector((BUS_WIDTH-1) downto 0);
-    signal pe_out_valid     : std_logic;
-    signal pe_backpressure  : std_logic;
+    signal pe_out           :    std_logic_vector((BUS_WIDTH-1) downto 0);
+    signal pe_out_valid         : std_logic;
+    signal pe_backpressure      : std_logic;
+    signal not_pe_backpressure  : std_logic;
     
     constant FIFO_ADDRESS_WIDTH     : natural := ceil_log2(MAX_CYCLES);
-    constant FIFO_DEPTH         : natural := 2 ** FIFO_ADDRESS_WIDTH;
+    constant FIFO_DEPTH             : natural := 2 ** FIFO_ADDRESS_WIDTH;
     constant FIFO_DATA_WIDTH        : natural := BUS_WIDTH; 
     
     signal pe_fifo_en_w, pe_fifo_en_r               : std_logic;
     signal pe_fifo_empty, pe_fifo_full              : std_logic;
-    signal pe_fifo_empty_r, pe_fifo_full_r          : std_logic;
     signal pe_fifo_data_w, pe_fifo_data_r           : std_logic_vector((BUS_WIDTH-1) downto 0);
         
     signal check_dest_fifo_en_w, check_dest_fifo_en_r       : std_logic;
@@ -265,70 +287,29 @@ begin
     y_in        <= y_message_r;
     y_in_valid  <= y_message_r_valid;
     
-    -- FIFO for processing element messages
-    PE_FIFO: fifo_sync
+    -- Processing element network interface controller
+    not_pe_backpressure <= not pe_backpressure;
+
+    PE_NIC: nic_testbench
     generic map (
-        BUS_WIDTH   => FIFO_DATA_WIDTH,
+        BUS_WIDTH   => BUS_WIDTH,
         FIFO_DEPTH  => FIFO_DEPTH
     )
     port map (
-        clk         => clk,
-        reset_n     => reset_n,
-        
-        write_en    => pe_fifo_en_w,
-        write_data  => pe_fifo_data_w,
-        
-        read_en     => pe_fifo_en_r,
-        read_data   => pe_fifo_data_r,
-        
-        full        => pe_fifo_full,
-        empty       => pe_fifo_empty
+        clk                 => clk,
+        reset_n             => reset_n,
+
+        pe_in_valid         => pe_message_b_valid,
+        pe_in_data          => pe_message_b,
+
+        network_ready       => not_pe_backpressure,
+
+        network_out_valid   => pe_in_valid,
+        network_out_data    => pe_in,
+
+        full                => open,
+        empty               => open
     );
-    
-    -- Register processing element FIFO control signals
-    PE_FIFO_CONTROL: process (clk)
-    begin
-        if (rising_edge(clk) and count <= MAX_CYCLES) then
-            if (reset_n = '0') then
-                pe_fifo_empty_r <= '1';
-                pe_fifo_full_r  <= '0';
-            else
-                pe_fifo_empty_r <= pe_fifo_empty;
-                pe_fifo_full_r  <= pe_fifo_full;
-            end if;
-        end if;
-    end process PE_FIFO_CONTROL;
-    
-    -- Writing to processing element FIFO
-    PE_FIFO_WRITE: process (clk)
-    begin
-        if (rising_edge(clk) and count <= MAX_CYCLES) then
-            if (reset_n = '0') then
-                pe_fifo_data_w <= (others => '0');
-                pe_fifo_en_w   <= '0';
-            elsif (pe_fifo_full = '0') then
-                if (pe_message_b_valid = '1') then
-                    pe_fifo_data_w     <= pe_message_b;
-                    pe_fifo_en_w       <= '1';
-                else
-                    pe_fifo_en_w       <= '0';
-                end if;
-            end if;
-        end if;
-    end process PE_FIFO_WRITE;
-    
-    -- Read from processing element FIFO
-    PE_FIFO_READ_ENABLE: process (pe_fifo_empty, pe_backpressure)
-    begin
-        if (pe_fifo_empty = '0') then
-            pe_fifo_en_r   <= not pe_backpressure;
-        else
-            pe_fifo_en_r   <= '0';
-        end if;
-    end process PE_FIFO_READ_ENABLE;
-    
-    pe_in       <= pe_fifo_data_r;
-    pe_in_valid <= pe_fifo_en_r;
     
     DUT: hoplite_router
     generic map (
@@ -449,10 +430,10 @@ begin
     end process CHECK_PE_MESSAGE_FIFO_WRITE;
     
     -- Read from FIFO
-    CHECK_PE_MESSAGE_FIFO_READ_ENABLE: process (check_pe_message_fifo_empty, pe_fifo_en_r)
+    CHECK_PE_MESSAGE_FIFO_READ_ENABLE: process (check_pe_message_fifo_empty, pe_in_valid)
     begin
         if (check_pe_message_fifo_empty = '0') then
-            check_pe_message_fifo_en_r   <= pe_fifo_en_r;
+            check_pe_message_fifo_en_r   <= pe_in_valid;
         else
             check_pe_message_fifo_en_r   <= '0';
         end if;
@@ -638,7 +619,7 @@ begin
     begin
         if (rising_edge(clk) and reset_n = '1' and count <= MAX_CYCLES) then
             if (check_pe_message_fifo_en_r = '1') then
-                if (unsigned(check_pe_message_fifo_data_r) /= unsigned(pe_fifo_data_r)) then
+                if (unsigned(check_pe_message_fifo_data_r) /= unsigned(pe_in)) then
                     write(my_line, string'(HT & "pe_in message "));
                     write(my_line, count-1);
                     write(my_line, string'(" does not match"));
