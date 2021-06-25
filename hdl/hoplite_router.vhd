@@ -70,17 +70,23 @@ architecture Behavioral of hoplite_router is
     type t_Coordinate is array (0 to 1) of std_logic_vector((COORD_BITS-1) downto 0);
     signal x_in_dest, y_in_dest : t_Coordinate;
     
+    constant X_INDEX_HEADER_START   : integer := 0;
+    constant X_INDEX_HEADER_END     : integer := COORD_BITS-1;
+    
+    constant Y_INDEX_HEADER_START   : integer := COORD_BITS;
+    constant Y_INDEX_HEADER_END     : integer := 2*COORD_BITS-1;
+    
     constant X_INDEX    : integer := 0;
     constant Y_INDEX    : integer := 1;
 
 begin
 
     -- Assign destination coordinates   
-    x_in_dest(X_INDEX) <= x_d((COORD_BITS-1) downto 0);
-    x_in_dest(Y_INDEX) <= x_d((2*COORD_BITS-1) downto COORD_BITS);
+    x_in_dest(X_INDEX) <= x_d(X_INDEX_HEADER_END downto X_INDEX_HEADER_START);
+    x_in_dest(Y_INDEX) <= x_d(Y_INDEX_HEADER_END downto Y_INDEX_HEADER_START);
     
-    y_in_dest(X_INDEX) <= y_d((COORD_BITS-1) downto 0);
-    y_in_dest(Y_INDEX) <= y_d((2*COORD_BITS-1) downto COORD_BITS);
+    y_in_dest(X_INDEX) <= y_d(X_INDEX_HEADER_END downto X_INDEX_HEADER_START);
+    y_in_dest(Y_INDEX) <= y_d(Y_INDEX_HEADER_END downto Y_INDEX_HEADER_START);
     
     x_in_valid_d <= x_in_valid;
     y_in_valid_d <= y_in_valid;
@@ -130,10 +136,6 @@ begin
     -- Output to X and Y links
     x_out <= x_q;
     y_out <= y_q;
-               
-    -- Valid signal routing
-    x_out_valid <= x_next;
-    y_out_valid <= y_next;
     
     OUTPUT_VALID_FF : process (clk)
     begin
@@ -149,7 +151,7 @@ begin
                     x_next <= pe_in_valid;
                 end if;
                 
-                
+                -- Switch y_out to act as pe_out
                 if (x_in_valid_d = '1' and (to_integer(unsigned(x_in_dest(X_INDEX))) = X_COORD)
                         and (to_integer(unsigned(x_in_dest(Y_INDEX))) = Y_COORD)) then
                     y_next <= '0';
@@ -168,6 +170,45 @@ begin
             end if;
         end if;
     end process OUTPUT_VALID_FF;
+    
+    -- Valid signal routing    
+    OUTPUT_VALID: process(y_in_valid_q, x_in_valid_q, y_q, x_q)
+    begin
+        -- Multicast not possible
+        if (y_in_valid_q = '1') then
+            x_out_valid <= x_next;
+            y_out_valid <= y_next;
+        elsif (to_integer(unsigned(x_in_dest(X_INDEX))) /= X_COORD) then
+            x_out_valid <= x_next;
+            y_out_valid <= '0';
+        elsif (to_integer(unsigned(x_in_dest(Y_INDEX))) /= Y_COORD) then
+            x_out_valid <= '0';
+            y_out_valid <= y_next;
+        else
+            x_out_valid <= x_next;
+            y_out_valid <= y_next;
+        end if;
+    end process OUTPUT_VALID;
+
+--    OUTPUT_VALID: process(clk)
+--    begin
+--        if (rising_edge(clk)) then
+--            -- Multicast not possible
+--            if (y_in_valid_q = '1') then
+--                x_out_valid <= x_next;
+--                y_out_valid <= y_next;
+--            elsif (to_integer(unsigned(x_in_dest(X_INDEX))) /= X_COORD) then
+--                x_out_valid <= x_next;
+--                y_out_valid <= '0';
+--            elsif (to_integer(unsigned(x_in_dest(Y_INDEX))) /= Y_COORD) then
+--                x_out_valid <= '0';
+--                y_out_valid <= y_next;
+--            else
+--                x_out_valid <= x_next;
+--                y_out_valid <= y_next;
+--            end if;
+--        end if;
+--    end process OUTPUT_VALID;
         
     -- Output to PE    
     PE_OUTPUT_FF : process (clk)

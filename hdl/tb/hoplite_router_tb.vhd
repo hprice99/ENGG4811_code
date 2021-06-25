@@ -586,12 +586,12 @@ begin
         if (rising_edge(clk) and reset_n = '1' and count <= MAX_CYCLES) then
             if (check_dest_fifo_en_r = '1') then
                 if (unsigned(check_dest_fifo_data_r) /= unsigned(pe_out)) then
-                    write(my_line, string'("pe_out message "));
+                    write(my_line, string'(HT & "pe_out message "));
                     write(my_line, count-1);
                     write(my_line, string'(" does not match"));
                     writeline(output, my_line);
                     
-                    write(my_line, string'("pe_out: destination = ("));
+                    write(my_line, string'(HT & "pe_out: destination = ("));
                     write(my_line, to_integer(unsigned(pe_out((COORD_BITS-1) downto 0))));
                     write(my_line, string'(", "));
                     write(my_line, to_integer(unsigned(pe_out((2*COORD_BITS-1) downto COORD_BITS))));
@@ -602,7 +602,7 @@ begin
                     
                     writeline(output, my_line);
                     
-                    write(my_line, string'("check_dest_fifo_out: destination = ("));
+                    write(my_line, string'(HT & "check_dest_fifo_out: destination = ("));
                     write(my_line, to_integer(unsigned(check_dest_fifo_data_r((COORD_BITS-1) downto 0))));
                     write(my_line, string'(", "));
                     write(my_line, to_integer(unsigned(check_dest_fifo_data_r((2*COORD_BITS-1) downto COORD_BITS))));
@@ -619,7 +619,7 @@ begin
                     
                     finish;
                 else
-                    write(my_line, string'("pe_out message "));
+                    write(my_line, string'(HT & "pe_out message "));
                     write(my_line, count-1);
                     write(my_line, string'(" matches"));
                     writeline(output, my_line);
@@ -639,12 +639,12 @@ begin
         if (rising_edge(clk) and reset_n = '1' and count <= MAX_CYCLES) then
             if (check_pe_message_fifo_en_r = '1') then
                 if (unsigned(check_pe_message_fifo_data_r) /= unsigned(pe_fifo_data_r)) then
-                    write(my_line, string'("pe_in message "));
+                    write(my_line, string'(HT & "pe_in message "));
                     write(my_line, count-1);
                     write(my_line, string'(" does not match"));
                     writeline(output, my_line);
                     
-                    write(my_line, string'("check_pe_message_fifo_data_r: destination = ("));
+                    write(my_line, string'(HT & "check_pe_message_fifo_data_r: destination = ("));
                     write(my_line, to_integer(unsigned(check_pe_message_fifo_data_r((COORD_BITS-1) downto 0))));
                     write(my_line, string'(", "));
                     write(my_line, to_integer(unsigned(check_pe_message_fifo_data_r((2*COORD_BITS-1) downto COORD_BITS))));
@@ -655,7 +655,7 @@ begin
                     
                     writeline(output, my_line);
                     
-                    write(my_line, string'("pe_in: destination = ("));
+                    write(my_line, string'(HT & "pe_in: destination = ("));
                     write(my_line, to_integer(unsigned(pe_in((COORD_BITS-1) downto 0))));
                     write(my_line, string'(", "));
                     write(my_line, to_integer(unsigned(pe_in((2*COORD_BITS-1) downto COORD_BITS))));
@@ -673,12 +673,12 @@ begin
                     -- finish;
                     stop;
                 else
-                    write(my_line, string'("pe_in message "));
+                    write(my_line, string'(HT & "pe_in message "));
                     write(my_line, count-1);
                     write(my_line, string'(" matches"));
                     writeline(output, my_line);
                     
-                    write(my_line, string'("check_pe_message_fifo_data_r: destination = ("));
+                    write(my_line, string'(HT & "check_pe_message_fifo_data_r: destination = ("));
                     write(my_line, to_integer(unsigned(check_pe_message_fifo_data_r((COORD_BITS-1) downto 0))));
                     write(my_line, string'(", "));
                     write(my_line, to_integer(unsigned(check_pe_message_fifo_data_r((2*COORD_BITS-1) downto COORD_BITS))));
@@ -689,7 +689,7 @@ begin
                     
                     writeline(output, my_line);
                     
-                    write(my_line, string'("pe_in: destination = ("));
+                    write(my_line, string'(HT & "pe_in: destination = ("));
                     write(my_line, to_integer(unsigned(pe_in((COORD_BITS-1) downto 0))));
                     write(my_line, string'(", "));
                     write(my_line, to_integer(unsigned(pe_in((2*COORD_BITS-1) downto COORD_BITS))));
