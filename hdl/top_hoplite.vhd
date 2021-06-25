@@ -134,15 +134,25 @@ architecture Behavioral of top is
     signal sw0_pipelined, sw1_pipelined, sw2_pipelined, sw3_pipelined : std_logic;
     constant SWITCH_PIPELINE_STAGES : integer := 30;
     constant MEM_SIZE : integer := 1024;
+    
+    signal clkdiv2 : std_logic;
 
 begin
+
+    -- Clock divider
+    CLOCK_DIVIDER: process (CLK_100MHZ)
+    begin
+        if (rising_edge(CLK_100MHZ)) then       
+            clkdiv2 <= not clkdiv2;
+        end if;
+    end process CLOCK_DIVIDER;
 
     SW0_PIPELINE : pipeline
         generic map (
             STAGES  => SWITCH_PIPELINE_STAGES
         )
         port map (
-            clk         => CLK_100MHZ,
+            clk         => clkdiv2,
             d_in        => SW(0),
             d_out       => sw0_pipelined
         );
@@ -156,7 +166,7 @@ begin
            MEM_SIZE         => MEM_SIZE
         )
         port map (
-            clk                         => CLK_100MHZ,
+            clk                         => clkdiv2,
             resetn                      => CPU_RESETN,
             sw                          => sw0_pipelined,
             in_byte_en                  => pe_out_messages_valid(0, 0),
@@ -185,7 +195,7 @@ begin
         COORD_BITS  => COORD_BITS
     )
     port map (
-        clk                 => CLK_100MHZ,
+        clk                 => clkdiv2,
         reset_n             => CPU_RESETN,
         x_in                => x_messages(1, 0),
         x_in_valid          => x_messages_valid(1, 0),
@@ -207,7 +217,7 @@ begin
             STAGES  => SWITCH_PIPELINE_STAGES
         )
         port map (
-            clk         => CLK_100MHZ,
+            clk         => clkdiv2,
             d_in        => SW(1),
             d_out       => sw1_pipelined
         );
@@ -221,7 +231,7 @@ begin
            MEM_SIZE         => MEM_SIZE
         )
         port map (
-            clk                         => CLK_100MHZ,
+            clk                         => clkdiv2,
             resetn                      => CPU_RESETN,
             sw                          => sw1_pipelined,
             in_byte_en                  => pe_out_messages_valid(1, 0),
@@ -250,7 +260,7 @@ begin
         COORD_BITS  => COORD_BITS
     )
     port map (
-        clk                 => CLK_100MHZ,
+        clk                 => clkdiv2,
         reset_n             => CPU_RESETN,
         x_in                => x_messages(0, 0),
         x_in_valid          => x_messages_valid(0, 0),
@@ -272,7 +282,7 @@ begin
             STAGES  => SWITCH_PIPELINE_STAGES
         )
         port map (
-            clk         => CLK_100MHZ,
+            clk         => clkdiv2,
             d_in        => SW(2),
             d_out       => sw2_pipelined
         );
@@ -286,7 +296,7 @@ begin
            MEM_SIZE         => MEM_SIZE
         )
         port map (
-            clk                         => CLK_100MHZ,
+            clk                         => clkdiv2,
             resetn                      => CPU_RESETN,
             sw                          => sw2_pipelined,
             in_byte_en                  => pe_out_messages_valid(0, 1),
@@ -315,7 +325,7 @@ begin
         COORD_BITS  => COORD_BITS
     )
     port map (
-        clk                 => CLK_100MHZ,
+        clk                 => clkdiv2,
         reset_n             => CPU_RESETN,
         x_in                => x_messages(1, 1),
         x_in_valid          => x_messages_valid(1, 1),
@@ -337,7 +347,7 @@ begin
             STAGES  => SWITCH_PIPELINE_STAGES
         )
         port map (
-            clk         => CLK_100MHZ,
+            clk         => clkdiv2,
             d_in        => SW(3),
             d_out       => sw3_pipelined
         );
@@ -351,7 +361,7 @@ begin
            MEM_SIZE         => MEM_SIZE
         )
         port map (
-            clk                         => CLK_100MHZ,
+            clk                         => clkdiv2,
             resetn                      => CPU_RESETN,
             sw                          => sw3_pipelined,
             in_byte_en                  => pe_out_messages_valid(1, 1),
@@ -380,7 +390,7 @@ begin
         COORD_BITS  => COORD_BITS
     )
     port map (
-        clk                 => CLK_100MHZ,
+        clk                 => clkdiv2,
         reset_n             => CPU_RESETN,
         x_in                => x_messages(0, 1),
         x_in_valid          => x_messages_valid(0, 1),
