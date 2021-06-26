@@ -65,21 +65,27 @@ architecture Behavioral of hoplite_tb is
     
     signal reset_n      : std_logic;
     
-    constant NETWORK_ROWS   : integer := 3;
-    constant NETWORK_COLS   : integer := 3;
+    constant NETWORK_ROWS   : integer := 2;
+    constant NETWORK_COLS   : integer := 2;
     constant NETWORK_NODES  : integer := NETWORK_ROWS * NETWORK_COLS;
-    constant COORD_BITS     : integer := 2;
+    constant COORD_BITS     : integer := 1;
     constant BUS_WIDTH      : integer := 4 * COORD_BITS;
     
+    type t_Coordinate is array (0 to 1) of std_logic_vector((COORD_BITS-1) downto 0);
+    constant X_INDEX    : integer := 0;
+    constant Y_INDEX    : integer := 1;
+    
     -- Array of message interfaces between nodes
-    type t_Message is array (0 to (NETWORK_ROWS-1), 0 to (NETWORK_COLS-1)) of std_logic_vector((BUS_WIDTH-1) downto 0);
-    type t_MessageValid is array (0 to (NETWORK_ROWS-1), 0 to (NETWORK_COLS-1)) of std_logic;
+    type t_Destination is array(0 to (NETWORK_COLS-1), 0 to (NETWORK_ROWS-1)) of t_Coordinate;
+    type t_Message is array (0 to (NETWORK_COLS-1), 0 to (NETWORK_ROWS-1)) of std_logic_vector((BUS_WIDTH-1) downto 0);
+    type t_MessageValid is array (0 to (NETWORK_COLS-1), 0 to (NETWORK_ROWS-1)) of std_logic;
     
 --    signal x_messages, y_messages : t_Message := (others => (others => (others => '0')));
 --    signal x_messages_valid, y_messages_valid : t_MessageValid := (others => (others => '0'));
 --    signal trig : t_MessageValid := (others => (others => '0'));
 
     signal x_messages, y_messages : t_Message;
+    signal destinations : t_Destination;
     signal x_messages_valid, y_messages_valid : t_MessageValid;
     signal trig : t_MessageValid;
     
@@ -109,7 +115,11 @@ begin
             constant curr_col : integer := j;
             constant next_row : integer := ((i+1) mod NETWORK_ROWS);
             constant next_col : integer := ((j+1) mod NETWORK_COLS);
-            begin        
+            begin
+                -- Set destination
+                destinations(curr_col, curr_row)(X_INDEX) <= std_logic_vector(to_unsigned(next_col, COORD_BITS));
+                destinations(curr_col, curr_row)(Y_INDEX) <= std_logic_vector(to_unsigned(next_row, COORD_BITS));
+            
                 -- Instantiate node
                 NODE: hoplite_tb_node
                 generic map (
@@ -121,17 +131,17 @@ begin
                 port map (
                     clk                 => clk,
                     reset_n             => reset_n,
-                    x_dest              => std_logic_vector(to_unsigned(next_row, COORD_BITS)),
-                    y_dest              => std_logic_vector(to_unsigned(next_col, COORD_BITS)),
-                    trig                => trig(curr_row, curr_col),
-                    x_in                => x_messages(curr_row, prev_col),
-                    x_in_valid          => x_messages_valid(curr_row, prev_col),
-                    y_in                => y_messages(prev_row, curr_col),
-                    y_in_valid          => y_messages_valid(prev_row, curr_col),
-                    x_out               => x_messages(curr_row, next_col),
-                    x_out_valid         => x_messages_valid(curr_row, next_col),
-                    y_out               => y_messages(next_row, curr_col),
-                    y_out_valid         => y_messages_valid(next_row, curr_col)
+                    x_dest              => destinations(curr_col, curr_row)(X_INDEX),
+                    y_dest              => destinations(curr_col, curr_row)(Y_INDEX),
+                    trig                => trig(curr_col, curr_row),
+                    x_in                => x_messages(prev_col, curr_row),
+                    x_in_valid          => x_messages_valid(prev_col, curr_row),                  
+                    y_in                => y_messages(curr_col, prev_row),
+                    y_in_valid          => y_messages_valid(curr_col, prev_row),
+                    x_out               => x_messages(next_col, curr_row),
+                    x_out_valid         => x_messages_valid(next_col, curr_row),
+                    y_out               => y_messages(curr_col, next_row),
+                    y_out_valid         => y_messages_valid(curr_col, next_row)
                 );
             
             -- TODO Ensure that each node's trig is only one-bit
