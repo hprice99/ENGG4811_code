@@ -134,8 +134,8 @@ architecture Behavioral of hoplite_tb_node is
     constant FIFO_DEPTH : integer := 100;
     
     -- Messages from PE to network
-    signal pe_to_network       : STD_LOGIC_VECTOR ((BUS_WIDTH-1) downto 0);
-    signal pe_to_network_valid : STD_LOGIC;
+    signal pe_message_out       : STD_LOGIC_VECTOR ((BUS_WIDTH-1) downto 0);
+    signal pe_message_out_valid : STD_LOGIC;
     
     signal pe_to_network_message    : STD_LOGIC_VECTOR ((BUS_WIDTH-1) downto 0);
     signal pe_to_network_valid      : STD_LOGIC;
@@ -146,11 +146,11 @@ architecture Behavioral of hoplite_tb_node is
     signal pe_to_network_full, pe_to_network_empty   : STD_LOGIC;
     
     -- Messages from network to PE
+    signal pe_message_in        : STD_LOGIC_VECTOR ((BUS_WIDTH-1) downto 0);
+    signal pe_message_in_valid  : STD_LOGIC;
+    
     signal network_to_pe_message    : STD_LOGIC_VECTOR ((BUS_WIDTH-1) downto 0);
     signal network_to_pe_valid      : STD_LOGIC;
-    
-    signal network_to_pe       : STD_LOGIC_VECTOR ((BUS_WIDTH-1) downto 0);
-    signal network_to_pe_valid : STD_LOGIC;
     
     signal pe_ready : STD_LOGIC;
     
@@ -176,13 +176,13 @@ begin
             x_in_valid          => x_in_valid,
             y_in                => y_in,
             y_in_valid          => y_in_valid,
-            pe_in               => pe_to_network,
+            pe_in               => pe_to_network_message,
             pe_in_valid         => pe_to_network_valid,
             x_out               => x_out_d,
             x_out_valid         => x_out_valid_d,
             y_out               => y_out_d,
             y_out_valid         => y_out_valid_d,
-            pe_out              => network_to_pe,
+            pe_out              => network_to_pe_message,
             pe_out_valid        => network_to_pe_valid,
             pe_backpressure     => pe_backpressure
         );
@@ -208,8 +208,8 @@ begin
             reset_n             => reset_n,
     
             -- Messages from PE to network
-            from_pe_valid       => pe_to_network_valid,
-            from_pe_data        => pe_to_network,
+            from_pe_valid       => pe_message_out_valid,
+            from_pe_data        => pe_message_out,
     
             network_ready       => router_ready,
             to_network_valid    => pe_to_network_valid,
@@ -223,8 +223,8 @@ begin
             from_network_data   => network_to_pe_message,
     
             pe_ready            => pe_ready,
-            to_pe_valid         => network_to_pe_valid,
-            to_pe_data          => network_to_pe,
+            to_pe_valid         => pe_message_in_valid,
+            to_pe_data          => pe_message_in,
     
             network_to_pe_full  => network_to_pe_full,
             network_to_pe_empty => network_to_pe_empty
@@ -337,10 +337,10 @@ begin
             trig                => trig,
             x_dest              => x_dest,
             y_dest              => y_dest,
-            message_out         => pe_to_network,
-            message_out_valid   => pe_to_network_valid,
-            message_in          => network_to_pe,
-            message_in_valid    => network_to_pe_valid
+            message_out         => pe_message_out,
+            message_out_valid   => pe_message_out_valid,
+            message_in          => pe_message_in,
+            message_in_valid    => pe_message_in_valid
         );
 
 end Behavioral;

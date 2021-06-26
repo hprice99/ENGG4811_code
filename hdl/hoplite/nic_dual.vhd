@@ -61,6 +61,10 @@ architecture Behavioural of nic_dual is
     signal pe_to_network_fifo_write_en, pe_to_network_fifo_read_en      : std_logic;
     signal pe_to_network_fifo_full, pe_to_network_fifo_empty            : std_logic;
     signal pe_to_network_fifo_write_data, pe_to_network_fifo_read_data  : std_logic_vector((BUS_WIDTH-1) downto 0);
+    
+    signal network_to_pe_fifo_write_en, network_to_pe_fifo_read_en      : std_logic;
+    signal network_to_pe_fifo_full, network_to_pe_fifo_empty            : std_logic;
+    signal network_to_pe_fifo_write_data, network_to_pe_fifo_read_data  : std_logic_vector((BUS_WIDTH-1) downto 0);
 
 begin
 
