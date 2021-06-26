@@ -18,21 +18,13 @@
 -- 
 ----------------------------------------------------------------------------------
 
-
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
-
--- Uncomment the following library declaration if using
--- arithmetic functions with Signed or Unsigned values
 use IEEE.NUMERIC_STD.ALL;
+use IEEE.math_real.all;
 
 use STD.textio.all;
 use IEEE.std_logic_textio.all;
-
--- Uncomment the following library declaration if instantiating
--- any Xilinx leaf cells in this code.
---library UNISIM;
---use UNISIM.VComponents.all;
 
 entity hoplite_tb_pe is
     Generic (
@@ -56,16 +48,24 @@ end hoplite_tb_pe;
 
 architecture Behavioral of hoplite_tb_pe is
 
+    type t_Coordinate is array (0 to 1) of std_logic_vector((COORD_BITS-1) downto 0);
+    constant X_INDEX    : integer := 0;
+    constant Y_INDEX    : integer := 1;
+
     constant x_src : std_logic_vector((COORD_BITS-1) downto 0) := std_logic_vector(to_unsigned(X_COORD, COORD_BITS));
     constant y_src : std_logic_vector((COORD_BITS-1) downto 0) := std_logic_vector(to_unsigned(Y_COORD, COORD_BITS));
 
+    constant src : t_Coordinate := (X_INDEX => x_src, Y_INDEX => y_src);
+    constant dest : t_Coordinate := (X_INDEX => x_dest, Y_INDEX => y_dest);
+
     signal message : std_logic_vector((BUS_WIDTH-1) downto 0);
     
-    signal received_x_src, received_y_src, received_x_dest, received_y_dest : std_logic_vector((COORD_BITS-1) downto 0);
+    signal received_src, received_dest : t_Coordinate;
 
 begin
 
-    message <=  y_src & x_src & y_dest & x_dest;
+    -- Message format 0 -- x_dest | y_dest | x_src | y_src -- (BUS_WIDTH-1)
+    message <=  src(Y_INDEX) & src(X_INDEX) & dest(Y_INDEX) & dest(X_INDEX);
 
     MESSAGE_OUT_FF : process (clk)
         begin
@@ -81,27 +81,26 @@ begin
         end process MESSAGE_OUT_FF;
 
     -- Print message_in to stdout if it is valid
-    received_y_src <= message_in((4*COORD_BITS-1) downto 3*COORD_BITS);
-    received_x_src <= message_in((3*COORD_BITS-1) downto 2*COORD_BITS);
-    received_y_dest <= message_in((2*COORD_BITS-1) downto COORD_BITS);
-    received_x_dest <= message_in((COORD_BITS-1) downto 0);
-    
+    received_src(Y_INDEX) <= message_in((4*COORD_BITS-1) downto 3*COORD_BITS);
+    received_src(X_INDEX) <= message_in((3*COORD_BITS-1) downto 2*COORD_BITS);
+    received_dest(Y_INDEX) <= message_in((2*COORD_BITS-1) downto COORD_BITS);
+    received_dest(X_INDEX) <= message_in((COORD_BITS-1) downto 0);
     
     MESSAGE_RECEIVED: process (clk)
         variable my_line : line;
         begin
             if (rising_edge(clk) and message_in_valid = '1') then
                 write(my_line, string'("Source X = "));
-                write(my_line, received_x_src);
+                write(my_line, to_integer(unsigned(received_src(X_INDEX))));
                 
                 write(my_line, string'(", Source Y = "));
-                write(my_line, received_y_src);
+                write(my_line, to_integer(unsigned(received_src(Y_INDEX))));
                 
                 write(my_line, string'(", Destination X = "));
-                write(my_line, received_x_dest);
+                write(my_line, to_integer(unsigned(received_dest(X_INDEX))));
                 
                 write(my_line, string'(", Destination Y = "));
-                write(my_line, received_y_dest);
+                write(my_line, to_integer(unsigned(received_dest(Y_INDEX))));
                 
                 writeline(output, my_line);
             end if;
