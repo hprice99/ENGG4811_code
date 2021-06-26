@@ -32,6 +32,7 @@ use IEEE.NUMERIC_STD.ALL;
 --library UNISIM;
 --use UNISIM.VComponents.all;
 
+-- TODO Change pe_in and pe_out to pe_to_network and network_to_pe
 entity hoplite_router is
     Generic (
         BUS_WIDTH   : integer := 32;
@@ -68,6 +69,8 @@ architecture Behavioral of hoplite_router is
     signal x_in_valid_q, y_in_valid_q : std_logic;
     
     type t_Coordinate is array (0 to 1) of std_logic_vector((COORD_BITS-1) downto 0);
+    constant X_INDEX    : integer := 0;
+    constant Y_INDEX    : integer := 1;
     signal x_in_dest, y_in_dest : t_Coordinate;
     
     constant X_INDEX_HEADER_START   : integer := 0;
@@ -75,9 +78,6 @@ architecture Behavioral of hoplite_router is
     
     constant Y_INDEX_HEADER_START   : integer := COORD_BITS;
     constant Y_INDEX_HEADER_END     : integer := 2*COORD_BITS-1;
-    
-    constant X_INDEX    : integer := 0;
-    constant Y_INDEX    : integer := 1;
 
 begin
 

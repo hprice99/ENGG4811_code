@@ -18,21 +18,13 @@
 -- 
 ----------------------------------------------------------------------------------
 
-
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.NUMERIC_STD.ALL;
+use IEEE.math_real.all;
 
 use STD.textio.all;
 use IEEE.std_logic_textio.all;
-
--- Uncomment the following library declaration if using
--- arithmetic functions with Signed or Unsigned values
---use IEEE.NUMERIC_STD.ALL;
-
--- Uncomment the following library declaration if instantiating
--- any Xilinx leaf cells in this code.
---library UNISIM;
---use UNISIM.VComponents.all;
 
 entity hoplite_tb_node is
     Generic (
@@ -85,6 +77,39 @@ architecture Behavioral of hoplite_tb_node is
             pe_backpressure : out STD_LOGIC
         );
     end component hoplite_router;
+    
+    component nic_dual
+        generic (
+            BUS_WIDTH   : integer := 32;
+            FIFO_DEPTH  : integer := 64
+        );
+        port (
+            clk                 : in std_logic;
+            reset_n             : in std_logic;
+    
+            -- Messages from PE to network
+            from_pe_valid       : in std_logic;
+            from_pe_data        : in std_logic_vector((BUS_WIDTH-1) downto 0);
+    
+            network_ready       : in std_logic;
+            to_network_valid    : out std_logic;
+            to_network_data     : out std_logic_vector((BUS_WIDTH-1) downto 0);
+            
+            pe_to_network_full  : out std_logic;
+            pe_to_network_empty : out std_logic;
+    
+            -- Messages from network to PE
+            from_network_valid  : in std_logic;
+            from_network_data   : in std_logic_vector((BUS_WIDTH-1) downto 0);
+    
+            pe_ready            : in std_logic;
+            to_pe_valid         : out std_logic;
+            to_pe_data          : out std_logic_vector((BUS_WIDTH-1) downto 0);
+    
+            network_to_pe_full  : out std_logic;
+            network_to_pe_empty : out std_logic
+        );
+    end component nic_dual;
 
     component hoplite_tb_pe
         generic (
@@ -106,14 +131,34 @@ architecture Behavioral of hoplite_tb_node is
         );
     end component hoplite_tb_pe; 
     
-    signal pe_message_out       : STD_LOGIC_VECTOR ((BUS_WIDTH-1) downto 0);
-    signal pe_message_out_valid : STD_LOGIC;
+    constant FIFO_DEPTH : integer := 100;
     
-    signal pe_message_in       : STD_LOGIC_VECTOR ((BUS_WIDTH-1) downto 0);
-    signal pe_message_in_valid : STD_LOGIC;
+    -- Messages from PE to network
+    signal pe_to_network       : STD_LOGIC_VECTOR ((BUS_WIDTH-1) downto 0);
+    signal pe_to_network_valid : STD_LOGIC;
     
-    signal x_out_buf, y_out_buf : STD_LOGIC_VECTOR ((BUS_WIDTH-1) downto 0);
-    signal x_out_valid_buf, y_out_valid_buf : STD_LOGIC;
+    signal pe_to_network_message    : STD_LOGIC_VECTOR ((BUS_WIDTH-1) downto 0);
+    signal pe_to_network_valid      : STD_LOGIC;
+    
+    signal pe_backpressure      : STD_LOGIC;
+    signal router_ready         : STD_LOGIC;
+    
+    signal pe_to_network_full, pe_to_network_empty   : STD_LOGIC;
+    
+    -- Messages from network to PE
+    signal network_to_pe_message    : STD_LOGIC_VECTOR ((BUS_WIDTH-1) downto 0);
+    signal network_to_pe_valid      : STD_LOGIC;
+    
+    signal network_to_pe       : STD_LOGIC_VECTOR ((BUS_WIDTH-1) downto 0);
+    signal network_to_pe_valid : STD_LOGIC;
+    
+    signal pe_ready : STD_LOGIC;
+    
+    signal network_to_pe_full, network_to_pe_empty  : STD_LOGIC;
+    
+    -- Packets routed out
+    signal x_out_d, y_out_d: STD_LOGIC_VECTOR ((BUS_WIDTH-1) downto 0);
+    signal x_out_valid_d, y_out_valid_d : STD_LOGIC;
 
 begin
 
@@ -131,69 +176,148 @@ begin
             x_in_valid          => x_in_valid,
             y_in                => y_in,
             y_in_valid          => y_in_valid,
-            pe_in               => pe_message_out,
-            pe_in_valid         => pe_message_out_valid,
-            x_out               => x_out_buf,
-            x_out_valid         => x_out_valid_buf,
-            y_out               => y_out_buf,
-            y_out_valid         => y_out_valid_buf,
-            pe_out              => pe_message_in,
-            pe_out_valid        => pe_message_in_valid,
-            pe_backpressure     => open
+            pe_in               => pe_to_network,
+            pe_in_valid         => pe_to_network_valid,
+            x_out               => x_out_d,
+            x_out_valid         => x_out_valid_d,
+            y_out               => y_out_d,
+            y_out_valid         => y_out_valid_d,
+            pe_out              => network_to_pe,
+            pe_out_valid        => network_to_pe_valid,
+            pe_backpressure     => pe_backpressure
         );
-       
+    
+    -- Connect router ports to node ports
+    x_out       <= x_out_d;
+    x_out_valid <= x_out_valid_d;
+    
+    y_out       <= y_out_d;
+    y_out_valid <= y_out_valid_d;
+        
+    -- Network interface controller (FIFO for messages to and from PE)
+    router_ready <= not pe_backpressure;
+    pe_ready <= '1';
+        
+    NIC: nic_dual
+        generic map (
+            BUS_WIDTH   => BUS_WIDTH,
+            FIFO_DEPTH  => FIFO_DEPTH
+        )
+        port map (
+            clk                 => clk,
+            reset_n             => reset_n,
+    
+            -- Messages from PE to network
+            from_pe_valid       => pe_to_network_valid,
+            from_pe_data        => pe_to_network,
+    
+            network_ready       => router_ready,
+            to_network_valid    => pe_to_network_valid,
+            to_network_data     => pe_to_network_message,
+            
+            pe_to_network_full  => pe_to_network_full,
+            pe_to_network_empty => pe_to_network_empty,
+    
+            -- Messages from network to PE
+            from_network_valid  => network_to_pe_valid,
+            from_network_data   => network_to_pe_message,
+    
+            pe_ready            => pe_ready,
+            to_pe_valid         => network_to_pe_valid,
+            to_pe_data          => network_to_pe,
+    
+            network_to_pe_full  => network_to_pe_full,
+            network_to_pe_empty => network_to_pe_empty
+        );
+
     PRINT: process (clk)
         variable my_line : line;
         begin
             if (rising_edge(clk)) then
                 if (x_in_valid = '1') then
-                    write(my_line, string'("("));
+                    write(my_line, string'("Node ("));
                     write(my_line, X_COORD);
                     
                     write(my_line, string'(", "));
                     write(my_line, Y_COORD);
+                    write(my_line, string'(")"));
                     
-                    write(my_line, string'("), x_in: "));
-                    write(my_line, x_in);
+                    writeline(output, my_line);
+                
+                    write(my_line, string'(HT & "x_in: destination = ("));
+                    write(my_line, to_integer(unsigned(x_in((COORD_BITS-1) downto 0))));
+                    write(my_line, string'(", "));
+                    write(my_line, to_integer(unsigned(x_in((2*COORD_BITS-1) downto COORD_BITS))));
+                    write(my_line, string'("), data = "));
+                    write(my_line, x_in((BUS_WIDTH-1) downto 2*COORD_BITS));
+                    write(my_line, string'(", raw = "));
+                    write(my_line, x_in((BUS_WIDTH-1) downto 0));
                     
                     writeline(output, my_line);
                 end if;
                 
                 if (y_in_valid = '1') then
-                    write(my_line, string'("("));
+                    write(my_line, string'("Node ("));
                     write(my_line, X_COORD);
                     
                     write(my_line, string'(", "));
                     write(my_line, Y_COORD);
+                    write(my_line, string'(")"));
                     
-                    write(my_line, string'("), y_in: "));
-                    write(my_line, y_in);
+                    writeline(output, my_line);
+                
+                    write(my_line, string'(HT & "y_in: destination = ("));
+                    write(my_line, to_integer(unsigned(y_in((COORD_BITS-1) downto 0))));
+                    write(my_line, string'(", "));
+                    write(my_line, to_integer(unsigned(y_in((2*COORD_BITS-1) downto COORD_BITS))));
+                    write(my_line, string'("), data = "));
+                    write(my_line, y_in((BUS_WIDTH-1) downto 2*COORD_BITS));
+                    write(my_line, string'(", raw = "));
+                    write(my_line, y_in((BUS_WIDTH-1) downto 0));
                     
                     writeline(output, my_line);
                 end if;
                 
-                if (x_out_valid_buf = '1') then
-                    write(my_line, string'("("));
+                if (x_out_valid_d = '1') then
+                    write(my_line, string'("Node ("));
                     write(my_line, X_COORD);
                     
                     write(my_line, string'(", "));
                     write(my_line, Y_COORD);
+                    write(my_line, string'(")"));
                     
-                    write(my_line, string'("), x_out: "));
-                    write(my_line, x_out_buf);
+                    writeline(output, my_line);
+                
+                    write(my_line, string'(HT & "x_out: destination = ("));
+                    write(my_line, to_integer(unsigned(x_out_d((COORD_BITS-1) downto 0))));
+                    write(my_line, string'(", "));
+                    write(my_line, to_integer(unsigned(x_out_d((2*COORD_BITS-1) downto COORD_BITS))));
+                    write(my_line, string'("), data = "));
+                    write(my_line, x_out_d((BUS_WIDTH-1) downto 2*COORD_BITS));
+                    write(my_line, string'(", raw = "));
+                    write(my_line, x_out_d((BUS_WIDTH-1) downto 0));
                     
                     writeline(output, my_line);
                 end if;
                 
-                if (y_out_valid_buf = '1') then
-                    write(my_line, string'("("));
+                if (y_out_valid_d = '1') then
+                    write(my_line, string'("Node ("));
                     write(my_line, X_COORD);
                     
                     write(my_line, string'(", "));
                     write(my_line, Y_COORD);
+                    write(my_line, string'(")"));
                     
-                    write(my_line, string'("), y_out: "));
-                    write(my_line, y_out_buf);
+                    writeline(output, my_line);
+                    
+                    write(my_line, string'(HT & "y_out: destination = ("));
+                    write(my_line, to_integer(unsigned(y_out_d((COORD_BITS-1) downto 0))));
+                    write(my_line, string'(", "));
+                    write(my_line, to_integer(unsigned(y_out_d((2*COORD_BITS-1) downto COORD_BITS))));
+                    write(my_line, string'("), data = "));
+                    write(my_line, y_out_d((BUS_WIDTH-1) downto 2*COORD_BITS));
+                    write(my_line, string'(", raw = "));
+                    write(my_line, y_out_d((BUS_WIDTH-1) downto 0));
                     
                     writeline(output, my_line);
                 end if;
@@ -213,10 +337,10 @@ begin
             trig                => trig,
             x_dest              => x_dest,
             y_dest              => y_dest,
-            message_out         => pe_message_out,
-            message_out_valid   => pe_message_out_valid,
-            message_in          => pe_message_in,
-            message_in_valid    => pe_message_in_valid
+            message_out         => pe_to_network,
+            message_out_valid   => pe_to_network_valid,
+            message_in          => network_to_pe,
+            message_in_valid    => network_to_pe_valid
         );
 
 end Behavioral;
