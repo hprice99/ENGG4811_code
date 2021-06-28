@@ -26,10 +26,8 @@ use IEEE.STD_LOGIC_1164.ALL;
 -- arithmetic functions with Signed or Unsigned values
 use IEEE.NUMERIC_STD.ALL;
 
--- Uncomment the following library declaration if instantiating
--- any Xilinx leaf cells in this code.
---library UNISIM;
---use UNISIM.VComponents.all;
+library xil_defaultlib;
+use xil_defaultlib.hoplite_network_tb_defs.all;
 
 entity hoplite_tb is
 end hoplite_tb;
@@ -46,6 +44,7 @@ architecture Behavioral of hoplite_tb is
     port ( 
         clk                 : in STD_LOGIC;
         reset_n             : in STD_LOGIC;
+        count               : in integer;
         x_dest              : in STD_LOGIC_VECTOR((COORD_BITS-1) downto 0);
         y_dest              : in STD_LOGIC_VECTOR((COORD_BITS-1) downto 0);
         trig                : in STD_LOGIC;
@@ -61,9 +60,11 @@ architecture Behavioral of hoplite_tb is
     end component hoplite_tb_node;
     
     signal clk          : std_logic := '0';
-    constant clk_period : time := 1 ns;
+    constant clk_period : time := 50 ns;
     
     signal reset_n      : std_logic;
+    
+    signal count            : integer;
     
     constant NETWORK_ROWS   : integer := 2;
     constant NETWORK_COLS   : integer := 2;
@@ -115,53 +116,65 @@ begin
             constant curr_col : integer := j;
             constant next_row : integer := ((i+1) mod NETWORK_ROWS);
             constant next_col : integer := ((j+1) mod NETWORK_COLS);
-            begin
-                -- Set destination
-                destinations(curr_col, curr_row)(X_INDEX) <= std_logic_vector(to_unsigned(next_col, COORD_BITS));
-                destinations(curr_col, curr_row)(Y_INDEX) <= std_logic_vector(to_unsigned(next_row, COORD_BITS));
-            
-                -- Instantiate node
-                NODE: hoplite_tb_node
-                generic map (
-                    BUS_WIDTH   => BUS_WIDTH,
-                    X_COORD     => i,
-                    Y_COORD     => j,
-                    COORD_BITS  => COORD_BITS
-                )
-                port map (
-                    clk                 => clk,
-                    reset_n             => reset_n,
-                    x_dest              => destinations(curr_col, curr_row)(X_INDEX),
-                    y_dest              => destinations(curr_col, curr_row)(Y_INDEX),
-                    trig                => trig(curr_col, curr_row),
-                    x_in                => x_messages(prev_col, curr_row),
-                    x_in_valid          => x_messages_valid(prev_col, curr_row),                  
-                    y_in                => y_messages(curr_col, prev_row),
-                    y_in_valid          => y_messages_valid(curr_col, prev_row),
-                    x_out               => x_messages(next_col, curr_row),
-                    x_out_valid         => x_messages_valid(next_col, curr_row),
-                    y_out               => y_messages(curr_col, next_row),
-                    y_out_valid         => y_messages_valid(curr_col, next_row)
-                );
-            
+        begin
+            -- Set destination
+            destinations(curr_col, curr_row)(X_INDEX) <= std_logic_vector(to_unsigned(next_col, COORD_BITS));
+            destinations(curr_col, curr_row)(Y_INDEX) <= std_logic_vector(to_unsigned(next_row, COORD_BITS));
+        
+            -- Instantiate node
+            NODE: hoplite_tb_node
+            generic map (
+                BUS_WIDTH   => BUS_WIDTH,
+                X_COORD     => i,
+                Y_COORD     => j,
+                COORD_BITS  => COORD_BITS
+            )
+            port map (
+                clk                 => clk,
+                reset_n             => reset_n,
+                count               => count,
+                x_dest              => destinations(curr_col, curr_row)(X_INDEX),
+                y_dest              => destinations(curr_col, curr_row)(Y_INDEX),
+                trig                => trig(curr_col, curr_row),
+                x_in                => x_messages(prev_col, curr_row),
+                x_in_valid          => x_messages_valid(prev_col, curr_row),                  
+                y_in                => y_messages(curr_col, prev_row),
+                y_in_valid          => y_messages_valid(curr_col, prev_row),
+                x_out               => x_messages(next_col, curr_row),
+                x_out_valid         => x_messages_valid(next_col, curr_row),
+                y_out               => y_messages(curr_col, next_row),
+                y_out_valid         => y_messages_valid(curr_col, next_row)
+            );
+        
             -- TODO Ensure that each node's trig is only one-bit
             TRIG_FF : process (clk)
-                begin
-                    if (rising_edge(clk)) then
-                        if (reset_n = '0') then
-                            trig(curr_row, curr_col) <= '0';
-                            
---                            x_messages(curr_row, curr_col) <= (others => '0');
---                            y_messages(curr_row, curr_col) <= (others => '0');
-                            
---                            x_messages_valid(curr_row, curr_col) <= '0';
---                            y_messages_valid(curr_row, curr_col) <= '0';
-                        elsif (curr_row = TEST_SRC_ROW and curr_col = TEST_SRC_COL) then
-                            trig(curr_row, curr_col) <= not trig(curr_row, curr_col);
-                        end if;
+            begin
+                if (rising_edge(clk)) then
+                    if (reset_n = '0' or count > MAX_COUNT) then
+                        trig(curr_row, curr_col) <= '0';
+                        
+                        x_messages(curr_row, curr_col) <= (others => '0');
+                        y_messages(curr_row, curr_col) <= (others => '0');
+                    
+                        x_messages_valid(curr_row, curr_col) <= '0';
+                        y_messages_valid(curr_row, curr_col) <= '0';
+                    elsif (curr_row = TEST_SRC_ROW and curr_col = TEST_SRC_COL and count <= MAX_COUNT) then
+                        trig(curr_row, curr_col) <= not trig(curr_row, curr_col);
                     end if;
+                end if;
             end process TRIG_FF;
         end generate NETWORK_COL_GEN;
     end generate NETWORK_ROW_GEN;
+    
+    COUNTER: process(clk)
+    begin
+        if (rising_edge(clk)) then
+            if (reset_n = '0') then
+                count <= 0;
+            else
+                count <= count + 1;
+            end if;
+        end if;
+    end process COUNTER;
 
 end Behavioral;

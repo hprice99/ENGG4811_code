@@ -36,6 +36,7 @@ entity hoplite_tb_pe is
     Port ( 
         clk                  : in STD_LOGIC;
         reset_n              : in STD_LOGIC;
+        count                : in integer;
         trig                 : in STD_LOGIC;
         x_dest               : in STD_LOGIC_VECTOR((COORD_BITS-1) downto 0);
         y_dest               : in STD_LOGIC_VECTOR((COORD_BITS-1) downto 0);
@@ -56,7 +57,7 @@ architecture Behavioral of hoplite_tb_pe is
     constant y_src : std_logic_vector((COORD_BITS-1) downto 0) := std_logic_vector(to_unsigned(Y_COORD, COORD_BITS));
 
     constant src : t_Coordinate := (X_INDEX => x_src, Y_INDEX => y_src);
-    constant dest : t_Coordinate := (X_INDEX => x_dest, Y_INDEX => y_dest);
+    signal dest : t_Coordinate;
 
     signal message : std_logic_vector((BUS_WIDTH-1) downto 0);
     
@@ -64,21 +65,24 @@ architecture Behavioral of hoplite_tb_pe is
 
 begin
 
+    dest(X_INDEX) <= x_dest; 
+    dest(Y_INDEX) <= y_dest;
+
     -- Message format 0 -- x_dest | y_dest | x_src | y_src -- (BUS_WIDTH-1)
     message <=  src(Y_INDEX) & src(X_INDEX) & dest(Y_INDEX) & dest(X_INDEX);
 
     MESSAGE_OUT_FF : process (clk)
-        begin
-            if (rising_edge(clk)) then
-                if (reset_n = '0') then
-                    message_out         <= (others => '0');
-                    message_out_valid   <= '0';
-                elsif (trig = '1') then
-                    message_out         <= message;
-                    message_out_valid   <= '1';
-                end if;
+    begin
+        if (rising_edge(clk)) then
+            if (reset_n = '0' or trig = '0') then
+                message_out         <= (others => '0');
+                message_out_valid   <= '0';
+            elsif (trig = '1') then
+                message_out         <= message;
+                message_out_valid   <= '1';
             end if;
-        end process MESSAGE_OUT_FF;
+        end if;
+    end process MESSAGE_OUT_FF;
 
     -- Print message_in to stdout if it is valid
     received_src(Y_INDEX) <= message_in((4*COORD_BITS-1) downto 3*COORD_BITS);
@@ -88,22 +92,34 @@ begin
     
     MESSAGE_RECEIVED: process (clk)
         variable my_line : line;
-        begin
-            if (rising_edge(clk) and message_in_valid = '1') then
-                write(my_line, string'("Source X = "));
-                write(my_line, to_integer(unsigned(received_src(X_INDEX))));
-                
-                write(my_line, string'(", Source Y = "));
-                write(my_line, to_integer(unsigned(received_src(Y_INDEX))));
-                
-                write(my_line, string'(", Destination X = "));
-                write(my_line, to_integer(unsigned(received_dest(X_INDEX))));
-                
-                write(my_line, string'(", Destination Y = "));
-                write(my_line, to_integer(unsigned(received_dest(Y_INDEX))));
-                
-                writeline(output, my_line);
-            end if;
-        end process MESSAGE_RECEIVED;
+    begin
+        if (rising_edge(clk) and reset_n = '1' and message_in_valid = '1') then
+            write(my_line, string'("Node ("));
+            write(my_line, X_COORD);
+            
+            write(my_line, string'(", "));
+            write(my_line, Y_COORD);
+            write(my_line, string'(")"));
+            
+            write(my_line, string'(", Cycle Count = "));
+            write(my_line, count);
+            
+            writeline(output, my_line);
+        
+            write(my_line, string'(HT & "Source X = "));
+            write(my_line, to_integer(unsigned(received_src(X_INDEX))));
+            
+            write(my_line, string'(", Source Y = "));
+            write(my_line, to_integer(unsigned(received_src(Y_INDEX))));
+            
+            write(my_line, string'(", Destination X = "));
+            write(my_line, to_integer(unsigned(received_dest(X_INDEX))));
+            
+            write(my_line, string'(", Destination Y = "));
+            write(my_line, to_integer(unsigned(received_dest(Y_INDEX))));
+            
+            writeline(output, my_line);
+        end if;
+    end process MESSAGE_RECEIVED;
     
 end Behavioral;

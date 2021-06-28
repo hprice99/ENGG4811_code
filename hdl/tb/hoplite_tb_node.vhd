@@ -26,6 +26,9 @@ use IEEE.math_real.all;
 use STD.textio.all;
 use IEEE.std_logic_textio.all;
 
+library xil_defaultlib;
+use xil_defaultlib.hoplite_network_tb_defs.all;
+
 entity hoplite_tb_node is
     Generic (
         X_COORD     : integer := 0;
@@ -36,6 +39,7 @@ entity hoplite_tb_node is
     Port ( 
         clk                 : in STD_LOGIC;
         reset_n             : in STD_LOGIC;
+        count               : in INTEGER;
         x_dest              : in STD_LOGIC_VECTOR((COORD_BITS-1) downto 0);
         y_dest              : in STD_LOGIC_VECTOR((COORD_BITS-1) downto 0);
         trig                : in STD_LOGIC;
@@ -121,6 +125,7 @@ architecture Behavioral of hoplite_tb_node is
         port (
             clk                  : in STD_LOGIC;
             reset_n              : in STD_LOGIC;
+            count                : in integer;
             trig                 : in STD_LOGIC;
             x_dest               : in STD_LOGIC_VECTOR((COORD_BITS-1) downto 0);
             y_dest               : in STD_LOGIC_VECTOR((COORD_BITS-1) downto 0);
@@ -196,7 +201,15 @@ begin
         
     -- Network interface controller (FIFO for messages to and from PE)
     router_ready <= not pe_backpressure;
-    pe_ready <= '1';
+    
+    PE_READY_TOGGLE: process(count)
+    begin
+        if (count mod PE_READY_FREQUENCY = 0) then
+            pe_ready <= '1';
+        else
+            pe_ready <= '0';
+        end if;
+    end process PE_READY_TOGGLE;
         
     NIC: nic_dual
         generic map (
@@ -232,97 +245,97 @@ begin
 
     PRINT: process (clk)
         variable my_line : line;
-        begin
-            if (rising_edge(clk)) then
-                if (x_in_valid = '1') then
-                    write(my_line, string'("Node ("));
-                    write(my_line, X_COORD);
-                    
-                    write(my_line, string'(", "));
-                    write(my_line, Y_COORD);
-                    write(my_line, string'(")"));
-                    
-                    writeline(output, my_line);
+    begin
+        if (rising_edge(clk) and reset_n = '1') then
+            if (x_in_valid = '1') then
+                write(my_line, string'("Node ("));
+                write(my_line, X_COORD);
                 
-                    write(my_line, string'(HT & "x_in: destination = ("));
-                    write(my_line, to_integer(unsigned(x_in((COORD_BITS-1) downto 0))));
-                    write(my_line, string'(", "));
-                    write(my_line, to_integer(unsigned(x_in((2*COORD_BITS-1) downto COORD_BITS))));
-                    write(my_line, string'("), data = "));
-                    write(my_line, x_in((BUS_WIDTH-1) downto 2*COORD_BITS));
-                    write(my_line, string'(", raw = "));
-                    write(my_line, x_in((BUS_WIDTH-1) downto 0));
-                    
-                    writeline(output, my_line);
-                end if;
+                write(my_line, string'(", "));
+                write(my_line, Y_COORD);
+                write(my_line, string'(")"));
                 
-                if (y_in_valid = '1') then
-                    write(my_line, string'("Node ("));
-                    write(my_line, X_COORD);
-                    
-                    write(my_line, string'(", "));
-                    write(my_line, Y_COORD);
-                    write(my_line, string'(")"));
-                    
-                    writeline(output, my_line);
+                writeline(output, my_line);
+            
+                write(my_line, string'(HT & "x_in: destination = ("));
+                write(my_line, to_integer(unsigned(x_in((COORD_BITS-1) downto 0))));
+                write(my_line, string'(", "));
+                write(my_line, to_integer(unsigned(x_in((2*COORD_BITS-1) downto COORD_BITS))));
+                write(my_line, string'("), data = "));
+                write(my_line, x_in((BUS_WIDTH-1) downto 2*COORD_BITS));
+                write(my_line, string'(", raw = "));
+                write(my_line, x_in((BUS_WIDTH-1) downto 0));
                 
-                    write(my_line, string'(HT & "y_in: destination = ("));
-                    write(my_line, to_integer(unsigned(y_in((COORD_BITS-1) downto 0))));
-                    write(my_line, string'(", "));
-                    write(my_line, to_integer(unsigned(y_in((2*COORD_BITS-1) downto COORD_BITS))));
-                    write(my_line, string'("), data = "));
-                    write(my_line, y_in((BUS_WIDTH-1) downto 2*COORD_BITS));
-                    write(my_line, string'(", raw = "));
-                    write(my_line, y_in((BUS_WIDTH-1) downto 0));
-                    
-                    writeline(output, my_line);
-                end if;
-                
-                if (x_out_valid_d = '1') then
-                    write(my_line, string'("Node ("));
-                    write(my_line, X_COORD);
-                    
-                    write(my_line, string'(", "));
-                    write(my_line, Y_COORD);
-                    write(my_line, string'(")"));
-                    
-                    writeline(output, my_line);
-                
-                    write(my_line, string'(HT & "x_out: destination = ("));
-                    write(my_line, to_integer(unsigned(x_out_d((COORD_BITS-1) downto 0))));
-                    write(my_line, string'(", "));
-                    write(my_line, to_integer(unsigned(x_out_d((2*COORD_BITS-1) downto COORD_BITS))));
-                    write(my_line, string'("), data = "));
-                    write(my_line, x_out_d((BUS_WIDTH-1) downto 2*COORD_BITS));
-                    write(my_line, string'(", raw = "));
-                    write(my_line, x_out_d((BUS_WIDTH-1) downto 0));
-                    
-                    writeline(output, my_line);
-                end if;
-                
-                if (y_out_valid_d = '1') then
-                    write(my_line, string'("Node ("));
-                    write(my_line, X_COORD);
-                    
-                    write(my_line, string'(", "));
-                    write(my_line, Y_COORD);
-                    write(my_line, string'(")"));
-                    
-                    writeline(output, my_line);
-                    
-                    write(my_line, string'(HT & "y_out: destination = ("));
-                    write(my_line, to_integer(unsigned(y_out_d((COORD_BITS-1) downto 0))));
-                    write(my_line, string'(", "));
-                    write(my_line, to_integer(unsigned(y_out_d((2*COORD_BITS-1) downto COORD_BITS))));
-                    write(my_line, string'("), data = "));
-                    write(my_line, y_out_d((BUS_WIDTH-1) downto 2*COORD_BITS));
-                    write(my_line, string'(", raw = "));
-                    write(my_line, y_out_d((BUS_WIDTH-1) downto 0));
-                    
-                    writeline(output, my_line);
-                end if;
+                writeline(output, my_line);
             end if;
-        end process PRINT;
+            
+            if (y_in_valid = '1') then
+                write(my_line, string'("Node ("));
+                write(my_line, X_COORD);
+                
+                write(my_line, string'(", "));
+                write(my_line, Y_COORD);
+                write(my_line, string'(")"));
+                
+                writeline(output, my_line);
+            
+                write(my_line, string'(HT & "y_in: destination = ("));
+                write(my_line, to_integer(unsigned(y_in((COORD_BITS-1) downto 0))));
+                write(my_line, string'(", "));
+                write(my_line, to_integer(unsigned(y_in((2*COORD_BITS-1) downto COORD_BITS))));
+                write(my_line, string'("), data = "));
+                write(my_line, y_in((BUS_WIDTH-1) downto 2*COORD_BITS));
+                write(my_line, string'(", raw = "));
+                write(my_line, y_in((BUS_WIDTH-1) downto 0));
+                
+                writeline(output, my_line);
+            end if;
+            
+            if (x_out_valid_d = '1') then
+                write(my_line, string'("Node ("));
+                write(my_line, X_COORD);
+                
+                write(my_line, string'(", "));
+                write(my_line, Y_COORD);
+                write(my_line, string'(")"));
+                
+                writeline(output, my_line);
+            
+                write(my_line, string'(HT & "x_out: destination = ("));
+                write(my_line, to_integer(unsigned(x_out_d((COORD_BITS-1) downto 0))));
+                write(my_line, string'(", "));
+                write(my_line, to_integer(unsigned(x_out_d((2*COORD_BITS-1) downto COORD_BITS))));
+                write(my_line, string'("), data = "));
+                write(my_line, x_out_d((BUS_WIDTH-1) downto 2*COORD_BITS));
+                write(my_line, string'(", raw = "));
+                write(my_line, x_out_d((BUS_WIDTH-1) downto 0));
+                
+                writeline(output, my_line);
+            end if;
+            
+            if (y_out_valid_d = '1') then
+                write(my_line, string'("Node ("));
+                write(my_line, X_COORD);
+                
+                write(my_line, string'(", "));
+                write(my_line, Y_COORD);
+                write(my_line, string'(")"));
+                
+                writeline(output, my_line);
+                
+                write(my_line, string'(HT & "y_out: destination = ("));
+                write(my_line, to_integer(unsigned(y_out_d((COORD_BITS-1) downto 0))));
+                write(my_line, string'(", "));
+                write(my_line, to_integer(unsigned(y_out_d((2*COORD_BITS-1) downto COORD_BITS))));
+                write(my_line, string'("), data = "));
+                write(my_line, y_out_d((BUS_WIDTH-1) downto 2*COORD_BITS));
+                write(my_line, string'(", raw = "));
+                write(my_line, y_out_d((BUS_WIDTH-1) downto 0));
+                
+                writeline(output, my_line);
+            end if;
+        end if;
+    end process PRINT;
     
     PE : hoplite_tb_pe
         generic map (
@@ -334,6 +347,7 @@ begin
         port map (
             clk                 => clk,
             reset_n             => reset_n,
+            count               => count,
             trig                => trig,
             x_dest              => x_dest,
             y_dest              => y_dest,
