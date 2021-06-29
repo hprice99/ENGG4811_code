@@ -91,9 +91,11 @@ architecture Behavioral of hoplite_tb is
 --    signal x_messages_valid, y_messages_valid : t_MessageValid := (others => (others => '0'));
 --    signal trig : t_MessageValid := (others => (others => '0'));
 
-    signal x_messages, y_messages : t_Message;
     signal destinations : t_Destination;
-    signal x_messages_valid, y_messages_valid : t_MessageValid;
+    signal x_messages_out, y_messages_out : t_Message;
+    signal x_messages_out_valid, y_messages_out_valid : t_MessageValid;
+    signal x_messages_in, y_messages_in : t_Message;
+    signal x_messages_in_valid, y_messages_in_valid : t_MessageValid;
     signal trig : t_MessageValid;
     
     constant TEST_SRC_ROW : integer := 0;
@@ -133,8 +135,8 @@ begin
             NODE: hoplite_tb_node
             generic map (
                 BUS_WIDTH   => BUS_WIDTH,
-                X_COORD     => i,
-                Y_COORD     => j,
+                X_COORD     => curr_col,
+                Y_COORD     => curr_row,
                 COORD_BITS  => COORD_BITS
             )
             port map (
@@ -148,17 +150,24 @@ begin
                 trig                => trig(curr_col, curr_row),
                 
                 -- Messages incoming to router
-                x_in                => x_messages(prev_col, curr_row),
-                x_in_valid          => x_messages_valid(prev_col, curr_row),                  
-                y_in                => y_messages(curr_col, prev_row),
-                y_in_valid          => y_messages_valid(curr_col, prev_row),
+                x_in                => x_messages_in(curr_col, curr_row),
+                x_in_valid          => x_messages_in_valid(curr_col, curr_row),                  
+                y_in                => y_messages_in(curr_col, curr_row),
+                y_in_valid          => y_messages_in_valid(curr_col, curr_row),
                 
                 -- Messages outgoing from router
-                x_out               => x_messages(next_col, curr_row),
-                x_out_valid         => x_messages_valid(next_col, curr_row),
-                y_out               => y_messages(curr_col, next_row),
-                y_out_valid         => y_messages_valid(curr_col, next_row)
+                x_out               => x_messages_out(curr_col, curr_row),
+                x_out_valid         => x_messages_out_valid(curr_col, curr_row),
+                y_out               => y_messages_out(curr_col, curr_row),
+                y_out_valid         => y_messages_out_valid(curr_col, curr_row)
             );
+            
+            -- Connect in and out messages
+            x_messages_in(curr_col, curr_row)       <= x_messages_out(prev_col, curr_row);
+            x_messages_in_valid(curr_col, curr_row) <= x_messages_out_valid(prev_col, curr_row);
+            
+            y_messages_in(curr_col, curr_row)       <= y_messages_out(curr_col, prev_row);
+            y_messages_in_valid(curr_col, curr_row) <= y_messages_out_valid(curr_col, prev_row);
         
             -- TODO Ensure that each node's trig is only one-bit
             TRIG_FF : process (clk)

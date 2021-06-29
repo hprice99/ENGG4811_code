@@ -40,13 +40,16 @@ entity hoplite_tb_node is
         clk                 : in STD_LOGIC;
         reset_n             : in STD_LOGIC;
         count               : in INTEGER;
+        
         x_dest              : in STD_LOGIC_VECTOR((COORD_BITS-1) downto 0);
         y_dest              : in STD_LOGIC_VECTOR((COORD_BITS-1) downto 0);
         trig                : in STD_LOGIC;
+        
         x_in                : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
         x_in_valid          : in STD_LOGIC;
         y_in                : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
         y_in_valid          : in STD_LOGIC;
+        
         x_out               : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
         x_out_valid         : out STD_LOGIC;
         y_out               : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
