@@ -94,6 +94,8 @@ begin
         variable my_line : line;
     begin
         if (rising_edge(clk) and reset_n = '1' and message_in_valid = '1') then
+            write(my_line, string'(HT & "hoplite_tb_pe: "));
+        
             write(my_line, string'("Node ("));
             write(my_line, X_COORD);
             
@@ -106,7 +108,7 @@ begin
             
             writeline(output, my_line);
         
-            write(my_line, string'(HT & "Source X = "));
+            write(my_line, string'(HT & HT & "Source X = "));
             write(my_line, to_integer(unsigned(received_src(X_INDEX))));
             
             write(my_line, string'(", Source Y = "));

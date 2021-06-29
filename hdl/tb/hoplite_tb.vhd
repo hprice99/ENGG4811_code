@@ -26,6 +26,12 @@ use IEEE.STD_LOGIC_1164.ALL;
 -- arithmetic functions with Signed or Unsigned values
 use IEEE.NUMERIC_STD.ALL;
 
+use STD.textio.all;
+use IEEE.std_logic_textio.all;
+
+use std.env.finish;
+use std.env.stop;
+
 library xil_defaultlib;
 use xil_defaultlib.hoplite_network_tb_defs.all;
 
@@ -119,7 +125,9 @@ begin
         begin
             -- Set destination
             destinations(curr_col, curr_row)(X_INDEX) <= std_logic_vector(to_unsigned(next_col, COORD_BITS));
-            destinations(curr_col, curr_row)(Y_INDEX) <= std_logic_vector(to_unsigned(next_row, COORD_BITS));
+            
+            -- destinations(curr_col, curr_row)(Y_INDEX) <= std_logic_vector(to_unsigned(next_row, COORD_BITS));
+            destinations(curr_col, curr_row)(Y_INDEX) <= std_logic_vector(to_unsigned(curr_row, COORD_BITS));
         
             -- Instantiate node
             NODE: hoplite_tb_node
@@ -133,13 +141,19 @@ begin
                 clk                 => clk,
                 reset_n             => reset_n,
                 count               => count,
+                
+                -- Signals to create outgoing messages
                 x_dest              => destinations(curr_col, curr_row)(X_INDEX),
                 y_dest              => destinations(curr_col, curr_row)(Y_INDEX),
                 trig                => trig(curr_col, curr_row),
+                
+                -- Messages incoming to router
                 x_in                => x_messages(prev_col, curr_row),
                 x_in_valid          => x_messages_valid(prev_col, curr_row),                  
                 y_in                => y_messages(curr_col, prev_row),
                 y_in_valid          => y_messages_valid(curr_col, prev_row),
+                
+                -- Messages outgoing from router
                 x_out               => x_messages(next_col, curr_row),
                 x_out_valid         => x_messages_valid(next_col, curr_row),
                 y_out               => y_messages(curr_col, next_row),
@@ -150,16 +164,20 @@ begin
             TRIG_FF : process (clk)
             begin
                 if (rising_edge(clk)) then
-                    if (reset_n = '0' or count > MAX_COUNT) then
+                    if (reset_n = '0') then
                         trig(curr_row, curr_col) <= '0';
                         
-                        x_messages(curr_row, curr_col) <= (others => '0');
-                        y_messages(curr_row, curr_col) <= (others => '0');
+--                        x_messages(curr_row, curr_col) <= (others => '0');
+--                        y_messages(curr_row, curr_col) <= (others => '0');
                     
-                        x_messages_valid(curr_row, curr_col) <= '0';
-                        y_messages_valid(curr_row, curr_col) <= '0';
-                    elsif (curr_row = TEST_SRC_ROW and curr_col = TEST_SRC_COL and count <= MAX_COUNT) then
-                        trig(curr_row, curr_col) <= not trig(curr_row, curr_col);
+--                        x_messages_valid(curr_row, curr_col) <= '0';
+--                        y_messages_valid(curr_row, curr_col) <= '0';
+                    elsif (curr_row = TEST_SRC_ROW and curr_col = TEST_SRC_COL) then
+                        if (count <= MAX_MESSAGE_COUNT) then
+                            trig(curr_row, curr_col) <= not trig(curr_row, curr_col);
+                        else
+                            trig(curr_row, curr_col) <= '0';
+                        end if;
                     end if;
                 end if;
             end process TRIG_FF;
@@ -172,9 +190,23 @@ begin
             if (reset_n = '0') then
                 count <= 0;
             else
-                count <= count + 1;
+                if (count <= MAX_COUNT) then
+                    count <= count + 1;
+                else
+                    stop;
+                end if;
             end if;
         end if;
     end process COUNTER;
+    
+    PRINT: process (clk)
+        variable my_line : line;
+    begin
+        if (rising_edge(clk) and reset_n = '1' and count <= MAX_COUNT) then
+            write(my_line, string'(CR & LF & "Cycle "));
+            write(my_line, count);           
+            writeline(output, my_line);
+        end if;
+    end process PRINT;
 
 end Behavioral;

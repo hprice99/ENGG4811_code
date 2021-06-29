@@ -164,6 +164,8 @@ architecture Behavioral of hoplite_tb_node is
     -- Packets routed out
     signal x_out_d, y_out_d: STD_LOGIC_VECTOR ((BUS_WIDTH-1) downto 0);
     signal x_out_valid_d, y_out_valid_d : STD_LOGIC;
+    
+    signal print_valid : STD_LOGIC;
 
 begin
 
@@ -198,6 +200,23 @@ begin
     
     y_out       <= y_out_d;
     y_out_valid <= y_out_valid_d;
+        
+--    OUTPUT: process (reset_n)
+--    begin
+--        if (reset_n = '0') then
+--            x_out       <= (others => '0');
+--            x_out_valid <= '0';
+            
+--            y_out       <= (others => '0');
+--            y_out_valid <= '0';
+--        else
+--            x_out       <= x_out_d;
+--            x_out_valid <= x_out_valid_d;
+            
+--            y_out       <= y_out_d;
+--            y_out_valid <= y_out_valid_d;
+--        end if;
+--    end process OUTPUT;
         
     -- Network interface controller (FIFO for messages to and from PE)
     router_ready <= not pe_backpressure;
@@ -243,11 +262,15 @@ begin
             network_to_pe_empty => network_to_pe_empty
         );
 
+    print_valid <= x_in_valid or y_in_valid or x_out_valid_d or y_out_valid_d;
+
     PRINT: process (clk)
         variable my_line : line;
     begin
         if (rising_edge(clk) and reset_n = '1') then
-            if (x_in_valid = '1') then
+            if (print_valid = '1') then
+                write(my_line, string'(HT & "hoplite_tb_node: "));
+               
                 write(my_line, string'("Node ("));
                 write(my_line, X_COORD);
                 
@@ -256,8 +279,10 @@ begin
                 write(my_line, string'(")"));
                 
                 writeline(output, my_line);
-            
-                write(my_line, string'(HT & "x_in: destination = ("));
+            end if;
+        
+            if (x_in_valid = '1') then
+                write(my_line, string'(HT & HT & "x_in: destination = ("));
                 write(my_line, to_integer(unsigned(x_in((COORD_BITS-1) downto 0))));
                 write(my_line, string'(", "));
                 write(my_line, to_integer(unsigned(x_in((2*COORD_BITS-1) downto COORD_BITS))));
@@ -269,17 +294,8 @@ begin
                 writeline(output, my_line);
             end if;
             
-            if (y_in_valid = '1') then
-                write(my_line, string'("Node ("));
-                write(my_line, X_COORD);
-                
-                write(my_line, string'(", "));
-                write(my_line, Y_COORD);
-                write(my_line, string'(")"));
-                
-                writeline(output, my_line);
-            
-                write(my_line, string'(HT & "y_in: destination = ("));
+            if (y_in_valid = '1') then           
+                write(my_line, string'(HT & HT & "y_in: destination = ("));
                 write(my_line, to_integer(unsigned(y_in((COORD_BITS-1) downto 0))));
                 write(my_line, string'(", "));
                 write(my_line, to_integer(unsigned(y_in((2*COORD_BITS-1) downto COORD_BITS))));
@@ -292,16 +308,7 @@ begin
             end if;
             
             if (x_out_valid_d = '1') then
-                write(my_line, string'("Node ("));
-                write(my_line, X_COORD);
-                
-                write(my_line, string'(", "));
-                write(my_line, Y_COORD);
-                write(my_line, string'(")"));
-                
-                writeline(output, my_line);
-            
-                write(my_line, string'(HT & "x_out: destination = ("));
+                write(my_line, string'(HT & HT & "x_out: destination = ("));
                 write(my_line, to_integer(unsigned(x_out_d((COORD_BITS-1) downto 0))));
                 write(my_line, string'(", "));
                 write(my_line, to_integer(unsigned(x_out_d((2*COORD_BITS-1) downto COORD_BITS))));
@@ -314,16 +321,7 @@ begin
             end if;
             
             if (y_out_valid_d = '1') then
-                write(my_line, string'("Node ("));
-                write(my_line, X_COORD);
-                
-                write(my_line, string'(", "));
-                write(my_line, Y_COORD);
-                write(my_line, string'(")"));
-                
-                writeline(output, my_line);
-                
-                write(my_line, string'(HT & "y_out: destination = ("));
+                write(my_line, string'(HT & HT & "y_out: destination = ("));
                 write(my_line, to_integer(unsigned(y_out_d((COORD_BITS-1) downto 0))));
                 write(my_line, string'(", "));
                 write(my_line, to_integer(unsigned(y_out_d((2*COORD_BITS-1) downto COORD_BITS))));
