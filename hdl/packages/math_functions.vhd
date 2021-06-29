@@ -13,6 +13,9 @@ package math_functions is
     function ceil_log2 (Arg : in positive)
     	return integer;
        
+    function max(arg1, arg2 : in integer)
+        return integer;
+       
 end package math_functions;
  
 -- Package Body Section
@@ -31,5 +34,14 @@ package body math_functions is
         
         return i;
     end function ceil_log2;
+    
+    function max(arg1, arg2 : integer) return integer is
+    begin
+        if (arg1 > arg2) then
+            return arg1;
+        else
+            return arg2;
+        end if;
+    end function max;
  
 end package body math_functions;

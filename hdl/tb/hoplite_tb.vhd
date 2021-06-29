@@ -25,6 +25,7 @@ use IEEE.STD_LOGIC_1164.ALL;
 -- Uncomment the following library declaration if using
 -- arithmetic functions with Signed or Unsigned values
 use IEEE.NUMERIC_STD.ALL;
+use IEEE.math_real.all;
 
 use STD.textio.all;
 use IEEE.std_logic_textio.all;
@@ -34,6 +35,7 @@ use std.env.stop;
 
 library xil_defaultlib;
 use xil_defaultlib.hoplite_network_tb_defs.all;
+use xil_defaultlib.math_functions.all;
 
 entity hoplite_tb is
 end hoplite_tb;
@@ -75,7 +77,7 @@ architecture Behavioral of hoplite_tb is
     constant NETWORK_ROWS   : integer := 2;
     constant NETWORK_COLS   : integer := 2;
     constant NETWORK_NODES  : integer := NETWORK_ROWS * NETWORK_COLS;
-    constant COORD_BITS     : integer := 1;
+    constant COORD_BITS     : integer := ceil_log2(max(NETWORK_ROWS, NETWORK_COLS));
     constant BUS_WIDTH      : integer := 4 * COORD_BITS;
     
     type t_Coordinate is array (0 to 1) of std_logic_vector((COORD_BITS-1) downto 0);
@@ -86,10 +88,6 @@ architecture Behavioral of hoplite_tb is
     type t_Destination is array(0 to (NETWORK_COLS-1), 0 to (NETWORK_ROWS-1)) of t_Coordinate;
     type t_Message is array (0 to (NETWORK_COLS-1), 0 to (NETWORK_ROWS-1)) of std_logic_vector((BUS_WIDTH-1) downto 0);
     type t_MessageValid is array (0 to (NETWORK_COLS-1), 0 to (NETWORK_ROWS-1)) of std_logic;
-    
---    signal x_messages, y_messages : t_Message := (others => (others => (others => '0')));
---    signal x_messages_valid, y_messages_valid : t_MessageValid := (others => (others => '0'));
---    signal trig : t_MessageValid := (others => (others => '0'));
 
     signal destinations : t_Destination;
     signal x_messages_out, y_messages_out : t_Message;
@@ -128,8 +126,8 @@ begin
             -- Set destination
             destinations(curr_col, curr_row)(X_INDEX) <= std_logic_vector(to_unsigned(next_col, COORD_BITS));
             
-            -- destinations(curr_col, curr_row)(Y_INDEX) <= std_logic_vector(to_unsigned(next_row, COORD_BITS));
-            destinations(curr_col, curr_row)(Y_INDEX) <= std_logic_vector(to_unsigned(curr_row, COORD_BITS));
+            destinations(curr_col, curr_row)(Y_INDEX) <= std_logic_vector(to_unsigned(next_row, COORD_BITS));
+            -- destinations(curr_col, curr_row)(Y_INDEX) <= std_logic_vector(to_unsigned(curr_row, COORD_BITS));
         
             -- Instantiate node
             NODE: hoplite_tb_node
@@ -168,20 +166,14 @@ begin
             
             y_messages_in(curr_col, curr_row)       <= y_messages_out(curr_col, prev_row);
             y_messages_in_valid(curr_col, curr_row) <= y_messages_out_valid(curr_col, prev_row);
-        
-            -- TODO Ensure that each node's trig is only one-bit
+
             TRIG_FF : process (clk)
             begin
                 if (rising_edge(clk)) then
                     if (reset_n = '0') then
                         trig(curr_row, curr_col) <= '0';
-                        
---                        x_messages(curr_row, curr_col) <= (others => '0');
---                        y_messages(curr_row, curr_col) <= (others => '0');
-                    
---                        x_messages_valid(curr_row, curr_col) <= '0';
---                        y_messages_valid(curr_row, curr_col) <= '0';
                     elsif (curr_row = TEST_SRC_ROW and curr_col = TEST_SRC_COL) then
+                    -- elsif (curr_row = TEST_SRC_ROW) then
                         if (count <= MAX_MESSAGE_COUNT) then
                             trig(curr_row, curr_col) <= not trig(curr_row, curr_col);
                         else
