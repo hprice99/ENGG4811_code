@@ -182,12 +182,14 @@ begin
         port map (
             clk                 => clk,
             reset_n             => reset_n,
+            
             x_in                => x_in,
             x_in_valid          => x_in_valid,
             y_in                => y_in,
             y_in_valid          => y_in_valid,
             pe_in               => pe_to_network_message,
             pe_in_valid         => pe_to_network_valid,
+            
             x_out               => x_out_d,
             x_out_valid         => x_out_valid_d,
             y_out               => y_out_d,
@@ -204,26 +206,10 @@ begin
     y_out       <= y_out_d;
     y_out_valid <= y_out_valid_d;
         
---    OUTPUT: process (reset_n)
---    begin
---        if (reset_n = '0') then
---            x_out       <= (others => '0');
---            x_out_valid <= '0';
-            
---            y_out       <= (others => '0');
---            y_out_valid <= '0';
---        else
---            x_out       <= x_out_d;
---            x_out_valid <= x_out_valid_d;
-            
---            y_out       <= y_out_d;
---            y_out_valid <= y_out_valid_d;
---        end if;
---    end process OUTPUT;
-        
     -- Network interface controller (FIFO for messages to and from PE)
     router_ready <= not pe_backpressure;
     
+    -- Only activate PE ready for a subset of cycles
     PE_READY_TOGGLE: process(count)
     begin
         if (count mod PE_READY_FREQUENCY = 0) then
@@ -349,11 +335,14 @@ begin
             clk                 => clk,
             reset_n             => reset_n,
             count               => count,
+            
             trig                => trig,
             x_dest              => x_dest,
             y_dest              => y_dest,
+            
             message_out         => pe_message_out,
             message_out_valid   => pe_message_out_valid,
+            
             message_in          => pe_message_in,
             message_in_valid    => pe_message_in_valid
         );

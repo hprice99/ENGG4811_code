@@ -199,9 +199,8 @@ begin
             if (reset_n = '0') then
                 count <= 0;
             else
-                if (count <= MAX_COUNT) then
-                    count <= count + 1;
-                else
+                count   <= count + 1;
+                if (count = MAX_COUNT) then
                     stop;
                 end if;
             end if;
@@ -211,7 +210,7 @@ begin
     PRINT: process (clk)
         variable my_line : line;
     begin
-        if (rising_edge(clk) and reset_n = '1' and count <= MAX_COUNT) then
+        if (rising_edge(clk) and reset_n = '1') then
             write(my_line, string'(CR & LF & "Cycle "));
             write(my_line, count);           
             writeline(output, my_line);

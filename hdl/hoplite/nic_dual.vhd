@@ -153,8 +153,8 @@ begin
                 network_to_pe_fifo_write_data <= (others => '0');
                 network_to_pe_fifo_write_en   <= '0';
             elsif (network_to_pe_fifo_full = '0') then
-                if (from_pe_valid = '1') then
-                    network_to_pe_fifo_write_data     <= from_pe_data;
+                if (from_network_valid = '1') then
+                    network_to_pe_fifo_write_data     <= from_network_data;
                     network_to_pe_fifo_write_en       <= '1';
                 else
                     network_to_pe_fifo_write_en       <= '0';
