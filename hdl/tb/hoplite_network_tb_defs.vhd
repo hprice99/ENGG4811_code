@@ -17,6 +17,9 @@ package hoplite_network_tb_defs is
     constant MAX_MESSAGE_COUNT  : integer := 1;
     
     constant PE_READY_FREQUENCY : integer := 5;
+    
+    -- Size of message data in packets
+    constant MESSAGE_BITS       : integer := 32;
 
 end package hoplite_network_tb_defs;
 

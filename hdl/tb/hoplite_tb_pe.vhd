@@ -26,6 +26,9 @@ use IEEE.math_real.all;
 use STD.textio.all;
 use IEEE.std_logic_textio.all;
 
+library xil_defaultlib;
+use xil_defaultlib.hoplite_network_tb_defs.all;
+
 entity hoplite_tb_pe is
     Generic (
         X_COORD     : integer := 0;
@@ -62,14 +65,15 @@ architecture Behavioral of hoplite_tb_pe is
     signal message : std_logic_vector((BUS_WIDTH-1) downto 0);
     
     signal received_src, received_dest : t_Coordinate;
+    signal received_message : std_logic_vector((MESSAGE_BITS-1) downto 0);
 
 begin
 
     dest(X_INDEX) <= x_dest; 
     dest(Y_INDEX) <= y_dest;
 
-    -- Message format 0 -- x_dest | y_dest | x_src | y_src -- (BUS_WIDTH-1)
-    message <=  src(Y_INDEX) & src(X_INDEX) & dest(Y_INDEX) & dest(X_INDEX);
+    -- Message format 0 -- x_dest | y_dest | x_src | y_src | count -- (BUS_WIDTH-1)
+    message <= std_logic_vector(to_unsigned(count, MESSAGE_BITS)) & src(Y_INDEX) & src(X_INDEX) & dest(Y_INDEX) & dest(X_INDEX);
 
     MESSAGE_OUT_FF : process (clk)
     begin
@@ -83,12 +87,37 @@ begin
             end if;
         end if;
     end process MESSAGE_OUT_FF;
+    
+    TRIGGER: process (clk)
+        variable my_line : line;
+    begin
+        if (rising_edge(clk) and reset_n = '1' and trig = '1') then
+            write(my_line, string'(HT & "hoplite_tb_pe: "));
+        
+            write(my_line, string'("Node ("));
+            write(my_line, X_COORD);
+            
+            write(my_line, string'(", "));
+            write(my_line, Y_COORD);
+            write(my_line, string'(")"));
+            
+            write(my_line, string'(", Cycle Count = "));
+            write(my_line, count);
+            
+            writeline(output, my_line);
+        
+            write(my_line, string'(HT & HT & "Trigger"));
+            
+            writeline(output, my_line);
+        end if;
+    end process TRIGGER;
 
     -- Print message_in to stdout if it is valid
-    received_src(Y_INDEX) <= message_in((4*COORD_BITS-1) downto 3*COORD_BITS);
-    received_src(X_INDEX) <= message_in((3*COORD_BITS-1) downto 2*COORD_BITS);
-    received_dest(Y_INDEX) <= message_in((2*COORD_BITS-1) downto COORD_BITS);
-    received_dest(X_INDEX) <= message_in((COORD_BITS-1) downto 0);
+    received_src(Y_INDEX)   <= message_in((4*COORD_BITS-1) downto 3*COORD_BITS);
+    received_src(X_INDEX)   <= message_in((3*COORD_BITS-1) downto 2*COORD_BITS);
+    received_dest(Y_INDEX)  <= message_in((2*COORD_BITS-1) downto COORD_BITS);
+    received_dest(X_INDEX)  <= message_in((COORD_BITS-1) downto 0);
+    received_message        <= message_in((BUS_WIDTH-1) downto 4*COORD_BITS);
     
     MESSAGE_RECEIVED: process (clk)
         variable my_line : line;
@@ -119,6 +148,9 @@ begin
             
             write(my_line, string'(", Destination Y = "));
             write(my_line, to_integer(unsigned(received_dest(Y_INDEX))));
+            
+            write(my_line, string'(", Count = "));
+            write(my_line, to_integer(unsigned(received_message)));
             
             writeline(output, my_line);
         end if;

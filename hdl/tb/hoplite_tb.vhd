@@ -78,7 +78,7 @@ architecture Behavioral of hoplite_tb is
     constant NETWORK_COLS   : integer := 2;
     constant NETWORK_NODES  : integer := NETWORK_ROWS * NETWORK_COLS;
     constant COORD_BITS     : integer := ceil_log2(max(NETWORK_ROWS, NETWORK_COLS));
-    constant BUS_WIDTH      : integer := 4 * COORD_BITS;
+    constant BUS_WIDTH      : integer := 4 * COORD_BITS + MESSAGE_BITS;
     
     type t_Coordinate is array (0 to 1) of std_logic_vector((COORD_BITS-1) downto 0);
     constant X_INDEX    : integer := 0;
@@ -186,27 +186,23 @@ begin
     end generate NETWORK_ROW_GEN;
     
     COUNTER: process(clk)
+        variable my_line : line;
     begin
         if (rising_edge(clk)) then
             if (reset_n = '0') then
                 count <= 0;
             else
                 count   <= count + 1;
+                
+                write(my_line, string'(CR & LF & "Cycle "));
+                write(my_line, count);           
+                writeline(output, my_line);
+                
                 if (count = MAX_COUNT) then
                     stop;
                 end if;
             end if;
         end if;
     end process COUNTER;
-    
-    PRINT: process (clk)
-        variable my_line : line;
-    begin
-        if (rising_edge(clk) and reset_n = '1') then
-            write(my_line, string'(CR & LF & "Cycle "));
-            write(my_line, count);           
-            writeline(output, my_line);
-        end if;
-    end process PRINT;
 
 end Behavioral;
