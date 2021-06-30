@@ -180,7 +180,7 @@ architecture Behavioral of hoplite_tb_node is
     signal network_to_pe_full, network_to_pe_empty  : STD_LOGIC;
     
     -- Packets routed out
-    signal x_out_d, y_out_d: STD_LOGIC_VECTOR ((BUS_WIDTH-1) downto 0);
+    signal x_out_d, y_out_d             : STD_LOGIC_VECTOR ((BUS_WIDTH-1) downto 0);
     signal x_out_valid_d, y_out_valid_d : STD_LOGIC;
     
     signal print_valid : STD_LOGIC;

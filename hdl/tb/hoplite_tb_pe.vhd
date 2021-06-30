@@ -61,20 +61,16 @@ end hoplite_tb_pe;
 
 architecture Behavioral of hoplite_tb_pe is
 
-    type t_Coordinate is array (0 to 1) of std_logic_vector((COORD_BITS-1) downto 0);
-    constant X_INDEX    : integer := 0;
-    constant Y_INDEX    : integer := 1;
-
     constant x_src : std_logic_vector((COORD_BITS-1) downto 0) := std_logic_vector(to_unsigned(X_COORD, COORD_BITS));
     constant y_src : std_logic_vector((COORD_BITS-1) downto 0) := std_logic_vector(to_unsigned(Y_COORD, COORD_BITS));
 
-    constant src : t_Coordinate := (X_INDEX => x_src, Y_INDEX => y_src);
-    signal dest : t_Coordinate;
+    constant src    : t_Coordinate := (X_INDEX => x_src, Y_INDEX => y_src);
+    signal dest     : t_Coordinate;
 
-    signal message : std_logic_vector((BUS_WIDTH-1) downto 0);
+    signal message  : std_logic_vector((BUS_WIDTH-1) downto 0);
     
-    signal received_src, received_dest : t_Coordinate;
-    signal received_message : std_logic_vector((MESSAGE_BITS-1) downto 0);
+    signal received_src, received_dest  : t_Coordinate;
+    signal received_message             : std_logic_vector((MESSAGE_BITS-1) downto 0);
 
 begin
 

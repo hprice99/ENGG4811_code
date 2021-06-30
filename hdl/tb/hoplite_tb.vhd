@@ -103,22 +103,7 @@ architecture Behavioral of hoplite_tb is
     
     signal count            : integer;
     
-    constant NETWORK_ROWS   : integer := 2;
-    constant NETWORK_COLS   : integer := 2;
-    constant NETWORK_NODES  : integer := NETWORK_ROWS * NETWORK_COLS;
-    constant COORD_BITS     : integer := ceil_log2(max(NETWORK_ROWS, NETWORK_COLS));
-    constant BUS_WIDTH      : integer := 4 * COORD_BITS + MESSAGE_BITS;
-    
-    type t_Coordinate is array (0 to 1) of std_logic_vector((COORD_BITS-1) downto 0);
-    constant X_INDEX    : integer := 0;
-    constant Y_INDEX    : integer := 1;
-    
     -- Array of message interfaces between nodes
-    type t_Destination is array(0 to (NETWORK_COLS-1), 0 to (NETWORK_ROWS-1)) of t_Coordinate;
-    type t_Message is array (0 to (NETWORK_COLS-1), 0 to (NETWORK_ROWS-1)) of std_logic_vector((BUS_WIDTH-1) downto 0);
-    type t_MessageValid is array (0 to (NETWORK_COLS-1), 0 to (NETWORK_ROWS-1)) of std_logic;
-    type t_Trigger is array (0 to (NETWORK_COLS-1), 0 to (NETWORK_ROWS-1)) of std_logic;
-
     signal destinations : t_Destination;
     signal x_messages_out, y_messages_out : t_Message;
     signal x_messages_out_valid, y_messages_out_valid : t_MessageValid;
@@ -129,10 +114,7 @@ architecture Behavioral of hoplite_tb is
     constant TEST_SRC_ROW : integer := 0;
     constant TEST_SRC_COL : integer := 0;
 
-    -- Message checking FIFO
-    type t_FifoMessage is array (0 to (NETWORK_COLS-1), 0 to (NETWORK_ROWS-1)) of t_Message;
-    type t_FifoMessageValid is array (0 to (NETWORK_COLS-1), 0 to (NETWORK_ROWS-1)) of t_MessageValid;
-    
+    -- Message checking FIFO   
     constant FIFO_DEPTH     : integer := MAX_MESSAGE_COUNT;
     
     -- Messages to send into checking FIFOs
