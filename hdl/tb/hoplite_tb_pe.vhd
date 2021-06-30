@@ -37,16 +37,25 @@ entity hoplite_tb_pe is
         BUS_WIDTH   : integer := 8
     );
     Port ( 
-        clk                  : in STD_LOGIC;
-        reset_n              : in STD_LOGIC;
-        count                : in integer;
-        trig                 : in STD_LOGIC;
-        x_dest               : in STD_LOGIC_VECTOR((COORD_BITS-1) downto 0);
-        y_dest               : in STD_LOGIC_VECTOR((COORD_BITS-1) downto 0);
-        message_out          : out STD_LOGIC_VECTOR ((BUS_WIDTH-1) downto 0);
-        message_out_valid    : out STD_LOGIC;
-        message_in           : in STD_LOGIC_VECTOR ((BUS_WIDTH-1) downto 0);
-        message_in_valid     : in STD_LOGIC
+        clk                     : in STD_LOGIC;
+        reset_n                 : in STD_LOGIC;
+        count                   : in integer;
+        
+        trig                    : in STD_LOGIC;
+        x_dest                  : in STD_LOGIC_VECTOR((COORD_BITS-1) downto 0);
+        y_dest                  : in STD_LOGIC_VECTOR((COORD_BITS-1) downto 0);
+        
+        message_out             : out STD_LOGIC_VECTOR ((BUS_WIDTH-1) downto 0);
+        message_out_valid       : out STD_LOGIC;
+        
+        message_in              : in STD_LOGIC_VECTOR ((BUS_WIDTH-1) downto 0);
+        message_in_valid        : in STD_LOGIC;
+        
+        last_message_sent       : out STD_LOGIC_VECTOR ((BUS_WIDTH-1) downto 0);
+        message_sent            : out STD_LOGIC;
+        
+        last_message_received   : out STD_LOGIC_VECTOR ((BUS_WIDTH-1) downto 0);
+        message_received        : out STD_LOGIC
    );
 end hoplite_tb_pe;
 
@@ -81,9 +90,15 @@ begin
             if (reset_n = '0' or trig = '0') then
                 message_out         <= (others => '0');
                 message_out_valid   <= '0';
+                
+                last_message_sent   <= (others => '0');
+                message_sent        <= '0';
             elsif (trig = '1') then
                 message_out         <= message;
                 message_out_valid   <= '1';
+                
+                last_message_sent   <= message;
+                message_sent        <= '1';
             end if;
         end if;
     end process MESSAGE_OUT_FF;
@@ -119,7 +134,20 @@ begin
     received_dest(X_INDEX)  <= message_in((COORD_BITS-1) downto 0);
     received_message        <= message_in((BUS_WIDTH-1) downto 4*COORD_BITS);
     
-    MESSAGE_RECEIVED: process (clk)
+    SAVE_MESSAGE_RECEIVED: process(clk)
+    begin
+        if (rising_edge(clk)) then
+            if (reset_n = '0') then
+                last_message_received <= (others => '0');
+            else
+                last_message_received <= message_in;
+            end if;
+        end if;
+    end process SAVE_MESSAGE_RECEIVED;
+    
+    message_received <= message_in_valid;
+    
+    PRINT_MESSAGE_RECEIVED: process (clk)
         variable my_line : line;
     begin
         if (rising_edge(clk) and reset_n = '1' and message_in_valid = '1') then
@@ -154,6 +182,6 @@ begin
             
             writeline(output, my_line);
         end if;
-    end process MESSAGE_RECEIVED;
+    end process PRINT_MESSAGE_RECEIVED;
     
 end Behavioral;

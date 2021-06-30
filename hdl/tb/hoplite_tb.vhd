@@ -50,22 +50,51 @@ architecture Behavioral of hoplite_tb is
         BUS_WIDTH   : integer := 8
     );
     port ( 
-        clk                 : in STD_LOGIC;
-        reset_n             : in STD_LOGIC;
-        count               : in integer;
-        x_dest              : in STD_LOGIC_VECTOR((COORD_BITS-1) downto 0);
-        y_dest              : in STD_LOGIC_VECTOR((COORD_BITS-1) downto 0);
-        trig                : in STD_LOGIC;
-        x_in                : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
-        x_in_valid          : in STD_LOGIC;
-        y_in                : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
-        y_in_valid          : in STD_LOGIC;
-        x_out               : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
-        x_out_valid         : out STD_LOGIC;
-        y_out               : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
-        y_out_valid         : out STD_LOGIC
+        clk                     : in STD_LOGIC;
+        reset_n                 : in STD_LOGIC;
+        count                   : in integer;
+        
+        x_dest                  : in STD_LOGIC_VECTOR((COORD_BITS-1) downto 0);
+        y_dest                  : in STD_LOGIC_VECTOR((COORD_BITS-1) downto 0);
+        trig                    : in STD_LOGIC;
+        
+        x_in                    : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
+        x_in_valid              : in STD_LOGIC;
+        y_in                    : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
+        y_in_valid              : in STD_LOGIC;
+        
+        x_out                   : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
+        x_out_valid             : out STD_LOGIC;
+        y_out                   : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
+        y_out_valid             : out STD_LOGIC;
+        
+        last_message_sent       : out STD_LOGIC_VECTOR ((BUS_WIDTH-1) downto 0);
+        message_sent            : out STD_LOGIC;
+        
+        last_message_received   : out STD_LOGIC_VECTOR ((BUS_WIDTH-1) downto 0);
+        message_received        : out STD_LOGIC
     );
     end component hoplite_tb_node;
+    
+    component fifo_sync
+        generic (
+            BUS_WIDTH   : integer := 32;
+            FIFO_DEPTH  : integer := 64
+        );
+        port (
+            clk         : in std_logic;
+            reset_n     : in std_logic;
+
+            write_en    : in std_logic;
+            write_data  : in std_logic_vector((BUS_WIDTH-1) downto 0);
+
+            read_en     : in std_logic;
+            read_data   : out std_logic_vector((BUS_WIDTH-1) downto 0);
+
+            full        : out std_logic;
+            empty       : out std_logic
+        );
+    end component fifo_sync;
     
     signal clk          : std_logic := '0';
     constant clk_period : time := 50 ns;
@@ -88,16 +117,40 @@ architecture Behavioral of hoplite_tb is
     type t_Destination is array(0 to (NETWORK_COLS-1), 0 to (NETWORK_ROWS-1)) of t_Coordinate;
     type t_Message is array (0 to (NETWORK_COLS-1), 0 to (NETWORK_ROWS-1)) of std_logic_vector((BUS_WIDTH-1) downto 0);
     type t_MessageValid is array (0 to (NETWORK_COLS-1), 0 to (NETWORK_ROWS-1)) of std_logic;
+    type t_Trigger is array (0 to (NETWORK_COLS-1), 0 to (NETWORK_ROWS-1)) of std_logic;
 
     signal destinations : t_Destination;
     signal x_messages_out, y_messages_out : t_Message;
     signal x_messages_out_valid, y_messages_out_valid : t_MessageValid;
     signal x_messages_in, y_messages_in : t_Message;
     signal x_messages_in_valid, y_messages_in_valid : t_MessageValid;
-    signal trig : t_MessageValid;
+    signal trig : t_Trigger;
     
     constant TEST_SRC_ROW : integer := 0;
     constant TEST_SRC_COL : integer := 0;
+
+    -- Message checking FIFO
+    type t_FifoMessage is array (0 to (NETWORK_COLS-1), 0 to (NETWORK_ROWS-1)) of t_Message;
+    type t_FifoMessageValid is array (0 to (NETWORK_COLS-1), 0 to (NETWORK_ROWS-1)) of t_MessageValid;
+    
+    constant FIFO_DEPTH     : integer := MAX_MESSAGE_COUNT;
+    
+    -- Messages to send into checking FIFOs
+    signal expected_messages_sent        : t_FifoMessage;
+    signal expected_messages_sent_valid  : t_FifoMessageValid;
+    
+    signal expected_messages_received       : t_FifoMessage;
+    signal expected_messages_received_valid : t_FifoMessageValid;
+    
+    -- Messages sent by processing elements
+    signal last_messages_sent               : t_Message;
+    signal last_messages_sent_destination   : t_Destination;
+    signal messages_sent                    : t_MessageValid;
+
+    -- Messages received by processing elements
+    signal last_messages_received       : t_Message;
+    signal last_messages_received_src   : t_Destination;
+    signal messages_received            : t_MessageValid; 
 
 begin
     
@@ -157,7 +210,15 @@ begin
                 x_out               => x_messages_out(curr_col, curr_row),
                 x_out_valid         => x_messages_out_valid(curr_col, curr_row),
                 y_out               => y_messages_out(curr_col, curr_row),
-                y_out_valid         => y_messages_out_valid(curr_col, curr_row)
+                y_out_valid         => y_messages_out_valid(curr_col, curr_row),
+                
+                -- Messages sent by the contained processing element
+                last_message_sent   => last_messages_sent(curr_col, curr_row),
+                message_sent        => messages_sent(curr_col, curr_row),
+                
+                -- Messages received by the contained processing element
+                last_message_received   => last_messages_received(curr_col, curr_row),
+                message_received        => messages_received(curr_col, curr_row)
             );
             
             -- Connect in and out messages
@@ -184,6 +245,78 @@ begin
             end process TRIG_FF;
         end generate NETWORK_COL_GEN;
     end generate NETWORK_ROW_GEN;
+    
+    -- Configure signals for message checking FIFO
+    FIFO_SRC_ROW_CONTROL: for src_y in 0 to (NETWORK_ROWS-1) generate
+        FIFO_SRC_COL_CONTROL: for src_x in 0 to (NETWORK_COLS-1) generate
+        begin
+            last_messages_sent_destination(src_x, src_y)(X_INDEX) <= last_messages_sent(src_x, src_y)((COORD_BITS-1) downto 0);
+            last_messages_sent_destination(src_x, src_y)(Y_INDEX) <= last_messages_sent(src_x, src_y)((2*COORD_BITS-1) downto COORD_BITS);
+            
+            FIFO_DEST_ROW_CONTROL: for dest_y in 0 to (NETWORK_ROWS-1) generate
+                FIFO_DEST_COL_CONTROL: for dest_x in 0 to (NETWORK_COLS-1) generate
+                    constant src_y_signal : std_logic_vector((COORD_BITS-1) downto 0) := std_logic_vector(to_unsigned(src_y, COORD_BITS));
+                    constant src_x_signal : std_logic_vector((COORD_BITS-1) downto 0) := std_logic_vector(to_unsigned(src_x, COORD_BITS));
+                    constant dest_y_signal : std_logic_vector((COORD_BITS-1) downto 0) := std_logic_vector(to_unsigned(dest_y, COORD_BITS));
+                    constant dest_x_signal : std_logic_vector((COORD_BITS-1) downto 0) := std_logic_vector(to_unsigned(dest_x, COORD_BITS));
+                begin
+                    last_messages_received_src(dest_x, dest_y)(X_INDEX) <= last_messages_received(dest_x, dest_y)((3*COORD_BITS-1) downto 2*COORD_BITS);
+                    last_messages_received_src(dest_x, dest_y)(Y_INDEX) <= last_messages_received(dest_x, dest_y)((4*COORD_BITS-1) downto 3*COORD_BITS);
+                
+                    -- FIFO for checking messages are correctly routed
+                    CHECK_FIFO: fifo_sync
+                    generic map (
+                        BUS_WIDTH   => BUS_WIDTH,
+                        FIFO_DEPTH  => FIFO_DEPTH
+                    )
+                    port map (
+                        clk         => clk,
+                        reset_n     => reset_n,
+                        
+                        write_en    => expected_messages_sent_valid(src_x, src_y)(dest_x, dest_y),
+                        write_data  => expected_messages_sent(src_x, src_y)(dest_x, dest_y),
+                        
+                        read_en     => expected_messages_received_valid(src_x, src_y)(dest_x, dest_y),
+                        read_data   => expected_messages_received(src_x, src_y)(dest_x, dest_y),
+                        
+                        full        => open,
+                        empty       => open
+                    );
+                    
+                    -- Assign messages sent to the correct FIFO                   
+                    ASSIGN_MESSAGE_SENT: process(clk)
+                    begin
+                        if (rising_edge(clk) and reset_n = '1') then
+                            if (messages_sent(src_x, src_y) = '1' 
+                                    and last_messages_sent_destination(src_x, src_y)(X_INDEX) = dest_x_signal
+                                    and last_messages_sent_destination(src_x, src_y)(Y_INDEX) = dest_y_signal) then
+                                expected_messages_sent_valid(src_x, src_y)(dest_x, dest_y)  <= '1';
+                                expected_messages_sent(src_x, src_y)(dest_x, dest_y)        <= last_messages_sent(src_x, src_y);
+                            else
+                                expected_messages_sent_valid(src_x, src_y)(dest_x, dest_y)  <= '0';
+                                expected_messages_sent(src_x, src_y)(dest_x, dest_y)        <= (others => '0');
+                            end if;
+                        end if;
+                    end process ASSIGN_MESSAGE_SENT;
+                    
+                    -- Assign messages received to the correct FIFO
+                    ASSIGN_MESSAGE_RECEIVED: process(clk)
+                    begin
+                        if (rising_edge(clk) and reset_n = '1') then
+                            if (messages_received(dest_x, dest_y) = '1' 
+                                    and last_messages_received_src(dest_x, dest_y)(X_INDEX) = src_x_signal
+                                    and last_messages_received_src(dest_x, dest_y)(Y_INDEX) = src_y_signal) then
+                                expected_messages_received_valid(src_x, src_y)(dest_x, dest_y)  <= '1';
+                            else
+                                expected_messages_received_valid(src_x, src_y)(dest_x, dest_y)  <= '0';
+                            end if;
+                        end if;
+                    end process ASSIGN_MESSAGE_RECEIVED;
+                end generate FIFO_DEST_COL_CONTROL;
+            end generate FIFO_DEST_ROW_CONTROL;
+        end generate FIFO_SRC_COL_CONTROL;
+    end generate FIFO_SRC_ROW_CONTROL;
+        
     
     COUNTER: process(clk)
         variable my_line : line;

@@ -11,7 +11,7 @@ use ieee.math_real.all;
 
 package hoplite_network_tb_defs is 
 
-    constant MAX_COUNT          : integer := 10;
+    constant MAX_COUNT          : integer := 15;
     
     -- Number of times message output is triggered
     constant MAX_MESSAGE_COUNT  : integer := 1;
