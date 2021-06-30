@@ -150,7 +150,7 @@ architecture Behavioral of hoplite_tb is
     -- Messages received by processing elements
     signal last_messages_received       : t_Message;
     signal last_messages_received_src   : t_Destination;
-    signal messages_received            : t_MessageValid; 
+    signal messages_received            : t_MessageValid;
 
 begin
     
@@ -165,6 +165,25 @@ begin
         wait for clk_period/2;  --for next 0.5 ns signal is '1'.
     end process CLK_PROCESS;
     
+    COUNTER: process(clk)
+        variable my_line : line;
+    begin
+        if (rising_edge(clk)) then
+            if (reset_n = '0') then
+                count   <= 0;
+            else
+                count   <= count + 1;
+                
+                write(my_line, string'(CR & LF & "Cycle "));
+                write(my_line, count);           
+                writeline(output, my_line);
+                
+                if (count = MAX_COUNT) then
+                    stop;
+                end if;
+            end if;
+        end if;
+    end process COUNTER;
 
     -- Generate the network
     NETWORK_ROW_GEN: for i in 0 to (NETWORK_ROWS-1) generate
@@ -312,30 +331,55 @@ begin
                             end if;
                         end if;
                     end process ASSIGN_MESSAGE_RECEIVED;
+                    
+                    -- Check message received
+                    CHECK_MESSAGE_RECEIVED: process(clk)
+                        variable my_line : line;
+                    begin
+                        if (rising_edge(clk) and reset_n = '1') then
+                            if (messages_received(dest_x, dest_y) = '1') then
+                                if (expected_messages_received(src_x, src_y)(dest_x, dest_y) = last_messages_received(dest_x, dest_y)) then
+--                                    write(my_line, string'(HT & "Message received successfully, message data = "));
+--                                    -- write(my_line, last_messages_received(dest_x, dest_y)((BUS_WIDTH-1) downto 0));
+--                                    write(my_line, to_integer(unsigned(last_messages_received(dest_x, dest_y)((BUS_WIDTH-1) downto 4*COORD_BITS))));           
+--                                    writeline(output, my_line);
+
+                                    write(my_line, string'(HT & "hoplite_tb: "));
+        
+                                    write(my_line, string'("Node ("));
+                                    write(my_line, dest_x);
+                                    
+                                    write(my_line, string'(", "));
+                                    write(my_line, dest_y);
+                                    write(my_line, string'(")"));
+                                    
+                                    write(my_line, string'(" received message successfully"));
+                                    
+                                    writeline(output, my_line);
+                                
+                                    write(my_line, string'(HT & HT & "Source X = "));
+                                    write(my_line, to_integer(unsigned(last_messages_received(dest_x, dest_y)((3*COORD_BITS-1) downto 2*COORD_BITS))));
+                                    
+                                    write(my_line, string'(", Source Y = "));
+                                    write(my_line, to_integer(unsigned(last_messages_received(dest_x, dest_y)((4*COORD_BITS-1) downto 3*COORD_BITS))));
+                                    
+                                    write(my_line, string'(", Destination X = "));
+                                    write(my_line, to_integer(unsigned(last_messages_received(dest_x, dest_y)((COORD_BITS-1) downto 0))));
+                                    
+                                    write(my_line, string'(", Destination Y = "));
+                                    write(my_line, to_integer(unsigned(last_messages_received(dest_x, dest_y)((2*COORD_BITS-1) downto COORD_BITS))));
+                                    
+                                    write(my_line, string'(", Count = "));
+                                    write(my_line, to_integer(unsigned(last_messages_received(dest_x, dest_y)((BUS_WIDTH-1) downto 4*COORD_BITS))));
+                                
+                                    writeline(output, my_line);
+                                end if;
+                            end if;
+                        end if;
+                    end process CHECK_MESSAGE_RECEIVED;
                 end generate FIFO_DEST_COL_CONTROL;
             end generate FIFO_DEST_ROW_CONTROL;
         end generate FIFO_SRC_COL_CONTROL;
     end generate FIFO_SRC_ROW_CONTROL;
-        
-    
-    COUNTER: process(clk)
-        variable my_line : line;
-    begin
-        if (rising_edge(clk)) then
-            if (reset_n = '0') then
-                count <= 0;
-            else
-                count   <= count + 1;
-                
-                write(my_line, string'(CR & LF & "Cycle "));
-                write(my_line, count);           
-                writeline(output, my_line);
-                
-                if (count = MAX_COUNT) then
-                    stop;
-                end if;
-            end if;
-        end if;
-    end process COUNTER;
 
 end Behavioral;
