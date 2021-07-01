@@ -234,8 +234,8 @@ begin
                 if (rising_edge(clk)) then
                     if (reset_n = '0') then
                         trig(curr_row, curr_col) <= '0';
-                    elsif (curr_row = TEST_SRC_ROW and curr_col = TEST_SRC_COL) then
-                    -- elsif (curr_row = TEST_SRC_ROW) then
+                    -- elsif (curr_row = TEST_SRC_ROW and curr_col = TEST_SRC_COL) then
+                    elsif (curr_row = TEST_SRC_ROW) then
                         if (count <= MAX_MESSAGE_COUNT) then
                             trig(curr_row, curr_col) <= not trig(curr_row, curr_col);
                         else
