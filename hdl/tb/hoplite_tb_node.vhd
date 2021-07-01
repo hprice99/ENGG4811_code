@@ -53,7 +53,13 @@ entity hoplite_tb_node is
         x_out               : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
         x_out_valid         : out STD_LOGIC;
         y_out               : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
-        y_out_valid         : out STD_LOGIC
+        y_out_valid         : out STD_LOGIC;
+        
+        last_message_sent       : out STD_LOGIC_VECTOR ((BUS_WIDTH-1) downto 0);
+        message_sent            : out STD_LOGIC;
+        
+        last_message_received   : out STD_LOGIC_VECTOR ((BUS_WIDTH-1) downto 0);
+        message_received        : out STD_LOGIC
     );
 end hoplite_tb_node;
 
@@ -130,12 +136,21 @@ architecture Behavioral of hoplite_tb_node is
             reset_n              : in STD_LOGIC;
             count                : in integer;
             trig                 : in STD_LOGIC;
+            
             x_dest               : in STD_LOGIC_VECTOR((COORD_BITS-1) downto 0);
             y_dest               : in STD_LOGIC_VECTOR((COORD_BITS-1) downto 0);
+            
             message_out          : out STD_LOGIC_VECTOR ((BUS_WIDTH-1) downto 0);
             message_out_valid    : out STD_LOGIC;
+            
             message_in           : in STD_LOGIC_VECTOR ((BUS_WIDTH-1) downto 0);
-            message_in_valid     : in STD_LOGIC
+            message_in_valid     : in STD_LOGIC;
+            
+            last_message_sent       : out STD_LOGIC_VECTOR ((BUS_WIDTH-1) downto 0);
+            message_sent            : out STD_LOGIC;
+            
+            last_message_received   : out STD_LOGIC_VECTOR ((BUS_WIDTH-1) downto 0);
+            message_received        : out STD_LOGIC
         );
     end component hoplite_tb_pe; 
     
@@ -165,7 +180,7 @@ architecture Behavioral of hoplite_tb_node is
     signal network_to_pe_full, network_to_pe_empty  : STD_LOGIC;
     
     -- Packets routed out
-    signal x_out_d, y_out_d: STD_LOGIC_VECTOR ((BUS_WIDTH-1) downto 0);
+    signal x_out_d, y_out_d             : STD_LOGIC_VECTOR ((BUS_WIDTH-1) downto 0);
     signal x_out_valid_d, y_out_valid_d : STD_LOGIC;
     
     signal print_valid : STD_LOGIC;
@@ -332,19 +347,25 @@ begin
             COORD_BITS  => COORD_BITS
         )
         port map (
-            clk                 => clk,
-            reset_n             => reset_n,
-            count               => count,
+            clk                     => clk,
+            reset_n                 => reset_n,
+            count                   => count,
             
-            trig                => trig,
-            x_dest              => x_dest,
-            y_dest              => y_dest,
+            trig                    => trig,
+            x_dest                  => x_dest,
+            y_dest                  => y_dest,
+
+            message_out             => pe_message_out,
+            message_out_valid       => pe_message_out_valid,
             
-            message_out         => pe_message_out,
-            message_out_valid   => pe_message_out_valid,
+            message_in              => pe_message_in,
+            message_in_valid        => pe_message_in_valid,
             
-            message_in          => pe_message_in,
-            message_in_valid    => pe_message_in_valid
+            last_message_sent       => last_message_sent,
+            message_sent            => message_sent,
+            
+            last_message_received   => last_message_received,
+            message_received        => message_received
         );
 
 end Behavioral;
