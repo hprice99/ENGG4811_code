@@ -98,12 +98,18 @@ architecture Behavioral of hoplite_tb is
     end component fifo_sync;
     
     signal clk          : std_logic := '0';
-    constant clk_period : time := 50 ns;
+    constant clk_period : time := 10 ns;
     
     signal reset_n      : std_logic;
     
     signal count            : integer;
-    signal row_broadcasts_sent, column_messages_sent    : integer;
+    
+    type t_Counts is array (0 to (NETWORK_COLS-1), 0 to (NETWORK_ROWS-1)) of integer;
+    type t_MessageCounts is array (0 to (NETWORK_COLS-1), 0 to (NETWORK_ROWS-1)) of t_Counts;
+    signal row_broadcasts_sent, column_messages_sent            : t_MessageCounts;
+    signal row_broadcasts_received, column_messages_received    : t_MessageCounts;
+    
+    signal expected_row_broadcasts_received, expected_column_messages_received    : t_MessageCounts;
     
     -- Array of message interfaces between nodes
     signal destinations : t_Destination;
@@ -180,12 +186,6 @@ begin
             constant next_row : integer := ((i+1) mod NETWORK_ROWS);
             constant next_col : integer := ((j+1) mod NETWORK_COLS);
         begin
-            -- Set destination
-            destinations(curr_col, curr_row)(X_INDEX) <= std_logic_vector(to_unsigned(next_col, COORD_BITS));
-            
-            destinations(curr_col, curr_row)(Y_INDEX) <= std_logic_vector(to_unsigned(next_row, COORD_BITS));
-            -- destinations(curr_col, curr_row)(Y_INDEX) <= std_logic_vector(to_unsigned(curr_row, COORD_BITS));
-        
             -- Instantiate node
             NODE: hoplite_tb_node
             generic map (
@@ -197,13 +197,14 @@ begin
             port map (
                 clk                 => clk,
                 reset_n             => reset_n,
+                
                 count               => count,
+                trig                => trig(curr_col, curr_row),
+                trig_broadcast      => trig_broadcast(curr_col, curr_row),
                 
                 -- Signals to create outgoing messages
                 x_dest              => destinations(curr_col, curr_row)(X_INDEX),
                 y_dest              => destinations(curr_col, curr_row)(Y_INDEX),
-                trig                => trig(curr_col, curr_row),
-                trig_broadcast      => trig_broadcast(curr_col, curr_row),
                 
                 -- Messages incoming to router
                 x_in                => x_messages_in(curr_col, curr_row),
@@ -232,25 +233,66 @@ begin
             
             y_messages_in(curr_col, curr_row)       <= y_messages_out(curr_col, prev_row);
             y_messages_in_valid(curr_col, curr_row) <= y_messages_out_valid(curr_col, prev_row);
+            
+            
+            -- Set destination
+            SET_DESTINATION: process (clk)
+            begin
+                if (rising_edge(clk) and reset_n = '1') then
+                    if (row_broadcasts_sent(curr_col, curr_row)(next_col, curr_row) < MESSAGE_BURST) then
+                        destinations(curr_col, curr_row)(X_INDEX) <= std_logic_vector(to_unsigned(next_col, COORD_BITS));            
+                        destinations(curr_col, curr_row)(Y_INDEX) <= std_logic_vector(to_unsigned(curr_row, COORD_BITS));
+                    elsif (column_messages_sent(curr_col, curr_row)(curr_col, next_row) < MESSAGE_BURST) then
+                        destinations(curr_col, curr_row)(X_INDEX) <= std_logic_vector(to_unsigned(curr_col, COORD_BITS));            
+                        destinations(curr_col, curr_row)(Y_INDEX) <= std_logic_vector(to_unsigned(next_row, COORD_BITS));
+                    else
+                        destinations(curr_col, curr_row)(X_INDEX) <= std_logic_vector(to_unsigned(next_col, COORD_BITS));            
+                        destinations(curr_col, curr_row)(Y_INDEX) <= std_logic_vector(to_unsigned(next_row, COORD_BITS));
+                    end if;
+                end if;
+            end process SET_DESTINATION;
 
-            TRIG_FF : process (clk)
+            TRIG_FF: process (clk)
             begin
                 if (rising_edge(clk)) then
+                    trig(curr_col, curr_row)            <= '0';
+                    trig_broadcast(curr_col, curr_row)  <= '0';
+                
                     if (reset_n = '0') then
                         trig(curr_col, curr_row)            <= '0';
                         trig_broadcast(curr_col, curr_row)  <= '0';
-                    elsif (curr_row = TEST_SRC_ROW) then
-                        if (count <= MAX_MESSAGE_COUNT) then
-                            trig(curr_col, curr_row) <= not trig(curr_col, curr_row);
-                            if (curr_col = TEST_BROADCAST_COL) then
-                                trig_broadcast(curr_col, curr_row)  <= '1';
-                            else
-                                trig_broadcast(curr_col, curr_row)  <= '0';
-                            end if;
-                        else
-                            trig(curr_col, curr_row)            <= '0';
-                            trig_broadcast(curr_col, curr_row)  <= '0';
-                        end if;
+                        
+                        for dest_y in 0 to (NETWORK_ROWS-1) loop
+                            for dest_x in 0 to (NETWORK_COLS-1) loop
+                                -- Set broadcast count on diagonals to 0, and MESSAGE_BURST otherwise
+                                if (curr_col = curr_row) then
+                                    row_broadcasts_sent(curr_col, curr_row)(dest_x, dest_y)     <= 0;
+                                else
+                                    row_broadcasts_sent(curr_col, curr_row)(dest_x, dest_y)     <= MESSAGE_BURST;
+                                end if;
+                                column_messages_sent(curr_col, curr_row)(dest_x, dest_y)    <= 0;
+                            end loop;
+                        end loop;
+                        
+                    -- Broadcast from diagonal elements
+                    elsif (row_broadcasts_sent(curr_col, curr_row)(next_col, curr_row) < MESSAGE_BURST
+                            and curr_row = curr_col) then
+                        trig(curr_col, curr_row)                                    <= '1';
+                        trig_broadcast(curr_col, curr_row)                          <= '1';
+                        row_broadcasts_sent(curr_col, curr_row)(next_col, curr_row) <= row_broadcasts_sent(curr_col, curr_row)(next_col, curr_row) + 1;
+                    
+                    -- Send messages down each column
+                    -- TODO Update method for checking if all broadcast messages have been sent
+                    elsif (row_broadcasts_received(0, 0)(1, 0) = MESSAGE_BURST
+                            and column_messages_sent(curr_col, curr_row)(curr_col, next_row) < MESSAGE_BURST
+                            and curr_row = TEST_SRC_ROW) then
+                        trig(curr_col, curr_row)                                        <= '1';
+                        trig_broadcast(curr_col, curr_row)                              <= '0';
+                        column_messages_sent(curr_col, curr_row)(curr_col, next_row)    <= column_messages_sent(curr_col, curr_row)(curr_col, next_row) + 1;
+                    
+                    else
+                        trig(curr_col, curr_row)            <= '0';
+                        trig_broadcast(curr_col, curr_row)  <= '0';
                     end if;
                 end if;
             end process TRIG_FF;
@@ -328,8 +370,14 @@ begin
                     CHECK_MESSAGE_RECEIVED: process(clk)
                         variable my_line : line;
                     begin
-                        if (rising_edge(clk) and reset_n = '1') then
-                            if (messages_received(dest_x, dest_y) = '1') then
+                        if (rising_edge(clk)) then
+                            if (reset_n = '0') then 
+--                                row_broadcasts_sent(src_x, src_y)(dest_x, dest_y)   <= 0;
+--                                column_messages_sent(src_x, src_y)(dest_x, dest_y)  <= 0;
+                                                          
+                                row_broadcasts_received(src_x, src_y)(dest_x, dest_y)   <= 0;
+                                column_messages_received(src_x, src_y)(dest_x, dest_y)  <= 0;
+                            elsif (messages_received(dest_x, dest_y) = '1') then
                                 if (expected_messages_received(src_x, src_y)(dest_x, dest_y) = last_messages_received(dest_x, dest_y)) then
                                     write(my_line, string'(HT & "hoplite_tb: "));
         
@@ -361,19 +409,211 @@ begin
                                 
                                     write(my_line, string'(", Type = "));
                                     if (last_messages_received(dest_x, dest_y)(BUS_WIDTH-1) = '1') then
+                                        row_broadcasts_received(src_x, src_y)(dest_x, dest_y)   <= row_broadcasts_received(src_x, src_y)(dest_x, dest_y) + 1;
                                         write(my_line, string'("Broadcast"));
                                     else
+                                        column_messages_received(src_x, src_y)(dest_x, dest_y)  <= column_messages_received(src_x, src_y)(dest_x, dest_y) + 1;
                                         write(my_line, string'("Unicast"));
                                     end if;
                                 
                                     writeline(output, my_line);
+                                elsif (last_messages_received_src(dest_x, dest_y)(X_INDEX) = src_x_signal
+                                            and last_messages_received_src(dest_x, dest_y)(Y_INDEX) = src_y_signal
+                                            and expected_messages_received(src_x, src_y)(dest_x, dest_y) /= last_messages_received(dest_x, dest_y)) then
+                                    write(my_line, string'(CR & LF & HT & "hoplite_tb: "));
+        
+                                    write(my_line, string'("Node ("));
+                                    write(my_line, dest_x);
+                                    
+                                    write(my_line, string'(", "));
+                                    write(my_line, dest_y);
+                                    write(my_line, string'(")"));
+                                    
+                                    write(my_line, string'(" did not receive message successfully from node ("));
+                                    write(my_line, src_x);
+                                    
+                                    write(my_line, string'(", "));
+                                    write(my_line, src_y);
+                                    write(my_line, string'(")"));
+                                    
+                                    writeline(output, my_line);
+                                    
+                                    write(my_line, string'(HT & HT & "last_messages_received:"));
+                                    
+                                    writeline(output, my_line);
+                                    
+                                    write(my_line, string'(HT & HT & HT & "Source X = "));
+                                    write(my_line, to_integer(unsigned(last_messages_received(dest_x, dest_y)((3*COORD_BITS-1) downto 2*COORD_BITS))));
+                                    
+                                    write(my_line, string'(", Source Y = "));
+                                    write(my_line, to_integer(unsigned(last_messages_received(dest_x, dest_y)((4*COORD_BITS-1) downto 3*COORD_BITS))));
+                                    
+                                    write(my_line, string'(", Destination X = "));
+                                    write(my_line, to_integer(unsigned(last_messages_received(dest_x, dest_y)((COORD_BITS-1) downto 0))));
+                                    
+                                    write(my_line, string'(", Destination Y = "));
+                                    write(my_line, to_integer(unsigned(last_messages_received(dest_x, dest_y)((2*COORD_BITS-1) downto COORD_BITS))));
+                                    
+                                    write(my_line, string'(", Count = "));
+                                    write(my_line, to_integer(unsigned(last_messages_received(dest_x, dest_y)((BUS_WIDTH-MESSAGE_TYPE_BITS-1) downto 4*COORD_BITS))));
+                                
+                                    write(my_line, string'(", Type = "));
+                                    if (last_messages_received(dest_x, dest_y)(BUS_WIDTH-1) = '1') then
+                                        write(my_line, string'("Broadcast"));
+                                    else
+                                        write(my_line, string'("Unicast"));
+                                    end if;
+                                    
+                                    writeline(output, my_line);
+                                    
+                                    write(my_line, string'(HT & HT & "expected_messages_received:"));
+                                    writeline(output, my_line);
+                                                                        
+                                    write(my_line, string'(HT & HT & HT & "Source X = "));
+                                    write(my_line, to_integer(unsigned(expected_messages_received(src_x, src_y)(dest_x, dest_y)((3*COORD_BITS-1) downto 2*COORD_BITS))));
+                                    
+                                    write(my_line, string'(", Source Y = "));
+                                    write(my_line, to_integer(unsigned(expected_messages_received(src_x, src_y)(dest_x, dest_y)((4*COORD_BITS-1) downto 3*COORD_BITS))));
+                                    
+                                    write(my_line, string'(", Destination X = "));
+                                    write(my_line, to_integer(unsigned(expected_messages_received(src_x, src_y)(dest_x, dest_y)((COORD_BITS-1) downto 0))));
+                                    
+                                    write(my_line, string'(", Destination Y = "));
+                                    write(my_line, to_integer(unsigned(expected_messages_received(src_x, src_y)(dest_x, dest_y)((2*COORD_BITS-1) downto COORD_BITS))));
+                                    
+                                    write(my_line, string'(", Count = "));
+                                    write(my_line, to_integer(unsigned(expected_messages_received(src_x, src_y)(dest_x, dest_y)((BUS_WIDTH-MESSAGE_TYPE_BITS-1) downto 4*COORD_BITS))));
+                                
+                                    write(my_line, string'(", Type = "));
+                                    if (expected_messages_received(src_x, src_y)(dest_x, dest_y)(BUS_WIDTH-1) = '1') then
+                                        write(my_line, string'("Broadcast"));
+                                    else
+                                        write(my_line, string'("Unicast"));
+                                    end if;
+                                    
+                                    writeline(output, my_line);
+                                    
+                                    stop;
                                 end if;
                             end if;
                         end if;
                     end process CHECK_MESSAGE_RECEIVED;
+                    
+                    -- Set the number of messages expected
+                    SET_BROADCAST_EXPECTED: if (src_x = src_y) generate
+                        -- Pick all elements on the row
+                        BROADCAST_EXPECTED: if (src_x /= dest_x and src_y = dest_y) generate
+                            expected_row_broadcasts_received(src_x, src_y)(dest_x, dest_y)    <= MESSAGE_BURST;
+                        end generate BROADCAST_EXPECTED;
+                        
+                        BROADCAST_NOT_EXPECTED: if (src_x = dest_x or src_y /= dest_y) generate
+                            expected_row_broadcasts_received(src_x, src_y)(dest_x, dest_y)    <= 0;
+                        end generate BROADCAST_NOT_EXPECTED;
+                    end generate SET_BROADCAST_EXPECTED;
+                    
+                    SET_BROADCAST_NOT_EXPECTED: if (src_x /= src_y) generate
+                        expected_row_broadcasts_received(src_x, src_y)(dest_x, dest_y)    <= 0;
+                    end generate SET_BROADCAST_NOT_EXPECTED;
+                    
+                    SET_COLUMN_EXPECTED: if (src_y = TEST_SRC_ROW) generate
+                        -- Pick all elements on the row
+                        COLUMN_EXPECTED: if (src_x = dest_x and src_y /= dest_y) generate
+                            expected_column_messages_received(src_x, src_y)(dest_x, dest_y)    <= MESSAGE_BURST;
+                        end generate COLUMN_EXPECTED;
+                        
+                        COLUMN_NOT_EXPECTED: if (src_x /= dest_x or src_y = dest_y) generate
+                            expected_column_messages_received(src_x, src_y)(dest_x, dest_y)    <= 0;
+                        end generate COLUMN_NOT_EXPECTED;
+                    end generate SET_COLUMN_EXPECTED;
+                    
+                    SET_COLUMN_NOT_EXPECTED: if (src_y /= TEST_SRC_ROW) generate
+                        expected_column_messages_received(src_x, src_y)(dest_x, dest_y)    <= 0;
+                    end generate SET_COLUMN_NOT_EXPECTED;
+
+                    CHECK_BROADCAST_MESSAGE_RECEIVED_COUNTS: process (row_broadcasts_received(src_x, src_y)(dest_x, dest_y))
+                        variable my_line : line;
+                    begin
+                        if (reset_n = '1') then
+                            write(my_line, row_broadcasts_received(src_x, src_y)(dest_x, dest_y));
+                            write(my_line, string'(" broadcast messages from node ("));
+                            write(my_line, src_x);
+                            write(my_line, string'(", "));
+                            write(my_line, src_y);
+                            write(my_line, string'(") to node ("));
+                            write(my_line, dest_x);
+                            write(my_line, string'(", "));
+                            write(my_line, dest_y);
+                            write(my_line, string'(") have been received"));
+                            
+                            writeline(output, my_line);
+                        
+                            if (row_broadcasts_received(src_x, src_y)(dest_x, dest_y) = MESSAGE_BURST) then
+                                write(my_line, string'("All broadcast messages from node ("));
+                                write(my_line, src_x);
+                                write(my_line, string'(", "));
+                                write(my_line, src_y);
+                                write(my_line, string'(") to node ("));
+                                write(my_line, dest_x);
+                                write(my_line, string'(", "));
+                                write(my_line, dest_y);
+                                write(my_line, string'(") have been received"));
+                                        
+                                writeline(output, my_line);
+                            end if;
+                        end if;
+                    end process CHECK_BROADCAST_MESSAGE_RECEIVED_COUNTS;
+                    
+                    CHECK_COLUMN_MESSAGE_RECEIVED_COUNTS: process (row_broadcasts_received(src_x, src_y)(dest_x, dest_y), 
+                            column_messages_received(src_x, src_y)(dest_x, dest_y))
+                        variable my_line : line;
+                    begin
+                        if (reset_n = '1') then
+                            write(my_line, column_messages_received(src_x, src_y)(dest_x, dest_y));
+                            write(my_line, string'(" column messages from node ("));
+                            write(my_line, src_x);
+                            write(my_line, string'(", "));
+                            write(my_line, src_y);
+                            write(my_line, string'(") to node ("));
+                            write(my_line, dest_x);
+                            write(my_line, string'(", "));
+                            write(my_line, dest_y);
+                            write(my_line, string'(") have been received"));
+                            
+                            writeline(output, my_line);
+                            
+                            if (column_messages_received(src_x, src_y)(dest_x, dest_y) = MESSAGE_BURST) then
+                                write(my_line, string'("All column messages from node ("));
+                                write(my_line, src_x);
+                                write(my_line, string'(", "));
+                                write(my_line, src_y);
+                                write(my_line, string'(") to node ("));
+                                write(my_line, dest_x);
+                                write(my_line, string'(", "));
+                                write(my_line, dest_y);
+                                write(my_line, string'(") have been received"));
+                                        
+                                writeline(output, my_line);
+                            end if;
+                        end if;
+                    end process CHECK_COLUMN_MESSAGE_RECEIVED_COUNTS;
                 end generate FIFO_DEST_COL_CONTROL;
             end generate FIFO_DEST_ROW_CONTROL;
         end generate FIFO_SRC_COL_CONTROL;
     end generate FIFO_SRC_ROW_CONTROL;
+
+    VERIFY_MESSAGES_RECEIVED_COUNT: process(clk)
+        variable my_line : line;
+    begin
+        if (rising_edge(clk)) then
+            if (reset_n = '1' 
+                    and row_broadcasts_received = expected_row_broadcasts_received
+                    and column_messages_received = expected_column_messages_received) then
+                write(my_line, string'(CR & LF & "All expected messages received"));    
+                writeline(output, my_line);
+                
+                stop;      
+            end if;
+        end if;
+    end process VERIFY_MESSAGES_RECEIVED_COUNT;
 
 end Behavioral;

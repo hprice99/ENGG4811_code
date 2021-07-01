@@ -13,12 +13,12 @@ use xil_defaultlib.math_functions.all;
 
 package hoplite_network_tb_defs is 
 
-    constant MAX_COUNT          : integer := 500;
-    
-    -- Number of times message output is triggered
-    constant MAX_MESSAGE_COUNT  : integer := 1;
+    constant MAX_COUNT          : integer := 2000;
     
     constant MESSAGE_BURST      : integer := 32;
+    
+    -- Number of times message output is triggered
+    constant MAX_MESSAGE_COUNT  : integer := 2 * MESSAGE_BURST;
     
     constant PE_READY_FREQUENCY : integer := 5;
     

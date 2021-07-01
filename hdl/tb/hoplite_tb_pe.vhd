@@ -122,6 +122,19 @@ begin
         
             write(my_line, string'(HT & HT & "Trigger"));
             
+            write(my_line, string'(", Type = "));
+            if (trig_broadcast = '1') then
+                write(my_line, string'("Broadcast"));
+            else
+                write(my_line, string'("Unicast"));
+            end if;
+            
+            write(my_line, string'(", Destination X = "));
+            write(my_line, to_integer(unsigned(dest(X_INDEX))));
+            
+            write(my_line, string'(", Destination Y = "));
+            write(my_line, to_integer(unsigned(dest(Y_INDEX))));
+            
             writeline(output, my_line);
         end if;
     end process TRIGGER;
@@ -186,6 +199,9 @@ begin
             else
                 write(my_line, string'("Unicast"));
             end if;
+            
+            write(my_line, string'(", Raw = "));
+            write(my_line, message_in);
             
             writeline(output, my_line);
         end if;
