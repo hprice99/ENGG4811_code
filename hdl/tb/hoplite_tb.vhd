@@ -57,6 +57,7 @@ architecture Behavioral of hoplite_tb is
         x_dest                  : in STD_LOGIC_VECTOR((COORD_BITS-1) downto 0);
         y_dest                  : in STD_LOGIC_VECTOR((COORD_BITS-1) downto 0);
         trig                    : in STD_LOGIC;
+        trig_broadcast          : in STD_LOGIC;
         
         x_in                    : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
         x_in_valid              : in STD_LOGIC;
@@ -102,6 +103,7 @@ architecture Behavioral of hoplite_tb is
     signal reset_n      : std_logic;
     
     signal count            : integer;
+    signal row_broadcasts_sent, column_messages_sent    : integer;
     
     -- Array of message interfaces between nodes
     signal destinations : t_Destination;
@@ -110,9 +112,10 @@ architecture Behavioral of hoplite_tb is
     signal x_messages_in, y_messages_in : t_Message;
     signal x_messages_in_valid, y_messages_in_valid : t_MessageValid;
     signal trig : t_Trigger;
+    signal trig_broadcast : t_Trigger;
     
-    constant TEST_SRC_ROW : integer := 0;
-    constant TEST_SRC_COL : integer := 0;
+    constant TEST_SRC_ROW           : integer := 0;
+    constant TEST_BROADCAST_COL     : integer := 0;
 
     -- Message checking FIFO   
     constant FIFO_DEPTH     : integer := MAX_MESSAGE_COUNT;
@@ -200,6 +203,7 @@ begin
                 x_dest              => destinations(curr_col, curr_row)(X_INDEX),
                 y_dest              => destinations(curr_col, curr_row)(Y_INDEX),
                 trig                => trig(curr_col, curr_row),
+                trig_broadcast      => trig_broadcast(curr_col, curr_row),
                 
                 -- Messages incoming to router
                 x_in                => x_messages_in(curr_col, curr_row),
@@ -233,13 +237,19 @@ begin
             begin
                 if (rising_edge(clk)) then
                     if (reset_n = '0') then
-                        trig(curr_row, curr_col) <= '0';
-                    -- elsif (curr_row = TEST_SRC_ROW and curr_col = TEST_SRC_COL) then
+                        trig(curr_col, curr_row)            <= '0';
+                        trig_broadcast(curr_col, curr_row)  <= '0';
                     elsif (curr_row = TEST_SRC_ROW) then
                         if (count <= MAX_MESSAGE_COUNT) then
-                            trig(curr_row, curr_col) <= not trig(curr_row, curr_col);
+                            trig(curr_col, curr_row) <= not trig(curr_col, curr_row);
+                            if (curr_col = TEST_BROADCAST_COL) then
+                                trig_broadcast(curr_col, curr_row)  <= '1';
+                            else
+                                trig_broadcast(curr_col, curr_row)  <= '0';
+                            end if;
                         else
-                            trig(curr_row, curr_col) <= '0';
+                            trig(curr_col, curr_row)            <= '0';
+                            trig_broadcast(curr_col, curr_row)  <= '0';
                         end if;
                     end if;
                 end if;
@@ -321,11 +331,6 @@ begin
                         if (rising_edge(clk) and reset_n = '1') then
                             if (messages_received(dest_x, dest_y) = '1') then
                                 if (expected_messages_received(src_x, src_y)(dest_x, dest_y) = last_messages_received(dest_x, dest_y)) then
---                                    write(my_line, string'(HT & "Message received successfully, message data = "));
---                                    -- write(my_line, last_messages_received(dest_x, dest_y)((BUS_WIDTH-1) downto 0));
---                                    write(my_line, to_integer(unsigned(last_messages_received(dest_x, dest_y)((BUS_WIDTH-1) downto 4*COORD_BITS))));           
---                                    writeline(output, my_line);
-
                                     write(my_line, string'(HT & "hoplite_tb: "));
         
                                     write(my_line, string'("Node ("));
@@ -352,7 +357,14 @@ begin
                                     write(my_line, to_integer(unsigned(last_messages_received(dest_x, dest_y)((2*COORD_BITS-1) downto COORD_BITS))));
                                     
                                     write(my_line, string'(", Count = "));
-                                    write(my_line, to_integer(unsigned(last_messages_received(dest_x, dest_y)((BUS_WIDTH-1) downto 4*COORD_BITS))));
+                                    write(my_line, to_integer(unsigned(last_messages_received(dest_x, dest_y)((BUS_WIDTH-MESSAGE_TYPE_BITS-1) downto 4*COORD_BITS))));
+                                
+                                    write(my_line, string'(", Type = "));
+                                    if (last_messages_received(dest_x, dest_y)(BUS_WIDTH-1) = '1') then
+                                        write(my_line, string'("Broadcast"));
+                                    else
+                                        write(my_line, string'("Unicast"));
+                                    end if;
                                 
                                     writeline(output, my_line);
                                 end if;

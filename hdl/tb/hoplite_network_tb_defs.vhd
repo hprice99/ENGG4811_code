@@ -13,22 +13,25 @@ use xil_defaultlib.math_functions.all;
 
 package hoplite_network_tb_defs is 
 
-    constant MAX_COUNT          : integer := 15;
+    constant MAX_COUNT          : integer := 500;
     
     -- Number of times message output is triggered
     constant MAX_MESSAGE_COUNT  : integer := 1;
+    
+    constant MESSAGE_BURST      : integer := 32;
     
     constant PE_READY_FREQUENCY : integer := 5;
     
     -- Size of message data in packets
     constant MESSAGE_BITS       : integer := 32;
+    constant MESSAGE_TYPE_BITS  : integer := 1;
     
     -- Constants
     constant NETWORK_ROWS   : integer := 2;
     constant NETWORK_COLS   : integer := 2;
     constant NETWORK_NODES  : integer := NETWORK_ROWS * NETWORK_COLS;
     constant COORD_BITS     : integer := ceil_log2(max(NETWORK_ROWS, NETWORK_COLS));
-    constant BUS_WIDTH      : integer := 4 * COORD_BITS + MESSAGE_BITS;
+    constant BUS_WIDTH      : integer := 4 * COORD_BITS + MESSAGE_BITS + MESSAGE_TYPE_BITS;
     
     constant X_INDEX    : integer := 0;
     constant Y_INDEX    : integer := 1;
