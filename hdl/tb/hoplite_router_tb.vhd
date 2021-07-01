@@ -238,7 +238,8 @@ begin
                 x_message_data              <= rand_slv(DATA_WIDTH, 3*count);
                 x_message_b_valid           <= rand_logic(VALID_THRESHOLD, count);
                 
-                y_message_dest(X_INDEX)     <= rand_slv(COORD_BITS, MAX_CYCLES-count);
+                -- Incoming Y messages are already in the correct column
+                y_message_dest(X_INDEX)     <= "00";
                 y_message_dest(Y_INDEX)     <= rand_slv(COORD_BITS, 2*MAX_CYCLES-count);
                 y_message_data              <= rand_slv(DATA_WIDTH, 3*MAX_CYCLES-count);
                 y_message_b_valid           <= rand_logic(VALID_THRESHOLD, MAX_CYCLES-count);
