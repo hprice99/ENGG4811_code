@@ -44,6 +44,7 @@ entity hoplite_tb_node is
         x_dest              : in STD_LOGIC_VECTOR((COORD_BITS-1) downto 0);
         y_dest              : in STD_LOGIC_VECTOR((COORD_BITS-1) downto 0);
         trig                : in STD_LOGIC;
+        trig_broadcast      : in STD_LOGIC;
         
         x_in                : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
         x_in_valid          : in STD_LOGIC;
@@ -75,12 +76,14 @@ architecture Behavioral of hoplite_tb_node is
         port (
             clk             : in STD_LOGIC;
             reset_n         : in STD_LOGIC;
+            
             x_in            : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
             x_in_valid      : in STD_LOGIC;
             y_in            : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
             y_in_valid      : in STD_LOGIC;
             pe_in           : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
             pe_in_valid     : in STD_LOGIC;
+            
             x_out           : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
             x_out_valid     : out STD_LOGIC;
             y_out           : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
@@ -132,10 +135,12 @@ architecture Behavioral of hoplite_tb_node is
             COORD_BITS  : integer := 1
         );
         port (
-            clk                  : in STD_LOGIC;
-            reset_n              : in STD_LOGIC;
-            count                : in integer;
-            trig                 : in STD_LOGIC;
+            clk                 : in STD_LOGIC;
+            reset_n             : in STD_LOGIC;
+            
+            count               : in integer;
+            trig                : in STD_LOGIC;
+            trig_broadcast      : in STD_LOGIC;
             
             x_dest               : in STD_LOGIC_VECTOR((COORD_BITS-1) downto 0);
             y_dest               : in STD_LOGIC_VECTOR((COORD_BITS-1) downto 0);
@@ -290,8 +295,18 @@ begin
                 write(my_line, to_integer(unsigned(x_in((COORD_BITS-1) downto 0))));
                 write(my_line, string'(", "));
                 write(my_line, to_integer(unsigned(x_in((2*COORD_BITS-1) downto COORD_BITS))));
-                write(my_line, string'("), data = "));
-                write(my_line, x_in((BUS_WIDTH-1) downto 2*COORD_BITS));
+                write(my_line, string'("), source = ("));
+                write(my_line, to_integer(unsigned(x_in((3*COORD_BITS-1) downto 2*COORD_BITS))));
+                write(my_line, string'(", "));
+                write(my_line, to_integer(unsigned(x_in((4*COORD_BITS-1) downto 3*COORD_BITS))));
+                write(my_line, string'("), type = "));
+                if (x_in(BUS_WIDTH-1) = '1') then
+                    write(my_line, string'("Broadcast"));
+                else
+                    write(my_line, string'("Unicast"));
+                end if;
+                write(my_line, string'(", data = "));
+                write(my_line, to_integer(unsigned(x_in((BUS_WIDTH-MESSAGE_TYPE_BITS-1) downto 4*COORD_BITS))));
                 write(my_line, string'(", raw = "));
                 write(my_line, x_in((BUS_WIDTH-1) downto 0));
                 
@@ -303,8 +318,18 @@ begin
                 write(my_line, to_integer(unsigned(y_in((COORD_BITS-1) downto 0))));
                 write(my_line, string'(", "));
                 write(my_line, to_integer(unsigned(y_in((2*COORD_BITS-1) downto COORD_BITS))));
-                write(my_line, string'("), data = "));
-                write(my_line, y_in((BUS_WIDTH-1) downto 2*COORD_BITS));
+                write(my_line, string'("), source = ("));
+                write(my_line, to_integer(unsigned(y_in((3*COORD_BITS-1) downto 2*COORD_BITS))));
+                write(my_line, string'(", "));
+                write(my_line, to_integer(unsigned(y_in((4*COORD_BITS-1) downto 3*COORD_BITS))));
+                write(my_line, string'("), type = "));
+                if (y_in(BUS_WIDTH-1) = '1') then
+                    write(my_line, string'("Broadcast"));
+                else
+                    write(my_line, string'("Unicast"));
+                end if;
+                write(my_line, string'(", data = "));
+                write(my_line, to_integer(unsigned(y_in((BUS_WIDTH-MESSAGE_TYPE_BITS-1) downto 4*COORD_BITS))));
                 write(my_line, string'(", raw = "));
                 write(my_line, y_in((BUS_WIDTH-1) downto 0));
                 
@@ -316,8 +341,18 @@ begin
                 write(my_line, to_integer(unsigned(x_out_d((COORD_BITS-1) downto 0))));
                 write(my_line, string'(", "));
                 write(my_line, to_integer(unsigned(x_out_d((2*COORD_BITS-1) downto COORD_BITS))));
-                write(my_line, string'("), data = "));
-                write(my_line, x_out_d((BUS_WIDTH-1) downto 2*COORD_BITS));
+                write(my_line, string'("), source = ("));
+                write(my_line, to_integer(unsigned(x_out_d((3*COORD_BITS-1) downto 2*COORD_BITS))));
+                write(my_line, string'(", "));
+                write(my_line, to_integer(unsigned(x_out_d((4*COORD_BITS-1) downto 3*COORD_BITS))));
+                write(my_line, string'("), type = "));
+                if (x_out_d(BUS_WIDTH-1) = '1') then
+                    write(my_line, string'("Broadcast"));
+                else
+                    write(my_line, string'("Unicast"));
+                end if;
+                write(my_line, string'(", data = "));
+                write(my_line, to_integer(unsigned(x_out_d((BUS_WIDTH-MESSAGE_TYPE_BITS-1) downto 4*COORD_BITS))));
                 write(my_line, string'(", raw = "));
                 write(my_line, x_out_d((BUS_WIDTH-1) downto 0));
                 
@@ -329,8 +364,18 @@ begin
                 write(my_line, to_integer(unsigned(y_out_d((COORD_BITS-1) downto 0))));
                 write(my_line, string'(", "));
                 write(my_line, to_integer(unsigned(y_out_d((2*COORD_BITS-1) downto COORD_BITS))));
-                write(my_line, string'("), data = "));
-                write(my_line, y_out_d((BUS_WIDTH-1) downto 2*COORD_BITS));
+                write(my_line, string'("), source = ("));
+                write(my_line, to_integer(unsigned(y_out_d((3*COORD_BITS-1) downto 2*COORD_BITS))));
+                write(my_line, string'(", "));
+                write(my_line, to_integer(unsigned(y_out_d((4*COORD_BITS-1) downto 3*COORD_BITS))));
+                write(my_line, string'("), type = "));
+                if (y_out_d(BUS_WIDTH-1) = '1') then
+                    write(my_line, string'("Broadcast"));
+                else
+                    write(my_line, string'("Unicast"));
+                end if;
+                write(my_line, string'(", data = "));
+                write(my_line, to_integer(unsigned(y_out_d((BUS_WIDTH-MESSAGE_TYPE_BITS-1) downto 4*COORD_BITS))));
                 write(my_line, string'(", raw = "));
                 write(my_line, y_out_d((BUS_WIDTH-1) downto 0));
                 
@@ -349,9 +394,11 @@ begin
         port map (
             clk                     => clk,
             reset_n                 => reset_n,
-            count                   => count,
             
+            count                   => count,
             trig                    => trig,
+            trig_broadcast          => trig_broadcast,
+            
             x_dest                  => x_dest,
             y_dest                  => y_dest,
 

@@ -39,9 +39,11 @@ entity hoplite_tb_pe is
     Port ( 
         clk                     : in STD_LOGIC;
         reset_n                 : in STD_LOGIC;
-        count                   : in integer;
         
+        count                   : in integer;
         trig                    : in STD_LOGIC;
+        trig_broadcast          : in STD_LOGIC;
+        
         x_dest                  : in STD_LOGIC_VECTOR((COORD_BITS-1) downto 0);
         y_dest                  : in STD_LOGIC_VECTOR((COORD_BITS-1) downto 0);
         
@@ -71,14 +73,15 @@ architecture Behavioral of hoplite_tb_pe is
     
     signal received_src, received_dest  : t_Coordinate;
     signal received_message             : std_logic_vector((MESSAGE_BITS-1) downto 0);
+    signal received_type                : std_logic;
 
 begin
 
     dest(X_INDEX) <= x_dest; 
     dest(Y_INDEX) <= y_dest;
 
-    -- Message format 0 -- x_dest | y_dest | x_src | y_src | count -- (BUS_WIDTH-1)
-    message <= std_logic_vector(to_unsigned(count, MESSAGE_BITS)) & src(Y_INDEX) & src(X_INDEX) & dest(Y_INDEX) & dest(X_INDEX);
+    -- Message format 0 -- x_dest | y_dest | x_src | y_src | count | type -- (BUS_WIDTH-1)
+    message <= trig_broadcast & std_logic_vector(to_unsigned(count, MESSAGE_BITS)) & src(Y_INDEX) & src(X_INDEX) & dest(Y_INDEX) & dest(X_INDEX);
 
     MESSAGE_OUT_FF : process (clk)
     begin
@@ -119,6 +122,19 @@ begin
         
             write(my_line, string'(HT & HT & "Trigger"));
             
+            write(my_line, string'(", Type = "));
+            if (trig_broadcast = '1') then
+                write(my_line, string'("Broadcast"));
+            else
+                write(my_line, string'("Unicast"));
+            end if;
+            
+            write(my_line, string'(", Destination X = "));
+            write(my_line, to_integer(unsigned(dest(X_INDEX))));
+            
+            write(my_line, string'(", Destination Y = "));
+            write(my_line, to_integer(unsigned(dest(Y_INDEX))));
+            
             writeline(output, my_line);
         end if;
     end process TRIGGER;
@@ -128,7 +144,8 @@ begin
     received_src(X_INDEX)   <= message_in((3*COORD_BITS-1) downto 2*COORD_BITS);
     received_dest(Y_INDEX)  <= message_in((2*COORD_BITS-1) downto COORD_BITS);
     received_dest(X_INDEX)  <= message_in((COORD_BITS-1) downto 0);
-    received_message        <= message_in((BUS_WIDTH-1) downto 4*COORD_BITS);
+    received_message        <= message_in((BUS_WIDTH-MESSAGE_TYPE_BITS-1) downto 4*COORD_BITS);
+    received_type           <= message_in(BUS_WIDTH-1);
     
     SAVE_MESSAGE_RECEIVED: process(clk)
     begin
@@ -175,6 +192,16 @@ begin
             
             write(my_line, string'(", Count = "));
             write(my_line, to_integer(unsigned(received_message)));
+            
+            write(my_line, string'(", Type = "));
+            if (received_type = '1') then
+                write(my_line, string'("Broadcast"));
+            else
+                write(my_line, string'("Unicast"));
+            end if;
+            
+            write(my_line, string'(", Raw = "));
+            write(my_line, message_in);
             
             writeline(output, my_line);
         end if;
