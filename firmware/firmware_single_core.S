@@ -1,4 +1,6 @@
 .section .init
+
+/* Main firmware */
 .global main
 
 /* set stack pointer */
