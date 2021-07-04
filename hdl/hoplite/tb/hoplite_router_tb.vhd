@@ -209,13 +209,30 @@ begin
         wait for clk_period/2;  --for next 0.5 ns signal is '1'.
     end process CLK_PROCESS;
     
+    -- Counter
+    COUNTER: process(clk)
+        variable my_line : line;
+    begin
+        if (rising_edge(clk)) then
+            if (reset_n = '0') then
+                count   <= 0;
+            else
+                count   <= count + 1;
+
+                if (count = MAX_CYCLES) then
+                    write(my_line, string'(CR & LF & "SUCCESS - Test complete"));       
+                    writeline(output, my_line);
+                    stop;
+                end if;
+            end if;
+        end if;
+    end process COUNTER;
+    
     -- Construct message
     CONSTRUCT_MESSAGE: process (clk)
     begin
         if (rising_edge(clk) and count <= MAX_CYCLES) then
-            if (reset_n = '0') then
-                count <= 0;
-                
+            if (reset_n = '0') then                
                 x_message_dest(X_INDEX)     <= (others => '0');
                 x_message_dest(Y_INDEX)     <= (others => '0');
                 x_message_data              <= (others => '0');
@@ -231,8 +248,6 @@ begin
                 pe_message_data             <= (others => '0');
                 pe_message_b_valid          <= '0';
             else
-                count <= count + 1;
-                
                 x_message_dest(X_INDEX)     <= rand_slv(COORD_BITS, count);
                 x_message_dest(Y_INDEX)     <= rand_slv(COORD_BITS, 2*count);
                 x_message_data              <= rand_slv(DATA_WIDTH, 3*count);
