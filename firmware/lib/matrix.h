@@ -1,6 +1,26 @@
 #ifndef MATRIX_H
 #define MATRIX_H
 
+#ifdef IO_CONFIG
+#include "io.h"
+#endif
+
+#ifndef MATRIX_ROW_END
+#define MATRIX_ROW_END (*(volatile char*)0x10000000)
+#endif
+
+#ifndef MATRIX_END
+#define MATRIX_END (*(volatile char*)0x20000000)
+#endif
+
+#ifndef MATRIX_POSITION
+#define MATRIX_POSITION (*(volatile char*)0x30000000)
+#endif
+
+#ifndef MATRIX_OUTPUT
+#define MATRIX_OUTPUT (*(volatile long*)0x40000000)
+#endif
+
 #define MATRIX_SIZE 64
 
 void print_matrix(long* matrix, int rows, int cols);

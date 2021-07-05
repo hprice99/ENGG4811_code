@@ -1,5 +1,5 @@
-#ifndef FIRMWARE_H
-#define FIRMWARE_H
+#ifndef IO_H
+#define IO_H
 
 #define CHAR_OUTPUT (*(volatile char*)0x10000000)
 #define LED (*(volatile char*)0x20000000)

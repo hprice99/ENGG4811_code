@@ -1,4 +1,3 @@
-#include "firmware.h"
 #include "print.h"
 
 void print_char(char c)

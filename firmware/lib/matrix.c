@@ -1,4 +1,3 @@
-#include "firmware.h"
 #include "matrix.h"
 #include "print.h"
 

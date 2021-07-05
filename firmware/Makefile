@@ -3,18 +3,18 @@ SINGLE_CORE_DIR = single_core
 HOPLITE_DIR = fox_hoplite
 
 .PHONY: all
-all: fw_single_core fw_hoplite
+all: build_single_core build_hoplite
 
-fw_hoplite:
+build_hoplite:
 	cd $(HOPLITE_DIR) && $(MAKE) all
 
-fw_single_core:
+build_single_core:
 	cd $(SINGLE_CORE_DIR) && $(MAKE) all
 
-clean: single_core_clean hoplite_clean
+clean: clean_single_core clean_hoplite
 
-single_core_clean:
+clean_single_core:
 	cd $(SINGLE_CORE_DIR) && $(MAKE) clean
 
-hoplite_clean:
+clean_hoplite:
 	cd $(HOPLITE_DIR) && $(MAKE) clean
