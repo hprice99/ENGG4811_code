@@ -179,19 +179,19 @@ begin
     -- Generate the network
     NETWORK_ROW_GEN: for i in 0 to (NETWORK_ROWS-1) generate
         NETWORK_COL_GEN: for j in 0 to (NETWORK_COLS-1) generate
-            constant prev_row : integer := ((i-1) mod NETWORK_ROWS);
-            constant prev_col : integer := ((j-1) mod NETWORK_COLS);
-            constant curr_row : integer := i;
-            constant curr_col : integer := j;
-            constant next_row : integer := ((i+1) mod NETWORK_ROWS);
-            constant next_col : integer := ((j+1) mod NETWORK_COLS);
+            constant prev_y : integer := ((i-1) mod NETWORK_ROWS);
+            constant prev_x : integer := ((j-1) mod NETWORK_COLS);
+            constant curr_y : integer := i;
+            constant curr_x : integer := j;
+            constant next_y : integer := ((i+1) mod NETWORK_ROWS);
+            constant next_x : integer := ((j+1) mod NETWORK_COLS);
         begin
             -- Instantiate node
             NODE: hoplite_tb_node
             generic map (
                 BUS_WIDTH   => BUS_WIDTH,
-                X_COORD     => curr_col,
-                Y_COORD     => curr_row,
+                X_COORD     => curr_x,
+                Y_COORD     => curr_y,
                 COORD_BITS  => COORD_BITS
             )
             port map (
@@ -199,55 +199,55 @@ begin
                 reset_n             => reset_n,
                 
                 count               => count,
-                trig                => trig(curr_col, curr_row),
-                trig_broadcast      => trig_broadcast(curr_col, curr_row),
+                trig                => trig(curr_x, curr_y),
+                trig_broadcast      => trig_broadcast(curr_x, curr_y),
                 
                 -- Signals to create outgoing messages
-                x_dest              => destinations(curr_col, curr_row)(X_INDEX),
-                y_dest              => destinations(curr_col, curr_row)(Y_INDEX),
+                x_dest              => destinations(curr_x, curr_y)(X_INDEX),
+                y_dest              => destinations(curr_x, curr_y)(Y_INDEX),
                 
                 -- Messages incoming to router
-                x_in                => x_messages_in(curr_col, curr_row),
-                x_in_valid          => x_messages_in_valid(curr_col, curr_row),                  
-                y_in                => y_messages_in(curr_col, curr_row),
-                y_in_valid          => y_messages_in_valid(curr_col, curr_row),
+                x_in                => x_messages_in(curr_x, curr_y),
+                x_in_valid          => x_messages_in_valid(curr_x, curr_y),                  
+                y_in                => y_messages_in(curr_x, curr_y),
+                y_in_valid          => y_messages_in_valid(curr_x, curr_y),
                 
                 -- Messages outgoing from router
-                x_out               => x_messages_out(curr_col, curr_row),
-                x_out_valid         => x_messages_out_valid(curr_col, curr_row),
-                y_out               => y_messages_out(curr_col, curr_row),
-                y_out_valid         => y_messages_out_valid(curr_col, curr_row),
+                x_out               => x_messages_out(curr_x, curr_y),
+                x_out_valid         => x_messages_out_valid(curr_x, curr_y),
+                y_out               => y_messages_out(curr_x, curr_y),
+                y_out_valid         => y_messages_out_valid(curr_x, curr_y),
                 
                 -- Messages sent by the contained processing element
-                last_message_sent   => last_messages_sent(curr_col, curr_row),
-                message_sent        => messages_sent(curr_col, curr_row),
+                last_message_sent   => last_messages_sent(curr_x, curr_y),
+                message_sent        => messages_sent(curr_x, curr_y),
                 
                 -- Messages received by the contained processing element
-                last_message_received   => last_messages_received(curr_col, curr_row),
-                message_received        => messages_received(curr_col, curr_row)
+                last_message_received   => last_messages_received(curr_x, curr_y),
+                message_received        => messages_received(curr_x, curr_y)
             );
             
             -- Connect in and out messages
-            x_messages_in(curr_col, curr_row)       <= x_messages_out(prev_col, curr_row);
-            x_messages_in_valid(curr_col, curr_row) <= x_messages_out_valid(prev_col, curr_row);
+            x_messages_in(curr_x, curr_y)       <= x_messages_out(prev_x, curr_y);
+            x_messages_in_valid(curr_x, curr_y) <= x_messages_out_valid(prev_x, curr_y);
             
-            y_messages_in(curr_col, curr_row)       <= y_messages_out(curr_col, prev_row);
-            y_messages_in_valid(curr_col, curr_row) <= y_messages_out_valid(curr_col, prev_row);
+            y_messages_in(curr_x, curr_y)       <= y_messages_out(curr_x, prev_y);
+            y_messages_in_valid(curr_x, curr_y) <= y_messages_out_valid(curr_x, prev_y);
             
             
             -- Set destination
             SET_DESTINATION: process (clk)
             begin
                 if (rising_edge(clk) and reset_n = '1') then
-                    if (row_broadcasts_sent(curr_col, curr_row)(next_col, curr_row) < MESSAGE_BURST) then
-                        destinations(curr_col, curr_row)(X_INDEX) <= std_logic_vector(to_unsigned(next_col, COORD_BITS));            
-                        destinations(curr_col, curr_row)(Y_INDEX) <= std_logic_vector(to_unsigned(curr_row, COORD_BITS));
-                    elsif (column_messages_sent(curr_col, curr_row)(curr_col, next_row) < MESSAGE_BURST) then
-                        destinations(curr_col, curr_row)(X_INDEX) <= std_logic_vector(to_unsigned(curr_col, COORD_BITS));            
-                        destinations(curr_col, curr_row)(Y_INDEX) <= std_logic_vector(to_unsigned(next_row, COORD_BITS));
+                    if (row_broadcasts_sent(curr_x, curr_y)(next_x, curr_y) < MESSAGE_BURST) then
+                        destinations(curr_x, curr_y)(X_INDEX) <= std_logic_vector(to_unsigned(next_x, COORD_BITS));            
+                        destinations(curr_x, curr_y)(Y_INDEX) <= std_logic_vector(to_unsigned(curr_y, COORD_BITS));
+                    elsif (column_messages_sent(curr_x, curr_y)(curr_x, next_y) < MESSAGE_BURST) then
+                        destinations(curr_x, curr_y)(X_INDEX) <= std_logic_vector(to_unsigned(curr_x, COORD_BITS));            
+                        destinations(curr_x, curr_y)(Y_INDEX) <= std_logic_vector(to_unsigned(next_y, COORD_BITS));
                     else
-                        destinations(curr_col, curr_row)(X_INDEX) <= std_logic_vector(to_unsigned(next_col, COORD_BITS));            
-                        destinations(curr_col, curr_row)(Y_INDEX) <= std_logic_vector(to_unsigned(next_row, COORD_BITS));
+                        destinations(curr_x, curr_y)(X_INDEX) <= std_logic_vector(to_unsigned(next_x, COORD_BITS));            
+                        destinations(curr_x, curr_y)(Y_INDEX) <= std_logic_vector(to_unsigned(next_y, COORD_BITS));
                     end if;
                 end if;
             end process SET_DESTINATION;
@@ -255,44 +255,44 @@ begin
             TRIG_FF: process (clk)
             begin
                 if (rising_edge(clk)) then
-                    trig(curr_col, curr_row)            <= '0';
-                    trig_broadcast(curr_col, curr_row)  <= '0';
+                    trig(curr_x, curr_y)            <= '0';
+                    trig_broadcast(curr_x, curr_y)  <= '0';
                 
                     if (reset_n = '0') then
-                        trig(curr_col, curr_row)            <= '0';
-                        trig_broadcast(curr_col, curr_row)  <= '0';
+                        trig(curr_x, curr_y)            <= '0';
+                        trig_broadcast(curr_x, curr_y)  <= '0';
                         
                         for dest_y in 0 to (NETWORK_ROWS-1) loop
                             for dest_x in 0 to (NETWORK_COLS-1) loop
                                 -- Set broadcast count on diagonals to 0, and MESSAGE_BURST otherwise
-                                if (curr_col = curr_row) then
-                                    row_broadcasts_sent(curr_col, curr_row)(dest_x, dest_y)     <= 0;
+                                if (curr_x = curr_y) then
+                                    row_broadcasts_sent(curr_x, curr_y)(dest_x, dest_y)     <= 0;
                                 else
-                                    row_broadcasts_sent(curr_col, curr_row)(dest_x, dest_y)     <= MESSAGE_BURST;
+                                    row_broadcasts_sent(curr_x, curr_y)(dest_x, dest_y)     <= MESSAGE_BURST;
                                 end if;
-                                column_messages_sent(curr_col, curr_row)(dest_x, dest_y)    <= 0;
+                                column_messages_sent(curr_x, curr_y)(dest_x, dest_y)    <= 0;
                             end loop;
                         end loop;
                         
                     -- Broadcast from diagonal elements
-                    elsif (row_broadcasts_sent(curr_col, curr_row)(next_col, curr_row) < MESSAGE_BURST
-                            and curr_row = curr_col) then
-                        trig(curr_col, curr_row)                                    <= '1';
-                        trig_broadcast(curr_col, curr_row)                          <= '1';
-                        row_broadcasts_sent(curr_col, curr_row)(next_col, curr_row) <= row_broadcasts_sent(curr_col, curr_row)(next_col, curr_row) + 1;
+                    elsif (row_broadcasts_sent(curr_x, curr_y)(next_x, curr_y) < MESSAGE_BURST
+                            and curr_y = curr_x) then
+                        trig(curr_x, curr_y)                                    <= '1';
+                        trig_broadcast(curr_x, curr_y)                          <= '1';
+                        row_broadcasts_sent(curr_x, curr_y)(next_x, curr_y) <= row_broadcasts_sent(curr_x, curr_y)(next_x, curr_y) + 1;
                     
                     -- Send messages down each column
                     -- TODO Update method for checking if all broadcast messages have been sent
                     elsif (row_broadcasts_received(0, 0)(1, 0) = MESSAGE_BURST
-                            and column_messages_sent(curr_col, curr_row)(curr_col, next_row) < MESSAGE_BURST
-                            and curr_row = TEST_SRC_ROW) then
-                        trig(curr_col, curr_row)                                        <= '1';
-                        trig_broadcast(curr_col, curr_row)                              <= '0';
-                        column_messages_sent(curr_col, curr_row)(curr_col, next_row)    <= column_messages_sent(curr_col, curr_row)(curr_col, next_row) + 1;
+                            and column_messages_sent(curr_x, curr_y)(curr_x, next_y) < MESSAGE_BURST
+                            and curr_y = TEST_SRC_ROW) then
+                        trig(curr_x, curr_y)                                        <= '1';
+                        trig_broadcast(curr_x, curr_y)                              <= '0';
+                        column_messages_sent(curr_x, curr_y)(curr_x, next_y)    <= column_messages_sent(curr_x, curr_y)(curr_x, next_y) + 1;
                     
                     else
-                        trig(curr_col, curr_row)            <= '0';
-                        trig_broadcast(curr_col, curr_row)  <= '0';
+                        trig(curr_x, curr_y)            <= '0';
+                        trig_broadcast(curr_x, curr_y)  <= '0';
                     end if;
                 end if;
             end process TRIG_FF;
