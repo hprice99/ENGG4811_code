@@ -51,3 +51,12 @@ void itoa(long n, char s[]) {
     print_string("Reverse ");
     reverse(s, i);
 }
+
+void *memcpy(void *dest, const void *src, int n)
+{
+	while (n) {
+		n--;
+		((char*)dest)[n] = ((char*)src)[n];
+	}
+	return dest;
+}

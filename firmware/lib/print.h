@@ -19,4 +19,6 @@ void reverse(char* s, int length);
 /* itoa:  convert n to characters in s */
 void itoa(long n, char s[]);
 
+void *memcpy(void *dest, const void *src, int n);
+
 #endif
