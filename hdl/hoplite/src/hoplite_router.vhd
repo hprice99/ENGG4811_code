@@ -66,12 +66,14 @@ architecture Behavioral of hoplite_router is
     signal x_next, y_next : std_logic;
     
     signal x_in_valid_d, y_in_valid_d : std_logic;
-    signal x_in_valid_q, y_in_valid_q : std_logic;
+--    signal x_in_valid_q, y_in_valid_q : std_logic;
     
     type t_Coordinate is array (0 to 1) of std_logic_vector((COORD_BITS-1) downto 0);
     constant X_INDEX    : integer := 0;
     constant Y_INDEX    : integer := 1;
-    signal x_in_dest, y_in_dest : t_Coordinate;
+    signal x_in_dest_d, y_in_dest_d : t_Coordinate;
+    signal x_in_dest_q, y_in_dest_q : t_Coordinate;
+    
     
     constant X_INDEX_HEADER_START   : integer := 0;
     constant X_INDEX_HEADER_END     : integer := COORD_BITS-1;
@@ -82,11 +84,11 @@ architecture Behavioral of hoplite_router is
 begin
 
     -- Assign destination coordinates   
-    x_in_dest(X_INDEX) <= x_d(X_INDEX_HEADER_END downto X_INDEX_HEADER_START);
-    x_in_dest(Y_INDEX) <= x_d(Y_INDEX_HEADER_END downto Y_INDEX_HEADER_START);
+    x_in_dest_d(X_INDEX) <= x_d(X_INDEX_HEADER_END downto X_INDEX_HEADER_START);
+    x_in_dest_d(Y_INDEX) <= x_d(Y_INDEX_HEADER_END downto Y_INDEX_HEADER_START);
     
-    y_in_dest(X_INDEX) <= y_d(X_INDEX_HEADER_END downto X_INDEX_HEADER_START);
-    y_in_dest(Y_INDEX) <= y_d(Y_INDEX_HEADER_END downto Y_INDEX_HEADER_START);
+    y_in_dest_d(X_INDEX) <= y_d(X_INDEX_HEADER_END downto X_INDEX_HEADER_START);
+    y_in_dest_d(Y_INDEX) <= y_d(Y_INDEX_HEADER_END downto Y_INDEX_HEADER_START);
     
     x_in_valid_d <= x_in_valid;
     y_in_valid_d <= y_in_valid;
@@ -118,17 +120,34 @@ begin
     begin
         if (rising_edge(clk)) then
             if (reset_n = '0') then
-                x_q <= (others => '0');
-                y_q <= (others => '0');
+                x_q         <= (others => '0');
+                y_q         <= (others => '0');
+                pe_out      <= (others => '0');
                 
-                x_in_valid_q <= '0';
-                y_in_valid_q <= '0';
+--                x_in_valid_q    <= '0';
+--                y_in_valid_q    <= '0';
+                pe_out_valid    <= '0';
             else
                 x_q <= x_d;
                 y_q <= y_d;
                 
-                x_in_valid_q <= x_in_valid;
-                y_in_valid_q <= y_in_valid;
+--                x_in_valid_q <= x_in_valid;
+--                y_in_valid_q <= y_in_valid;
+                
+                if (x_in_valid = '1' and (to_integer(unsigned(x_in_dest_d(X_INDEX))) = X_COORD)
+                        and (to_integer(unsigned(x_in_dest_d(Y_INDEX))) = Y_COORD)) then
+                    pe_out_valid    <= '1'; 
+                    pe_out          <= x_d;
+                    
+                elsif (y_in_valid = '1' and (to_integer(unsigned(y_in_dest_d(X_INDEX))) = X_COORD)
+                        and (to_integer(unsigned(y_in_dest_d(Y_INDEX))) = Y_COORD)) then
+                    pe_out_valid    <= '1';
+                    pe_out          <= y_d;
+                
+                else
+                    pe_out_valid    <= '0';
+                    
+                end if;
             end if;
         end if;
     end process OUTPUT_FF;
@@ -137,100 +156,160 @@ begin
     x_out <= x_q;
     y_out <= y_q;
     
-    OUTPUT_VALID_FF : process (clk)
-    begin
-        if (rising_edge(clk)) then
-            if (reset_n = '0') then
-                x_next <= '0';
-                y_next <= '0';
-            else
-                if (x_in_valid_d = '1' and ((to_integer(unsigned(x_in_dest(X_INDEX))) /= X_COORD)
-                        or (to_integer(unsigned(x_in_dest(Y_INDEX))) /= Y_COORD))) then
-                    x_next <= '1';
-                else
-                    x_next <= pe_in_valid;
-                end if;
+--    PE_OUTPUT: process (x_in_dest_q, y_in_dest_q, x_in_valid_q, y_in_valid_q)
+--    begin
+--        if (x_in_valid_q = '1' and (to_integer(unsigned(x_in_dest_q(X_INDEX))) = X_COORD)
+--                and (to_integer(unsigned(x_in_dest_q(Y_INDEX))) = Y_COORD)) then
+--            pe_out_valid    <= '1'; 
+--            pe_out          <= x_q;
+            
+--        elsif (y_in_valid_q = '1' and (to_integer(unsigned(y_in_dest_q(X_INDEX))) = X_COORD)
+--                and (to_integer(unsigned(y_in_dest_q(Y_INDEX))) = Y_COORD)) then
+--            pe_out_valid    <= '1';
+--            pe_out          <= y_q;
+        
+--        else
+--            pe_out_valid    <= '0';
+--        end if;
+--    end process PE_OUTPUT;    
+    
+--    OUTPUT_VALID_FF: process (clk)
+--    begin
+--        if (rising_edge(clk)) then
+--            if (reset_n = '0') then
+--                x_next <= '0';
+--                y_next <= '0';
                 
-                -- Switch y_out to act as pe_out
-                if (x_in_valid_d = '1' and (to_integer(unsigned(x_in_dest(X_INDEX))) = X_COORD)
-                        and (to_integer(unsigned(x_in_dest(Y_INDEX))) = Y_COORD)) then
-                    y_next <= '0';
-                elsif (y_in_valid_d = '1' and (to_integer(unsigned(y_in_dest(X_INDEX))) = X_COORD)
-                        and (to_integer(unsigned(y_in_dest(Y_INDEX))) = Y_COORD)) then
-                    y_next <= '0';
-                elsif (y_in_valid_d = '1' and ((to_integer(unsigned(y_in_dest(X_INDEX))) /= X_COORD)
-                        or (to_integer(unsigned(y_in_dest(Y_INDEX))) /= Y_COORD))) then
-                    y_next <= '1';
-                elsif (x_in_valid_d = '1' and ((to_integer(unsigned(x_in_dest(X_INDEX))) /= X_COORD)
-                        or (to_integer(unsigned(x_in_dest(Y_INDEX))) /= Y_COORD))) then
-                    y_next <= '1';
-                else
-                    y_next <= pe_in_valid;
-                end if;
-            end if;
+--            else
+--                if (x_in_valid_d = '1' and ((to_integer(unsigned(x_in_dest_d(X_INDEX))) /= X_COORD)
+--                        or (to_integer(unsigned(x_in_dest_d(Y_INDEX))) /= Y_COORD))) then
+--                    x_next <= '1';
+--                else
+--                    x_next <= pe_in_valid;
+--                end if;
+                
+--                -- Switch y_out to act as pe_out
+--                if (x_in_valid_d = '1' and (to_integer(unsigned(x_in_dest_d(X_INDEX))) = X_COORD)
+--                        and (to_integer(unsigned(x_in_dest_d(Y_INDEX))) = Y_COORD)) then
+--                    y_next <= '0';
+                    
+--                elsif (y_in_valid_d = '1' and (to_integer(unsigned(y_in_dest_d(X_INDEX))) = X_COORD)
+--                        and (to_integer(unsigned(y_in_dest_d(Y_INDEX))) = Y_COORD)) then
+--                    y_next <= '0';
+                    
+--                elsif (y_in_valid_d = '1' and ((to_integer(unsigned(y_in_dest_d(X_INDEX))) /= X_COORD)
+--                        or (to_integer(unsigned(y_in_dest_d(Y_INDEX))) /= Y_COORD))) then
+--                    y_next <= '1';
+                    
+--                elsif (x_in_valid_d = '1' and ((to_integer(unsigned(x_in_dest_d(X_INDEX))) /= X_COORD)
+--                        or (to_integer(unsigned(x_in_dest_d(Y_INDEX))) /= Y_COORD))) then
+--                    y_next <= '1';
+                    
+--                else
+--                    y_next <= pe_in_valid;
+                    
+--                end if;
+--            end if;
+--        end if;
+--    end process OUTPUT_VALID_FF;
+
+    OUTPUT_VALID_FF: process (x_in_valid_d, y_in_valid_d, x_in_dest_d, y_in_dest_d)
+    begin
+        if (x_in_valid_d = '1' and ((to_integer(unsigned(x_in_dest_d(X_INDEX))) /= X_COORD)
+                or (to_integer(unsigned(x_in_dest_d(Y_INDEX))) /= Y_COORD))) then
+            x_next <= '1';
+        else
+            x_next <= pe_in_valid;
+        end if;
+        
+        -- Switch y_out to act as pe_out
+        if (x_in_valid_d = '1' and (to_integer(unsigned(x_in_dest_d(X_INDEX))) = X_COORD)
+                and (to_integer(unsigned(x_in_dest_d(Y_INDEX))) = Y_COORD)) then
+            y_next <= '0';
+            
+        elsif (y_in_valid_d = '1' and (to_integer(unsigned(y_in_dest_d(X_INDEX))) = X_COORD)
+                and (to_integer(unsigned(y_in_dest_d(Y_INDEX))) = Y_COORD)) then
+            y_next <= '0';
+            
+        elsif (y_in_valid_d = '1' and ((to_integer(unsigned(y_in_dest_d(X_INDEX))) /= X_COORD)
+                or (to_integer(unsigned(y_in_dest_d(Y_INDEX))) /= Y_COORD))) then
+            y_next <= '1';
+            
+        elsif (x_in_valid_d = '1' and ((to_integer(unsigned(x_in_dest_d(X_INDEX))) /= X_COORD)
+                or (to_integer(unsigned(x_in_dest_d(Y_INDEX))) /= Y_COORD))) then
+            y_next <= '1';
+            
+        else
+            y_next <= pe_in_valid;
+            
         end if;
     end process OUTPUT_VALID_FF;
     
     -- Valid signal routing    
-    OUTPUT_VALID: process(y_in_valid_q, x_in_valid_q, y_q, x_q)
-    begin
-        -- Multicast not possible
-        if (y_in_valid_q = '1') then
-            x_out_valid <= x_next;
-            y_out_valid <= y_next;
-        elsif (to_integer(unsigned(x_in_dest(X_INDEX))) /= X_COORD) then
-            x_out_valid <= x_next;
-            y_out_valid <= '0';
-        elsif (to_integer(unsigned(x_in_dest(Y_INDEX))) /= Y_COORD) then
-            x_out_valid <= '0';
-            y_out_valid <= y_next;
-        else
-            x_out_valid <= x_next;
-            y_out_valid <= y_next;
-        end if;
-    end process OUTPUT_VALID;
-
---    OUTPUT_VALID: process(clk)
+--    OUTPUT_VALID: process(y_in_valid_q, x_in_valid_q, y_q, x_q)
 --    begin
---        if (rising_edge(clk)) then
---            -- Multicast not possible
---            if (y_in_valid_q = '1') then
---                x_out_valid <= x_next;
---                y_out_valid <= y_next;
---            elsif (to_integer(unsigned(x_in_dest(X_INDEX))) /= X_COORD) then
---                x_out_valid <= x_next;
---                y_out_valid <= '0';
---            elsif (to_integer(unsigned(x_in_dest(Y_INDEX))) /= Y_COORD) then
---                x_out_valid <= '0';
---                y_out_valid <= y_next;
---            else
---                x_out_valid <= x_next;
---                y_out_valid <= y_next;
---            end if;
+--        -- Multicast not possible
+--        if (y_in_valid_q = '1') then
+--            x_out_valid <= x_next;
+--            y_out_valid <= y_next;
+--        elsif (to_integer(unsigned(x_in_dest_d(X_INDEX))) /= X_COORD) then
+--            x_out_valid <= x_next;
+--            y_out_valid <= '0';
+--        elsif (to_integer(unsigned(x_in_dest_d(Y_INDEX))) /= Y_COORD) then
+--            x_out_valid <= '0';
+--            y_out_valid <= y_next;
+--        else
+--            x_out_valid <= x_next;
+--            y_out_valid <= y_next;
 --        end if;
 --    end process OUTPUT_VALID;
-        
-    -- Output to PE    
-    PE_OUTPUT_FF : process (clk)
+
+    OUTPUT_VALID: process(clk)
     begin
         if (rising_edge(clk)) then
             if (reset_n = '0') then
-                pe_out_valid <= '0';
-                pe_out <= (others => '0');
-            else                    
-                if (x_in_valid_d = '1' and (to_integer(unsigned(x_in_dest(X_INDEX))) = X_COORD)
-                        and (to_integer(unsigned(x_in_dest(Y_INDEX))) = Y_COORD)) then
-                    pe_out_valid <= '1'; 
-                    pe_out <= x_d;
-                elsif (y_in_valid_d = '1' and (to_integer(unsigned(y_in_dest(X_INDEX))) = X_COORD)
-                        and (to_integer(unsigned(y_in_dest(Y_INDEX))) = Y_COORD)) then
-                    pe_out_valid <= '1';
-                    pe_out <= y_d;
+                x_out_valid <= '0';
+                y_out_valid <= '0';
+            else
+                -- Multicast not possible
+                if (y_in_valid = '1') then
+                    x_out_valid <= x_next;
+                    y_out_valid <= y_next;
+                elsif (to_integer(unsigned(x_in_dest_d(X_INDEX))) /= X_COORD) then
+                    x_out_valid <= x_next;
+                    y_out_valid <= '0';
+                elsif (to_integer(unsigned(x_in_dest_d(Y_INDEX))) /= Y_COORD) then
+                    x_out_valid <= '0';
+                    y_out_valid <= y_next;
                 else
-                    pe_out_valid <= '0';
+                    x_out_valid <= x_next;
+                    y_out_valid <= y_next;
                 end if;
             end if;
         end if;
-    end process PE_OUTPUT_FF;
+    end process OUTPUT_VALID;
+        
+--    -- Output to PE    
+--    PE_OUTPUT_FF : process (clk)
+--    begin
+--        if (rising_edge(clk)) then
+--            if (reset_n = '0') then
+--                pe_out_valid <= '0';
+--                pe_out <= (others => '0');
+--            else                    
+--                if (x_in_valid_d = '1' and (to_integer(unsigned(x_in_dest(X_INDEX))) = X_COORD)
+--                        and (to_integer(unsigned(x_in_dest(Y_INDEX))) = Y_COORD)) then
+--                    pe_out_valid <= '1'; 
+--                    pe_out <= x_d;
+--                elsif (y_in_valid_d = '1' and (to_integer(unsigned(y_in_dest(X_INDEX))) = X_COORD)
+--                        and (to_integer(unsigned(y_in_dest(Y_INDEX))) = Y_COORD)) then
+--                    pe_out_valid <= '1';
+--                    pe_out <= y_d;
+--                else
+--                    pe_out_valid <= '0';
+--                end if;
+--            end if;
+--        end if;
+--    end process PE_OUTPUT_FF;
     
 end Behavioral;
