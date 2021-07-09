@@ -370,9 +370,7 @@ begin
             packet_in_complete  => processor_out_packet_complete,
             
             packet_out          => pe_message_out,
-            packet_out_valid    => pe_message_out_valid,
-            
-            packet_read         => processor_in_message_read
+            packet_out_valid    => pe_message_out_valid
         );
         
     DECODER: message_decoder
@@ -391,7 +389,9 @@ begin
             x_coord_out         => open,
             y_coord_out         => open,
             message_out         => processor_in_message,
-            packet_out_valid    => processor_in_message_valid            
+            packet_out_valid    => processor_in_message_valid,
+            
+            packet_read         => processor_in_message_read            
         );
     
     PE: system

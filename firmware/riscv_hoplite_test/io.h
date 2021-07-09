@@ -4,10 +4,11 @@
 #define CHAR_OUTPUT     (*(volatile char*)0x10000000)
 
 // PE to network
-#define X_COORD_OUTPUT          (*(volatile char*)0x20000000)
-#define Y_COORD_OUTPUT          (*(volatile char*)0x20000010)
-#define MESSAGE_OUTPUT          (*(volatile long*)0x20000020)
-#define PACKET_COMPLETE_OUTPUT  (*(volatile char*)0x20000030)
+#define PE_READY                (*(volatile char*)0x20000000)
+#define X_COORD_OUTPUT          (*(volatile char*)0x20000010)
+#define Y_COORD_OUTPUT          (*(volatile char*)0x20000020)
+#define MESSAGE_OUTPUT          (*(volatile long*)0x20000030)
+#define PACKET_COMPLETE_OUTPUT  (*(volatile char*)0x20000040)
 
 // LEDs
 #define LED_0_OUTPUT    (*(volatile char*)0x30000000)

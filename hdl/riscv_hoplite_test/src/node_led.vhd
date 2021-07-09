@@ -46,7 +46,6 @@ entity node_led is
         MESSAGE_BITS    : integer := 32;
         BUS_WIDTH       : integer := 8;
         
-        USE_ILA            : std_logic := '1';
         DIVIDE_ENABLED     : std_logic := '0';
         MULTIPLY_ENABLED   : std_logic := '1';
         FIRMWARE           : string    := "firmware.hex";
@@ -218,6 +217,7 @@ architecture Behavioral of node_led is
             message_in          : in std_logic_vector(31 downto 0);
             message_in_valid    : in std_logic; 
             message_in_read     : out std_logic;
+            message_in_ready    : out std_logic;
             
             trap                : out std_logic
         );
@@ -262,6 +262,10 @@ architecture Behavioral of node_led is
     
     signal network_to_pe_full, network_to_pe_empty  : STD_LOGIC;
     
+    -- Packets routed out
+    signal x_out_d, y_out_d             : STD_LOGIC_VECTOR ((BUS_WIDTH-1) downto 0);
+    signal x_out_valid_d, y_out_valid_d : STD_LOGIC;
+    
     -- Message encoder signals
     signal processor_out_message_x_coord, processor_out_message_y_coord             : std_logic_vector((COORD_BITS-1) downto 0);
     signal processor_out_message_x_coord_valid, processor_out_message_y_coord_valid : std_logic;
@@ -305,14 +309,21 @@ begin
             pe_in               => pe_to_network_message,
             pe_in_valid         => pe_to_network_valid,
             
-            x_out               => x_out,
-            x_out_valid         => x_out_valid,
-            y_out               => y_out,
-            y_out_valid         => y_out_valid,
+            x_out               => x_out_d,
+            x_out_valid         => x_out_valid_d,
+            y_out               => y_out_d,
+            y_out_valid         => y_out_valid_d,
             pe_out              => network_to_pe_message,
             pe_out_valid        => network_to_pe_valid,
             pe_backpressure     => pe_backpressure
         );
+    
+    -- Connect router ports to node ports
+    x_out       <= x_out_d;
+    x_out_valid <= x_out_valid_d;
+    
+    y_out       <= y_out_d;
+    y_out_valid <= y_out_valid_d;
     
     -- Network interface controller (FIFO for messages to and from PE)
     router_ready <= not pe_backpressure;
@@ -371,9 +382,7 @@ begin
             packet_in_complete  => processor_out_packet_complete,
             
             packet_out          => pe_message_out,
-            packet_out_valid    => pe_message_out_valid,
-            
-            packet_read         => processor_in_message_read
+            packet_out_valid    => pe_message_out_valid
         );
         
     DECODER: message_decoder
@@ -392,7 +401,9 @@ begin
             x_coord_out         => open,
             y_coord_out         => open,
             message_out         => processor_in_message,
-            packet_out_valid    => processor_in_message_valid            
+            packet_out_valid    => processor_in_message_valid,
+            
+            packet_read         => processor_in_message_read         
         );
     
     PE: system
@@ -414,7 +425,7 @@ begin
             clk                 => clk,           
             reset_n             => reset_n,
             
-            switch              => switch,
+            switch              => switch_pipelined,
             LED                 => LED,
             
             x_coord_out         => processor_out_message_x_coord,
@@ -431,6 +442,7 @@ begin
             message_in          => processor_in_message,
             message_in_valid    => processor_in_message_valid,
             message_in_read     => processor_in_message_read,
+            message_in_ready    => pe_ready,
             
             trap                => open
         );

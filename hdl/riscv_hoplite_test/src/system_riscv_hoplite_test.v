@@ -38,9 +38,13 @@ module system #(
     input wire[31:0]    message_in,
     input wire          message_in_valid,
     output reg          message_in_read,
+    output reg          message_in_ready,
     
 	output wire        trap
 );
+    // Import memory-mapped IO addresses
+    `include "io.vh"
+
 	// set this to 0 for better timing but less performance/MHz
 	parameter FAST_MEMORY = 1;
 
@@ -91,6 +95,9 @@ module system #(
 
 	generate if (FAST_MEMORY) begin
 		always @(posedge clk) begin
+		    if (reset_n) begin
+		      LED <= 0;
+		    end
             out_byte_en         <= 0;
             
             x_coord_out_valid   <= 0;
@@ -99,6 +106,7 @@ module system #(
             packet_out_complete <= 0;   
             
             message_in_read     <= 0;
+            message_in_ready    <= 0;
             
 			mem_ready    <= 1;
 
@@ -114,49 +122,53 @@ module system #(
 			
 			if (mem_la_write) begin
 			case(mem_la_addr)
-			     32'h1000_0000: begin
+			    `CHAR_OUTPUT: begin
 			            out_byte_en[0]  <= 1;
 				        out_byte        <= mem_la_wdata;
 				    end
-				 32'h2000_0000: begin
+				`PE_READY_OUTPUT: begin
+				        message_in_ready    <= 1;
+				    end
+				`X_COORD_OUTPUT: begin
 				        x_coord_out_valid   <= 1;
 				        x_coord_out         <= mem_la_wdata;
 				    end
-				 32'h2000_0010: begin
+				`Y_COORD_OUTPUT: begin
 				        y_coord_out_valid   <= 1;
 				        y_coord_out         <= mem_la_wdata;
 				    end
-				 32'h2000_0020: begin
+				`MESSAGE_OUTPUT: begin
 				        message_out_valid   <= 1;
 				        message_out         <= mem_la_wdata;
 				    end
-				 32'h2000_0030: begin
+				`PACKET_COMPLETE_OUTPUT: begin
 				        packet_out_complete <= 1;
 				    end
-				 32'h3000_0000: begin
+                `LED_0_OUTPUT: begin
 				        LED[0]  <= mem_la_wdata[0];
 				    end
-				32'h3000_0010: begin
+				`LED_1_OUTPUT: begin
 				        LED[1]  <= mem_la_wdata[0];
 				    end
-				32'h3000_0020: begin
+				`LED_2_OUTPUT: begin
 				        LED[2]  <= mem_la_wdata[0];
 				    end
-				32'h3000_0030: begin
+				`LED_3_OUTPUT: begin
 				        LED[3]  <= mem_la_wdata[0];
 				    end
 		      endcase
 			end
 			
+		    // TODO Allow processor to read its (x,y) coordinate from code
 			if (mem_la_read) begin
 			case(mem_la_addr)
-			     32'h4000_0000: begin
+			     `SWITCH_INPUT: begin
 				    mem_rdata   <= switch;
 				    end
-				 32'h5000_0000: begin
+				 `MESSAGE_VALID_INPUT: begin
 				    mem_rdata   <= message_in_valid;
 				    end   
-				 32'h5000_0010: begin
+				 `MESSAGE_INPUT: begin
 				    mem_rdata           <= message_in;
 				    message_in_read     <= 1;
 				    end   

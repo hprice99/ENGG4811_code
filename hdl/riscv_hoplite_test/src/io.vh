@@ -4,10 +4,11 @@
 `define CHAR_OUTPUT     32'h1000_0000
 
 // PE to network
-`define X_COORD_OUTPUT          32'h2000_0000
-`define Y_COORD_OUTPUT          32'h2000_0010
-`define MESSAGE_OUTPUT          32'h2000_0020
-`define PACKET_COMPLETE_OUTPUT  32'h2000_0030
+`define PE_READY_OUTPUT         32'h2000_0000
+`define X_COORD_OUTPUT          32'h2000_0010
+`define Y_COORD_OUTPUT          32'h2000_0020
+`define MESSAGE_OUTPUT          32'h2000_0030
+`define PACKET_COMPLETE_OUTPUT  32'h2000_0040
 
 // LEDs
 `define LED_0_OUTPUT    32'h3000_0000
