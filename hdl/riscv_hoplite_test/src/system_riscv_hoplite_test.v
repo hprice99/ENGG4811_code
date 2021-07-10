@@ -172,6 +172,12 @@ module system #(
 				    mem_rdata           <= message_in;
 				    message_in_read     <= 1;
 				    end   
+				  `X_COORD_INPUT: begin
+				        mem_rdata           <= X_COORD;
+				    end
+				  `Y_COORD_INPUT: begin
+				        mem_rdata           <= Y_COORD;
+				   end
 		      endcase
 			end
 		end

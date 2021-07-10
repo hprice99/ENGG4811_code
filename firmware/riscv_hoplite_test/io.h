@@ -22,4 +22,8 @@
 #define MESSAGE_VALID_INPUT     (*(volatile char*)0x50000000)
 #define MESSAGE_INPUT           (*(volatile long*)0x50000010)
 
+// Node details
+#define X_COORD_INPUT           (*(volatile char*)0x60000000)
+#define Y_COORD_INPUT           (*(volatile char*)0x60000010)
+
 #endif

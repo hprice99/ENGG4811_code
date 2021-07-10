@@ -160,6 +160,7 @@ begin
                         NETWORK_NODES   => NETWORK_NODES,
                     
                         X_COORD         => curr_x,
+                        -- X_COORD         => 1,
                         Y_COORD         => curr_y,
                         COORD_BITS      => COORD_BITS,
                         MESSAGE_BITS    => MESSAGE_BITS,

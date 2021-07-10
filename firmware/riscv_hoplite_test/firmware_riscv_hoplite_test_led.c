@@ -3,7 +3,7 @@
 
 #define LOOP_DELAY 1000000000
 // #define NUM_DELAYS 1000000000
-#define NUM_DELAYS 500
+#define NUM_DELAYS 50000
 // #define LOOP_DELAY 2
 #define LED_COUNT 4
 
@@ -34,7 +34,15 @@ void main() {
 
     print_string("ENGG4811 PicoRV32 test\n");
 
-    // TODO Read node coordinates from hardware and print
+    // Read node coordinates from hardware and print
+    int x_coord = X_COORD_INPUT;
+    int y_coord = Y_COORD_INPUT;
+
+    print_string("Node coordinates (");
+    print_hex(x_coord, 1);
+    print_string(", ");
+    print_hex(y_coord, 1);
+    print_string(")\n");
 
     unsigned long loopCount = 0;
     unsigned long delayCount = 0;
