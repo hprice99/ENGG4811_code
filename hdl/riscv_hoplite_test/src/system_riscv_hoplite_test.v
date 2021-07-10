@@ -95,7 +95,7 @@ module system #(
 
 	generate if (FAST_MEMORY) begin
 		always @(posedge clk) begin
-		    if (reset_n) begin
+		    if (reset_n == 0) begin
 		      LED <= 0;
 		    end
             out_byte_en         <= 0;

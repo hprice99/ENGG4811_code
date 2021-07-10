@@ -66,7 +66,6 @@ architecture Behavioral of hoplite_router is
     signal x_next, y_next : std_logic;
     
     signal x_in_valid_d, y_in_valid_d : std_logic;
---    signal x_in_valid_q, y_in_valid_q : std_logic;
     
     type t_Coordinate is array (0 to 1) of std_logic_vector((COORD_BITS-1) downto 0);
     constant X_INDEX    : integer := 0;
@@ -124,16 +123,11 @@ begin
                 y_q         <= (others => '0');
                 pe_out      <= (others => '0');
                 
---                x_in_valid_q    <= '0';
---                y_in_valid_q    <= '0';
                 pe_out_valid    <= '0';
             else
                 x_q <= x_d;
                 y_q <= y_d;
-                
---                x_in_valid_q <= x_in_valid;
---                y_in_valid_q <= y_in_valid;
-                
+               
                 if (x_in_valid = '1' and (to_integer(unsigned(x_in_dest_d(X_INDEX))) = X_COORD)
                         and (to_integer(unsigned(x_in_dest_d(Y_INDEX))) = Y_COORD)) then
                     pe_out_valid    <= '1'; 

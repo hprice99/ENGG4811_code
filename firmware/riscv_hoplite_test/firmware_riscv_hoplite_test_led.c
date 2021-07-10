@@ -1,8 +1,10 @@
 #include "io.h"
 #include "print.h"
 
-// #define LOOP_DELAY 1000000000
-#define LOOP_DELAY 0
+#define LOOP_DELAY 1000000000
+// #define NUM_DELAYS 1000000000
+#define NUM_DELAYS 500
+// #define LOOP_DELAY 2
 #define LED_COUNT 4
 
 int ledValues[LED_COUNT] = {0, 0, 0, 0};
@@ -29,32 +31,17 @@ void setLeds(int led, int value) {
 }
 
 void main() {
+
     print_string("ENGG4811 PicoRV32 test\n");
 
-    char message[] = "$Uryyb+Jbeyq!+Vs+lbh+pna+ernq+guvf+zrffntr+gura$gur+CvpbEI32+PCH"
-            "+frrzf+gb+or+jbexvat+whfg+svar.$$++++++++++++++++GRFG+CNFFRQ!$$";
-    for (int i = 0; message[i]; i++)
-        switch (message[i])
-        {
-        case 'a' ... 'm':
-        case 'A' ... 'M':
-            message[i] += 13;
-            break;
-        case 'n' ... 'z':
-        case 'N' ... 'Z':
-            message[i] -= 13;
-            break;
-        case '$':
-            message[i] = '\n';
-            break;
-        case '+':
-            message[i] = ' ';
-            break;
-        }
-    print_string(message);
+    // TODO Read node coordinates from hardware and print
 
     unsigned long loopCount = 0;
+    unsigned long delayCount = 0;
     int currentLed = 0;
+
+    // 0 - LED0 to LED3, 1 - LED3 to LED0
+    int direction = 0;
 
     while (1) {
 
@@ -62,15 +49,38 @@ void main() {
 
         if (loopCount > LOOP_DELAY) {
 
-            ledValues[currentLed] = 1 - ledValues[currentLed];
+            delayCount++;
 
-            setLeds(currentLed, ledValues[currentLed]);
+            if (delayCount > NUM_DELAYS) {
 
-            currentLed++;
+                ledValues[currentLed] = 1 - ledValues[currentLed];
+                setLeds(currentLed, ledValues[currentLed]);
 
-            if (currentLed >= LED_COUNT) {
+                print_string("Current LED: ");
+                print_hex(currentLed, 1);
+                print_string("\n");
 
-                currentLed = 0;
+                if (direction == 0) {
+
+                    currentLed++;
+
+                    if (currentLed >= LED_COUNT) {
+
+                        direction = 1; 
+                        currentLed = LED_COUNT - 1;
+                    }
+                } else {
+
+                    currentLed--;
+
+                    if (currentLed < 0) {
+
+                        direction = 0;
+                        currentLed = 0;
+                    }
+                }
+
+                delayCount = 0;
             }
 
             loopCount = 0;

@@ -13,12 +13,10 @@ void print_char(char c);
 
 void print_string(const char *s);
 
-/* reverse:  reverse string s in place */
-void reverse(char* s, int length);
-
-/* itoa:  convert n to characters in s */
-void itoa(long n, char s[]);
-
 void *memcpy(void *dest, const void *src, int n);
+
+// void print_dec(unsigned long val);
+
+void print_hex(unsigned long val, int digits);
 
 #endif

@@ -31,6 +31,9 @@ use IEEE.STD_LOGIC_1164.ALL;
 --library UNISIM;
 --use UNISIM.VComponents.all;
 
+use STD.textio.all;
+use IEEE.std_logic_textio.all;
+
 entity top_tb is
 end top_tb;
 
@@ -74,5 +77,15 @@ begin
         SW          => switch,
         LED         => LED
     );
+
+    -- Print LED values
+    LED_PRINT: process (LED)
+        variable my_line : line;
+    begin
+        write(my_line, string'("LEDs = "));
+        write(my_line, LED);
+        
+        writeline(output, my_line);
+    end process LED_PRINT;
 
 end Behavioral;

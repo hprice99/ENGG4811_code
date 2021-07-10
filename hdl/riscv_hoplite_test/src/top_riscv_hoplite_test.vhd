@@ -117,7 +117,7 @@ architecture Behavioral of top is
     
     constant SWITCH_NODE_FIRMWARE   : string := "firmware_riscv_hoplite_test_switch.hex";
     constant LED_NODE_FIRMWARE      : string := "firmware_riscv_hoplite_test_led.hex";
-    constant MEM_SIZE   : integer := 1024;
+    constant MEM_SIZE               : integer := 1024;
     
     signal reset_n : std_logic;
 
