@@ -7,11 +7,8 @@ void print_matrix(long* matrix, int rows, int cols) {
 
     for (int row = 0; row < rows; row++) {
         for (int col = 0; col < cols; col++) {
-            print_string("itoa ");
-            itoa(*((matrix + row * rows) + col), digit);
-
-            print_string("Print ");
-            print_string(digit);
+            // TODO Determine number of digits
+            // print_hex(*((matrix + row * rows) + col), 4);
         }
         print_string(" ; \n");
     }

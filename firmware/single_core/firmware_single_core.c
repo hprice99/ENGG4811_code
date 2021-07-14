@@ -19,15 +19,6 @@ void mysrand(unsigned int seed) {
     next = seed;
 }
 
-void *memcpy(void *dest, const void *src, int n)
-{
-	while (n) {
-		n--;
-		((char*)dest)[n] = ((char*)src)[n];
-	}
-	return dest;
-}
-
 void main()
 {
     int ledValue = 0;
