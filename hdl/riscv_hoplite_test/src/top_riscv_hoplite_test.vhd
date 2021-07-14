@@ -54,6 +54,8 @@ architecture Behavioral of top is
         
             X_COORD         : integer := 0;
             Y_COORD         : integer := 0;
+            NODE_NUMBER     : integer := 0;
+            
             COORD_BITS      : integer := 2;
             MESSAGE_BITS    : integer := 32;
             BUS_WIDTH       : integer := 8;
@@ -162,6 +164,8 @@ begin
                         X_COORD         => curr_x,
                         -- X_COORD         => 1,
                         Y_COORD         => curr_y,
+                        NODE_NUMBER     => node_number,
+                        
                         COORD_BITS      => COORD_BITS,
                         MESSAGE_BITS    => MESSAGE_BITS,
                         BUS_WIDTH       => BUS_WIDTH,
@@ -201,6 +205,8 @@ begin
                     
                         X_COORD         => curr_x,
                         Y_COORD         => curr_y,
+                        NODE_NUMBER     => node_number,
+                        
                         COORD_BITS      => COORD_BITS,
                         MESSAGE_BITS    => MESSAGE_BITS,
                         BUS_WIDTH       => BUS_WIDTH,

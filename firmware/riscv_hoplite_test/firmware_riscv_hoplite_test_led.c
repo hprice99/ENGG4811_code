@@ -15,6 +15,15 @@ int my_x_coord;
 int my_y_coord;
 int my_node_number;
 
+int switchState;
+
+long createMessage(int val) {
+
+    long message = (my_node_number << 8) | val;
+
+    return message;
+}
+
 void setLeds(int led, int value) {
 
     switch (led) {
@@ -122,10 +131,34 @@ void main() {
     // loopLeds();
 
     int network_error;
+    long message_to_send;
     long message_received;
     struct ledMessage decoded_message;
 
+    switchState = SWITCH_INPUT;
+
     while (1) {
+
+        // Switch flipped
+        if (SWITCH_INPUT != switchState) {
+
+            switchState = SWITCH_INPUT;
+
+            // Create message
+            message_to_send = createMessage(switchState);
+
+            // Send message
+            network_error = send_message(LED_X, LED_Y, message_to_send);
+
+            if (network_error != NETWORK_SUCCESS) {
+
+                print_string("Unable to send message\n");
+            } else {
+
+                print_string("Message sent ");
+                print_hex(message_to_send, 4);
+            }
+        }
 
         network_error = receive_message(&message_received);
 

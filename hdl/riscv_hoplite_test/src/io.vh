@@ -22,6 +22,7 @@
 `define MESSAGE_VALID_INPUT         32'h5000_0000
 `define MESSAGE_INPUT               32'h5000_0010
 `define MESSAGE_IN_AVAILABLE_INPUT  32'h5000_0020
+`define MESSAGE_IN_READY_OUTPUT     32'h5000_0030
 
 // Node details
 `define X_COORD_INPUT           32'h6000_0000

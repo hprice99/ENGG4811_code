@@ -58,7 +58,7 @@ architecture Behavioral of message_decoder is
     signal latest_packet    : std_logic_vector((BUS_WIDTH-1) downto 0);
 
 begin
-    -- latest_packet       <= packet_in;
+    latest_packet       <= packet_in;
     -- packet_out_valid    <= packet_in_valid;
     
     -- Message format 0 -- x_dest | y_dest | messsage -- (BUS_WIDTH-1)
@@ -66,16 +66,16 @@ begin
     y_coord_out <= latest_packet((2*COORD_BITS-1) downto COORD_BITS);
     message_out <= latest_packet((BUS_WIDTH-1) downto 2*COORD_BITS);
     
-    PACKET_FF: process (clk)
-    begin
-        if (rising_edge(clk)) then
-            if (reset_n = '0') then
-                latest_packet   <= (others => '0');
-            elsif (packet_in_valid = '1') then
-                latest_packet   <= packet_in;
-            end if;
-        end if;
-    end process PACKET_FF;
+--    PACKET_FF: process (clk)
+--    begin
+--        if (rising_edge(clk)) then
+--            if (reset_n = '0') then
+--                latest_packet   <= (others => '0');
+--            elsif (packet_in_valid = '1') then
+--                latest_packet   <= packet_in;
+--            end if;
+--        end if;
+--    end process PACKET_FF;
     
     -- Hold packet_out_valid high from when packet_in_valid is high to when the message is read, then reset
     VALID_FF: process (clk)

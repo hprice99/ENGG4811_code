@@ -8,7 +8,8 @@ module system #(
     parameter COORD_BITS        = 1,
     
     parameter X_COORD           = 0,
-    parameter Y_COORD           = 0,     
+    parameter Y_COORD           = 0,
+    parameter NODE_NUMBER       = 0,     
 
 	parameter DIVIDE_ENABLED   = 0,
 	parameter MULTIPLY_ENABLED = 1,
@@ -35,8 +36,11 @@ module system #(
     
     output reg          packet_out_complete,
     
+    input wire          message_out_ready,
+    
     input wire[31:0]    message_in,
     input wire          message_in_valid,
+    input wire          message_in_available,
     output reg          message_in_read,
     output reg          message_in_ready,
     
@@ -120,14 +124,12 @@ module system #(
 			end
 			else
 			
+			// Output
 			if (mem_la_write) begin
 			case(mem_la_addr)
 			    `CHAR_OUTPUT: begin
 			            out_byte_en[0]  <= 1;
 				        out_byte        <= mem_la_wdata;
-				    end
-				`PE_READY_OUTPUT: begin
-				        message_in_ready    <= 1;
 				    end
 				`X_COORD_OUTPUT: begin
 				        x_coord_out_valid   <= 1;
@@ -156,28 +158,40 @@ module system #(
 				`LED_3_OUTPUT: begin
 				        LED[3]  <= mem_la_wdata[0];
 				    end
+				 `MESSAGE_IN_READY_OUTPUT: begin
+				        message_in_ready    <= 1;
+				    end
 		      endcase
 			end
-			
-		    // TODO Allow processor to read its (x,y) coordinate from code
+	   
+	       // Input
 			if (mem_la_read) begin
 			case(mem_la_addr)
 			     `SWITCH_INPUT: begin
-				    mem_rdata   <= switch;
+				        mem_rdata   <= switch;
+				    end
+				 `MESSAGE_OUT_READY_INPUT: begin
+				        mem_rdata   <= message_out_ready;
+				    end
+                `MESSAGE_IN_AVAILABLE_INPUT: begin
+				        mem_rdata   <= message_in_available;
 				    end
 				 `MESSAGE_VALID_INPUT: begin
-				    mem_rdata   <= message_in_valid;
+				        mem_rdata   <= message_in_valid;
 				    end   
 				 `MESSAGE_INPUT: begin
-				    mem_rdata           <= message_in;
-				    message_in_read     <= 1;
+				        mem_rdata           <= message_in;
+				        message_in_read     <= 1;
 				    end   
 				  `X_COORD_INPUT: begin
 				        mem_rdata           <= X_COORD;
 				    end
 				  `Y_COORD_INPUT: begin
 				        mem_rdata           <= Y_COORD;
-				   end
+				    end
+				  `NODE_NUMBER_INPUT: begin
+				        mem_rdata           <= NODE_NUMBER;
+				    end
 		      endcase
 			end
 		end

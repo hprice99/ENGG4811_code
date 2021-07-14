@@ -42,6 +42,8 @@ entity node_led is
     
         X_COORD         : integer := 0;
         Y_COORD         : integer := 0;
+        NODE_NUMBER     : integer := 0;
+        
         COORD_BITS      : integer := 2;
         MESSAGE_BITS    : integer := 32;
         BUS_WIDTH       : integer := 8;
@@ -190,6 +192,7 @@ architecture Behavioral of node_led is
         
             X_COORD         : integer := 0;
             Y_COORD         : integer := 0;
+            NODE_NUMBER     : integer := 0;
             
             DIVIDE_ENABLED     : std_logic := '0';
             MULTIPLY_ENABLED   : std_logic := '1';
@@ -197,29 +200,32 @@ architecture Behavioral of node_led is
             MEM_SIZE           : integer   := 4096
         );
         port (
-            clk                 : in std_logic;
-            reset_n             : in std_logic;
+            clk                     : in std_logic;
+            reset_n                 : in std_logic;
             
-            switch              : in std_logic;
-            LED                 : out std_logic_vector((NETWORK_NODES-1) downto 0);
+            switch                  : in std_logic;
+            LED                     : out std_logic_vector((NETWORK_NODES-1) downto 0);
             
-            x_coord_out         : out std_logic_vector((COORD_BITS-1) downto 0);
-            x_coord_out_valid   : out std_logic;
+            x_coord_out             : out std_logic_vector((COORD_BITS-1) downto 0);
+            x_coord_out_valid       : out std_logic;
             
-            y_coord_out         : out std_logic_vector((COORD_BITS-1) downto 0);
-            y_coord_out_valid   : out std_logic;
+            y_coord_out             : out std_logic_vector((COORD_BITS-1) downto 0);
+            y_coord_out_valid       : out std_logic;
             
-            message_out         : out std_logic_vector(31 downto 0); 
-            message_out_valid   : out std_logic;
+            message_out             : out std_logic_vector(31 downto 0); 
+            message_out_valid       : out std_logic;
             
-            packet_out_complete : out std_logic;
+            packet_out_complete     : out std_logic;
             
-            message_in          : in std_logic_vector(31 downto 0);
-            message_in_valid    : in std_logic; 
-            message_in_read     : out std_logic;
-            message_in_ready    : out std_logic;
+            message_out_ready       : in std_logic;
             
-            trap                : out std_logic
+            message_in              : in std_logic_vector(31 downto 0);
+            message_in_valid        : in std_logic; 
+            message_in_available    : in std_logic;
+            message_in_read         : out std_logic;
+            message_in_ready        : out std_logic;
+            
+            trap                    : out std_logic
         );
     end component system;
     
@@ -279,6 +285,9 @@ architecture Behavioral of node_led is
     signal processor_in_message         : std_logic_vector((MESSAGE_BITS-1) downto 0);
     signal processor_in_message_valid   : std_logic;
     signal processor_in_message_read    : std_logic;
+    
+    signal message_out_ready    : std_logic;
+    signal message_in_available : std_logic;
 
 begin
     SWITCH_PIPELINE : pipeline
@@ -405,6 +414,9 @@ begin
             
             packet_read         => processor_in_message_read         
         );
+        
+    message_out_ready       <= not pe_to_network_full;
+    message_in_available    <= not network_to_pe_empty;
     
     PE: system
         generic map (
@@ -415,6 +427,7 @@ begin
         
             X_COORD         => X_COORD,     
             Y_COORD         => Y_COORD,
+            NODE_NUMBER     => NODE_NUMBER,
             
             DIVIDE_ENABLED      => DIVIDE_ENABLED,
             MULTIPLY_ENABLED    => MULTIPLY_ENABLED,
@@ -422,29 +435,32 @@ begin
             MEM_SIZE            => MEM_SIZE
         )
         port map (
-            clk                 => clk,           
-            reset_n             => reset_n,
+            clk                     => clk,           
+            reset_n                 => reset_n,
             
-            switch              => switch_pipelined,
-            LED                 => LED,
+            switch                  => switch_pipelined,
+            LED                     => LED,
             
-            x_coord_out         => processor_out_message_x_coord,
-            x_coord_out_valid   => processor_out_message_x_coord_valid,
+            x_coord_out             => processor_out_message_x_coord,
+            x_coord_out_valid       => processor_out_message_x_coord_valid,
             
-            y_coord_out         => processor_out_message_y_coord,
-            y_coord_out_valid   => processor_out_message_y_coord_valid,
+            y_coord_out             => processor_out_message_y_coord,
+            y_coord_out_valid       => processor_out_message_y_coord_valid,
             
-            message_out         => processor_out_message,
-            message_out_valid   => processor_out_message_valid,
+            message_out             => processor_out_message,
+            message_out_valid       => processor_out_message_valid,
             
-            packet_out_complete => processor_out_packet_complete,
+            packet_out_complete     => processor_out_packet_complete,
             
-            message_in          => processor_in_message,
-            message_in_valid    => processor_in_message_valid,
-            message_in_read     => processor_in_message_read,
-            message_in_ready    => pe_ready,
+            message_out_ready       => message_out_ready,
             
-            trap                => open
+            message_in              => processor_in_message,
+            message_in_valid        => processor_in_message_valid,
+            message_in_available    => message_in_available,
+            message_in_read         => processor_in_message_read,
+            message_in_ready        => pe_ready,
+            
+            trap                    => open
         );
 
 end Behavioral;

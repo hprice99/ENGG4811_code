@@ -34,6 +34,10 @@ use IEEE.STD_LOGIC_1164.ALL;
 use STD.textio.all;
 use IEEE.std_logic_textio.all;
 
+library xil_defaultlib;
+use xil_defaultlib.random.all;
+use xil_defaultlib.math_functions.all;
+
 entity top_tb is
 end top_tb;
 
@@ -55,6 +59,10 @@ architecture Behavioral of top_tb is
     
     signal switch   : std_logic_vector(3 downto 0);
     signal LED      : std_logic_vector(3 downto 0);
+    
+    signal count    : integer;
+    
+    constant SWITCH_THRESHOLD    : real := 0.5;
 
 begin
 
@@ -69,9 +77,28 @@ begin
         wait for clk_period/2;  --for next 0.5 ns signal is '1'.
     end process CLK_PROCESS;
     
+    -- Construct message
+    TOGGLE_SWITCHES: process (clk)
+    begin
+        if (rising_edge(clk)) then
+            if (reset_n = '0') then                
+                count   <= 0;
+                switch  <= (others => '0');
+            else
+                count   <= count + 1;
+                
+                if (count mod 100000 = 0 and count > 100) then
+--                    switch  <= rand_slv(4, count);
+
+                        switch <= rand_logic(SWITCH_THRESHOLD, 3*count) & rand_logic(SWITCH_THRESHOLD, 2*count) & rand_logic(SWITCH_THRESHOLD, count) & rand_logic(SWITCH_THRESHOLD, 4*count);
+                end if;
+            end if;
+        end if;
+    end process TOGGLE_SWITCHES;
+    
     DUT: top
     port map (
-        CPU_RESETN => reset_n,
+        CPU_RESETN  => reset_n,
         CLK_100MHZ  => clk,
         
         SW          => switch,
@@ -82,7 +109,10 @@ begin
     LED_PRINT: process (LED)
         variable my_line : line;
     begin
-        write(my_line, string'("LEDs = "));
+        write(my_line, string'("Cycle = "));
+        write(my_line, count);
+    
+        write(my_line, string'(", LEDs = "));
         write(my_line, LED);
         
         writeline(output, my_line);
