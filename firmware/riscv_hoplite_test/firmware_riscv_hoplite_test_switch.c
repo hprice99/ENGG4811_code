@@ -1,6 +1,7 @@
 #include "io.h"
 #include "print.h"
 #include "network.h"
+#include "led.h"
 
 #include "firmware_riscv_hoplite_test_switch.h"
 
@@ -9,13 +10,6 @@ int my_y_coord;
 int my_node_number;
 
 int switchState;
-
-long createMessage(int val) {
-
-    long message = (my_node_number << 8) | val;
-
-    return message;
-}
 
 void main() {
 
@@ -46,7 +40,7 @@ void main() {
             switchState = SWITCH_INPUT;
 
             // Create message
-            message = createMessage(switchState);
+            message = createMessage(my_node_number, switchState);
 
             // Send message
             network_error = send_message(LED_X, LED_Y, message);

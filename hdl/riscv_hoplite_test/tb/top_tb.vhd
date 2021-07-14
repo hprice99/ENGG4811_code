@@ -88,9 +88,7 @@ begin
                 count   <= count + 1;
                 
                 if (count mod 100000 = 0 and count > 100) then
---                    switch  <= rand_slv(4, count);
-
-                        switch <= rand_logic(SWITCH_THRESHOLD, 3*count) & rand_logic(SWITCH_THRESHOLD, 2*count) & rand_logic(SWITCH_THRESHOLD, count) & rand_logic(SWITCH_THRESHOLD, 4*count);
+                    switch  <= rand_slv(4, count);
                 end if;
             end if;
         end if;
@@ -111,6 +109,9 @@ begin
     begin
         write(my_line, string'("Cycle = "));
         write(my_line, count);
+        
+        write(my_line, string'(", switches = "));
+        write(my_line, switch);
     
         write(my_line, string'(", LEDs = "));
         write(my_line, LED);

@@ -1,6 +1,7 @@
 #include "io.h"
 #include "print.h"
 #include "network.h"
+#include "led.h"
 
 #include "firmware_riscv_hoplite_test_led.h"
 
@@ -16,13 +17,6 @@ int my_y_coord;
 int my_node_number;
 
 int switchState;
-
-long createMessage(int val) {
-
-    long message = (my_node_number << 8) | val;
-
-    return message;
-}
 
 void setLeds(int led, int value) {
 
@@ -99,19 +93,6 @@ void loopLeds(void) {
     }
 }
 
-struct ledMessage decodeMessage(long message) {
-
-    struct ledMessage decoded_message;
-
-    // Message format
-    // Bits 0 to 7 - Value
-    // Bits 8 to 15 - LED
-    decoded_message.value = message & 0xFF;
-    decoded_message.led = (message >> 8) & 0xFF;
-
-    return decoded_message;
-}
-
 void main() {
 
     print_string("ENGG4811 PicoRV32 test\n");
@@ -145,7 +126,7 @@ void main() {
             switchState = SWITCH_INPUT;
 
             // Create message
-            message_to_send = createMessage(switchState);
+            message_to_send = createMessage(my_node_number, switchState);
 
             // Send message
             network_error = send_message(LED_X, LED_Y, message_to_send);
