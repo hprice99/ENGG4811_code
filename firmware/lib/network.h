@@ -42,10 +42,6 @@
 #define MESSAGE_IN_AVAILABLE_INPUT  (*(volatile long*)0x50000020)
 #endif
 
-#ifndef MESSAGE_IN_READY_OUTPUT
-#define MESSAGE_IN_READY_OUTPUT     (*(volatile long*)0x50000030)
-#endif
-
 int send_message(int dest_x, int dest_y, long message);
 
 int receive_message(long* message);

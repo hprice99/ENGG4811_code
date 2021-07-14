@@ -223,7 +223,6 @@ architecture Behavioral of node_led is
             message_in_valid        : in std_logic; 
             message_in_available    : in std_logic;
             message_in_read         : out std_logic;
-            message_in_ready        : out std_logic;
             
             trap                    : out std_logic
         );
@@ -335,7 +334,8 @@ begin
     y_out_valid <= y_out_valid_d;
     
     -- Network interface controller (FIFO for messages to and from PE)
-    router_ready <= not pe_backpressure;
+    router_ready    <= not pe_backpressure;
+    pe_ready        <= processor_in_message_read;
     
     NIC: nic_dual
         generic map (
@@ -458,7 +458,6 @@ begin
             message_in_valid        => processor_in_message_valid,
             message_in_available    => message_in_available,
             message_in_read         => processor_in_message_read,
-            message_in_ready        => pe_ready,
             
             trap                    => open
         );

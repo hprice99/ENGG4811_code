@@ -28,8 +28,5 @@ int receive_message(long* message) {
 
     *message = MESSAGE_INPUT;
 
-    // Load the next message
-    MESSAGE_IN_READY_OUTPUT = 1;
-
     return NETWORK_SUCCESS;
 }

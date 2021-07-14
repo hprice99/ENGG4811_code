@@ -22,7 +22,6 @@
 #define MESSAGE_VALID_INPUT         (*(volatile char*)0x50000000)
 #define MESSAGE_INPUT               (*(volatile long*)0x50000010)
 #define MESSAGE_IN_AVAILABLE_INPUT  (*(volatile long*)0x50000020)
-#define MESSAGE_IN_READY_OUTPUT     (*(volatile long*)0x50000030)
 
 // Node details
 #define X_COORD_INPUT           (*(volatile char*)0x60000000)

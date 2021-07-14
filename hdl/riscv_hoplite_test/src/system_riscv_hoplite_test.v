@@ -42,7 +42,6 @@ module system #(
     input wire          message_in_valid,
     input wire          message_in_available,
     output reg          message_in_read,
-    output reg          message_in_ready,
     
 	output wire        trap
 );
@@ -110,7 +109,6 @@ module system #(
             packet_out_complete <= 0;   
             
             message_in_read     <= 0;
-            message_in_ready    <= 0;
             
 			mem_ready    <= 1;
 
@@ -157,9 +155,6 @@ module system #(
 				    end
 				`LED_3_OUTPUT: begin
 				        LED[3]  <= mem_la_wdata[0];
-				    end
-				 `MESSAGE_IN_READY_OUTPUT: begin
-				        message_in_ready    <= 1;
 				    end
 		      endcase
 			end
