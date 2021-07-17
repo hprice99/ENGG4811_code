@@ -34,7 +34,7 @@ use IEEE.NUMERIC_STD.ALL;
 library xil_defaultlib;
 use xil_defaultlib.math_functions.all;
 
-entity node_led is
+entity node is
     Generic (
         NETWORK_ROWS    : integer := 2;
         NETWORK_COLS    : integer := 2;   
@@ -70,9 +70,9 @@ entity node_led is
         y_out               : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
         y_out_valid         : out STD_LOGIC
     );
-end node_led;
+end node;
 
-architecture Behavioral of node_led is
+architecture Behavioral of node is
 
     component hoplite_router
         generic (
