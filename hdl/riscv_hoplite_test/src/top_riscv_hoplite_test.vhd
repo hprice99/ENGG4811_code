@@ -150,8 +150,11 @@ begin
             x_messages_in(curr_x, curr_y)       <= x_messages_out(prev_x, curr_y);
             x_messages_in_valid(curr_x, curr_y) <= x_messages_out_valid(prev_x, curr_y);
             
-            y_messages_in(curr_x, curr_y)       <= y_messages_out(curr_x, prev_y);
-            y_messages_in_valid(curr_x, curr_y) <= y_messages_out_valid(curr_x, prev_y);
+--            y_messages_in(curr_x, curr_y)       <= y_messages_out(curr_x, prev_y);
+--            y_messages_in_valid(curr_x, curr_y) <= y_messages_out_valid(curr_x, prev_y);
+
+            y_messages_in(curr_x, curr_y)       <= y_messages_out(curr_x, next_y);
+            y_messages_in_valid(curr_x, curr_y) <= y_messages_out_valid(curr_x, next_y);
         
             -- Instantiate node
             LED_NODE_GEN: if (i = LED_NODE_COL and j = LED_NODE_COL) generate
