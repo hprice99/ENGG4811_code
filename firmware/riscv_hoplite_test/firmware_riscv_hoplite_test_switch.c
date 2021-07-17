@@ -27,10 +27,25 @@ void main() {
     print_string("), node number = ");
     print_hex(my_node_number, 1);
 
-    switchState = SWITCH_INPUT;
-
     int network_error;
     long message;
+
+    switchState = SWITCH_INPUT;
+
+    // Create message
+    message = createMessage(my_node_number, switchState);
+
+    // Send message
+    network_error = send_message(LED_X, LED_Y, message);
+
+    if (network_error != NETWORK_SUCCESS) {
+
+        print_string("Unable to send message\n");
+    } else {
+
+        print_string("Message sent ");
+        print_hex(message, 4);
+    }
 
     while (1) {
 

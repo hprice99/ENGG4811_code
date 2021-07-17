@@ -118,6 +118,21 @@ void main() {
 
     switchState = SWITCH_INPUT;
 
+    // Create message
+    message_to_send = createMessage(my_node_number, switchState);
+
+    // Send message
+    network_error = send_message(LED_X, LED_Y, message_to_send);
+
+    if (network_error != NETWORK_SUCCESS) {
+
+        print_string("Unable to send message\n");
+    } else {
+
+        print_string("Message sent ");
+        print_hex(message_to_send, 4);
+    }
+
     while (1) {
 
         // Switch flipped

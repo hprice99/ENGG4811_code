@@ -46,7 +46,7 @@ end top;
 
 architecture Behavioral of top is
 
-    component node_led
+    component node
         generic (
             NETWORK_ROWS    : integer := 2;
             NETWORK_COLS    : integer := 2;   
@@ -82,7 +82,7 @@ architecture Behavioral of top is
             y_out               : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
             y_out_valid         : out STD_LOGIC
         );
-    end component node_led;
+    end component node;
 
     -- Size of message data in packets
     constant MESSAGE_BITS       : integer := 32;
@@ -150,19 +150,21 @@ begin
             x_messages_in(curr_x, curr_y)       <= x_messages_out(prev_x, curr_y);
             x_messages_in_valid(curr_x, curr_y) <= x_messages_out_valid(prev_x, curr_y);
             
-            y_messages_in(curr_x, curr_y)       <= y_messages_out(curr_x, prev_y);
-            y_messages_in_valid(curr_x, curr_y) <= y_messages_out_valid(curr_x, prev_y);
+--            y_messages_in(curr_x, curr_y)       <= y_messages_out(curr_x, prev_y);
+--            y_messages_in_valid(curr_x, curr_y) <= y_messages_out_valid(curr_x, prev_y);
+
+            y_messages_in(curr_x, curr_y)       <= y_messages_out(curr_x, next_y);
+            y_messages_in_valid(curr_x, curr_y) <= y_messages_out_valid(curr_x, next_y);
         
             -- Instantiate node
             LED_NODE_GEN: if (i = LED_NODE_COL and j = LED_NODE_COL) generate
-                LED_NODE: node_led
+                LED_NODE: node
                     generic map (
                         NETWORK_ROWS    => NETWORK_ROWS,
                         NETWORK_COLS    => NETWORK_COLS,
                         NETWORK_NODES   => NETWORK_NODES,
                     
                         X_COORD         => curr_x,
-                        -- X_COORD         => 1,
                         Y_COORD         => curr_y,
                         NODE_NUMBER     => node_number,
                         
@@ -197,7 +199,7 @@ begin
             end generate LED_NODE_GEN;
             
             SWITCH_NODE_GEN: if (not (i = LED_NODE_COL and j = LED_NODE_COL)) generate
-                SWITCH_NODE: node_led
+                SWITCH_NODE: node
                     generic map (
                         NETWORK_ROWS    => NETWORK_ROWS,
                         NETWORK_COLS    => NETWORK_COLS,
