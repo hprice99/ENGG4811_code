@@ -21,8 +21,15 @@
 
 // Network to PE
 #define MESSAGE_VALID_INPUT         (*(volatile char*)0x50000000)
-#define MESSAGE_INPUT               (*(volatile long*)0x50000010)
-#define MESSAGE_IN_AVAILABLE_INPUT  (*(volatile long*)0x50000020)
+#define MESSAGE_IN_AVAILABLE_INPUT  (*(volatile char*)0x50000010)
+#define MULTICAST_GROUP_INPUT       (*(volatile char*)0x50000020)
+#define DONE_FLAG_INPUT             (*(volatile char*)0x50000030)
+#define RESULT_FLAG_INPUT           (*(volatile char*)0x50000040)
+#define MATRIX_TYPE_INPUT           (*(volatile char*)0x50000050)
+#define MATRIX_X_COORD_INPUT        (*(volatile char*)0x50000060)
+#define MATRIX_Y_COORD_INPUT        (*(volatile char*)0x50000070)
+#define MATRIX_ELEMENT_INPUT        (*(volatile long*)0x50000080)
+#define MESSAGE_READ_OUTPUT         (*(volatile char*)0x50000090)
 
 // Node details
 #define X_COORD_INPUT           (*(volatile char*)0x60000000)

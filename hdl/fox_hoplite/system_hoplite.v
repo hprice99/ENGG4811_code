@@ -77,7 +77,13 @@ module system #(
 
     input wire          message_out_ready,
 
-    input wire[31:0]    message_in,
+    input wire[MULTICAST_GROUP_BITS-1:0]    multicast_group_in,
+    input wire  done_flag_in,
+    input wire  result_flag_in,
+    input wire[MATRIX_TYPE_BITS-1:0]    matrix_type_in,
+    input wire[MATRIX_COORD_BITS-1:0]   matrix_x_coord_in,
+    input wire[MATRIX_COORD_BITS-1:0]   matrix_y_coord_in,
+    input wire[MATRIX_ELEMENT_BITS-1:0] matrix_element_in,
     input wire          message_in_valid,
     input wire          message_in_available,
     output reg          message_in_read,
@@ -135,7 +141,6 @@ module system #(
     
     assign trap_ila[0] = trap;
 
-
     reg [31:0] memory [0:MEM_SIZE-1];
     initial $readmemh(FIRMWARE, memory);
 
@@ -150,10 +155,16 @@ module system #(
                 LED <= 0;
             end
             
-            x_coord_out_valid   <= 0;
-            y_coord_out_valid   <= 0;
-            message_out_valid   <= 0;
-            packet_out_complete <= 0;
+            x_coord_out_valid           <= 0;
+            y_coord_out_valid           <= 0;
+            multicast_group_out_valid   <= 0;
+            done_flag_out_valid         <= 0;
+            result_flag_out_valid       <= 0;
+            matrix_type_out_valid       <= 0;
+            matrix_x_coord_out_valid    <= 0;
+            matrix_y_coord_out_valid    <= 0;
+            matrix_element_out_valid    <= 0;
+            packet_out_complete         <= 0;
             
             message_in_read     <= 0;
 
@@ -225,6 +236,10 @@ module system #(
                     LED  <= mem_la_wdata[0];
                 end
 
+                `MESSAGE_READ_OUTPUT: begin
+                    message_in_read <= 1;
+                end
+
                 // Testbench outputs
                 `MATRIX_END_ROW_OUTPUT: begin
                     out_matrix_end_row <= mem_la_wdata;
@@ -249,11 +264,32 @@ module system #(
                 end
                 `MESSAGE_VALID_INPUT: begin
                     mem_rdata   <= message_in_valid;
-                end   
-                `MESSAGE_INPUT: begin
-                    mem_rdata           <= message_in;
-                    message_in_read     <= 1;
-                end   
+                end
+
+                // Received message
+                `MULTICAST_GROUP_INPUT: begin
+                    mem_rdata   <= multicast_group_in;
+                end
+                `DONE_FLAG_INPUT: begin
+                    mem_rdata   <= done_flag_in;
+                end
+                `RESULT_FLAG_INPUT: begin
+                    mem_rdata   <= result_flag_in;
+                end
+                `MATRIX_TYPE_INPUT: begin
+                    mem_rdata   <= matrix_type_in;
+                end
+                `MATRIX_X_COORD_INPUT: begin
+                    mem_rdata   <= matrix_x_coord_in;
+                end
+                `MATRIX_Y_COORD_INPUT: begin
+                    mem_rdata   <= matrix_y_coord_in;
+                end
+                `MATRIX_ELEMENT_INPUT: begin
+                    mem_rdata   <= matrix_element_in;
+                end
+
+                // Node details
                 `X_COORD_INPUT: begin
                     mem_rdata           <= X_COORD;
                 end

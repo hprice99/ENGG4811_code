@@ -21,8 +21,15 @@
 
 // Network to PE
 `define MESSAGE_VALID_INPUT         32'h5000_0000
-`define MESSAGE_INPUT               32'h5000_0010
-`define MESSAGE_IN_AVAILABLE_INPUT  32'h5000_0020
+`define MESSAGE_IN_AVAILABLE_INPUT  32'h5000_0010
+`define MULTICAST_GROUP_INPUT       32'h5000_0020
+`define DONE_FLAG_INPUT             32'h5000_0030
+`define RESULT_FLAG_INPUT           32'h5000_0040
+`define MATRIX_TYPE_INPUT           32'h5000_0050
+`define MATRIX_X_COORD_INPUT        32'h5000_0060
+`define MATRIX_Y_COORD_INPUT        32'h5000_0070
+`define MATRIX_ELEMENT_INPUT        32'h5000_0080
+`define MESSAGE_READ_OUTPUT         32'h5000_0090
 
 // Node details
 `define X_COORD_INPUT           32'h6000_0000

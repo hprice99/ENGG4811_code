@@ -205,13 +205,15 @@ architecture Behavioral of node is
             packet_out_valid            : out std_logic
         );
     end component message_encoder;
-    
-    -- TODO Update decoder
+
     component message_decoder
         generic (
-            COORD_BITS      : integer := 2;
-            MESSAGE_BITS    : integer := 32;
-            BUS_WIDTH       : integer := 36
+            COORD_BITS              : integer := 2;
+            MULTICAST_GROUP_BITS    : integer := 1;
+            MATRIX_TYPE_BITS        : integer := 1;
+            MATRIX_COORD_BITS       : integer := 8;
+            MATRIX_ELEMENT_BITS     : integer := 32;
+            BUS_WIDTH               : integer := 56
         );
         port (
             clk                 : in std_logic;
@@ -222,7 +224,14 @@ architecture Behavioral of node is
             
             x_coord_out         : out std_logic_vector((COORD_BITS-1) downto 0);
             y_coord_out         : out std_logic_vector((COORD_BITS-1) downto 0);
-            message_out         : out std_logic_vector((MESSAGE_BITS-1) downto 0);
+            multicast_group_out : out std_logic_vector((MULTICAST_GROUP_BITS-1) downto 0);
+            done_flag_out       : out std_logic;
+            result_flag_out     : out std_logic;
+            matrix_type_out     : out std_logic_vector((MATRIX_TYPE_BITS-1) downto 0);
+            matrix_x_coord_out  : out std_logic_vector((MATRIX_COORD_BITS-1) downto 0);
+            matrix_y_coord_out  : out std_logic_vector((MATRIX_COORD_BITS-1) downto 0);
+            matrix_element_out  : out std_logic_vector((MATRIX_ELEMENT_BITS-1) downto 0);
+
             packet_out_valid    : out std_logic;
             
             packet_read         : in std_logic
@@ -300,7 +309,13 @@ architecture Behavioral of node is
             
             message_out_ready       : in std_logic;
             
-            message_in              : in std_logic_vector(31 downto 0);
+            multicast_group_in      : in std_logic_vector((MULTICAST_GROUP_BITS-1) downto 0);
+            done_flag_in            : in std_logic;
+            result_flag_in          : in std_logic;
+            matrix_type_in          : in std_logic_vector((MATRIX_TYPE_BITS-1) downto 0);
+            matrix_x_coord_in       : in std_logic_vector((MATRIX_COORD_BITS-1) downto 0);
+            matrix_y_coord_in       : in std_logic_vector((MATRIX_COORD_BITS-1) downto 0);
+            matrix_element_in       : in std_logic_vector((MATRIX_ELEMENT_BITS-1) downto 0);
             message_in_valid        : in std_logic; 
             message_in_available    : in std_logic;
             message_in_read         : out std_logic;
@@ -374,7 +389,14 @@ architecture Behavioral of node is
     signal processor_out_packet_complete    : std_logic;
     
     -- Message decoder signals
-    signal processor_in_message         : std_logic_vector((MESSAGE_BITS-1) downto 0);
+    signal processor_in_multicast_group : std_logic_vector((MULTICAST_GROUP_BITS-1) downto 0);
+    signal processor_in_done_flag       : std_logic;
+    signal processor_in_result_flag     : std_logic;
+    signal processor_in_matrix_type     : std_logic_vector((MATRIX_TYPE_BITS-1) downto 0);
+    signal processor_in_matrix_x_coord  : std_logic_vector((MATRIX_COORD_BITS-1) downto 0);
+    signal processor_in_matrix_y_coord  : std_logic_vector((MATRIX_COORD_BITS-1) downto 0);
+    signal processor_in_matrix_element  : std_logic_vector((MATRIX_ELEMENT_BITS-1) downto 0);
+
     signal processor_in_message_valid   : std_logic;
     signal processor_in_message_read    : std_logic;
     
@@ -501,9 +523,12 @@ begin
         
     DECODER: message_decoder
         generic map (
-            COORD_BITS      => COORD_BITS,
-            MESSAGE_BITS    => MESSAGE_BITS,
-            BUS_WIDTH       => BUS_WIDTH
+            COORD_BITS              => COORD_BITS,
+            MULTICAST_GROUP_BITS    => MULTICAST_GROUP_BITS,
+            MATRIX_TYPE_BITS        => MATRIX_TYPE_BITS,
+            MATRIX_COORD_BITS       => MATRIX_COORD_BITS,
+            MATRIX_ELEMENT_BITS     => MATRIX_ELEMENT_BITS,
+            BUS_WIDTH               => BUS_WIDTH
         )
         port map (
             clk                 => clk,
@@ -514,10 +539,16 @@ begin
             
             x_coord_out         => open,
             y_coord_out         => open,
-            message_out         => processor_in_message,
+            multicast_group_out => processor_in_multicast_group,
+            done_flag_out       => processor_in_done_flag,
+            result_flag_out     => processor_in_result_flag,
+            matrix_type_out     => processor_in_matrix_type,
+            matrix_x_coord_out  => processor_in_matrix_x_coord,
+            matrix_y_coord_out  => processor_in_matrix_y_coord,
+            matrix_element_out  => processor_in_matrix_element,
+
             packet_out_valid    => processor_in_message_valid,
-            
-            packet_read         => processor_in_message_read         
+            packet_read         => processor_in_message_read
         );
         
     message_out_ready       <= not pe_to_network_full;
@@ -587,8 +618,15 @@ begin
             packet_complete_out         => processor_out_packet_complete,
             
             message_out_ready       => message_out_ready,
-            
-            message_in              => processor_in_message,
+
+            multicast_group_in      => processor_in_multicast_group,
+            done_flag_in            => processor_in_done_flag,
+            result_flag_in          => processor_in_result_flag,
+            matrix_type_in          => processor_in_matrix_type,
+            matrix_x_coord_in       => processor_in_matrix_x_coord,
+            matrix_y_coord_in       => processor_in_matrix_y_coord,
+            matrix_element_in       => processor_in_matrix_element,
+
             message_in_valid        => processor_in_message_valid,
             message_in_available    => message_in_available,
             message_in_read         => processor_in_message_read,
