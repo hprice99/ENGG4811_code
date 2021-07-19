@@ -3,8 +3,8 @@ CFLAGS = -march=rv32im
 MEM_SIZE = 1024
 
 LIB = ../lib
-LIB_SRCS = $(LIB)/print.c $(LIB)/network.c led.c
-LIB_HEADERS = $(LIB)/print.h $(LIB)/network.h led.h
+LIB_SRCS = $(LIB)/print.c network.c led.c
+LIB_HEADERS = $(LIB)/print.h network.h led.h
 
 IO_CONFIG = IO_CONFIG
 

@@ -109,8 +109,6 @@ void main() {
     print_string("), node number = ");
     print_hex(my_node_number, 1);
 
-    // loopLeds();
-
     int network_error;
     long message_to_send;
     long message_received;
@@ -118,27 +116,14 @@ void main() {
 
     switchState = SWITCH_INPUT;
 
-    // Create message
-    message_to_send = createMessage(my_node_number, switchState);
-
-    // Send message
-    network_error = send_message(LED_X, LED_Y, message_to_send);
-
-    if (network_error != NETWORK_SUCCESS) {
-
-        print_string("Unable to send message\n");
-    } else {
-
-        print_string("Message sent ");
-        print_hex(message_to_send, 4);
-    }
-
     while (1) {
 
-        // Switch flipped
-        if (SWITCH_INPUT != switchState) {
+        int newSwitchState = SWITCH_INPUT;
 
-            switchState = SWITCH_INPUT;
+        // Switch flipped
+        if (newSwitchState != switchState) {
+
+            switchState = newSwitchState;
 
             // Create message
             message_to_send = createMessage(my_node_number, switchState);
