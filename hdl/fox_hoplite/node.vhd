@@ -158,30 +158,51 @@ architecture Behavioral of node is
         );
     end component nic_dual;
     
-    -- TODO Update encoder
+   
     component message_encoder
         generic (
-            COORD_BITS      : integer := 2;
-            MESSAGE_BITS    : integer := 32;
-            BUS_WIDTH       : integer := 36
+            COORD_BITS              : integer := 2;
+            MULTICAST_GROUP_BITS    : integer := 1;
+            MATRIX_TYPE_BITS        : integer := 1;
+            MATRIX_COORD_BITS       : integer := 8;
+            MATRIX_ELEMENT_BITS     : integer := 32;
+            BUS_WIDTH               : integer := 56
         );
         port (
-            clk                 : in std_logic;
-            reset_n             : in std_logic;
+            clk                         : in std_logic;
+            reset_n                     : in std_logic;
             
-            x_coord_in          : in std_logic_vector((COORD_BITS-1) downto 0);
-            x_coord_in_valid    : in std_logic;
+            x_coord_in                  : in std_logic_vector((COORD_BITS-1) downto 0);
+            x_coord_in_valid            : in std_logic;
             
-            y_coord_in          : in std_logic_vector((COORD_BITS-1) downto 0);
-            y_coord_in_valid    : in std_logic;
+            y_coord_in                  : in std_logic_vector((COORD_BITS-1) downto 0);
+            y_coord_in_valid            : in std_logic;
+
+            multicast_group_in          : in std_logic_vector((MULTICAST_GROUP_BITS-1) downto 0);
+            multicast_group_in_valid    : in std_logic;
+
+            done_flag_in                : in std_logic;
+            done_flag_in_valid          : in std_logic;
+
+            result_flag_in              : in std_logic;
+            result_flag_in_valid        : in std_logic;
+
+            matrix_type_in              : in std_logic_vector((MATRIX_TYPE_BITS-1) downto 0);
+            matrix_type_in_valid        : in std_logic;
+
+            matrix_x_coord_in           : in std_logic_vector((MATRIX_COORD_BITS-1) downto 0);
+            matrix_x_coord_in_valid     : in std_logic;
+
+            matrix_y_coord_in           : in std_logic_vector((MATRIX_COORD_BITS-1) downto 0);
+            matrix_y_coord_in_valid     : in std_logic;
             
-            message_in          : in std_logic_vector((MESSAGE_BITS-1) downto 0);
-            message_in_valid    : in std_logic;
+            matrix_element_in           : in std_logic_vector((MESSAGE_BITS-1) downto 0);
+            matrix_element_in_valid     : in std_logic;
             
-            packet_in_complete  : in std_logic;
+            packet_complete_in          : in std_logic;
             
-            packet_out          : out std_logic_vector((BUS_WIDTH-1) downto 0);
-            packet_out_valid    : out std_logic
+            packet_out                  : out std_logic_vector((BUS_WIDTH-1) downto 0);
+            packet_out_valid            : out std_logic
         );
     end component message_encoder;
     
@@ -214,7 +235,6 @@ architecture Behavioral of node is
             NETWORK_ROWS    : integer := 2;
             NETWORK_COLS    : integer := 2;
             NETWORK_NODES   : integer := 4;
-            COORD_BITS      : integer := 1;
 
             -- Fox's algorithm network paramters
             FOX_NETWORK_ROWS    : integer := 2;
@@ -229,6 +249,14 @@ architecture Behavioral of node is
             NODE_NUMBER     : integer := 0;
 
             MATRIX_SIZE     : integer := 32;
+
+            -- Network packet format
+            COORD_BITS              : integer := 2;
+            MULTICAST_GROUP_BITS    : integer := 1;
+            MATRIX_TYPE_BITS        : integer := 1;
+            MATRIX_COORD_BITS       : integer := 8;
+            MATRIX_ELEMENT_BITS     : integer := 32;
+            BUS_WIDTH               : integer := 56
             
             DIVIDE_ENABLED     : std_logic := '0';
             MULTIPLY_ENABLED   : std_logic := '1';
@@ -241,16 +269,34 @@ architecture Behavioral of node is
             
             LED                     : out std_logic;
             
-            x_coord_out             : out std_logic_vector((COORD_BITS-1) downto 0);
-            x_coord_out_valid       : out std_logic;
+            x_coord_out                 : out std_logic_vector((COORD_BITS-1) downto 0);
+            x_coord_out_valid           : out std_logic;
             
-            y_coord_out             : out std_logic_vector((COORD_BITS-1) downto 0);
-            y_coord_out_valid       : out std_logic;
+            y_coord_out                 : out std_logic_vector((COORD_BITS-1) downto 0);
+            y_coord_out_valid           : out std_logic;
+
+            multicast_group_out         : out std_logic_vector((MULTICAST_GROUP_BITS-1) downto 0);
+            multicast_group_out_valid   : out std_logic;
+
+            done_flag_out               : out std_logic;
+            done_flag_out_valid         : out std_logic;
+
+            result_flag_out             : out std_logic;
+            result_flag_out_valid       : out std_logic;
+
+            matrix_type_out             : out std_logic_vector((MATRIX_TYPE_BITS-1) downto 0);
+            matrix_type_out_valid       : out std_logic;
+
+            matrix_x_coord_out          : out std_logic_vector((MATRIX_COORD_BITS-1) downto 0);
+            matrix_x_coord_out_valid    : out std_logic;
+
+            matrix_y_coord_out          : out std_logic_vector((MATRIX_COORD_BITS-1) downto 0);
+            matrix_y_coord_out_valid    : out std_logic;
             
-            message_out             : out std_logic_vector(31 downto 0); 
-            message_out_valid       : out std_logic;
+            matrix_element_out          : out std_logic_vector((MESSAGE_BITS-1) downto 0);
+            matrix_element_out_valid    : out std_logic;
             
-            packet_out_complete     : out std_logic;
+            packet_complete_out     : out std_logic;
             
             message_out_ready       : in std_logic;
             
@@ -310,8 +356,20 @@ architecture Behavioral of node is
     signal processor_out_message_x_coord, processor_out_message_y_coord             : std_logic_vector((COORD_BITS-1) downto 0);
     signal processor_out_message_x_coord_valid, processor_out_message_y_coord_valid : std_logic;
     
-    signal processor_out_message        : std_logic_vector((MESSAGE_BITS-1) downto 0);
-    signal processor_out_message_valid  : std_logic;
+    signal processor_out_multicast_group  : std_logic_vector((MULTICAST_GROUP_BITS-1) downto 0);
+    signal processor_out_multicast_group_valid : std_logic;
+
+    signal processor_out_done_flag, processor_out_result_flag   : std_logic;
+    signal processor_out_done_flag_valid, processor_out_result_flag_valid : std_logic;
+
+    signal processor_out_matrix_type      : std_logic_vector((MATRIX_TYPE_BITS-1) downto 0);
+    signal processor_out_matrix_type_valid  : std_logic;
+
+    signal processor_out_matrix_x_coord, processor_out_matrix_y_coord   : std_logic_vector((MATRIX_COORD_BITS-1) downto 0);
+    signal processor_out_matrix_x_coord_valid, processor_out_matrix_y_coord_valid   : std_logic;
+
+    signal processor_out_matrix_element   : std_logic_vector((MATRIX_ELEMENT_BITS-1) downto 0);
+    signal processor_out_matrix_element_valid   : std_logic;
     
     signal processor_out_packet_complete    : std_logic;
     
@@ -397,27 +455,48 @@ begin
 
     ENCODER: message_encoder
         generic map (
-            COORD_BITS      => COORD_BITS,
-            MESSAGE_BITS    => MESSAGE_BITS,
-            BUS_WIDTH       => BUS_WIDTH
+            COORD_BITS              => COORD_BITS,
+            MULTICAST_GROUP_BITS    => MULTICAST_GROUP_BITS,
+            MATRIX_TYPE_BITS        => MATRIX_TYPE_BITS,
+            MATRIX_COORD_BITS       => MATRIX_COORD_BITS,
+            MATRIX_ELEMENT_BITS     => MATRIX_ELEMENT_BITS,
+            BUS_WIDTH               => BUS_WIDTH
         )
         port map (
-            clk                 => clk,
-            reset_n             => reset_n,
+            clk                         => clk,
+            reset_n                     => reset_n,
             
-            x_coord_in          => processor_out_message_x_coord,
-            x_coord_in_valid    => processor_out_message_x_coord_valid,
+            x_coord_in                  => processor_out_message_x_coord,
+            x_coord_in_valid            => processor_out_message_x_coord_valid,
             
-            y_coord_in          => processor_out_message_y_coord,
-            y_coord_in_valid    => processor_out_message_y_coord_valid,
+            y_coord_in                  => processor_out_message_y_coord,
+            y_coord_in_valid            => processor_out_message_y_coord_valid,
             
-            message_in          => processor_out_message,
-            message_in_valid    => processor_out_message_valid,
+            multicast_group_in          => processor_out_multicast_group,
+            multicast_group_in_valid    => processor_out_multicast_group_valid,
+
+            done_flag_in                => processor_out_done_flag,
+            done_flag_in_valid          => processor_out_done_flag_valid,
+
+            result_flag_in              => processor_out_result_flag,
+            result_flag_in_valid        => processor_out_result_flag_valid,
+
+            matrix_type_in              => processor_out_matrix_type_in,
+            matrix_type_in_valid        => processor_out_marix_type_in_valid,
+
+            matrix_x_coord_in           => processor_out_matrix_x_coord,
+            matrix_x_coord_in_valid     => processor_out_matrix_x_coord_valid,
+
+            matrix_y_coord_in           => processor_out_matrix_y_coord,
+            matrix_y_coord_in_valid     => processor_out_matrix_y_coord_valid,
+
+            matrix_element_in           => processor_out_matrix_element,
+            matrix_element_in_valid     => processor_out_matrix_element_valid,
             
-            packet_in_complete  => processor_out_packet_complete,
+            packet_complete_in          => processor_out_packet_complete,
             
-            packet_out          => pe_message_out,
-            packet_out_valid    => pe_message_out_valid
+            packet_out                  => pe_message_out,
+            packet_out_valid            => pe_message_out_valid
         );
         
     DECODER: message_decoder
@@ -478,16 +557,34 @@ begin
             out_char                => out_char,
             out_char_en             => out_char_en,
             
-            x_coord_out             => processor_out_message_x_coord,
-            x_coord_out_valid       => processor_out_message_x_coord_valid,
+            x_coord_out                 => processor_out_message_x_coord,
+            x_coord_out_valid           => processor_out_message_x_coord_valid,
             
-            y_coord_out             => processor_out_message_y_coord,
-            y_coord_out_valid       => processor_out_message_y_coord_valid,
+            y_coord_out                 => processor_out_message_y_coord,
+            y_coord_out_valid           => processor_out_message_y_coord_valid,
             
-            message_out             => processor_out_message,
-            message_out_valid       => processor_out_message_valid,
+            multicast_group_out         => processor_out_multicast_group,
+            multicast_group_out_valid   => processor_out_multicast_group_valid,
+
+            done_flag_out               => processor_out_done_flag,
+            done_flag_out_valid         => processor_out_done_flag_valid,
+
+            result_flag_out             => processor_out_result_flag,
+            result_flag_out_valid       => processor_out_result_flag_valid,
+
+            matrix_type_out             => processor_out_matrix_type_in,
+            matrix_type_out_valid       => processor_out_marix_type_in_valid,
+
+            matrix_x_coord_out          => processor_out_matrix_x_coord,
+            matrix_x_coord_out_valid    => processor_out_matrix_x_coord_valid,
+
+            matrix_y_coord_out          => processor_out_matrix_y_coord,
+            matrix_y_coord_out_valid    => processor_out_matrix_y_coord_valid,
+
+            matrix_element_out          => processor_out_matrix_element,
+            matrix_element_out_valid    => processor_out_matrix_element_valid,
             
-            packet_out_complete     => processor_out_packet_complete,
+            packet_complete_out         => processor_out_packet_complete,
             
             message_out_ready       => message_out_ready,
             

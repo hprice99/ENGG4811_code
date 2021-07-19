@@ -33,59 +33,116 @@ use IEEE.STD_LOGIC_1164.ALL;
 
 entity message_encoder is
     Generic (
-        COORD_BITS      : integer := 2;
-        MESSAGE_BITS    : integer := 32;
-        BUS_WIDTH       : integer := 36
+        COORD_BITS              : integer := 2;
+        MULTICAST_GROUP_BITS    : integer := 1;
+        MATRIX_TYPE_BITS        : integer := 1;
+        MATRIX_COORD_BITS       : integer := 8;
+        MATRIX_ELEMENT_BITS     : integer := 32;
+        BUS_WIDTH               : integer := 56
     );
     Port (
-        clk                 : in std_logic;
-        reset_n             : in std_logic;
+        clk                         : in std_logic;
+        reset_n                     : in std_logic;
         
-        x_coord_in          : in std_logic_vector((COORD_BITS-1) downto 0);
-        x_coord_in_valid    : in std_logic;
+        x_coord_in                  : in std_logic_vector((COORD_BITS-1) downto 0);
+        x_coord_in_valid            : in std_logic;
         
-        y_coord_in          : in std_logic_vector((COORD_BITS-1) downto 0);
-        y_coord_in_valid    : in std_logic;
+        y_coord_in                  : in std_logic_vector((COORD_BITS-1) downto 0);
+        y_coord_in_valid            : in std_logic;
+
+        multicast_group_in          : in std_logic_vector((MULTICAST_GROUP_BITS-1) downto 0);
+        multicast_group_in_valid    : in std_logic;
+
+        done_flag_in                : in std_logic;
+        done_flag_in_valid          : in std_logic;
+
+        result_flag_in              : in std_logic;
+        result_flag_in_valid        : in std_logic;
+
+        matrix_type_in              : in std_logic_vector((MATRIX_TYPE_BITS-1) downto 0);
+        matrix_type_in_valid        : in std_logic;
+
+        matrix_x_coord_in           : in std_logic_vector((MATRIX_COORD_BITS-1) downto 0);
+        matrix_x_coord_in_valid     : in std_logic;
+
+        matrix_y_coord_in           : in std_logic_vector((MATRIX_COORD_BITS-1) downto 0);
+        matrix_y_coord_in_valid     : in std_logic;
         
-        message_in          : in std_logic_vector((MESSAGE_BITS-1) downto 0);
-        message_in_valid    : in std_logic;
+        matrix_element_in           : in std_logic_vector((MESSAGE_BITS-1) downto 0);
+        matrix_element_in_valid     : in std_logic;
         
-        packet_in_complete  : in std_logic;
+        packet_complete_in          : in std_logic;
         
-        packet_out          : out std_logic_vector((BUS_WIDTH-1) downto 0);
-        packet_out_valid    : out std_logic
+        packet_out                  : out std_logic_vector((BUS_WIDTH-1) downto 0);
+        packet_out_valid            : out std_logic
     );
 end message_encoder;
 
 architecture Behavioral of message_encoder is
 
-    signal x_coord, y_coord : std_logic_vector((COORD_BITS-1) downto 0);
-    signal message          : std_logic_vector((MESSAGE_BITS-1) downto 0);
+    signal dest_x_coord, dest_y_coord : std_logic_vector((COORD_BITS-1) downto 0);
+    signal multicast_group  : std_logic_vector((MULTICAST_GROUP_BITS-1) downto 0);
+    signal done_flag, result_flag   : std_logic;
+    signal matrix_type      : std_logic_vector((MATRIX_TYPE_BITS-1) downto 0);
+    signal matrix_x_coord, matrix_y_coord   : std_logic_vector((MATRIX_COORD_BITS-1) downto 0);
+    signal matrix_element   : std_logic_vector((MATRIX_ELEMENT_BITS-1) downto 0);
 
 begin
 
-    -- Message format 0 -- x_dest | y_dest | messsage -- (BUS_WIDTH-1)
-    packet_out          <= message & y_coord & x_coord;
-    packet_out_valid    <= packet_in_complete; -- TODO May need to ensure that this only lasts one clock cycle (already done by system)
+    -- Message format 0 -- x_dest | y_dest | multicast_group | done | result | matrix | matrix_x_coord | matrix_y_coord | matrix_element -- (BUS_WIDTH-1)
+    packet_out          <= matrix_element & matrix_y_coord & matrix_x_coord & 
+                            matrix_type & result_flag & done_flag & 
+                            multicast_group & dest_y_coord & dest_x_coord;
+    packet_out_valid    <= packet_complete_in; 
     
     FIELD_FF: process (clk)
     begin
         if (rising_edge(clk)) then
             if (reset_n = '0') then
-                x_coord     <= (others => '0');
-                y_coord     <= (others => '0');
-                message     <= (others => '0');
+                dest_x_coord        <= (others => '0');
+                dest_y_coord        <= (others => '0');
+                multicast_group     <= (others => '0');
+                done_flag           <= '0';
+                result_flag         <= '0';
+                matrix_type         <= (others => '0');
+                matrix_x_coord      <= (others => '0');
+                matrix_y_coord      <= (others => '0');
+                matrix_element      <= (others => '0');
             else
                 if (x_coord_in_valid = '1') then
-                    x_coord <= x_coord_in;
+                    dest_x_coord <= x_coord_in;
                 end if;
                 
                 if (y_coord_in_valid = '1') then
-                    y_coord <= y_coord_in;
+                    dest_y_coord <= y_coord_in;
                 end if;
                 
-                if (message_in_valid = '1') then
-                    message <= message_in;
+                if (multicast_group_in_valid = '1') then
+                    multicast_group <= multicast_group_in;
+                end if;
+
+                if (done_flag_in_valid = '1') then
+                    done_flag <= done_flag_in;
+                end if;
+
+                if (result_flag_in_valid = '1') then
+                    result_flag <= result_flag_in;
+                end if;
+
+                if (matrix_type_in_valid = '1') then
+                    matrix_type <= matrix_type_in;
+                end if;
+
+                if (matrix_x_coord_in_valid = '1') then
+                    matrix_x_coord <= matrix_x_coord_in;
+                end if;
+
+                if (matrix_y_coord_in_valid = '1') then
+                    matrix_y_coord <= matrix_y_coord_in;
+                end if;
+            
+                if (matrix_element_in_valid = '1') then
+                    matrix_element <= matrix_element_in;
                 end if;
             end if;
         end if;

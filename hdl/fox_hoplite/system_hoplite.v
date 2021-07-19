@@ -6,7 +6,6 @@ module system #(
     parameter NETWORK_ROWS      = 2,
     parameter NETWORK_COLS      = 2,
     parameter NETWORK_NODES     = 4,
-    parameter COORD_BITS        = 1,
 
     // Fox's algorithm network parameters
     parameter FOX_NETWORK_ROWS  = 2,
@@ -17,16 +16,24 @@ module system #(
     parameter RESULT_X_COORD    = 0, 
     parameter RESULT_Y_COORD    = 2,
     
+    // Node parameters
     parameter X_COORD           = 0,
     parameter Y_COORD           = 0,
     parameter NODE_NUMBER       = 0,
 
     parameter MATRIX_SIZE       = 32,
 
-    parameter DIVIDE_ENABLED   = 0,
-    parameter MULTIPLY_ENABLED = 1,
-    parameter FIRMWARE         = "firmware.hex",
-    parameter MEM_SIZE         = 4096
+    // Network packet parameters
+    parameter COORD_BITS            = 1,
+    parameter MULTICAST_GROUP_BITS  = 1,
+    parameter MATRIX_TYPE_BITS      = 1,
+    parameter MATRIX_COORD_BITS     = 8,
+    parameter MATRIX_ELEMENT_BITS   = 32,
+
+    parameter DIVIDE_ENABLED    = 0,
+    parameter MULTIPLY_ENABLED  = 1,
+    parameter FIRMWARE          = "firmware.hex",
+    parameter MEM_SIZE          = 4096
 ) (
     input              clk,
     input              reset_n,
@@ -45,10 +52,28 @@ module system #(
     output reg[COORD_BITS-1:0] y_coord_out,
     output reg                 y_coord_out_valid,
 
-    output reg[31:0]    message_out,
-    output reg          message_out_valid,
+    output reg[MULTICAST_GROUP_BITS-1:0]    multicast_group_out,
+    output reg                              multicast_group_out_valid,
 
-    output reg          packet_out_complete,
+    output reg  done_flag_out,
+    output reg  done_flag_out_valid,
+
+    output reg  result_flag_out,
+    output reg  result_flag_out_valid,
+
+    output reg[MATRIX_TYPE_BITS-1:0]    matrix_type_out,
+    output reg                          matrix_type_out_valid,
+
+    output reg[MATRIX_COORD_BITS-1:0]   matrix_x_coord_out,
+    output reg                          matrix_x_coord_out_valid,
+
+    output reg[MATRIX_COORD_BITS-1:0]   matrix_y_coord_out,
+    output reg                          matrix_y_coord_out_valid,
+
+    output reg[MATRIX_ELEMENT_BITS-1:0] matrix_element_out,
+    output reg                          matrix_element_out_valid,
+
+    output reg          packet_complete_out,
 
     input wire          message_out_ready,
 
@@ -154,6 +179,8 @@ module system #(
                     out_char_en     <= 1;
                     out_char        <= mem_la_wdata;
                 end
+
+                // Output to network
                 `X_COORD_OUTPUT: begin
                     x_coord_out_valid   <= 1;
                     x_coord_out         <= mem_la_wdata;
@@ -162,16 +189,43 @@ module system #(
                     y_coord_out_valid   <= 1;
                     y_coord_out         <= mem_la_wdata;
                 end
-                `MESSAGE_OUTPUT: begin
-                    message_out_valid   <= 1;
-                    message_out         <= mem_la_wdata;
+                `MULTICAST_GROUP_OUTPUT: begin
+                    multicast_group_out_valid   <= 1;
+                    multicast_group_out         <= mem_la_wdata;
+                end
+                `DONE_FLAG_OUTPUT: begin
+                    done_flag_out_valid   <= 1;
+                    done_flag_out         <= mem_la_wdata;
+                end
+                `RESULT_FLAG_OUTPUT: begin
+                    result_flag_out_valid   <= 1;
+                    result_flag_out         <= mem_la_wdata;
+                end
+                `MATRIX_TYPE_OUTPUT: begin
+                    matrix_type_out_valid   <= 1;
+                    matrix_type_out         <= mem_la_wdata;
+                end
+                `MATRIX_X_COORD_OUTPUT: begin
+                    matrix_x_coord_out_valid   <= 1;
+                    matrix_x_coord_out         <= mem_la_wdata;
+                end
+                `MATRIX_Y_COORD_OUTPUT: begin
+                    matrix_y_coord_out_valid   <= 1;
+                    matrix_y_coord_out         <= mem_la_wdata;
+                end
+                `MATRIX_ELEMENT_OUTPUT: begin
+                    matrix_element_out_valid   <= 1;
+                    matrix_element_out         <= mem_la_wdata;
                 end
                 `PACKET_COMPLETE_OUTPUT: begin
-                    packet_out_complete <= 1;
+                    packet_complete_out <= 1;
                 end
+
                 `LED_OUTPUT: begin
                     LED  <= mem_la_wdata[0];
                 end
+
+                // Testbench outputs
                 `MATRIX_END_ROW_OUTPUT: begin
                     out_matrix_end_row <= mem_la_wdata;
                 end

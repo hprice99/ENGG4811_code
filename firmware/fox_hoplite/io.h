@@ -7,8 +7,14 @@
 #define MESSAGE_OUT_READY_INPUT     (*(volatile char*)0x20000000)
 #define X_COORD_OUTPUT              (*(volatile char*)0x20000010)
 #define Y_COORD_OUTPUT              (*(volatile char*)0x20000020)
-#define MESSAGE_OUTPUT              (*(volatile long*)0x20000030)
-#define PACKET_COMPLETE_OUTPUT      (*(volatile char*)0x20000040)
+#define MULTICAST_GROUP_OUTPUT      (*(volatile char*)0x20000030)
+#define DONE_FLAG_OUTPUT            (*(volatile char*)0x20000040)
+#define RESULT_FLAG_OUTPUT          (*(volatile char*)0x20000050)
+#define MATRIX_TYPE_OUTPUT          (*(volatile char*)0x20000060)
+#define MATRIX_X_COORD_OUTPUT       (*(volatile char*)0x20000070)
+#define MATRIX_Y_COORD_OUTPUT       (*(volatile char*)0x20000080)
+#define MATRIX_ELEMENT_OUTPUT       (*(volatile long*)0x20000090)
+#define PACKET_COMPLETE_OUTPUT      (*(volatile char*)0x20000100)
 
 // LEDs
 #define LED_OUTPUT    (*(volatile char*)0x30000000)
