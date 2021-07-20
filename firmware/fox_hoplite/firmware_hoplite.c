@@ -2,6 +2,10 @@
 #include "print.h"
 #include "network.h"
 
+#include <stdbool.h>
+
+#define LOOP_DELAY 40000000
+
 int my_x_coord;
 int my_y_coord;
 int my_node_number;
@@ -22,5 +26,19 @@ void main() {
     print_string("), node number = ");
     print_hex(my_node_number, 1);
 
-    LED_OUTPUT = 1;
+    int ledValue = 0;
+    long loopCount = 0;
+
+    while (1) {
+
+        if (loopCount > LOOP_DELAY) {
+
+            loopCount = 0;
+            ledValue = 1 - ledValue;
+
+            LED_OUTPUT = ledValue;
+        }
+
+        loopCount++;
+    }
 }
