@@ -39,7 +39,7 @@ module system #(
     input              reset_n,
 
     // LED to indicate when all stages are complete
-    output wire         LED,
+    output reg         LED,
 
     // UART
     output reg[7:0]     out_char,
@@ -121,7 +121,7 @@ module system #(
        .ENABLE_DIV (DIVIDE_ENABLED)
     ) picorv32_core (
         .clk         (clk         ),
-        .reset_n      (reset_n      ),
+        .resetn      (reset_n     ),
         .trap        (trap        ),
         .mem_valid   (mem_valid   ),
         .mem_instr   (mem_instr   ),
@@ -164,13 +164,12 @@ module system #(
             matrix_x_coord_out_valid    <= 0;
             matrix_y_coord_out_valid    <= 0;
             matrix_element_out_valid    <= 0;
-            packet_out_complete         <= 0;
+            packet_complete_out         <= 0;
             
             message_in_read     <= 0;
 
             out_char_en             <= 0;
             out_matrix_en           <= 0;
-            out_matrix_position_en  <= 0;
             out_matrix_end_row      <= 0;
             out_matrix_end          <= 0;
             
@@ -325,7 +324,7 @@ module system #(
             m_read_data <= memory[mem_addr >> 2];
             mem_rdata <= m_read_data;
 
-            out_byte_en[0] <= 0;
+            out_char_en <= 0;
 
             (* parallel_case *)
             case (1)
@@ -340,8 +339,8 @@ module system #(
                     mem_ready <= 1;
                 end
                 mem_valid && !mem_ready && |mem_wstrb && mem_addr == 32'h1000_0000: begin
-                    out_byte_en[0] <= 1;
-                    out_byte <= mem_wdata;
+                    out_char_en <= 1;
+                    out_char <= mem_wdata;
                     mem_ready <= 1;
                 end
             endcase

@@ -40,28 +40,37 @@ entity node is
         NETWORK_ROWS    : integer := 2;
         NETWORK_COLS    : integer := 2;
         NETWORK_NODES   : integer := 4;
-        COORD_BITS      : integer := 1;
 
         -- Fox's algorithm network paramters
         FOX_NETWORK_ROWS    : integer := 2;
         FOX_NETWORK_COLS    : integer := 2;
         FOX_NETWORK_NODES   : integer := 4;
 
+        -- Result node parameters
         RESULT_X_COORD  : integer := 0;
         RESULT_Y_COORD  : integer := 2;
     
+        -- Node parameters
         X_COORD         : integer := 0;
         Y_COORD         : integer := 0;
         NODE_NUMBER     : integer := 0;
 
-        MESSAGE_BITS    : integer := 32;
-        BUS_WIDTH       : integer := 8;
+        -- Packet parameters
+        COORD_BITS              : integer := 2;
+        MULTICAST_GROUP_BITS    : integer := 1;
+        MATRIX_TYPE_BITS        : integer := 1;
+        MATRIX_COORD_BITS       : integer := 8;
+        MATRIX_ELEMENT_BITS     : integer := 32;
+        BUS_WIDTH               : integer := 56;
 
+        -- Matrix parameters
         MATRIX_SIZE     : integer := 32;
         MATRIX_FILE     : string  := "none";
 
+        -- NIC parameters
         FIFO_DEPTH      : integer := 32;
         
+        -- PicoRV32 core parameters
         DIVIDE_ENABLED     : std_logic := '0';
         MULTIPLY_ENABLED   : std_logic := '1';
         FIRMWARE           : string    := "firmware.hex";
@@ -196,7 +205,7 @@ architecture Behavioral of node is
             matrix_y_coord_in           : in std_logic_vector((MATRIX_COORD_BITS-1) downto 0);
             matrix_y_coord_in_valid     : in std_logic;
             
-            matrix_element_in           : in std_logic_vector((MESSAGE_BITS-1) downto 0);
+            matrix_element_in           : in std_logic_vector((MATRIX_ELEMENT_BITS-1) downto 0);
             matrix_element_in_valid     : in std_logic;
             
             packet_complete_in          : in std_logic;
@@ -265,7 +274,7 @@ architecture Behavioral of node is
             MATRIX_TYPE_BITS        : integer := 1;
             MATRIX_COORD_BITS       : integer := 8;
             MATRIX_ELEMENT_BITS     : integer := 32;
-            BUS_WIDTH               : integer := 56
+            BUS_WIDTH               : integer := 56;
             
             DIVIDE_ENABLED     : std_logic := '0';
             MULTIPLY_ENABLED   : std_logic := '1';
@@ -277,6 +286,9 @@ architecture Behavioral of node is
             reset_n                 : in std_logic;
             
             LED                     : out std_logic;
+            
+            out_char                : out std_logic_vector(7 downto 0);
+            out_char_en             : out std_logic;
             
             x_coord_out                 : out std_logic_vector((COORD_BITS-1) downto 0);
             x_coord_out_valid           : out std_logic;
@@ -302,7 +314,7 @@ architecture Behavioral of node is
             matrix_y_coord_out          : out std_logic_vector((MATRIX_COORD_BITS-1) downto 0);
             matrix_y_coord_out_valid    : out std_logic;
             
-            matrix_element_out          : out std_logic_vector((MESSAGE_BITS-1) downto 0);
+            matrix_element_out          : out std_logic_vector((MATRIX_ELEMENT_BITS-1) downto 0);
             matrix_element_out_valid    : out std_logic;
             
             packet_complete_out     : out std_logic;
@@ -377,7 +389,7 @@ architecture Behavioral of node is
     signal processor_out_done_flag, processor_out_result_flag   : std_logic;
     signal processor_out_done_flag_valid, processor_out_result_flag_valid : std_logic;
 
-    signal processor_out_matrix_type      : std_logic_vector((MATRIX_TYPE_BITS-1) downto 0);
+    signal processor_out_matrix_type        : std_logic_vector((MATRIX_TYPE_BITS-1) downto 0);
     signal processor_out_matrix_type_valid  : std_logic;
 
     signal processor_out_matrix_x_coord, processor_out_matrix_y_coord   : std_logic_vector((MATRIX_COORD_BITS-1) downto 0);
@@ -503,8 +515,8 @@ begin
             result_flag_in              => processor_out_result_flag,
             result_flag_in_valid        => processor_out_result_flag_valid,
 
-            matrix_type_in              => processor_out_matrix_type_in,
-            matrix_type_in_valid        => processor_out_marix_type_in_valid,
+            matrix_type_in              => processor_out_matrix_type,
+            matrix_type_in_valid        => processor_out_matrix_type_valid,
 
             matrix_x_coord_in           => processor_out_matrix_x_coord,
             matrix_x_coord_in_valid     => processor_out_matrix_x_coord_valid,
@@ -603,8 +615,8 @@ begin
             result_flag_out             => processor_out_result_flag,
             result_flag_out_valid       => processor_out_result_flag_valid,
 
-            matrix_type_out             => processor_out_matrix_type_in,
-            matrix_type_out_valid       => processor_out_marix_type_in_valid,
+            matrix_type_out             => processor_out_matrix_type,
+            matrix_type_out_valid       => processor_out_matrix_type_valid,
 
             matrix_x_coord_out          => processor_out_matrix_x_coord,
             matrix_x_coord_out_valid    => processor_out_matrix_x_coord_valid,
@@ -632,7 +644,7 @@ begin
             message_in_read         => processor_in_message_read,
 
             out_matrix              => out_matrix,
-            out_matrix_en           => out_matrix,
+            out_matrix_en           => out_matrix_en,
             out_matrix_end_row      => out_matrix_end_row,
             out_matrix_end          => out_matrix_end,
             

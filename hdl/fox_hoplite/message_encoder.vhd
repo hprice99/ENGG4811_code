@@ -68,7 +68,7 @@ entity message_encoder is
         matrix_y_coord_in           : in std_logic_vector((MATRIX_COORD_BITS-1) downto 0);
         matrix_y_coord_in_valid     : in std_logic;
         
-        matrix_element_in           : in std_logic_vector((MESSAGE_BITS-1) downto 0);
+        matrix_element_in           : in std_logic_vector((MATRIX_ELEMENT_BITS-1) downto 0);
         matrix_element_in_valid     : in std_logic;
         
         packet_complete_in          : in std_logic;
