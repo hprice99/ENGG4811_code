@@ -43,9 +43,8 @@
 #define MATRIX_SIZE_INPUT       (*(volatile long*)0x70000030)
 
 // Network details
-#define FOX_NETWORK_ROWS_INPUT  (*(volatile long*)0x80000000)
-#define FOX_NETWORK_COLS_INPUT  (*(volatile long*)0x80000010)
-#define RESULT_X_COORD_INPUT    (*(volatile long*)0x80000020)
-#define RESULT_Y_COORD_INPUT    (*(volatile long*)0x80000030)
+#define FOX_NETWORK_STAGES_INPUT    (*(volatile long*)0x80000000)
+#define RESULT_X_COORD_INPUT        (*(volatile long*)0x80000010)
+#define RESULT_Y_COORD_INPUT        (*(volatile long*)0x80000020)
 
 #endif

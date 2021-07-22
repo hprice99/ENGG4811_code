@@ -26,6 +26,7 @@ use IEEE.STD_LOGIC_1164.ALL;
 -- arithmetic functions with Signed or Unsigned values
 use IEEE.NUMERIC_STD.ALL;
 use ieee.std_logic_unsigned.all;
+use IEEE.math_real.all;
 
 -- Uncomment the following library declaration if instantiating
 -- any Xilinx leaf cells in this code.
@@ -48,8 +49,7 @@ architecture Behavioral of board_top is
     component top
         generic (
             -- Fox's algorithm network paramters
-            FOX_NETWORK_ROWS    : integer := 2;
-            FOX_NETWORK_COLS    : integer := 2;
+            FOX_NETWORK_STAGES  : integer := 2;
             FOX_NETWORK_NODES   : integer := 4
         );
         port (
@@ -60,9 +60,8 @@ architecture Behavioral of board_top is
     end component top;
 
     -- Fox's algorithm network paramters
-    constant FOX_NETWORK_ROWS    : integer := 2;
-    constant FOX_NETWORK_COLS    : integer := 2;
-    constant FOX_NETWORK_NODES   : integer := FOX_NETWORK_ROWS * FOX_NETWORK_COLS;
+    constant FOX_NETWORK_STAGES  : integer := 2;
+    constant FOX_NETWORK_NODES   : integer := FOX_NETWORK_STAGES ** 2;
     
     signal clkdiv2  : std_logic := '0';
 
@@ -78,8 +77,7 @@ begin
 
     FOX_TOP: top
         generic map (
-            FOX_NETWORK_ROWS    => FOX_NETWORK_ROWS,
-            FOX_NETWORK_COLS    => FOX_NETWORK_COLS,
+            FOX_NETWORK_STAGES  => FOX_NETWORK_STAGES,
             FOX_NETWORK_NODES   => FOX_NETWORK_NODES
         )
         port map (

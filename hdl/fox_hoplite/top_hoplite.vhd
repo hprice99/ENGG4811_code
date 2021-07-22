@@ -38,8 +38,7 @@ use xil_defaultlib.math_functions.all;
 entity top is
     Generic (
         -- Fox's algorithm network paramters
-        FOX_NETWORK_ROWS    : integer := 2;
-        FOX_NETWORK_COLS    : integer := 2;
+        FOX_NETWORK_STAGES  : integer := 2;
         FOX_NETWORK_NODES   : integer := 4
     );
     Port ( 
@@ -60,8 +59,7 @@ architecture Behavioral of top is
             NETWORK_NODES   : integer := 4;
 
             -- Fox's algorithm network paramters
-            FOX_NETWORK_ROWS    : integer := 2;
-            FOX_NETWORK_COLS    : integer := 2;
+            FOX_NETWORK_STAGES  : integer := 2;
             FOX_NETWORK_NODES   : integer := 4;
 
             -- Result node parameters
@@ -217,8 +215,7 @@ begin
                     NETWORK_NODES   => NETWORK_NODES,
 
                     -- Fox's algorithm network paramters
-                    FOX_NETWORK_ROWS    => FOX_NETWORK_ROWS,
-                    FOX_NETWORK_COLS    => FOX_NETWORK_COLS,
+                    FOX_NETWORK_STAGES  => FOX_NETWORK_STAGES,
                     FOX_NETWORK_NODES   => FOX_NETWORK_NODES,
 
                     -- Result node parameters

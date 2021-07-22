@@ -8,9 +8,8 @@ module system #(
     parameter NETWORK_NODES     = 4,
 
     // Fox's algorithm network parameters
-    parameter FOX_NETWORK_ROWS  = 2,
-    parameter FOX_NETWORK_COLS  = 2,
-    parameter FOX_NETWORK_NODES = 4,
+    parameter FOX_NETWORK_STAGES    = 2,
+    parameter FOX_NETWORK_NODES     = 4,
 
     // Destination for results
     parameter RESULT_X_COORD    = 0, 
@@ -301,11 +300,8 @@ module system #(
                 `MATRIX_SIZE_INPUT: begin
                     mem_rdata   <= MATRIX_SIZE;
                 end
-                `FOX_NETWORK_ROWS_INPUT: begin
-                    mem_rdata   <= FOX_NETWORK_ROWS;
-                end
-                `FOX_NETWORK_COLS_INPUT: begin
-                    mem_rdata   <= FOX_NETWORK_COLS;
+                `FOX_NETWORK_STAGES_INPUT: begin
+                    mem_rdata   <= FOX_NETWORK_STAGES;
                 end
                 `RESULT_X_COORD_INPUT: begin
                     mem_rdata   <= RESULT_X_COORD;

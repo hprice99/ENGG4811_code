@@ -42,8 +42,7 @@ entity node is
         NETWORK_NODES   : integer := 4;
 
         -- Fox's algorithm network paramters
-        FOX_NETWORK_ROWS    : integer := 2;
-        FOX_NETWORK_COLS    : integer := 2;
+        FOX_NETWORK_STAGES  : integer := 2;
         FOX_NETWORK_NODES   : integer := 4;
 
         -- Result node parameters
@@ -255,8 +254,7 @@ architecture Behavioral of node is
             NETWORK_NODES   : integer := 4;
 
             -- Fox's algorithm network paramters
-            FOX_NETWORK_ROWS    : integer := 2;
-            FOX_NETWORK_COLS    : integer := 2;
+            FOX_NETWORK_STAGES  : integer := 2;
             FOX_NETWORK_NODES   : integer := 4;
 
             RESULT_X_COORD  : integer := 0;
@@ -573,8 +571,7 @@ begin
             NETWORK_NODES   => NETWORK_NODES,
             COORD_BITS      => COORD_BITS,
 
-            FOX_NETWORK_ROWS    => FOX_NETWORK_ROWS,
-            FOX_NETWORK_COLS    => FOX_NETWORK_COLS,
+            FOX_NETWORK_STAGES  => FOX_NETWORK_STAGES,
             FOX_NETWORK_NODES   => FOX_NETWORK_NODES,
 
             RESULT_X_COORD  => RESULT_X_COORD,
