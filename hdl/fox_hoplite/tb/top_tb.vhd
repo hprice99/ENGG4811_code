@@ -24,7 +24,7 @@ use IEEE.STD_LOGIC_1164.ALL;
 
 -- Uncomment the following library declaration if using
 -- arithmetic functions with Signed or Unsigned values
---use IEEE.NUMERIC_STD.ALL;
+use IEEE.NUMERIC_STD.ALL;
 
 -- Uncomment the following library declaration if instantiating
 -- any Xilinx leaf cells in this code.
@@ -35,8 +35,6 @@ use STD.textio.all;
 use IEEE.std_logic_textio.all;
 
 library xil_defaultlib;
-use xil_defaultlib.random.all;
-use xil_defaultlib.math_functions.all;
 use xil_defaultlib.fox_defs.all;
 
 entity top_tb is
@@ -110,8 +108,8 @@ begin
             FOX_NETWORK_NODES   => FOX_NETWORK_NODES
         )
         port map (
-            clk                 => clkdiv2,
-            reset_n             => CPU_RESETN,
+            clk                 => clk,
+            reset_n             => reset_n,
             LED                 => LED,
             out_char            => out_char,
             out_char_en         => out_char_en,
@@ -132,9 +130,11 @@ begin
             begin
                 if (rising_edge(clk) and reset_n = '1') then
                     if (out_char_en(curr_x, curr_y) = '1') then
-                        write(my_line, string'(out_char));
-
-                        writeline(output, my_line);
+                        if (to_integer(unsigned(out_char(curr_x, curr_y))) = 10) then
+                            writeline(output, my_line);
+                        else
+                            write(my_line, out_char(curr_x, curr_y));
+                        end if;
                     end if;
                 end if;
             end process CHAR_OUTPUT;
