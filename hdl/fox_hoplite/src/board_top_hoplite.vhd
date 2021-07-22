@@ -35,6 +35,7 @@ use IEEE.math_real.all;
 
 library xil_defaultlib;
 use xil_defaultlib.math_functions.all;
+use xil_defaultlib.fox_defs.all;
 
 entity board_top is
     Port ( 
@@ -53,15 +54,17 @@ architecture Behavioral of board_top is
             FOX_NETWORK_NODES   : integer := 4
         );
         port (
-            clk      : in std_logic;
-            reset_n  : in std_logic;
-            LED      : out STD_LOGIC_VECTOR((FOX_NETWORK_NODES-1) downto 0)
+            clk                 : in std_logic;
+            reset_n             : in std_logic;
+            LED                 : out STD_LOGIC_VECTOR((FOX_NETWORK_NODES-1) downto 0);
+            out_char            : out t_Char;
+            out_char_en         : out t_MessageValid;
+            out_matrix          : out t_Matrix;
+            out_matrix_en       : out t_MessageValid;
+            out_matrix_end_row  : out t_MessageValid;
+            out_matrix_end      : out t_MessageValid
         );
     end component top;
-
-    -- Fox's algorithm network paramters
-    constant FOX_NETWORK_STAGES  : integer := 2;
-    constant FOX_NETWORK_NODES   : integer := FOX_NETWORK_STAGES ** 2;
     
     signal clkdiv2  : std_logic := '0';
 
@@ -81,9 +84,15 @@ begin
             FOX_NETWORK_NODES   => FOX_NETWORK_NODES
         )
         port map (
-            clk     => clkdiv2,
-            reset_n => CPU_RESETN,
-            LED     => LED
+            clk                 => clkdiv2,
+            reset_n             => CPU_RESETN,
+            LED                 => LED,
+            out_char            => open,
+            out_char_en         => open,
+            out_matrix          => open,
+            out_matrix_en       => open,
+            out_matrix_end_row  => open,
+            out_matrix_end      => open
         );
 
 end Behavioral;

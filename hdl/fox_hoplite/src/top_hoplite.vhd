@@ -34,6 +34,7 @@ use ieee.std_logic_unsigned.all;
 
 library xil_defaultlib;
 use xil_defaultlib.math_functions.all;
+use xil_defaultlib.fox_defs.all;
 
 entity top is
     Generic (
@@ -42,11 +43,16 @@ entity top is
         FOX_NETWORK_NODES   : integer := 4
     );
     Port ( 
-           reset_n  : in STD_LOGIC;
-           clk      : in STD_LOGIC;
-           LED      : out STD_LOGIC_VECTOR((FOX_NETWORK_NODES-1) downto 0)
+           reset_n              : in STD_LOGIC;
+           clk                  : in STD_LOGIC;
+           LED                  : out STD_LOGIC_VECTOR((FOX_NETWORK_NODES-1) downto 0);
+           out_char             : out t_Char;
+           out_char_en          : out t_MessageValid;
+           out_matrix           : out t_Matrix;
+           out_matrix_en        : out t_MessageValid;
+           out_matrix_end_row   : out t_MessageValid;
+           out_matrix_end       : out t_MessageValid
     );
-    -- TODO Expose out_char and out_matrix as output port
 end top;
 
 architecture Behavioral of top is
@@ -117,73 +123,23 @@ architecture Behavioral of top is
             out_matrix_end      : out std_logic
         );
     end component node;
-    
-    -- Constants
-    constant NETWORK_ROWS   : integer := 2;
-    constant NETWORK_COLS   : integer := 2;
-    constant NETWORK_NODES  : integer := NETWORK_ROWS * NETWORK_COLS;
-
-    -- Fox's algorithm network paramters
-    -- constant FOX_NETWORK_ROWS    : integer := 2;
-    -- constant FOX_NETWORK_COLS    : integer := 2;
-    -- constant FOX_NETWORK_NODES   : integer := FOX_NETWORK_ROWS * FOX_NETWORK_COLS;
 
     -- Result node parameters
     -- TODO Implement result node
     constant RESULT_X_COORD  : integer := 0;
     constant RESULT_Y_COORD  : integer := 0;
-
-    -- Size of message data in packets
-    constant COORD_BITS             : integer := ceil_log2(max(NETWORK_ROWS, NETWORK_COLS));
-    constant MULTICAST_GROUP_BITS   : integer := 1;
-    constant DONE_FLAG_BITS         : integer := 1;
-    constant RESULT_FLAG_BITS       : integer := 1;
-    constant MATRIX_TYPE_BITS       : integer := 1;
-    constant MATRIX_COORD_BITS      : integer := 8;
-    constant MATRIX_ELEMENT_BITS    : integer := 32;
-    constant BUS_WIDTH              : integer := 
-            2*COORD_BITS + MULTICAST_GROUP_BITS + DONE_FLAG_BITS + 
-            RESULT_FLAG_BITS + MATRIX_TYPE_BITS + 2*MATRIX_COORD_BITS + 
-            MATRIX_ELEMENT_BITS;
-
-    -- Matrix parameters
-    constant MATRIX_SIZE    : integer := 2;
-
-    -- NIC parameters
-    constant FIFO_DEPTH : integer := 64;
-
-    constant X_INDEX    : integer := 0;
-    constant Y_INDEX    : integer := 1;
-
-    -- Custom types
-    type t_Coordinate is array (0 to 1) of std_logic_vector((COORD_BITS-1) downto 0);
-    type t_Destination is array(0 to (NETWORK_COLS-1), 0 to (NETWORK_ROWS-1)) of t_Coordinate;
-    type t_Message is array (0 to (NETWORK_COLS-1), 0 to (NETWORK_ROWS-1)) of std_logic_vector((BUS_WIDTH-1) downto 0);
-    type t_MessageValid is array (0 to (NETWORK_COLS-1), 0 to (NETWORK_ROWS-1)) of std_logic;
-    type t_Char is array (0 to (NETWORK_COLS-1), 0 to (NETWORK_ROWS-1)) of std_logic_vector(7 downto 0);
-    type t_Matrix is array (0 to (NETWORK_COLS-1), 0 to (NETWORK_ROWS-1)) of std_logic_vector(31 downto 0);
     
     -- Array of message interfaces between nodes
     signal x_messages_out, y_messages_out : t_Message;
     signal x_messages_out_valid, y_messages_out_valid : t_MessageValid;
     signal x_messages_in, y_messages_in : t_Message;
     signal x_messages_in_valid, y_messages_in_valid : t_MessageValid;
-    
-    -- UART output
-    signal out_char     : t_Char;
-    signal out_char_en  : t_MessageValid;
-
-    -- Matrix output
-    signal out_matrix           : t_Matrix;
-    signal out_matrix_en        : t_MessageValid;
-    signal out_matrix_end_row   : t_MessageValid;
-    signal out_matrix_end       : t_MessageValid;
 
     constant DIVIDE_ENABLED     : std_logic := '0';
     constant MULTIPLY_ENABLED   : std_logic := '1';
     constant FOX_FIRMWARE       : string := "firmware_hoplite.hex";
 
-    constant MEM_SIZE               : integer := 4096;
+    constant MEM_SIZE           : integer := 4096;
 
 begin
 
