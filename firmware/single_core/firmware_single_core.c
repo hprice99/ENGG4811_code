@@ -1,4 +1,5 @@
 #include "io.h"
+#include "matrix_config.h"
 #include "print.h"
 #include "matrix.h"
 

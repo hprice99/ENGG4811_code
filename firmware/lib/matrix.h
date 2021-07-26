@@ -5,6 +5,10 @@
 #include "io.h"
 #endif
 
+#ifdef MATRIX_CONFIG
+#include "matrix_config.h"
+#endif
+
 #ifndef MATRIX_ROW_END
 #define MATRIX_ROW_END (*(volatile char*)0x10000000)
 #endif
@@ -21,7 +25,9 @@
 #define MATRIX_OUTPUT (*(volatile long*)0x40000000)
 #endif
 
-#define MATRIX_SIZE 64
+#ifndef MATRIX_SIZE
+#error MATRIX_SIZE not defined
+#endif
 
 void print_matrix(long* matrix, int rows, int cols);
 
