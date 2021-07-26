@@ -35,6 +35,8 @@
 `define X_COORD_INPUT           32'h6000_0000
 `define Y_COORD_INPUT           32'h6000_0010
 `define NODE_NUMBER_INPUT       32'h6000_0020
+`define MATRIX_X_OFFSET_INPUT   32'h6000_0030
+`define MATRIX_Y_OFFSET_INPUT   32'h6000_0040
 
 // Matrix
 `define MATRIX_OUTPUT           32'h7000_0000

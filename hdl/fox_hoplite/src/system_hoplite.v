@@ -21,6 +21,10 @@ module system #(
     parameter NODE_NUMBER       = 0,
 
     parameter MATRIX_SIZE       = 32,
+    
+    // Matrix coordinate offset
+    parameter MATRIX_X_OFFSET   = 0,
+    parameter MATRIX_Y_OFFSET   = 0,
 
     // Network packet parameters
     parameter COORD_BITS            = 1,
@@ -302,6 +306,12 @@ module system #(
                 end
                 `FOX_NETWORK_STAGES_INPUT: begin
                     mem_rdata   <= FOX_NETWORK_STAGES;
+                end
+                `MATRIX_X_OFFSET_INPUT: begin
+                    mem_rdata   <= MATRIX_X_OFFSET;
+                end
+                `MATRIX_Y_OFFSET_INPUT: begin
+                    mem_rdata   <= MATRIX_Y_OFFSET;
                 end
                 `RESULT_X_COORD_INPUT: begin
                     mem_rdata   <= RESULT_X_COORD;

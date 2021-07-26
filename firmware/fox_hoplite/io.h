@@ -35,6 +35,8 @@
 #define X_COORD_INPUT           (*(volatile char*)0x60000000)
 #define Y_COORD_INPUT           (*(volatile char*)0x60000010)
 #define NODE_NUMBER_INPUT       (*(volatile char*)0x60000020)
+#define MATRIX_X_OFFSET_INPUT   (*(volatile char*)0x60000030)
+#define MATRIX_Y_OFFSET_INPUT   (*(volatile char*)0x60000040)
 
 // Matrix
 #define MATRIX_OUTPUT           (*(volatile long*)0x70000000)

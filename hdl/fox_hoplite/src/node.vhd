@@ -66,6 +66,10 @@ entity node is
         MATRIX_SIZE     : integer := 32;
         MATRIX_FILE     : string  := "none";
 
+        -- Matrix offset for node
+        MATRIX_X_OFFSET : integer := 0;
+        MATRIX_Y_OFFSET : integer := 0;
+
         -- NIC parameters
         FIFO_DEPTH      : integer := 32;
         
@@ -265,6 +269,10 @@ architecture Behavioral of node is
             NODE_NUMBER     : integer := 0;
 
             MATRIX_SIZE     : integer := 32;
+            
+            -- Matrix offset for node
+            MATRIX_X_OFFSET : integer := 0;
+            MATRIX_Y_OFFSET : integer := 0;
 
             -- Network packet format
             COORD_BITS              : integer := 2;
@@ -581,6 +589,9 @@ begin
             NODE_NUMBER     => NODE_NUMBER,
 
             MATRIX_SIZE     => MATRIX_SIZE,
+            
+            MATRIX_X_OFFSET => MATRIX_X_OFFSET,
+            MATRIX_Y_OFFSET => MATRIX_Y_OFFSET,
             
             DIVIDE_ENABLED      => DIVIDE_ENABLED,
             MULTIPLY_ENABLED    => MULTIPLY_ENABLED,

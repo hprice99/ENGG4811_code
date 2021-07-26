@@ -26,10 +26,10 @@ package fox_defs is
             MATRIX_ELEMENT_BITS;
             
     -- Matrix parameters
-    constant MATRIX_SIZE    : integer := 2;
+    constant MATRIX_SIZE    : integer := 1;
 
     -- NIC parameters
-    constant FIFO_DEPTH : integer := 64;
+    constant FIFO_DEPTH : integer := 2 * MATRIX_SIZE;
 
     constant X_INDEX    : integer := 0;
     constant Y_INDEX    : integer := 1;
