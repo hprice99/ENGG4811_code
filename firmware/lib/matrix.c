@@ -37,19 +37,7 @@ void output_matrix(char* label, long* matrix, int rows, int cols) {
     print_string("] \n\n");
 }
 
-void multiply_matrices(long* A, long* B) {
-
-    // Create matrix
-    long C[MATRIX_SIZE * MATRIX_SIZE];
-
-    for (long row = 0; row < MATRIX_SIZE; row++) {
-        for (long col = 0; col < MATRIX_SIZE; col++) {
-
-            int index = row * MATRIX_SIZE + col;
-
-            C[index] = 0;
-        }
-    }
+void multiply_matrices(long* A, long* B, long* C) {
 
     for (long i = 0; i < MATRIX_SIZE; i++) {
         for (long j = 0; j < MATRIX_SIZE; j++) {
@@ -68,6 +56,4 @@ void multiply_matrices(long* A, long* B) {
 
         print_string(" Row done\n");
     }
-
-    output_matrix("C = A*B", (long*)C, MATRIX_SIZE, MATRIX_SIZE);
 }

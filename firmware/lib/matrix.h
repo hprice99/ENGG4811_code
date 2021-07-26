@@ -35,6 +35,6 @@ void output_digit(long digit);
 
 void output_matrix(char* label, long* matrix, int rows, int cols);
 
-void multiply_matrices(long* A, long* B);
+void multiply_matrices(long* A, long* B, long* C);
 
 #endif

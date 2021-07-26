@@ -9,6 +9,7 @@
 
 long A[MATRIX_SIZE * MATRIX_SIZE];
 long B[MATRIX_SIZE * MATRIX_SIZE];
+long C[MATRIX_SIZE * MATRIX_SIZE];
 
 void createA(void) {
 
@@ -46,6 +47,18 @@ void createB(void) {
     output_matrix("B", (long*)B, MATRIX_SIZE, MATRIX_SIZE);
 }
 
+void createC(void) {
+
+    for (long row = 0; row < MATRIX_SIZE; row++) {
+        for (long col = 0; col < MATRIX_SIZE; col++) {
+
+            int index = row * MATRIX_SIZE + col;
+
+            C[index] = 0;
+        }
+    }
+}
+
 void main(void) {
     int ledValue = 0;
 
@@ -57,9 +70,11 @@ void main(void) {
 
     createA();
     createB();
+    createC();
 
-    multiply_matrices(A, B);
+    multiply_matrices(A, B, C);
 
+    output_matrix("C = A*B", (long*)C, MATRIX_SIZE, MATRIX_SIZE);
     print_string("Matrix multiplication completed\n");
 
     while (1) {
