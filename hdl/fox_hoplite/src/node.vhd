@@ -272,7 +272,6 @@ architecture Behavioral of node is
             MATRIX_TYPE_BITS        : integer := 1;
             MATRIX_COORD_BITS       : integer := 8;
             MATRIX_ELEMENT_BITS     : integer := 32;
-            BUS_WIDTH               : integer := 56;
             
             DIVIDE_ENABLED     : std_logic := '0';
             MULTIPLY_ENABLED   : std_logic := '1';

@@ -26,8 +26,15 @@ void main() {
     print_string("), node number = ");
     print_hex(my_node_number, 1);
 
-    int ledValue = 0;
+    fox_stages = FOX_NETWORK_STAGES_INPUT;
+    print_string(", Fox stages = ");
+    print_hex(fox_stages, 1);
+    print_string("\n");
+
+    int ledValue = 1;
     long loopCount = 0;
+
+    LED_OUTPUT = ledValue;
 
     while (1) {
 

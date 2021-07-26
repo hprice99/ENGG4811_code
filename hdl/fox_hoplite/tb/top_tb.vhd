@@ -72,6 +72,7 @@ architecture Behavioral of top_tb is
 
     signal out_char     : t_Char;
     signal out_char_en  : t_MessageValid;
+    signal line_started : t_MessageValid;
 
     signal out_matrix           : t_Matrix;
     signal out_matrix_en        : t_MessageValid;
@@ -124,16 +125,33 @@ begin
         CHAR_OUTPUT_COL_GEN: for j in 0 to (NETWORK_COLS-1) generate
             constant curr_y         : integer := i;
             constant curr_x         : integer := j;
+            constant node_number    : integer := i * NETWORK_ROWS + j;
         begin
             CHAR_OUTPUT: process (clk)
                 variable my_line : line;
             begin
-                if (rising_edge(clk) and reset_n = '1') then
-                    if (out_char_en(curr_x, curr_y) = '1') then
-                        if (to_integer(unsigned(out_char(curr_x, curr_y))) = 10) then
-                            writeline(output, my_line);
-                        else
-                            write(my_line, out_char(curr_x, curr_y));
+                if (rising_edge(clk)) then
+                    if (reset_n = '0') then
+                        line_started(curr_x, curr_y)    <= '0';
+                    else
+                        if (out_char_en(curr_x, curr_y) = '1') then
+                            if (character'val(to_integer(unsigned(out_char(curr_x, curr_y)))) = LF) then
+                                writeline(output, my_line);
+                                line_started(curr_x, curr_y)    <= '0';
+                            else
+                                if (line_started(curr_x, curr_y) = '0') then
+                                    write(my_line, string'("Node number = "));
+                                    write(my_line, node_number);
+                                    write(my_line, string'(": "));
+--                                    writeline(output, my_line);
+                                    
+--                                    write(my_line, string'(CR & LF & HT));
+                                end if;
+                                
+                                line_started(curr_x, curr_y)    <= '1';
+                                
+                                write(my_line, character'val(to_integer(unsigned(out_char(curr_x, curr_y)))));
+                            end if;
                         end if;
                     end if;
                 end if;
