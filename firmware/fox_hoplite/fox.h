@@ -17,7 +17,7 @@ extern long stage_B[MATRIX_SIZE * MATRIX_SIZE];
 
 extern long result_C[MATRIX_SIZE * MATRIX_SIZE];
 
-#define FOX_NETWORK_WAIT    40000000
+#define FOX_NETWORK_WAIT    1000000000
 
 enum FoxError {
     FOX_ALGORITHM_ERROR         = -4,

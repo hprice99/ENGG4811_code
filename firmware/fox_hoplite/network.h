@@ -4,9 +4,9 @@
 #include <stdbool.h>
 
 enum NetworkError {
-    NETWORK_ERROR,
-    NETWORK_MESSAGE_UNAVAILABLE,
-    NETWORK_SUCCESS
+    NETWORK_SUCCESS             ,
+    NETWORK_ERROR               ,
+    NETWORK_MESSAGE_UNAVAILABLE 
 };
 
 #ifdef IO_CONFIG
@@ -121,7 +121,7 @@ struct MatrixPacket create_matrix_packet(int destX, int destY,
         enum MatrixType matrixType, int matrixX, int matrixY, 
         long matrixElement);
 
-void print_matrix_packet(struct MatrixPacket packet);
+void print_matrix_packet(char* caller, struct MatrixPacket packet);
 
 enum NetworkError send_message(struct MatrixPacket packet);
 

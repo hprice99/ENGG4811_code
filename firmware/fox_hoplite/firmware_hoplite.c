@@ -49,7 +49,7 @@ void create_my_A(void) {
             }
             */
 
-           my_A[index] = my_node_number;
+           my_A[index] = my_node_number + 1;
            // my_A[index] = 1;
         }
     }
@@ -65,16 +65,7 @@ void create_initial_stage_B(void) {
 
             int index = row * MATRIX_SIZE + col;
 
-            /*
-            if (col < 50) {
-                stage_B[index] = col + 1;
-            } else {
-                stage_B[index] = col - 50;
-            }
-            */
-
-           stage_B[index] = 2 * my_node_number + 4;
-           // stage_B[index] = 1;
+            stage_B[index] = 2 * my_node_number + 4;
         }
     }
 
@@ -103,10 +94,6 @@ void main() {
     xOffset = MATRIX_X_OFFSET_INPUT;
     yOffset = MATRIX_Y_OFFSET_INPUT;
 
-    // TODO Remove offset if not needed
-    xOffset = 0;
-    yOffset = 0;
-
     print_string("Node coordinates (");
     print_hex(my_x_coord, 1);
     print_string(", ");
@@ -132,6 +119,7 @@ void main() {
 
     fox_algorithm(my_x_coord, my_y_coord);
 
+    // TODO Implement alternate result print
     tb_output_matrix("Matrix multiplication complete. C", result_C, 
             MATRIX_SIZE, MATRIX_SIZE);
 

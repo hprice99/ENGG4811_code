@@ -21,14 +21,22 @@ struct MatrixPacket create_matrix_packet(int destX, int destY,
     return packet;
 }
 
-void print_matrix_packet(struct MatrixPacket packet) {
+void print_matrix_packet(char* caller, struct MatrixPacket packet) {
 
-    print_string("print_matrix_packet - ");
-    print_string("Matrix type = ");
+    print_string(caller);
+
+    print_string(" - destX = ");
+    print_hex(packet.destX, 1);
+    print_string(", destY = ");
+    print_hex(packet.destY, 1);
+
+    print_string(", matrix type = ");
 
     if (packet.matrixType == A_type) {
+
         print_string("A");
     } else if (packet.matrixType == B_type) {
+
         print_string("B");
     }
 
@@ -69,8 +77,6 @@ enum NetworkError send_message(struct MatrixPacket packet) {
 enum NetworkError receive_message(struct MatrixPacket* packet) {
 
     if (MESSAGE_IN_AVAILABLE_INPUT == 0) { 
-
-        // print_string("receive_message message not available\n");
 
         return NETWORK_MESSAGE_UNAVAILABLE;
     }
