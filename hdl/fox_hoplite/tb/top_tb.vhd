@@ -121,13 +121,13 @@ begin
         );
 
     -- Generate the network
-    CHAR_OUTPUT_ROW_GEN: for i in 0 to (NETWORK_ROWS-1) generate
-        CHAR_OUTPUT_COL_GEN: for j in 0 to (NETWORK_COLS-1) generate
+    PRINT_OUTPUT_ROW_GEN: for i in 0 to (NETWORK_ROWS-1) generate
+        PRINT_OUTPUT_COL_GEN: for j in 0 to (NETWORK_COLS-1) generate
             constant curr_y         : integer := i;
             constant curr_x         : integer := j;
             constant node_number    : integer := i * NETWORK_ROWS + j;
         begin
-            CHAR_OUTPUT: process (clk)
+            PRINT_OUTPUT: process (clk)
                 variable my_line : line;
             begin
                 if (rising_edge(clk)) then
@@ -140,7 +140,9 @@ begin
                                 line_started(curr_x, curr_y)    <= '0';
                             else
                                 if (line_started(curr_x, curr_y) = '0') then
-                                    write(my_line, string'("Node number = "));
+                                    write(my_line, string'("Cycle count = "));
+                                    write(my_line, count);
+                                    write(my_line, string'(", Node number = "));
                                     write(my_line, node_number);
                                     write(my_line, string'(": "));
 --                                    writeline(output, my_line);
@@ -153,10 +155,25 @@ begin
                                 write(my_line, character'val(to_integer(unsigned(out_char(curr_x, curr_y)))));
                             end if;
                         end if;
+                        
+                        if (out_matrix_en(curr_x, curr_y) = '1') then
+                            write(my_line, string'(" "));
+                            write(my_line, to_integer(unsigned(out_matrix(curr_x, curr_y))));
+                        end if;
+                        
+                        if (out_matrix_end_row(curr_x, curr_y) = '1') then
+                            write(my_line, string'(" ,"));
+                            writeline(output, my_line);
+                        end if;
+                        
+                        if (out_matrix_end(curr_x, curr_y) = '1') then
+                            write(my_line, string'(""));
+                            writeline(output, my_line);
+                        end if;
                     end if;
                 end if;
-            end process CHAR_OUTPUT;
-        end generate CHAR_OUTPUT_COL_GEN;
-    end generate CHAR_OUTPUT_ROW_GEN;
+            end process PRINT_OUTPUT;
+        end generate PRINT_OUTPUT_COL_GEN;
+    end generate PRINT_OUTPUT_ROW_GEN;
 
 end Behavioral;

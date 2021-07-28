@@ -9,6 +9,7 @@ CONFIG_HEADERS = io.h matrix_config.h
 
 IO_CONFIG = IO_CONFIG
 MATRIX_CONFIG = MATRIX_CONFIG
+MATRIX_POSITION_OUT_ENABLED = MATRIX_POSITION_OUT_ENABLED
 
 PROJ_NAME = single_core
 
@@ -16,7 +17,7 @@ PROJ_NAME = single_core
 all: firmware_$(PROJ_NAME)
 
 firmware_$(PROJ_NAME): firmware_$(PROJ_NAME).c $(LIB_SRCS) $(LIB_HEADERS) $(CONFIG_HEADERS) firmware_$(PROJ_NAME).lds firmware_$(PROJ_NAME).S
-	$(TOOLCHAIN_PREFIX)gcc $(CFLAGS) -D$(IO_CONFIG) -D$(MATRIX_CONFIG) -I. -I$(LIB) -Os -ffreestanding -nostdlib -o firmware_$(PROJ_NAME).elf firmware_$(PROJ_NAME).S firmware_$(PROJ_NAME).c $(LIB_SRCS) --std=gnu99 -Wl,-Bstatic,-T,firmware_$(PROJ_NAME).lds,-Map,firmware_$(PROJ_NAME).map,--strip-debug -lgcc \
+	$(TOOLCHAIN_PREFIX)gcc $(CFLAGS) -D$(IO_CONFIG) -D$(MATRIX_CONFIG) -D$(MATRIX_POSITION_OUT_ENABLED) -I. -I$(LIB) -Os -ffreestanding -nostdlib -o firmware_$(PROJ_NAME).elf firmware_$(PROJ_NAME).S firmware_$(PROJ_NAME).c $(LIB_SRCS) --std=gnu99 -Wl,-Bstatic,-T,firmware_$(PROJ_NAME).lds,-Map,firmware_$(PROJ_NAME).map,--strip-debug -lgcc \
 	&& $(TOOLCHAIN_PREFIX)objcopy -O binary firmware_$(PROJ_NAME).elf firmware_$(PROJ_NAME).bin \
 	&& python3 ../makehex.py firmware_$(PROJ_NAME).bin $(MEM_SIZE) > firmware_$(PROJ_NAME).hex
 

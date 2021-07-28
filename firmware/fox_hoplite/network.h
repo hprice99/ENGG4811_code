@@ -3,8 +3,11 @@
 
 #include <stdbool.h>
 
-#define NETWORK_ERROR   -1
-#define NETWORK_SUCCESS 0
+enum NetworkError {
+    NETWORK_ERROR,
+    NETWORK_MESSAGE_UNAVAILABLE,
+    NETWORK_SUCCESS
+};
 
 #ifdef IO_CONFIG
 #include "io.h"
@@ -97,8 +100,8 @@
 #endif
 
 enum MatrixType {
-    A = 0, 
-    B = 1
+    A_type = 0, 
+    B_type = 1
 };
 
 struct MatrixPacket {
@@ -113,8 +116,15 @@ struct MatrixPacket {
     long matrixElement;
 };
 
-int send_message(struct MatrixPacket packet);
+struct MatrixPacket create_matrix_packet(int destX, int destY, 
+        int multicastGroup, bool doneFlag, bool resultFlag, 
+        enum MatrixType matrixType, int matrixX, int matrixY, 
+        long matrixElement);
 
-int receive_message(struct MatrixPacket* packet);
+void print_matrix_packet(struct MatrixPacket packet);
+
+enum NetworkError send_message(struct MatrixPacket packet);
+
+enum NetworkError receive_message(struct MatrixPacket* packet);
 
 #endif

@@ -52,8 +52,10 @@ void multiply_matrices(long* A, long* B, long* C) {
             }
         }
 
+        #ifdef MATRIX_POSITION_OUT_ENABLED
         MATRIX_POSITION = i;
 
         print_string(" Row done\n");
+        #endif
     }
 }
