@@ -186,7 +186,7 @@ enum FoxError receive_matrix(enum MatrixType matrixType) {
         receiveLoopsLevel1 = 0;
 
         // Needed to prevent processors from running too fast
-        print_char(0);
+        // print_char(0);
 
         #ifdef DEBUG_PRINT
         print_char('r');
