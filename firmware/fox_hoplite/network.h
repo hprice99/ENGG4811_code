@@ -4,9 +4,10 @@
 #include <stdbool.h>
 
 enum NetworkError {
-    NETWORK_SUCCESS             ,
-    NETWORK_ERROR               ,
-    NETWORK_MESSAGE_UNAVAILABLE 
+    NETWORK_SUCCESS,
+    NETWORK_ERROR,
+    NETWORK_MESSAGE_OUT_UNAVAILABLE,
+    NETWORK_MESSAGE_IN_UNAVAILABLE
 };
 
 #ifdef IO_CONFIG

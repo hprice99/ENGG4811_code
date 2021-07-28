@@ -5,8 +5,6 @@
 
 #include <stdbool.h>
 
-#define MATRIX_SIZE 1
-
 #include "matrix.h"
 #include "fox.h"
 
@@ -36,21 +34,12 @@ void tb_output_matrix(char* label, long* matrix, int rows, int cols) {
 
 void create_my_A(void) {
 
-    for (long row = 0; row < MATRIX_SIZE; row++) {
-        for (long col = 0; col < MATRIX_SIZE; col++) {
+    for (long x = 0; x < MATRIX_SIZE; x++) {
+        for (long y = 0; y < MATRIX_SIZE; y++) {
 
-            int index = row * MATRIX_SIZE + col;
+            int index = COORDINATE_TO_INDEX(x, y);
 
-            /*
-            if (row < 50) {
-                my_A[index] = row + 1;
-            } else {
-                my_A[index] = row - 50;
-            }
-            */
-
-           my_A[index] = my_node_number + 1;
-           // my_A[index] = 1;
+            my_A[index] = my_node_number + 1;
         }
     }
 
@@ -60,10 +49,10 @@ void create_my_A(void) {
 
 void create_initial_stage_B(void) {
 
-    for (long row = 0; row < MATRIX_SIZE; row++) {
-        for (long col = 0; col < MATRIX_SIZE; col++) {
+    for (long x = 0; x < MATRIX_SIZE; x++) {
+        for (long y = 0; y < MATRIX_SIZE; y++) {
 
-            int index = row * MATRIX_SIZE + col;
+            int index = COORDINATE_TO_INDEX(x, y);
 
             stage_B[index] = 2 * my_node_number + 4;
         }
@@ -75,10 +64,10 @@ void create_initial_stage_B(void) {
 
 void initialise_C(void) {
 
-    for (long row = 0; row < MATRIX_SIZE; row++) {
-        for (long col = 0; col < MATRIX_SIZE; col++) {
+    for (long x = 0; x < MATRIX_SIZE; x++) {
+        for (long y = 0; y < MATRIX_SIZE; y++) {
 
-            int index = row * MATRIX_SIZE + col;
+            int index = COORDINATE_TO_INDEX(x, y);
 
             result_C[index] = 0;
         }

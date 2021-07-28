@@ -54,7 +54,7 @@ enum NetworkError send_message(struct MatrixPacket packet) {
 
     if (MESSAGE_OUT_READY_INPUT == 0) {
 
-        return NETWORK_ERROR;
+        return NETWORK_MESSAGE_OUT_UNAVAILABLE;
     }
 
     // Set packet fields
@@ -78,7 +78,7 @@ enum NetworkError receive_message(struct MatrixPacket* packet) {
 
     if (MESSAGE_IN_AVAILABLE_INPUT == 0) { 
 
-        return NETWORK_MESSAGE_UNAVAILABLE;
+        return NETWORK_MESSAGE_IN_UNAVAILABLE;
     }
 
     packet->multicastGroup = MULTICAST_GROUP_INPUT;

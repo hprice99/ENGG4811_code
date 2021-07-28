@@ -31,14 +31,11 @@ enum FoxError send_A(int my_x_coord, int my_y_coord, int fox_rows);
 
 enum FoxError send_B(int my_x_coord, int my_y_coord, int fox_cols);
 
-enum FoxError assign_element(enum MatrixType matrixType, int x, int y, 
-        int element);
+enum FoxError assign_element(struct MatrixPacket packet);
 
 enum FoxError receive_matrix(enum MatrixType matrixType);
 
 bool is_broadcast_stage(int my_x_coord, int my_y_coord, int stage);
-
-enum FoxError fox_matrix_multiply(void);
 
 enum FoxError fox_algorithm(int my_row, int my_col);
 
