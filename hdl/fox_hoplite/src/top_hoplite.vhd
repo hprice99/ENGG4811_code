@@ -87,8 +87,9 @@ architecture Behavioral of top is
 
             -- Matrix parameters
             -- TODO Add FOX_MATRIX_SIZE
-            MATRIX_SIZE     : integer := 32;
-            MATRIX_FILE     : string  := "none";
+            TOTAL_MATRIX_SIZE   : integer := 32;
+            FOX_MATRIX_SIZE     : integer := 16;
+            MATRIX_FILE         : string  := "none";
             
             -- Matrix offset for node
             MATRIX_X_OFFSET : integer := 0;
@@ -134,8 +135,6 @@ architecture Behavioral of top is
     constant RESULT_X_COORD  : integer := 0;
     constant RESULT_Y_COORD  : integer := 0;
     
-    constant FIFO_DEPTH : integer := 2 * MATRIX_SIZE;
-    
     -- Array of message interfaces between nodes
     signal x_messages_out, y_messages_out : t_Message;
     signal x_messages_out_valid, y_messages_out_valid : t_MessageValid;
@@ -160,8 +159,8 @@ begin
             constant next_y         : integer := ((i+1) mod NETWORK_ROWS);
             constant next_x         : integer := ((j+1) mod NETWORK_COLS);
             constant node_number    : integer := i * NETWORK_ROWS + j;
-            constant y_offset       : integer := i * (MATRIX_SIZE);
-            constant x_offset       : integer := j * (MATRIX_SIZE);
+            constant y_offset       : integer := i * (FOX_MATRIX_SIZE);
+            constant x_offset       : integer := j * (FOX_MATRIX_SIZE);
         begin
             -- Connect in and out messages
             x_messages_in(curr_x, curr_y)       <= x_messages_out(prev_x, curr_y);
@@ -201,7 +200,8 @@ begin
                     BUS_WIDTH               => BUS_WIDTH,
 
                     -- Matrix parameters
-                    MATRIX_SIZE     => MATRIX_SIZE,
+                    TOTAL_MATRIX_SIZE       => TOTAL_MATRIX_SIZE,
+                    FOX_MATRIX_SIZE         => FOX_MATRIX_SIZE,
                     -- TODO Implement matrix initialisation files for each node
                     MATRIX_FILE     => "none",
                     

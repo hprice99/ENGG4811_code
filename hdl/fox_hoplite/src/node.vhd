@@ -63,8 +63,9 @@ entity node is
         BUS_WIDTH               : integer := 56;
 
         -- Matrix parameters
-        MATRIX_SIZE     : integer := 32;
-        MATRIX_FILE     : string  := "none";
+        TOTAL_MATRIX_SIZE       : integer := 32;
+        FOX_MATRIX_SIZE         : integer := 16;
+        MATRIX_FILE             : string  := "none";
 
         -- Matrix offset for node
         MATRIX_X_OFFSET : integer := 0;
@@ -268,7 +269,7 @@ architecture Behavioral of node is
             Y_COORD         : integer := 0;
             NODE_NUMBER     : integer := 0;
 
-            MATRIX_SIZE     : integer := 32;
+            FOX_MATRIX_SIZE : integer := 16;
             
             -- Matrix offset for node
             MATRIX_X_OFFSET : integer := 0;
@@ -588,7 +589,7 @@ begin
             Y_COORD         => Y_COORD,
             NODE_NUMBER     => NODE_NUMBER,
 
-            MATRIX_SIZE     => MATRIX_SIZE,
+            FOX_MATRIX_SIZE => FOX_MATRIX_SIZE,
             
             MATRIX_X_OFFSET => MATRIX_X_OFFSET,
             MATRIX_Y_OFFSET => MATRIX_Y_OFFSET,

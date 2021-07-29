@@ -12,6 +12,10 @@ package fox_defs is
     constant NETWORK_COLS   : integer := 2;
     constant NETWORK_NODES  : integer := NETWORK_ROWS * NETWORK_COLS;
     
+    -- Fox's algorithm network paramters
+    constant FOX_NETWORK_STAGES  : integer := 2;
+    constant FOX_NETWORK_NODES   : integer := FOX_NETWORK_STAGES ** 2;
+    
     -- Size of message data in packets
     constant COORD_BITS             : integer := ceil_log2(max(NETWORK_ROWS, NETWORK_COLS));
     constant MULTICAST_GROUP_BITS   : integer := 1;
@@ -26,17 +30,14 @@ package fox_defs is
             MATRIX_ELEMENT_BITS;
             
     -- Matrix parameters
-    constant MATRIX_SIZE    : integer := 1;
+    constant TOTAL_MATRIX_SIZE  : integer := 2;
+    constant FOX_MATRIX_SIZE    : integer := TOTAL_MATRIX_SIZE / FOX_NETWORK_STAGES;
 
     -- NIC parameters
-    constant FIFO_DEPTH : integer := 2 * MATRIX_SIZE;
+    constant FIFO_DEPTH : integer := 2 * FOX_MATRIX_SIZE;
 
     constant X_INDEX    : integer := 0;
     constant Y_INDEX    : integer := 1;
-
-    -- Fox's algorithm network paramters
-    constant FOX_NETWORK_STAGES  : integer := 2;
-    constant FOX_NETWORK_NODES   : integer := FOX_NETWORK_STAGES ** 2;
 
     -- Custom types
     type t_Coordinate is array (0 to 1) of std_logic_vector((COORD_BITS-1) downto 0);

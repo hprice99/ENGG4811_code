@@ -20,7 +20,7 @@ module system #(
     parameter Y_COORD           = 0,
     parameter NODE_NUMBER       = 0,
 
-    parameter MATRIX_SIZE       = 32,
+    parameter FOX_MATRIX_SIZE   = 32,
     
     // Matrix coordinate offset
     parameter MATRIX_X_OFFSET   = 0,
@@ -301,8 +301,8 @@ module system #(
                 `NODE_NUMBER_INPUT: begin
                     mem_rdata           <= NODE_NUMBER;
                 end
-                `MATRIX_SIZE_INPUT: begin
-                    mem_rdata   <= MATRIX_SIZE;
+                `FOX_MATRIX_SIZE_INPUT: begin
+                    mem_rdata   <= FOX_MATRIX_SIZE;
                 end
                 `FOX_NETWORK_STAGES_INPUT: begin
                     mem_rdata   <= FOX_NETWORK_STAGES;
