@@ -12,9 +12,15 @@ package fox_defs is
     constant NETWORK_COLS   : integer := 2;
     constant NETWORK_NODES  : integer := NETWORK_ROWS * NETWORK_COLS;
     
+    -- Matrix parameters
+    -- Matrix has dimensions (TOTAL_MATRIX_SIZE * TOTAL_MATRIX_SIZE)
+    constant TOTAL_MATRIX_SIZE  : integer := 2;
+    
     -- Fox's algorithm network paramters
     constant FOX_NETWORK_STAGES  : integer := 2;
     constant FOX_NETWORK_NODES   : integer := FOX_NETWORK_STAGES ** 2;
+    -- Each processor operates on a (FOX_MATRIX_SIZE * FOX_MATRIX_SIZE) matrix
+    constant FOX_MATRIX_SIZE     : integer := TOTAL_MATRIX_SIZE / FOX_NETWORK_STAGES;
     
     -- Size of message data in packets
     constant COORD_BITS             : integer := ceil_log2(max(NETWORK_ROWS, NETWORK_COLS));
@@ -29,10 +35,6 @@ package fox_defs is
             RESULT_FLAG_BITS + MATRIX_TYPE_BITS + 2*MATRIX_COORD_BITS + 
             MATRIX_ELEMENT_BITS;
             
-    -- Matrix parameters
-    constant TOTAL_MATRIX_SIZE  : integer := 2;
-    constant FOX_MATRIX_SIZE    : integer := TOTAL_MATRIX_SIZE / FOX_NETWORK_STAGES;
-
     -- NIC parameters
     constant FIFO_DEPTH : integer := 2 * FOX_MATRIX_SIZE;
 

@@ -29,17 +29,21 @@ long expected_C[][MATRIX_SIZE * MATRIX_SIZE] = {
 void tb_output_matrix(char* label, long* matrix, int rows, int cols) {
 
     print_string(label);
-    print_string(" = [ ");
+    print_string(" = ");
 
     for (long row = 0; row < rows; row++) {
+        MATRIX_END_ROW_OUTPUT = 1;
         for (long col = 0; col < cols; col++) {
+
+            if (row == 0 && col == 0) {
+                print_string("[");
+            }
             
             output_digit(*((matrix + row * rows) + col));
         }
-        MATRIX_ROW_END = 1;
     }
 
-    MATRIX_END = 1;
+    MATRIX_END_OUTPUT = 1;
 
     print_string("] \n");
 }

@@ -142,7 +142,8 @@ begin
                                 if (line_started(curr_x, curr_y) = '0') then
                                     write(my_line, string'("Cycle count = "));
                                     write(my_line, count);
-                                    write(my_line, string'(", Node number = "));
+                                    write(my_line, string'(", "));
+                                    write(my_line, string'("Node number = "));
                                     write(my_line, node_number);
                                     write(my_line, string'(": "));
 --                                    writeline(output, my_line);
@@ -157,19 +158,19 @@ begin
                         end if;
                         
                         if (out_matrix_en(curr_x, curr_y) = '1') then
-                            write(my_line, string'(" "));
                             write(my_line, to_integer(unsigned(out_matrix(curr_x, curr_y))));
+                            write(my_line, string'(" "));
                         end if;
                         
                         if (out_matrix_end_row(curr_x, curr_y) = '1') then
-                            write(my_line, string'(" ,"));
-                            writeline(output, my_line);
+                            write(my_line, string'(" ," & LF));
+                            -- writeline(output, my_line);
                         end if;
                         
-                        if (out_matrix_end(curr_x, curr_y) = '1') then
-                            write(my_line, string'(""));
-                            writeline(output, my_line);
-                        end if;
+--                        if (out_matrix_end(curr_x, curr_y) = '1') then
+--                            write(my_line, LF);
+--                            -- writeline(output, my_line);
+--                        end if;
                     end if;
                 end if;
             end process PRINT_OUTPUT;
