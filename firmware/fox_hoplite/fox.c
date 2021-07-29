@@ -122,14 +122,14 @@ enum FoxError assign_element(struct MatrixPacket packet) {
     #ifdef DEBUG_PRINT
     print_string("assign_element");
     print_string(", x = ");
-    print_hex(x, 1);
+    print_hex(packet.matrixX, 1);
     print_string(", y = ");
-    print_hex(y, 1);
+    print_hex(packet.matrixY, 1);
 
     print_string(", assign_element index = ");
     print_hex(index, 1);
     print_string(", element = ");
-    print_hex(element, 1);
+    print_hex(packet.matrixElement, 1);
     #endif
 
     if (packet.matrixType == A_type) {
