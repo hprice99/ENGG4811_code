@@ -29,6 +29,8 @@
 #error MATRIX_SIZE not defined
 #endif
 
+#define MATRIX_ELEMENTS (MATRIX_SIZE * MATRIX_SIZE)
+
 #define COORDINATE_TO_INDEX(x, y)   (y * MATRIX_SIZE + x)
 
 void print_matrix(long* matrix, int rows, int cols);

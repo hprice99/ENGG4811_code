@@ -164,7 +164,7 @@ enum FoxError receive_matrix(enum MatrixType matrixType) {
     long receiveLoopsLevel1 = 0;
     long receiveLoopsLevel2 = 0;
 
-    while (elementsReceived < MATRIX_SIZE) {
+    while (elementsReceived < MATRIX_ELEMENTS) {
 
         receiveLoopsLevel1 = 0;
         receiveLoopsLevel2 = 0;

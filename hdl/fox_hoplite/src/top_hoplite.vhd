@@ -86,7 +86,6 @@ architecture Behavioral of top is
             BUS_WIDTH               : integer := 56;
 
             -- Matrix parameters
-            -- TODO Add FOX_MATRIX_SIZE
             TOTAL_MATRIX_SIZE   : integer := 32;
             FOX_MATRIX_SIZE     : integer := 16;
             MATRIX_FILE         : string  := "none";

@@ -154,6 +154,11 @@ void main() {
     print_hex(xOffset, 3);
     print_string(", yOffset = ");
     print_hex(yOffset, 3);
+
+    print_string(", matrix size = ");
+    print_hex(MATRIX_SIZE, 1);
+    print_string(", matrix elements = ");
+    print_hex(MATRIX_ELEMENTS, 1);
     print_string("\n\n");
 
     int ledValue = 1;
