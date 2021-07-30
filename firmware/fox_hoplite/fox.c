@@ -12,6 +12,9 @@ long stage_B[MATRIX_SIZE * MATRIX_SIZE];
 
 long result_C[MATRIX_SIZE * MATRIX_SIZE];
 
+int aElementsReceived;
+int bElementsReceived;
+
 enum FoxError send_A(int my_x_coord, int my_y_coord, int fox_rows) {
 
     enum NetworkError networkError = NETWORK_ERROR;
@@ -135,6 +138,11 @@ enum FoxError assign_element(struct MatrixPacket packet) {
     if (packet.matrixType == A_type) {
 
         stage_A[index] = packet.matrixElement;
+        aElementsReceived++;
+
+        print_string("aElementsReceived = ");
+        print_hex(aElementsReceived, 3);
+        print_string("\n");
 
         #ifdef DEBUG_PRINT
         print_string(", type = A");
@@ -142,6 +150,11 @@ enum FoxError assign_element(struct MatrixPacket packet) {
     } else if (packet.matrixType == B_type) {
 
         stage_B[index] = packet.matrixElement;
+        bElementsReceived++;
+
+        print_string("bElementsReceived = ");
+        print_hex(bElementsReceived, 3);
+        print_string("\n");
 
         #ifdef DEBUG_PRINT
         print_string(", type = B");
@@ -157,14 +170,16 @@ enum FoxError assign_element(struct MatrixPacket packet) {
 
 enum FoxError receive_matrix(enum MatrixType matrixType) {
 
-    int elementsReceived = 0;
-    enum NetworkError networkError = NETWORK_ERROR;
+    enum NetworkError networkError;
     struct MatrixPacket packet;
 
     long receiveLoopsLevel1 = 0;
     long receiveLoopsLevel2 = 0;
 
-    while (elementsReceived < MATRIX_ELEMENTS) {
+    while ((matrixType == A_type && aElementsReceived < MATRIX_ELEMENTS) || 
+            (matrixType == B_type && bElementsReceived < MATRIX_ELEMENTS)) {
+
+        networkError = NETWORK_ERROR;
 
         receiveLoopsLevel1 = 0;
         receiveLoopsLevel2 = 0;
@@ -197,17 +212,27 @@ enum FoxError receive_matrix(enum MatrixType matrixType) {
             return FOX_NETWORK_TIMEOUT_ERROR;
         }
 
-        if (packet.matrixType != matrixType) {
-
-            print_string("receive_matrix assignment error\n");
-
-            return FOX_ASSIGNMENT_ERROR;
-        }
-
         assign_element(packet);
-
-        elementsReceived++;
     }
+
+    // Reset the number of elements received in the desired matrix
+    if (matrixType == A_type) {
+
+        aElementsReceived = 0;
+
+        print_string("aElementsReceived = ");
+        print_hex(aElementsReceived, 3);
+        print_string("\n");
+    } else if (matrixType == B_type) {
+
+        bElementsReceived = 0;
+
+        print_string("bElementsReceived = ");
+        print_hex(bElementsReceived, 3);
+        print_string("\n");
+    }
+
+    return FOX_SUCCESS;
 }
 
 bool is_broadcast_stage(int my_x_coord, int my_y_coord, int stage) {
@@ -224,6 +249,9 @@ bool is_broadcast_stage(int my_x_coord, int my_y_coord, int stage) {
 }
 
 enum FoxError fox_algorithm(int my_x_coord, int my_y_coord) {
+
+    aElementsReceived = 0;
+    bElementsReceived = 0;
 
     for (int stage = 0; stage < foxStages; stage++) {
 
