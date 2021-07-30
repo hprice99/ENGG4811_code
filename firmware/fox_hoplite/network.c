@@ -25,12 +25,7 @@ void print_matrix_packet(char* caller, struct MatrixPacket packet) {
 
     print_string(caller);
 
-    print_string(" - destX = ");
-    print_hex(packet.destX, 1);
-    print_string(", destY = ");
-    print_hex(packet.destY, 1);
-
-    print_string(", matrix type = ");
+    print_string(" - matrix type = ");
 
     if (packet.matrixType == A_type) {
 
