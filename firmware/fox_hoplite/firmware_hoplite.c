@@ -55,7 +55,8 @@ void create_my_A(void) {
 
             int index = COORDINATE_TO_INDEX(x, y);
 
-            my_A[index] = my_node_number + 1;
+            // my_A[index] = my_node_number + 1;
+            my_A[index] = my_node_number + x + y + 1;
         }
     }
 
@@ -70,7 +71,8 @@ void create_initial_stage_B(void) {
 
             int index = COORDINATE_TO_INDEX(x, y);
 
-            stage_B[index] = 2 * my_node_number + 4;
+            // stage_B[index] = 2 * my_node_number + 4;
+            stage_B[index] = 2 * my_node_number + x + y + 4;
         }
     }
 

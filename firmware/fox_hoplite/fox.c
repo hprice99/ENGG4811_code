@@ -140,30 +140,28 @@ enum FoxError assign_element(struct MatrixPacket packet) {
         stage_A[index] = packet.matrixElement;
         aElementsReceived++;
 
+        #ifdef DEBUG_PRINT
+        print_string(", type = A");
+        print_string("\n");
+
         print_string("aElementsReceived = ");
         print_hex(aElementsReceived, 3);
         print_string("\n");
-
-        #ifdef DEBUG_PRINT
-        print_string(", type = A");
         #endif
     } else if (packet.matrixType == B_type) {
 
         stage_B[index] = packet.matrixElement;
         bElementsReceived++;
 
+        #ifdef DEBUG_PRINT
+        print_string(", type = B");
+        print_string("\n");
+
         print_string("bElementsReceived = ");
         print_hex(bElementsReceived, 3);
         print_string("\n");
-
-        #ifdef DEBUG_PRINT
-        print_string(", type = B");
         #endif
     }
-
-    #ifdef DEBUG_PRINT
-    print_string("\n");
-    #endif
 
     return FOX_SUCCESS;
 }
@@ -179,6 +177,7 @@ enum FoxError receive_matrix(enum MatrixType matrixType) {
     while ((matrixType == A_type && aElementsReceived < MATRIX_ELEMENTS) || 
             (matrixType == B_type && bElementsReceived < MATRIX_ELEMENTS)) {
 
+        // Reset networkError before trying to receive each packet
         networkError = NETWORK_ERROR;
 
         receiveLoopsLevel1 = 0;
@@ -219,17 +218,9 @@ enum FoxError receive_matrix(enum MatrixType matrixType) {
     if (matrixType == A_type) {
 
         aElementsReceived = 0;
-
-        print_string("aElementsReceived = ");
-        print_hex(aElementsReceived, 3);
-        print_string("\n");
     } else if (matrixType == B_type) {
 
         bElementsReceived = 0;
-
-        print_string("bElementsReceived = ");
-        print_hex(bElementsReceived, 3);
-        print_string("\n");
     }
 
     return FOX_SUCCESS;
