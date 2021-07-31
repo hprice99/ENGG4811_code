@@ -34,7 +34,7 @@ use IEEE.NUMERIC_STD.ALL;
 library xil_defaultlib;
 use xil_defaultlib.math_functions.all;
 
-entity node is
+entity fox_node is
     Generic (
         -- Entire network parameters
         NETWORK_ROWS    : integer := 2;
@@ -104,9 +104,9 @@ entity node is
         out_matrix_end_row  : out std_logic;
         out_matrix_end      : out std_logic
     );
-end node;
+end fox_node;
 
-architecture Behavioral of node is
+architecture Behavioral of fox_node is
 
     component hoplite_router
         generic (

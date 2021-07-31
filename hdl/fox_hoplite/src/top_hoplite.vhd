@@ -57,7 +57,7 @@ end top;
 
 architecture Behavioral of top is
 
-    component node
+    component fox_node
         generic (
             -- Entire network parameters
             NETWORK_ROWS    : integer := 2;
@@ -127,7 +127,7 @@ architecture Behavioral of top is
             out_matrix_end_row  : out std_logic;
             out_matrix_end      : out std_logic
         );
-    end component node;
+    end component fox_node;
 
     -- Result node parameters
     -- TODO Implement result node
@@ -170,7 +170,7 @@ begin
         
             -- Instantiate node
             -- TODO Instantiate result node
-            FOX_NODE: node
+            FOX_NODE_INITIALISE: fox_node
                 generic map (
                     -- Entire network parameters
                     NETWORK_ROWS    => NETWORK_ROWS,
