@@ -1,268 +1,209 @@
-#define CHAR_OUTPUT (*(volatile char*)0x10000000)
-#define LED (*(volatile char*)0x20000000)
-#define SWITCH (*(volatile char*)0x30000000)
+#include "io.h"
+#include "matrix_config.h"
+#include "print.h"
+#include "network.h"
 
-#define MATRIX_ROW_END (*(volatile char*)0x50000000)
-#define MATRIX_END (*(volatile char*)0x60000000)
-#define MATRIX_POSITION (*(volatile char*)0x70000000)
-#define MATRIX_OUTPUT (*(volatile long*)0x80000000)
+#include <stdbool.h>
 
-#define LOOP_COUNTER 1000000000
+#include "matrix.h"
+#include "fox.h"
 
-#define MATRIX_SIZE 5
+#define LOOP_DELAY      40000000
 
-#define MAX_ENTRY 10
+int my_x_coord;
+int my_y_coord;
+int my_node_number;
 
-// https://man7.org/linux/man-pages/man3/rand.3.html
-static unsigned long next = 1;
+#ifdef CHECK_C
+#define RESULT_FLASH    10000000
 
-/* RAND_MAX assumed to be 32767 */
-int myrand(void) {
-    next = next * 1103515245 + 12345;
-    return((unsigned)(next/65536) % MAX_ENTRY);
-}
+// Expected results
+long expected_C[][MATRIX_SIZE * MATRIX_SIZE] = {
+    {20}, 
+    {26}, 
+    {44}, 
+    {58}
+};
+#endif
 
-void mysrand(unsigned int seed) {
-    next = seed;
-}
-
-void print_char(char c)
-{
-    CHAR_OUTPUT = c;
-}
-
-void print_string(const char *s)
-{
-	while (*s) print_char(*s++);
-}
-
-void *memcpy(void *dest, const void *src, int n)
-{
-	while (n) {
-		n--;
-		((char*)dest)[n] = ((char*)src)[n];
-	}
-	return dest;
-}
-
-/* reverse:  reverse string s in place */
-void reverse(char* s, int length)
-{
-    int i, j;
-    char c;
-
-    // Reverse the string
-    for (i = 0, j = length - 1; i < j; i++, j--) {
-        c = s[i];
-        s[i] = s[j];
-        s[j] = c;
-    }
-}
-
-/* itoa:  convert n to characters in s */
-void itoa(int n, char s[]) {
-    int i, sign;
-
-    print_string("Sign ");
-
-    if ((sign = n) < 0) { /* record sign */
-        n = -n;          /* make n positive */
-    }
-
-    i = 0;
-
-    print_string("Digits ");
-
-    do {       /* generate digits in reverse order */
-        s[i++] = n % 10 + '0';   /* get next digit */
-    } while ((n /= 10) > 0);     /* delete it */
-
-    if (sign < 0) {
-        s[i++] = '-';
-    }
-
-    s[i] = '\0';
-
-    print_string("Reverse ");
-    reverse(s, i);
-}
-
-void print_matrix(long* matrix, int rows, int cols) {
-
-    char digit[7];
-
-    for (int row = 0; row < rows; row++) {
-        for (int col = 0; col < cols; col++) {
-            print_string("itoa ");
-            itoa(*((matrix + row * rows) + col), digit);
-
-            print_string("Print ");
-            print_string(digit);
-        }
-        print_string(" ; \n");
-    }
-}
-
-void output_digit(long digit) {
-
-    MATRIX_OUTPUT = digit;
-}
-
-void output_matrix(char* label, long* matrix, int rows, int cols) {
+void tb_output_matrix(char* label, long* matrix, int rows, int cols) {
 
     print_string(label);
-    print_string(" = [ \n");
+    print_string(" = ");
 
     for (long row = 0; row < rows; row++) {
+        MATRIX_END_ROW_OUTPUT = 1;
         for (long col = 0; col < cols; col++) {
+
+            if (row == 0 && col == 0) {
+                print_string("[");
+            }
             
             output_digit(*((matrix + row * rows) + col));
         }
-        MATRIX_ROW_END = 1;
     }
 
-    MATRIX_END = 1;
+    MATRIX_END_OUTPUT = 1;
 
-    print_string("] \n\n");
+    print_string("] \n");
 }
 
-void multiply_matrices(void) {
-    // Create matrices
-    long A[MATRIX_SIZE][MATRIX_SIZE];
-    long B[MATRIX_SIZE][MATRIX_SIZE];
-    long C[MATRIX_SIZE][MATRIX_SIZE];
+void create_my_A(void) {
 
-    // Create random matrices
-    /*
-    for (int row = 0; row < MATRIX_SIZE; row++) {
-        for (int col = 0; col < MATRIX_SIZE; col++) {
-            A[row][col] = myrand();
-            B[row][col] = myrand();
-            C[row][col] = 0;
+    for (long x = 0; x < MATRIX_SIZE; x++) {
+        for (long y = 0; y < MATRIX_SIZE; y++) {
+
+            int index = COORDINATE_TO_INDEX(x, y);
+
+            // my_A[index] = my_node_number + 1;
+            my_A[index] = my_node_number + x + y + 1;
         }
     }
-    */
 
-    // Create fixed matrices
-    for (int row = 0; row < MATRIX_SIZE; row++) {
-        for (int col = 0; col < MATRIX_SIZE; col++) {
-            A[row][col] = row + 1;
-            B[row][col] = col + 1;
-            C[row][col] = 0;
+    tb_output_matrix("A", my_A, MATRIX_SIZE, MATRIX_SIZE);
+    print_string("\n");
+}
+
+void create_initial_stage_B(void) {
+
+    for (long x = 0; x < MATRIX_SIZE; x++) {
+        for (long y = 0; y < MATRIX_SIZE; y++) {
+
+            int index = COORDINATE_TO_INDEX(x, y);
+
+            // stage_B[index] = 2 * my_node_number + 4;
+            stage_B[index] = 2 * my_node_number + x + y + 4;
         }
-
-        MATRIX_POSITION = row;
-
-        // print_string("Row done ");
-
-        /*
-        char message[200];
-        itoa(row, message);
-        print_string(message);
-        */
-
-        // print_string("\n");
     }
-    MATRIX_END = 1;
 
-    // Print A and B
-    /*
-    print_string("A = ");
-    print_matrix((int*)A, MATRIX_SIZE, MATRIX_SIZE);
+    tb_output_matrix("B", stage_B, MATRIX_SIZE, MATRIX_SIZE);
+    print_string("\n");
+}
 
-    print_string("B = ");
-    print_matrix((int*)B, MATRIX_SIZE, MATRIX_SIZE);
-    */
+void initialise_C(void) {
 
-    // print_string("A and B created\n");
+    for (long x = 0; x < MATRIX_SIZE; x++) {
+        for (long y = 0; y < MATRIX_SIZE; y++) {
 
-    output_matrix("A", (long*)A, MATRIX_SIZE, MATRIX_SIZE);
-    output_matrix("B", (long*)B, MATRIX_SIZE, MATRIX_SIZE);
+            int index = COORDINATE_TO_INDEX(x, y);
 
-    for (int i = 0; i < MATRIX_SIZE; i++) {
-        for (int j = 0; j < MATRIX_SIZE; j++) {
-            for (int k = 0; k < MATRIX_SIZE; k++) {
-                C[i][j] = C[i][j] + A[i][k] * B[k][j];
+            result_C[index] = 0;
+        }
+    }
+}
+
+#ifdef CHECK_C
+bool check_C(void) {
+
+    for (long x = 0; x < MATRIX_SIZE; x++) {
+        for (long y = 0; y < MATRIX_SIZE; y++) {
+
+            int index = COORDINATE_TO_INDEX(x, y);
+
+            if (expected_C[my_node_number][index] != result_C[index]) {
+
+                return false;
             }
         }
-
-        MATRIX_POSITION = i;
     }
 
-    /*
-    print_string("C = ");
-    print_matrix((int*)C, MATRIX_SIZE, MATRIX_SIZE);
-    */
+    long loopCount = 0;
+    int resultFlashes = 0;
 
-    output_matrix("C = A*B", (long*)C, MATRIX_SIZE, MATRIX_SIZE);
-}
-
-void main()
-{
     int ledValue = 0;
+    LED_OUTPUT = ledValue;
 
-    int switchValue = 0;
+    // Flash LEDs quickly to show result
+    while (resultFlashes < 100) {
 
-    int i = 0;
+        if (loopCount > RESULT_FLASH) {
 
-    LED = ledValue;
+            loopCount = 0;
+            ledValue = 1 - ledValue;
 
-    print_string("ENGG4811 PicoRV32 test\n");
-
-	char message[] = "$Uryyb+Jbeyq!+Vs+lbh+pna+ernq+guvf+zrffntr+gura$gur+CvpbEI32+PCH"
-			"+frrzf+gb+or+jbexvat+whfg+svar.$$++++++++++++++++GRFG+CNFFRQ!$$";
-	for (int i = 0; message[i]; i++)
-		switch (message[i])
-		{
-		case 'a' ... 'm':
-		case 'A' ... 'M':
-			message[i] += 13;
-			break;
-		case 'n' ... 'z':
-		case 'N' ... 'Z':
-			message[i] -= 13;
-			break;
-		case '$':
-			message[i] = '\n';
-			break;
-		case '+':
-			message[i] = ' ';
-			break;
-		}
-	print_string(message);
-
-    multiply_matrices();
-
-    while (1) {
-
-        LED = ledValue;
-
-        if (ledValue) {
-            print_string("LED on\n");
-        } else {
-            print_string("LED off\n");
+            LED_OUTPUT = ledValue;
         }
 
-        /*
-        while (i < LOOP_COUNTER) {
+        loopCount++;
 
-            i++;
-        }
+        resultFlashes++;
+    }
+
+    return true;
+}
+#endif
+
+void main() {
+
+    // Read node coordinates from hardware and print
+    my_x_coord = X_COORD_INPUT;
+    my_y_coord = Y_COORD_INPUT;
+    my_node_number = NODE_NUMBER_INPUT;
+    xOffset = MATRIX_X_OFFSET_INPUT;
+    yOffset = MATRIX_Y_OFFSET_INPUT;
+
+    print_string("Node coordinates (");
+    print_hex(my_x_coord, 1);
+    print_string(", ");
+    print_hex(my_y_coord, 1);
+    print_string("), node number = ");
+    print_hex(my_node_number, 1);
+
+    foxStages = FOX_NETWORK_STAGES_INPUT;
+    print_string(", Fox stages = ");
+    print_hex(foxStages, 1);
+    print_string(", xOffset = ");
+    print_hex(xOffset, 3);
+    print_string(", yOffset = ");
+    print_hex(yOffset, 3);
+
+    print_string(", matrix size = ");
+    print_hex(MATRIX_SIZE, 1);
+    print_string(", matrix elements = ");
+    print_hex(MATRIX_ELEMENTS, 1);
+    print_string("\n\n");
+
+    int ledValue = 1;
+    long loopCount = 0;
+
+    create_my_A();
+    create_initial_stage_B();
+    initialise_C();
+
+    fox_algorithm(my_x_coord, my_y_coord);
+
+    // TODO Implement alternate result print
+    tb_output_matrix("Matrix multiplication complete. C", result_C, 
+            MATRIX_SIZE, MATRIX_SIZE);
+
+    #ifdef CHECK_C
+    bool cCorrect = check_C();
+    if (cCorrect) {
+
+        print_string("C correct\n");
+    } else {
+
+        print_string("C incorrect\n");
+    }
+    #else
+    bool cCorrect = true;
+    #endif
+
+    LED_OUTPUT = ledValue;
+
+    if (cCorrect) {
         
-        i = 0;
-        */
+        while (1) {
 
-        switchValue = SWITCH;
+            if (loopCount > LOOP_DELAY) {
 
-        if (switchValue) {
-            print_string("Switch on\n");
-            // ledValue = 1 - ledValue;
+                loopCount = 0;
+                ledValue = 1 - ledValue;
 
-            ledValue = 1;
-        } else {
-            print_string("Switch off\n");
+                LED_OUTPUT = ledValue;
+            }
 
-            ledValue = 0;
+            loopCount++;
         }
     }
 }

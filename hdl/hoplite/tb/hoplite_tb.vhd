@@ -608,7 +608,7 @@ begin
             if (reset_n = '1' 
                     and row_broadcasts_received = expected_row_broadcasts_received
                     and column_messages_received = expected_column_messages_received) then
-                write(my_line, string'(CR & LF & "All expected messages received"));    
+                write(my_line, string'(CR & LF & "SUCCESS - All expected messages received"));    
                 writeline(output, my_line);
                 
                 stop;      

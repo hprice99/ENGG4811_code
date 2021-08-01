@@ -15,6 +15,17 @@ build_single_core:
 build_riscv_hoplite_test:
 	cd $(RISCV_HOPLITE_TEST_DIR) && $(MAKE) all
 
+debug: build_single_core_debug build_hoplite_debug build_riscv_hoplite_test_debug
+
+build_hoplite_debug:
+	cd $(HOPLITE_DIR) && $(MAKE) debug
+
+build_single_core_debug:
+	cd $(SINGLE_CORE_DIR) && $(MAKE) debug
+
+build_riscv_hoplite_test_debug:
+	cd $(RISCV_HOPLITE_TEST_DIR) && $(MAKE) debug
+
 clean: clean_single_core clean_hoplite clean_riscv_hoplite_test
 
 clean_single_core:

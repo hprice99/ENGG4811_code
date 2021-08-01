@@ -5,7 +5,8 @@ use ieee.numeric_std.all;
 entity nic_dual is
     generic (
         BUS_WIDTH   : integer := 32;
-        FIFO_DEPTH  : integer := 64
+        FIFO_DEPTH  : integer := 64;
+        INIT_FILE   : string  := "none"
     );
     port (
         clk                 : in std_logic;

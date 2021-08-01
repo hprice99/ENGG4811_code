@@ -1,4 +1,5 @@
 #include "io.h"
+#include "matrix_config.h"
 #include "print.h"
 #include "matrix.h"
 
@@ -6,21 +7,59 @@
 
 #define MAX_ENTRY 10
 
-// https://man7.org/linux/man-pages/man3/rand.3.html
-static unsigned long next = 1;
+long A[MATRIX_SIZE * MATRIX_SIZE];
+long B[MATRIX_SIZE * MATRIX_SIZE];
+long C[MATRIX_SIZE * MATRIX_SIZE];
 
-/* RAND_MAX assumed to be 32767 */
-int myrand(void) {
-    next = next * 1103515245 + 12345;
-    return((unsigned)(next/65536) % MAX_ENTRY);
+void createA(void) {
+
+    for (long row = 0; row < MATRIX_SIZE; row++) {
+        for (long col = 0; col < MATRIX_SIZE; col++) {
+
+            int index = row * MATRIX_SIZE + col;
+
+            if (row < 50) {
+                A[index] = row + 1;
+            } else {
+                A[index] = row - 50;
+            }
+        }
+    }
+
+    output_matrix("A", (long*)A, MATRIX_SIZE, MATRIX_SIZE);
 }
 
-void mysrand(unsigned int seed) {
-    next = seed;
+void createB(void) {
+
+    for (long row = 0; row < MATRIX_SIZE; row++) {
+        for (long col = 0; col < MATRIX_SIZE; col++) {
+
+            int index = row * MATRIX_SIZE + col;
+
+            if (col < 50) {
+                B[index] = col + 1;
+            } else {
+                B[index] = col - 50;
+            }
+        }
+    }
+
+    output_matrix("B", (long*)B, MATRIX_SIZE, MATRIX_SIZE);
 }
 
-void main()
-{
+void createC(void) {
+
+    for (long row = 0; row < MATRIX_SIZE; row++) {
+        for (long col = 0; col < MATRIX_SIZE; col++) {
+
+            int index = row * MATRIX_SIZE + col;
+
+            C[index] = 0;
+        }
+    }
+}
+
+void main(void) {
     int ledValue = 0;
 
     int switchValue = 0;
@@ -29,8 +68,13 @@ void main()
 
     LED = ledValue;
 
-    multiply_matrices();
+    createA();
+    createB();
+    createC();
 
+    multiply_matrices(A, B, C);
+
+    output_matrix("C = A*B", (long*)C, MATRIX_SIZE, MATRIX_SIZE);
     print_string("Matrix multiplication completed\n");
 
     while (1) {
