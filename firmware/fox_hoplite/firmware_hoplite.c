@@ -142,6 +142,9 @@ void main() {
     xOffset = MATRIX_X_OFFSET_INPUT;
     yOffset = MATRIX_Y_OFFSET_INPUT;
 
+    resultXCoord = RESULT_X_COORD_INPUT;
+    resultYCoord = RESULT_Y_COORD_INPUT;
+
     print_string("Node coordinates (");
     print_hex(my_x_coord, 1);
     print_string(", ");
@@ -161,7 +164,15 @@ void main() {
     print_hex(MATRIX_SIZE, 1);
     print_string(", matrix elements = ");
     print_hex(MATRIX_ELEMENTS, 1);
+    print_string(", resultXCoord = ");
+    print_hex(resultXCoord, 1);
+    print_string(", resultYCoord = ");
+    print_hex(resultYCoord, 1);
     print_string("\n\n");
+
+    #ifdef RESULT
+    print_string("Result node\n\n");
+    #endif
 
     int ledValue = 1;
     long loopCount = 0;

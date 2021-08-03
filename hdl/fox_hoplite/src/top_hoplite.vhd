@@ -140,11 +140,15 @@ architecture Behavioral of top is
     signal x_messages_in, y_messages_in : t_Message;
     signal x_messages_in_valid, y_messages_in_valid : t_MessageValid;
 
-    constant DIVIDE_ENABLED     : std_logic := '0';
-    constant MULTIPLY_ENABLED   : std_logic := '1';
-    constant FOX_FIRMWARE       : string := "firmware_hoplite.hex";
+    constant FOX_DIVIDE_ENABLED     : std_logic := '0';
+    constant RESULT_DIVIDE_ENABLED  : std_logic := '1';
+    constant MULTIPLY_ENABLED       : std_logic := '1';
+    
+    constant FOX_FIRMWARE           : string := "firmware_hoplite.hex";
+    constant RESULT_FIRMWARE        : string := "firmware_hoplite_result.hex";
 
-    constant MEM_SIZE           : integer := 4096;
+    constant FOX_MEM_SIZE           : integer := 4096;
+    constant RESULT_MEM_SIZE        : integer := 8192;
 
 begin
 
@@ -169,8 +173,8 @@ begin
             y_messages_in_valid(curr_x, curr_y) <= y_messages_out_valid(curr_x, next_y);
         
             -- Instantiate node
-            -- TODO Instantiate result node
-            FOX_NODE_INITIALISE: fox_node
+            RESULT_GEN: if (curr_x = RESULT_X_COORD and curr_y = RESULT_Y_COORD) generate
+                RESULT_NODE_INITIALISE: fox_node
                 generic map (
                     -- Entire network parameters
                     NETWORK_ROWS    => NETWORK_ROWS,
@@ -209,13 +213,89 @@ begin
                     MATRIX_Y_OFFSET => y_offset,
 
                     -- NIC parameters
-                    FIFO_DEPTH      => FIFO_DEPTH,
+                    FIFO_DEPTH      => RESULT_FIFO_DEPTH,
                     
                     -- PicoRV32 core parameters
-                    DIVIDE_ENABLED     => DIVIDE_ENABLED,
+                    DIVIDE_ENABLED     => RESULT_DIVIDE_ENABLED,
+                    MULTIPLY_ENABLED   => MULTIPLY_ENABLED,
+                    FIRMWARE           => RESULT_FIRMWARE,
+                    MEM_SIZE           => RESULT_MEM_SIZE
+                )
+                port map (
+                    clk                 => clk,
+                    reset_n             => reset_n,
+                    
+                    LED                 => LED(node_number),
+
+                    out_char            => out_char(curr_x, curr_y),
+                    out_char_en         => out_char_en(curr_x, curr_y),
+                    
+                    -- Messages incoming to router
+                    x_in                => x_messages_in(curr_x, curr_y),
+                    x_in_valid          => x_messages_in_valid(curr_x, curr_y),                  
+                    y_in                => y_messages_in(curr_x, curr_y),
+                    y_in_valid          => y_messages_in_valid(curr_x, curr_y),
+                    
+                    -- Messages outgoing from router
+                    x_out               => x_messages_out(curr_x, curr_y),
+                    x_out_valid         => x_messages_out_valid(curr_x, curr_y),
+                    y_out               => y_messages_out(curr_x, curr_y),
+                    y_out_valid         => y_messages_out_valid(curr_x, curr_y),
+
+                    out_matrix          => out_matrix(curr_x, curr_y),
+                    out_matrix_en       => out_matrix_en(curr_x, curr_y),
+                    out_matrix_end_row  => out_matrix_end_row(curr_x, curr_y),
+                    out_matrix_end      => out_matrix_end(curr_x, curr_y)
+                );           
+            end generate RESULT_GEN;
+            
+            FOX_GEN: if (curr_x /= RESULT_X_COORD or curr_y /= RESULT_Y_COORD) generate
+                FOX_NODE_INITIALISE: fox_node
+                generic map (
+                    -- Entire network parameters
+                    NETWORK_ROWS    => NETWORK_ROWS,
+                    NETWORK_COLS    => NETWORK_COLS,
+                    NETWORK_NODES   => NETWORK_NODES,
+
+                    -- Fox's algorithm network paramters
+                    FOX_NETWORK_STAGES  => FOX_NETWORK_STAGES,
+                    FOX_NETWORK_NODES   => FOX_NETWORK_NODES,
+
+                    -- Result node parameters
+                    RESULT_X_COORD  => RESULT_X_COORD,
+                    RESULT_Y_COORD  => RESULT_Y_COORD,
+                
+                    -- Node parameters
+                    X_COORD         => curr_x,
+                    Y_COORD         => curr_y,
+                    NODE_NUMBER     => node_number,
+
+                    -- Packet parameters
+                    COORD_BITS              => COORD_BITS,
+                    MULTICAST_GROUP_BITS    => MULTICAST_GROUP_BITS,
+                    MATRIX_TYPE_BITS        => MATRIX_TYPE_BITS,
+                    MATRIX_COORD_BITS       => MATRIX_COORD_BITS, 
+                    MATRIX_ELEMENT_BITS     => MATRIX_ELEMENT_BITS,
+                    BUS_WIDTH               => BUS_WIDTH,
+
+                    -- Matrix parameters
+                    TOTAL_MATRIX_SIZE       => TOTAL_MATRIX_SIZE,
+                    FOX_MATRIX_SIZE         => FOX_MATRIX_SIZE,
+                    -- TODO Implement matrix initialisation files for each node
+                    MATRIX_FILE     => "none",
+                    
+                    -- Matrix offset for node
+                    MATRIX_X_OFFSET => x_offset,
+                    MATRIX_Y_OFFSET => y_offset,
+
+                    -- NIC parameters
+                    FIFO_DEPTH      => FOX_FIFO_DEPTH,
+                    
+                    -- PicoRV32 core parameters
+                    DIVIDE_ENABLED     => FOX_DIVIDE_ENABLED,
                     MULTIPLY_ENABLED   => MULTIPLY_ENABLED,
                     FIRMWARE           => FOX_FIRMWARE,
-                    MEM_SIZE           => MEM_SIZE
+                    MEM_SIZE           => FOX_MEM_SIZE
                 )
                 port map (
                     clk                 => clk,
@@ -243,6 +323,7 @@ begin
                     out_matrix_end_row  => out_matrix_end_row(curr_x, curr_y),
                     out_matrix_end      => out_matrix_end(curr_x, curr_y)
                 );
+            end generate FOX_GEN;
         end generate NETWORK_COL_GEN;
     end generate NETWORK_ROW_GEN;
 

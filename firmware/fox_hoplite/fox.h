@@ -10,6 +10,9 @@ extern int foxStages;
 extern int xOffset;
 extern int yOffset;
 
+extern int resultXCoord;
+extern int resultYCoord;
+
 extern long my_A[MATRIX_SIZE * MATRIX_SIZE];
 
 extern long stage_A[MATRIX_SIZE * MATRIX_SIZE];

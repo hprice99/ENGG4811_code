@@ -14,7 +14,8 @@ package fox_defs is
     
     -- Matrix parameters
     -- Matrix has dimensions (TOTAL_MATRIX_SIZE * TOTAL_MATRIX_SIZE)
-    constant TOTAL_MATRIX_SIZE  : integer := 4;
+    constant TOTAL_MATRIX_SIZE      : integer := 4;
+    constant TOTAL_MATRIX_ELEMENTS  : integer := (TOTAL_MATRIX_SIZE ** 2);
     
     -- Fox's algorithm network paramters
     constant FOX_NETWORK_STAGES  : integer := 2;
@@ -37,7 +38,8 @@ package fox_defs is
             MATRIX_ELEMENT_BITS;
             
     -- NIC parameters
-    constant FIFO_DEPTH : integer := 2 * FOX_MATRIX_ELEMENTS;
+    constant FOX_FIFO_DEPTH     : integer := 2 * FOX_MATRIX_ELEMENTS;
+    constant RESULT_FIFO_DEPTH  : integer := TOTAL_MATRIX_ELEMENTS;
 
     constant X_INDEX    : integer := 0;
     constant Y_INDEX    : integer := 1;

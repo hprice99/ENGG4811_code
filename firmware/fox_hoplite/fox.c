@@ -5,6 +5,9 @@ int foxStages;
 int xOffset;
 int yOffset;
 
+int resultXCoord;
+int resultYCoord;
+
 long my_A[MATRIX_SIZE * MATRIX_SIZE];
 
 long stage_A[MATRIX_SIZE * MATRIX_SIZE];
