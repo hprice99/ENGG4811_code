@@ -37,6 +37,7 @@ void output_matrix(char* label, long* matrix, int rows, int cols) {
     print_string("] \n\n");
 }
 
+// TODO Make matrix_size a parameter
 void multiply_matrices(long* A, long* B, long* C) {
 
     for (long i = 0; i < MATRIX_SIZE; i++) {

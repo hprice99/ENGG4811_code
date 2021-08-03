@@ -15,6 +15,11 @@ long stage_B[MATRIX_SIZE * MATRIX_SIZE];
 
 long result_C[MATRIX_SIZE * MATRIX_SIZE];
 
+#ifdef RESULT
+long total_C[TOTAL_MATRIX_SIZE * TOTAL_MATRIX_SIZE];
+int cElementsReceived;
+#endif
+
 int aElementsReceived;
 int bElementsReceived;
 
@@ -46,6 +51,12 @@ enum FoxError send_A(int my_x_coord, int my_y_coord, int fox_rows) {
 
             // Loop through each destination and send
             for (int destX = 0; destX < fox_rows; destX++) {
+
+                // Don't send to itself
+                if (destX == my_x_coord) {
+
+                    continue;
+                }
 
                 packet.destX = destX;
 
@@ -120,6 +131,51 @@ enum FoxError send_B(int my_x_coord, int my_y_coord, int fox_cols) {
     return FOX_SUCCESS;
 }
 
+enum FoxError send_C(int my_x_coord, int my_y_coord) {
+
+    enum NetworkError networkError = NETWORK_ERROR;
+
+    struct MatrixPacket packet;
+
+    packet.doneFlag = false;
+    packet.resultFlag = true;
+    packet.matrixType = A_type;
+    packet.multicastGroup = 0;
+    packet.destX = resultXCoord;
+    packet.destY = resultYCoord;
+
+    // Loop through matrix elements
+    for (long x = 0; x < MATRIX_SIZE; x++) {
+        for (long y = 0; y < MATRIX_SIZE; y++) {
+
+            int index = COORDINATE_TO_INDEX(x, y);
+
+            packet.matrixX = x + xOffset;
+            packet.matrixY = y + yOffset;
+            packet.matrixElement = result_C[index];
+
+            #ifdef DEBUG_PRINT
+            print_char('s');
+            #endif
+
+            networkError = send_message(packet);
+
+            #ifdef DEBUG_PRINT
+            print_matrix_packet("end_C", packet);
+            #endif
+
+            if (networkError == NETWORK_ERROR) {
+
+                print_string("send_C network error\n");
+
+                return FOX_NETWORK_ERROR;
+            }
+        }
+    }
+
+    return FOX_SUCCESS;
+}
+
 enum FoxError assign_element(struct MatrixPacket packet) {
 
     // int index = packet.matrixY * MATRIX_SIZE + packet.matrixX;
@@ -167,6 +223,33 @@ enum FoxError assign_element(struct MatrixPacket packet) {
     }
 
     return FOX_SUCCESS;
+}
+
+enum FoxError assign_my_A(void) {
+
+    struct MatrixPacket packet;
+
+    packet.doneFlag = false;
+    packet.resultFlag = false;
+    packet.matrixType = A_type;
+    packet.multicastGroup = 1;
+
+    // Loop through matrix elements
+    for (long x = 0; x < MATRIX_SIZE; x++) {
+        for (long y = 0; y < MATRIX_SIZE; y++) {
+
+            int index = COORDINATE_TO_INDEX(x, y);
+
+            packet.matrixX = x;
+            packet.matrixY = y;
+            packet.matrixElement = my_A[index];
+
+            assign_element(packet);
+        }
+    }
+
+    // Reset the number of A elements received so that the next stage works
+    aElementsReceived = 0;
 }
 
 enum FoxError receive_matrix(enum MatrixType matrixType) {
@@ -229,6 +312,128 @@ enum FoxError receive_matrix(enum MatrixType matrixType) {
     return FOX_SUCCESS;
 }
 
+#ifdef RESULT
+enum FoxError assign_my_C(void) {
+
+    print_string("assign_my_c\n");
+
+    struct MatrixPacket packet;
+
+    packet.doneFlag = false;
+    packet.resultFlag = true;
+    packet.matrixType = A_type;
+    packet.multicastGroup = 0;
+
+    // Loop through matrix elements
+    for (long x = 0; x < MATRIX_SIZE; x++) {
+        for (long y = 0; y < MATRIX_SIZE; y++) {
+
+            int cX = x + xOffset;
+            int cY = y + yOffset;
+
+            int index = COORDINATE_TO_INDEX(cX, cY);
+
+            packet.matrixX = cX;
+            packet.matrixY = cY;
+            packet.matrixElement = result_C[index];
+
+            assign_result(packet);
+        }
+    }
+}
+
+enum FoxError receive_result(void) {
+
+    enum NetworkError networkError;
+    struct MatrixPacket packet;
+
+    long receiveLoopsLevel1 = 0;
+    long receiveLoopsLevel2 = 0;
+
+    while (cElementsReceived < TOTAL_MATRIX_ELEMENTS) {
+
+        // Reset networkError before trying to receive each packet
+        networkError = NETWORK_ERROR;
+
+        receiveLoopsLevel1 = 0;
+        receiveLoopsLevel2 = 0;
+
+        while (receiveLoopsLevel1 < FOX_NETWORK_WAIT && 
+                networkError != NETWORK_SUCCESS) {
+            
+            while (receiveLoopsLevel2 < FOX_NETWORK_WAIT && 
+                    networkError != NETWORK_SUCCESS) {
+
+                networkError = receive_message(&packet);
+                receiveLoopsLevel2++;
+            }
+
+            receiveLoopsLevel2 = 0;
+
+            receiveLoopsLevel1++;
+        }
+        receiveLoopsLevel1 = 0;
+
+        #ifdef DEBUG_PRINT
+        print_matrix_packet("receive_matrix", packet);
+        #endif
+
+        if (networkError == NETWORK_ERROR || 
+                networkError == NETWORK_MESSAGE_IN_UNAVAILABLE) {
+
+            print_string("receive_matrix network timeout error\n");
+
+            return FOX_NETWORK_TIMEOUT_ERROR;
+        }
+
+        assign_result(packet);
+    }
+
+    return FOX_SUCCESS;
+}
+
+enum FoxError assign_result(struct MatrixPacket packet) {
+
+    // int index = packet.matrixY * MATRIX_SIZE + packet.matrixX;
+    int index = COORDINATE_TO_INDEX(packet.matrixX, packet.matrixY);
+
+    if (packet.resultFlag != 1) {
+
+        print_string("Did not receive C matrix\n");
+        return FOX_ASSIGNMENT_ERROR;
+    }
+
+    #ifdef DEBUG_PRINT
+    print_matrix_packet("assign_result", packet);
+
+    print_string("assign_result");
+    print_string(", x = ");
+    print_hex(packet.matrixX, 1);
+    print_string(", y = ");
+    print_hex(packet.matrixY, 1);
+
+    print_string(", assign_result index = ");
+    print_hex(index, 1);
+    print_string(", element = ");
+    print_hex(packet.matrixElement, 3);
+    #endif
+
+    total_C[index] = packet.matrixElement;
+    cElementsReceived++;
+
+    #ifdef DEBUG_PRINT
+    print_string(", type = C");
+    print_string("\n");
+
+    print_string("cElementsReceived = ");
+    print_dec(cElementsReceived);
+    print_string("\n");
+    #endif
+
+    return FOX_SUCCESS;
+}
+#endif
+
 bool is_broadcast_stage(int my_x_coord, int my_y_coord, int stage) {
 
     int broadcastXCoord = stage + my_y_coord;
@@ -246,6 +451,10 @@ enum FoxError fox_algorithm(int my_x_coord, int my_y_coord) {
 
     aElementsReceived = 0;
     bElementsReceived = 0;
+    
+    #ifdef RESULT
+    cElementsReceived = 0;
+    #endif
 
     for (int stage = 0; stage < foxStages; stage++) {
 
@@ -253,9 +462,13 @@ enum FoxError fox_algorithm(int my_x_coord, int my_y_coord) {
         if (is_broadcast_stage(my_x_coord, my_y_coord, stage)) {
 
             send_A(my_x_coord, my_y_coord, foxStages);
-        }
 
-        receive_matrix(A_type);
+            // Assign my_A
+            assign_my_A();
+        } else {
+
+            receive_matrix(A_type);
+        }
 
         // Multiply matrices
         multiply_matrices(stage_A, stage_B, result_C);
@@ -270,4 +483,13 @@ enum FoxError fox_algorithm(int my_x_coord, int my_y_coord) {
             receive_matrix(B_type);
         }
     }
+
+    /*
+    #ifdef RESULT
+    assign_my_C();
+    receive_result();
+    #else
+    send_C(my_x_coord, my_y_coord);
+    #endif
+    */
 }

@@ -55,8 +55,8 @@ void create_my_A(void) {
 
             int index = COORDINATE_TO_INDEX(x, y);
 
-            // my_A[index] = my_node_number + 1;
-            my_A[index] = my_node_number + x + y + 1;
+            my_A[index] = my_node_number + 1;
+            // my_A[index] = my_node_number + x + y + 1;
         }
     }
 
@@ -71,8 +71,9 @@ void create_initial_stage_B(void) {
 
             int index = COORDINATE_TO_INDEX(x, y);
 
+            stage_B[index] = my_node_number + 1;
             // stage_B[index] = 2 * my_node_number + 4;
-            stage_B[index] = 2 * my_node_number + x + y + 4;
+            // stage_B[index] = 2 * my_node_number + x + y + 4;
         }
     }
 
@@ -91,6 +92,32 @@ void initialise_C(void) {
         }
     }
 }
+
+#ifdef RESULT
+void print_C(void) {
+
+    print_string("C = [");
+    for (long x = 0; x < TOTAL_MATRIX_SIZE; x++) {
+        for (long y = 0; y < TOTAL_MATRIX_SIZE; y++) {
+
+            int index = COORDINATE_TO_INDEX(x, y);
+
+            print_dec(total_C[index]);
+
+            if (y < TOTAL_MATRIX_SIZE - 1) {
+                print_string(", ");
+            }
+        }
+
+        if (x < TOTAL_MATRIX_SIZE - 1) {
+
+            print_string(";\n \t");
+        }
+    }
+
+    print_string("]\n");
+}
+#endif
 
 #ifdef CHECK_C
 bool check_C(void) {
@@ -170,10 +197,6 @@ void main() {
     print_hex(resultYCoord, 1);
     print_string("\n\n");
 
-    #ifdef RESULT
-    print_string("Result node\n\n");
-    #endif
-
     int ledValue = 1;
     long loopCount = 0;
 
@@ -181,11 +204,25 @@ void main() {
     create_initial_stage_B();
     initialise_C();
 
+    #ifdef RESULT
+    print_string("Result node ");
+    print_dec(my_node_number);
+    print_string("\n\n");
+    #endif
+
     fox_algorithm(my_x_coord, my_y_coord);
 
     // TODO Implement alternate result print
     tb_output_matrix("Matrix multiplication complete. C", result_C, 
             MATRIX_SIZE, MATRIX_SIZE);
+
+    #ifdef RESULT
+    assign_my_C();
+    receive_result();
+    print_C();
+    #else
+    send_C(my_x_coord, my_y_coord);
+    #endif
 
     #ifdef CHECK_C
     bool cCorrect = check_C();
