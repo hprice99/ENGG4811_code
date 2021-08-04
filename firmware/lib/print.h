@@ -15,7 +15,7 @@ void print_string(const char *s);
 
 void *memcpy(void *dest, const void *src, int n);
 
-// void print_dec(unsigned long val);
+void print_dec(unsigned long val);
 
 void print_hex(unsigned long val, int digits);
 

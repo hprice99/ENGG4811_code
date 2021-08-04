@@ -21,8 +21,6 @@ void *memcpy(void *dest, const void *src, int n) {
     return dest;
 }
 
-// TODO Fix so that division is not required
-/*
 void print_dec(unsigned long val) {
 
     char buffer[10];
@@ -37,7 +35,6 @@ void print_dec(unsigned long val) {
         print_char('0' + *(--p));
     }
 }
-*/
 
 void print_hex(unsigned long val, int digits) {
     for (int i = (4*digits)-4; i >= 0; i -= 4) {

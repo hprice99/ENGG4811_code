@@ -120,15 +120,19 @@ begin
             out_matrix_end      => out_matrix_end
         );
 
-    -- Generate the network
-    PRINT_OUTPUT_ROW_GEN: for i in 0 to (NETWORK_ROWS-1) generate
-        PRINT_OUTPUT_COL_GEN: for j in 0 to (NETWORK_COLS-1) generate
+    -- Generate prints for Fox's algorithm processing elements
+    PRINT_OUTPUT_ROW_GEN: for i in 0 to (FOX_NETWORK_STAGES-1) generate
+        PRINT_OUTPUT_COL_GEN: for j in 0 to (FOX_NETWORK_STAGES-1) generate
             constant curr_y         : integer := i;
             constant curr_x         : integer := j;
-            constant node_number    : integer := i * NETWORK_ROWS + j;
+            constant node_number    : integer := i * FOX_NETWORK_STAGES + j;
         begin
             PRINT_OUTPUT: process (clk)
-                variable my_line : line;
+                variable my_output_line : line;
+                variable my_file_line   : line;
+                
+                constant my_file_name : string := "Node " & integer'image(node_number) & ".txt";
+                file WriteFile : TEXT open WRITE_MODE is my_file_name;
             begin
                 if (rising_edge(clk)) then
                     if (reset_n = '0') then
@@ -136,31 +140,45 @@ begin
                     else
                         if (out_char_en(curr_x, curr_y) = '1') then
                             if (character'val(to_integer(unsigned(out_char(curr_x, curr_y)))) = LF) then
-                                writeline(output, my_line);
+                                writeline(output, my_output_line);
+                                writeline(WriteFile, my_file_line);
+                                
                                 line_started(curr_x, curr_y)    <= '0';
                             else
                                 if (line_started(curr_x, curr_y) = '0') then
-                                    write(my_line, string'("Cycle count = "));
-                                    write(my_line, count);
-                                    write(my_line, string'(", "));
-                                    write(my_line, string'("Node number = "));
-                                    write(my_line, node_number);
-                                    write(my_line, string'(": "));
+                                    write(my_output_line, string'("Cycle count = "));
+                                    write(my_output_line, count);
+                                    write(my_output_line, string'(", "));
+                                    write(my_output_line, string'("Node number = "));
+                                    write(my_output_line, node_number);
+                                    write(my_output_line, string'(": "));
+                                    
+                                    write(my_file_line, string'("Cycle count = "));
+                                    write(my_file_line, count);
+                                    write(my_file_line, string'(", "));
+                                    write(my_file_line, string'("Node number = "));
+                                    write(my_file_line, node_number);
+                                    write(my_file_line, string'(": "));
                                 end if;
                                 
                                 line_started(curr_x, curr_y)    <= '1';
                                 
-                                write(my_line, character'val(to_integer(unsigned(out_char(curr_x, curr_y)))));
+                                write(my_output_line, character'val(to_integer(unsigned(out_char(curr_x, curr_y)))));
+                                write(my_file_line, character'val(to_integer(unsigned(out_char(curr_x, curr_y)))));
                             end if;
                         end if;
                         
                         if (out_matrix_en(curr_x, curr_y) = '1') then
-                            write(my_line, to_integer(unsigned(out_matrix(curr_x, curr_y))));
-                            write(my_line, string'(" "));
+                            write(my_output_line, to_integer(unsigned(out_matrix(curr_x, curr_y))));
+                            write(my_output_line, string'(" "));
+                            
+                            write(my_file_line, to_integer(unsigned(out_matrix(curr_x, curr_y))));
+                            write(my_file_line, string'(" "));
                         end if;
                         
                         if (out_matrix_end_row(curr_x, curr_y) = '1') then
-                            write(my_line, string'(" ," & LF));
+                            write(my_output_line, string'(" ," & LF));
+                            write(my_file_line, string'(" ," & LF));
                         end if;
                     end if;
                 end if;

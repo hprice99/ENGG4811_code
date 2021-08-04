@@ -27,7 +27,10 @@ void print_matrix_packet(char* caller, struct MatrixPacket packet) {
 
     print_string(" - matrix type = ");
 
-    if (packet.matrixType == A_type) {
+    if (packet.resultFlag) {
+        
+        print_string("C");
+    } else if (packet.matrixType == A_type) {
 
         print_string("A");
     } else if (packet.matrixType == B_type) {

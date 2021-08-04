@@ -46,7 +46,7 @@
 
 // Network details
 `define FOX_NETWORK_STAGES_INPUT    32'h8000_0000
-`define RESULT_X_COORD_INPUT        32'h8000_0020
-`define RESULT_Y_COORD_INPUT        32'h8000_0030
+`define RESULT_X_COORD_INPUT        32'h8000_0010
+`define RESULT_Y_COORD_INPUT        32'h8000_0020
 
 `endif

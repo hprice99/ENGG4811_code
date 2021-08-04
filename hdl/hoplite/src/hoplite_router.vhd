@@ -150,8 +150,11 @@ begin
     x_out <= x_q;
     y_out <= y_q;
 
-    NEXT_VALID: process (x_in_valid_d, y_in_valid_d, x_in_dest_d, y_in_dest_d)
-    begin
+     NEXT_VALID: process (x_in_valid_d, y_in_valid_d, x_in_dest_d, y_in_dest_d, pe_in_valid)
+     begin
+        x_next  <= '0';
+        y_next  <= '0';
+     
         if (x_in_valid_d = '1' and ((to_integer(unsigned(x_in_dest_d(X_INDEX))) /= X_COORD)
                 or (to_integer(unsigned(x_in_dest_d(Y_INDEX))) /= Y_COORD))) then
             x_next <= '1';
@@ -181,6 +184,40 @@ begin
             
         end if;
     end process NEXT_VALID;
+    
+--    NEXT_VALID: process (clk)
+--    begin
+--        if (rising_edge(clk) and reset_n = '1') then
+--            if (x_in_valid_d = '1' and ((to_integer(unsigned(x_in_dest_d(X_INDEX))) /= X_COORD)
+--                    or (to_integer(unsigned(x_in_dest_d(Y_INDEX))) /= Y_COORD))) then
+--                x_next <= '1';
+--            else
+--                x_next <= pe_in_valid;
+--            end if;
+            
+--            -- Switch y_out to act as pe_out
+--            if (x_in_valid_d = '1' and (to_integer(unsigned(x_in_dest_d(X_INDEX))) = X_COORD)
+--                    and (to_integer(unsigned(x_in_dest_d(Y_INDEX))) = Y_COORD)) then
+--                y_next <= '0';
+                
+--            elsif (y_in_valid_d = '1' and (to_integer(unsigned(y_in_dest_d(X_INDEX))) = X_COORD)
+--                    and (to_integer(unsigned(y_in_dest_d(Y_INDEX))) = Y_COORD)) then
+--                y_next <= '0';
+                
+--            elsif (y_in_valid_d = '1' and ((to_integer(unsigned(y_in_dest_d(X_INDEX))) /= X_COORD)
+--                    or (to_integer(unsigned(y_in_dest_d(Y_INDEX))) /= Y_COORD))) then
+--                y_next <= '1';
+                
+--            elsif (x_in_valid_d = '1' and ((to_integer(unsigned(x_in_dest_d(X_INDEX))) /= X_COORD)
+--                    or (to_integer(unsigned(x_in_dest_d(Y_INDEX))) /= Y_COORD))) then
+--                y_next <= '1';
+                
+--            else
+--                y_next <= pe_in_valid;
+                
+--            end if;
+--        end if;
+--    end process NEXT_VALID;
     
     -- Valid signal routing    
     OUTPUT_VALID_FF: process(clk)
