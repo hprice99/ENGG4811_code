@@ -14,18 +14,6 @@ int my_x_coord;
 int my_y_coord;
 int my_node_number;
 
-#ifdef CHECK_C
-#define RESULT_FLASH    10000000
-
-// Expected results
-long expected_C[][MATRIX_SIZE * MATRIX_SIZE] = {
-    {20}, 
-    {26}, 
-    {44}, 
-    {58}
-};
-#endif
-
 void tb_output_matrix(char* label, long* matrix, int rows, int cols) {
 
     print_string(label);
@@ -119,47 +107,6 @@ void print_C(void) {
 }
 #endif
 
-#ifdef CHECK_C
-bool check_C(void) {
-
-    for (long x = 0; x < MATRIX_SIZE; x++) {
-        for (long y = 0; y < MATRIX_SIZE; y++) {
-
-            int index = COORDINATE_TO_INDEX(x, y);
-
-            if (expected_C[my_node_number][index] != result_C[index]) {
-
-                return false;
-            }
-        }
-    }
-
-    long loopCount = 0;
-    int resultFlashes = 0;
-
-    int ledValue = 0;
-    LED_OUTPUT = ledValue;
-
-    // Flash LEDs quickly to show result
-    while (resultFlashes < 100) {
-
-        if (loopCount > RESULT_FLASH) {
-
-            loopCount = 0;
-            ledValue = 1 - ledValue;
-
-            LED_OUTPUT = ledValue;
-        }
-
-        loopCount++;
-
-        resultFlashes++;
-    }
-
-    return true;
-}
-#endif
-
 void main() {
 
     // Read node coordinates from hardware and print
@@ -212,7 +159,6 @@ void main() {
 
     fox_algorithm(my_x_coord, my_y_coord);
 
-    // TODO Implement alternate result print
     tb_output_matrix("Matrix multiplication complete. C", result_C, 
             MATRIX_SIZE, MATRIX_SIZE);
 
@@ -224,34 +170,18 @@ void main() {
     send_C(my_x_coord, my_y_coord);
     #endif
 
-    #ifdef CHECK_C
-    bool cCorrect = check_C();
-    if (cCorrect) {
-
-        print_string("C correct\n");
-    } else {
-
-        print_string("C incorrect\n");
-    }
-    #else
-    bool cCorrect = true;
-    #endif
-
     LED_OUTPUT = ledValue;
 
-    if (cCorrect) {
-        
-        while (1) {
+    while (1) {
 
-            if (loopCount > LOOP_DELAY) {
+        if (loopCount > LOOP_DELAY) {
 
-                loopCount = 0;
-                ledValue = 1 - ledValue;
+            loopCount = 0;
+            ledValue = 1 - ledValue;
 
-                LED_OUTPUT = ledValue;
-            }
-
-            loopCount++;
+            LED_OUTPUT = ledValue;
         }
+
+        loopCount++;
     }
 }
