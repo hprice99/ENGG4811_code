@@ -97,19 +97,19 @@ void initialise_C(void) {
 void print_C(void) {
 
     print_string("C = [");
-    for (long x = 0; x < TOTAL_MATRIX_SIZE; x++) {
-        for (long y = 0; y < TOTAL_MATRIX_SIZE; y++) {
+    for (long y = 0; y < TOTAL_MATRIX_SIZE; y++) {
+        for (long x = 0; x < TOTAL_MATRIX_SIZE; x++) {
 
-            int index = COORDINATE_TO_INDEX(x, y);
+            int index = RESULT_COORDINATE_TO_INDEX(x, y);
 
             print_dec(total_C[index]);
 
-            if (y < TOTAL_MATRIX_SIZE - 1) {
+            if (x < TOTAL_MATRIX_SIZE - 1) {
                 print_string(", ");
             }
         }
 
-        if (x < TOTAL_MATRIX_SIZE - 1) {
+        if (y < TOTAL_MATRIX_SIZE - 1) {
 
             print_string(";\n \t");
         }

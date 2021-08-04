@@ -39,7 +39,7 @@ enum FoxError send_A(int my_x_coord, int my_y_coord, int fox_rows) {
     for (long x = 0; x < MATRIX_SIZE; x++) {
         for (long y = 0; y < MATRIX_SIZE; y++) {
 
-            int index = COORDINATE_TO_INDEX(x, y);
+            int index = FOX_COORDINATE_TO_INDEX(x, y);
 
             packet.matrixX = x;
             packet.matrixY = y;
@@ -95,7 +95,7 @@ enum FoxError send_B(int my_x_coord, int my_y_coord, int fox_cols) {
     for (long x = 0; x < MATRIX_SIZE; x++) {
         for (long y = 0; y < MATRIX_SIZE; y++) {
 
-            int index = COORDINATE_TO_INDEX(x, y);
+            int index = FOX_COORDINATE_TO_INDEX(x, y);
 
             packet.matrixX = x;
             packet.matrixY = y;
@@ -148,7 +148,7 @@ enum FoxError send_C(int my_x_coord, int my_y_coord) {
     for (long x = 0; x < MATRIX_SIZE; x++) {
         for (long y = 0; y < MATRIX_SIZE; y++) {
 
-            int index = COORDINATE_TO_INDEX(x, y);
+            int index = FOX_COORDINATE_TO_INDEX(x, y);
 
             packet.matrixX = x + xOffset;
             packet.matrixY = y + yOffset;
@@ -179,7 +179,7 @@ enum FoxError send_C(int my_x_coord, int my_y_coord) {
 enum FoxError assign_element(struct MatrixPacket packet) {
 
     // int index = packet.matrixY * MATRIX_SIZE + packet.matrixX;
-    int index = COORDINATE_TO_INDEX(packet.matrixX, packet.matrixY);
+    int index = FOX_COORDINATE_TO_INDEX(packet.matrixX, packet.matrixY);
 
     #ifdef DEBUG_PRINT
     print_string("assign_element");
@@ -238,7 +238,7 @@ enum FoxError assign_my_A(void) {
     for (long x = 0; x < MATRIX_SIZE; x++) {
         for (long y = 0; y < MATRIX_SIZE; y++) {
 
-            int index = COORDINATE_TO_INDEX(x, y);
+            int index = FOX_COORDINATE_TO_INDEX(x, y);
 
             packet.matrixX = x;
             packet.matrixY = y;
@@ -328,10 +328,10 @@ enum FoxError assign_my_C(void) {
     for (long x = 0; x < MATRIX_SIZE; x++) {
         for (long y = 0; y < MATRIX_SIZE; y++) {
 
+            int index = FOX_COORDINATE_TO_INDEX(x, y);
+
             int cX = x + xOffset;
             int cY = y + yOffset;
-
-            int index = COORDINATE_TO_INDEX(cX, cY);
 
             packet.matrixX = cX;
             packet.matrixY = cY;
@@ -394,8 +394,7 @@ enum FoxError receive_result(void) {
 
 enum FoxError assign_result(struct MatrixPacket packet) {
 
-    // int index = packet.matrixY * MATRIX_SIZE + packet.matrixX;
-    int index = COORDINATE_TO_INDEX(packet.matrixX, packet.matrixY);
+    int index = RESULT_COORDINATE_TO_INDEX(packet.matrixX, packet.matrixY);
 
     if (packet.resultFlag != 1) {
 
@@ -413,9 +412,9 @@ enum FoxError assign_result(struct MatrixPacket packet) {
     print_hex(packet.matrixY, 1);
 
     print_string(", assign_result index = ");
-    print_hex(index, 1);
+    print_dec(index);
     print_string(", element = ");
-    print_hex(packet.matrixElement, 3);
+    print_dec(packet.matrixElement);
     #endif
 
     total_C[index] = packet.matrixElement;

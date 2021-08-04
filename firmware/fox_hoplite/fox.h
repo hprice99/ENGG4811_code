@@ -26,6 +26,9 @@ extern long total_C[TOTAL_MATRIX_SIZE * TOTAL_MATRIX_SIZE];
 
 #define FOX_NETWORK_WAIT    1000000000
 
+#define FOX_COORDINATE_TO_INDEX(x, y)   (y * MATRIX_SIZE + x)
+#define RESULT_COORDINATE_TO_INDEX(x, y)   (y * TOTAL_MATRIX_SIZE + x)
+
 enum FoxError {
     FOX_ALGORITHM_ERROR         = -4,
     FOX_ASSIGNMENT_ERROR        = -3,
