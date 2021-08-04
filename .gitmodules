@@ -1,4 +1,1 @@
 
-[submodule "hdl/submodules/uart-for-fpga"]
-	path = hdl/submodules/uart-for-fpga
-	url = https://github.com/hprice99/uart-for-fpga.git
