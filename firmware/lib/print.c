@@ -1,7 +1,13 @@
 #include "print.h"
 
-void print_char(char c)
-{
+void print_char(char c) {
+
+    while (!CHAR_OUTPUT_READY_INPUT) {
+
+        // Wait for the character buffer to become available
+        __asm__("nop");
+    }
+    
     CHAR_OUTPUT = c;
 }
 

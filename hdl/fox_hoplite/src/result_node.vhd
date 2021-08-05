@@ -171,6 +171,7 @@ architecture Behavioral of result_node is
 
             out_char            : out std_logic_vector(7 downto 0);
             out_char_en         : out std_logic;
+            out_char_ready      : in std_logic;
             
             x_in                : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
             x_in_valid          : in STD_LOGIC;
@@ -245,6 +246,7 @@ architecture Behavioral of result_node is
     
     signal pe_to_uart           : std_logic_vector(7 downto 0);
     signal pe_to_uart_valid     : std_logic;
+    signal pe_to_uart_ready     : std_logic;
     
     signal uart_tx_ready        : std_logic;
     signal uart_tx_data         : std_logic_vector(7 downto 0);
@@ -316,6 +318,7 @@ begin
     
             out_char            => pe_to_uart,
             out_char_en         => pe_to_uart_valid,
+            out_char_ready      => pe_to_uart_ready,
             
             -- Messages incoming to router
             x_in                => x_in,
@@ -334,6 +337,8 @@ begin
             out_matrix_end_row  => out_matrix_end_row,
             out_matrix_end      => out_matrix_end
         );
+        
+    pe_to_uart_ready    <= not uart_tx_buffer_full;
         
     UART_BUFFER: fifo_sync
         generic map (
@@ -354,16 +359,18 @@ begin
             empty       => uart_tx_buffer_empty
         );
         
-    TX_BUFFER_READ_VALID: process (clk)
-    begin
-        if (rising_edge(clk)) then
-            if (reset_n = '0') then
-                uart_tx_buffer_read_valid   <= '0';
-            else
-                uart_tx_buffer_read_valid   <= uart_tx_ready;
-            end if;
-        end if;
-    end process TX_BUFFER_READ_VALID;    
+    uart_tx_buffer_read_valid   <= uart_tx_ready;
+        
+--    TX_BUFFER_READ_VALID: process (clk)
+--    begin
+--        if (rising_edge(clk)) then
+--            if (reset_n = '0') then
+--                uart_tx_buffer_read_valid   <= '0';
+--            else
+--                uart_tx_buffer_read_valid   <= uart_tx_ready;
+--            end if;
+--        end if;
+--    end process TX_BUFFER_READ_VALID;
 
     UART_GEN: if (ENABLE_UART = True) generate
         UART_INITIALISE: UART

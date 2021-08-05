@@ -17,8 +17,9 @@ PROJ_NAME = hoplite
 
 .PHONY: all
 all: firmware_$(PROJ_NAME) firmware_$(PROJ_NAME)_result
-
 debug: firmware_$(PROJ_NAME)_debug firmware_$(PROJ_NAME)_result_debug
+
+# TODO Add define and target for testbench outputs so that the FPGA firmware does not need all prints
 
 firmware_$(PROJ_NAME): firmware_$(PROJ_NAME).c io.h $(LIB_SRCS) $(LIB_HEADERS) $(CONFIG_HEADERS) firmware_$(PROJ_NAME).lds firmware_$(PROJ_NAME).S
 	$(TOOLCHAIN_PREFIX)gcc $(CFLAGS) -D$(IO_CONFIG) -D$(MATRIX_CONFIG) -I. -I$(LIB) -Os -ffreestanding -nostdlib -o firmware_$(PROJ_NAME).elf firmware_$(PROJ_NAME).S firmware_$(PROJ_NAME).c $(LIB_SRCS) --std=gnu99 -Wl,-Bstatic,-T,firmware_$(PROJ_NAME).lds,-Map,firmware_$(PROJ_NAME).map,--strip-debug -lgcc \

@@ -119,6 +119,7 @@ architecture Behavioral of top is
 
             out_char            : out std_logic_vector(7 downto 0);
             out_char_en         : out std_logic;
+            out_char_ready      : in std_logic;
             
             x_in                : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
             x_in_valid          : in STD_LOGIC;
@@ -236,7 +237,7 @@ architecture Behavioral of top is
     constant FOX_MEM_SIZE           : integer := 4096;
     constant RESULT_MEM_SIZE        : integer := 8192;
 
-    constant UART_FIFO_DEPTH    : integer := 50;
+    constant UART_FIFO_DEPTH    : integer := 500;
 
 begin
 
@@ -400,6 +401,7 @@ begin
 
                     out_char            => out_char(curr_x, curr_y),
                     out_char_en         => out_char_en(curr_x, curr_y),
+                    out_char_ready      => '1',
                     
                     -- Messages incoming to router
                     x_in                => x_messages_in(curr_x, curr_y),

@@ -69,17 +69,52 @@ architecture Behavioral of top_tb is
         );
     end component top;
     
+    component UART is
+        Generic (
+            CLK_FREQ      : integer := 50e6;   -- system clock frequency in Hz
+            BAUD_RATE     : integer := 115200; -- baud rate value
+            PARITY_BIT    : string  := "none"; -- type of parity: "none", "even", "odd", "mark", "space"
+            USE_DEBOUNCER : boolean := True    -- enable/disable debouncer
+        );
+        Port (
+            -- CLOCK AND RESET
+            CLK          : in  std_logic; -- system clock
+            RST          : in  std_logic; -- high active synchronous reset
+            -- UART INTERFACE
+            UART_TXD     : out std_logic; -- serial transmit data
+            UART_RXD     : in  std_logic; -- serial receive data
+            -- USER DATA INPUT INTERFACE
+            DIN          : in  std_logic_vector(7 downto 0); -- input data to be transmitted over UART
+            DIN_VLD      : in  std_logic; -- when DIN_VLD = 1, input data (DIN) are valid
+            DIN_RDY      : out std_logic; -- when DIN_RDY = 1, transmitter is ready and valid input data will be accepted for transmiting
+            -- USER DATA OUTPUT INTERFACE
+            DOUT         : out std_logic_vector(7 downto 0); -- output data received via UART
+            DOUT_VLD     : out std_logic; -- when DOUT_VLD = 1, output data (DOUT) are valid (is assert only for one clock cycle)
+            FRAME_ERROR  : out std_logic; -- when FRAME_ERROR = 1, stop bit was invalid (is assert only for one clock cycle)
+            PARITY_ERROR : out std_logic  -- when PARITY_ERROR = 1, parity bit was invalid (is assert only for one clock cycle)
+        );
+    end component UART;
+    
     signal clk          : std_logic := '0';
     constant clk_period : time := 10 ns;
-    constant CLK_FREQ   : integer := 100e6;
     
     signal reset_n      : std_logic;
+    signal reset        : std_logic;
     
     signal LED      : std_logic_vector((FOX_NETWORK_NODES-1) downto 0);
     
     signal count    : integer;
     
     signal uart_tx  : std_logic;
+    
+    signal uart_rx  : std_logic;
+    signal uart_rx_char         : std_logic_vector(7 downto 0);
+    signal uart_rx_char_valid   : std_logic;
+    
+    constant CLK_FREQ   : integer := 100e6;
+    constant BAUD_RATE  : integer := 115200;
+    constant PARITY_BIT : string := "none";
+    constant USE_DEBOUNCER  : boolean := True;
 
     signal out_char     : t_Char;
     signal out_char_en  : t_MessageValid;
@@ -94,6 +129,8 @@ begin
 
     -- Generate clk and reset_n
     reset_n <= '0', '1' after 100*clk_period;
+    
+    reset   <= not reset_n;
 
     CLK_PROCESS: process
     begin
@@ -138,6 +175,38 @@ begin
             out_matrix_end_row  => out_matrix_end_row,
             out_matrix_end      => out_matrix_end
         );
+        
+--    RX_BUFFER: process (clk)
+--    begin
+--        if (rising_edge(clk)) then
+--            uart_rx <= uart_tx;
+--        end if;
+--    end process RX_BUFFER;
+    
+--    UART_RECEIVER: UART
+--            generic map (
+--                CLK_FREQ      => CLK_FREQ,
+--                BAUD_RATE     => BAUD_RATE,
+--                PARITY_BIT    => PARITY_BIT,
+--                USE_DEBOUNCER => USE_DEBOUNCER
+--            )
+--            port map (
+--                -- CLOCK AND RESET
+--                CLK          => clk,
+--                RST          => reset,
+
+--                UART_TXD     => uart_tx,
+--                UART_RXD     => uart_rx,
+                
+--                DIN          => (others => '1'), 
+--                DIN_VLD      => '0', 
+--                DIN_RDY      => open,
+
+--                DOUT         => uart_rx_char,
+--                DOUT_VLD     => uart_rx_char_valid, 
+--                FRAME_ERROR  => open, 
+--                PARITY_ERROR => open
+--            );
 
     -- Generate prints for Fox's algorithm processing elements
     PRINT_OUTPUT_ROW_GEN: for i in 0 to (FOX_NETWORK_STAGES-1) generate

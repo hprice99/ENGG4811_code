@@ -315,7 +315,9 @@ enum FoxError receive_matrix(enum MatrixType matrixType) {
 #ifdef RESULT
 enum FoxError assign_my_C(void) {
 
+    #ifdef DEBUG_PRINT
     print_string("assign_my_c\n");
+    #endif
 
     struct MatrixPacket packet;
 
