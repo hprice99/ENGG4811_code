@@ -189,6 +189,26 @@ architecture Behavioral of result_node is
         );
     end component fox_node;
     
+    component fifo_sync
+        generic (
+            BUS_WIDTH   : integer := 32;
+            FIFO_DEPTH  : integer := 64
+        );
+        port (
+            clk         : in std_logic;
+            reset_n     : in std_logic;
+
+            write_en    : in std_logic;
+            write_data  : in std_logic_vector((BUS_WIDTH-1) downto 0);
+
+            read_en     : in std_logic;
+            read_data   : out std_logic_vector((BUS_WIDTH-1) downto 0);
+
+            full        : out std_logic;
+            empty       : out std_logic
+        );
+    end component fifo_sync;
+    
     component UART is
         Generic (
             CLK_FREQ      : integer := 50e6;   -- system clock frequency in Hz
@@ -217,20 +237,29 @@ architecture Behavioral of result_node is
 
     signal reset    : std_logic;
     
-    signal uart_din         : std_logic_vector(7 downto 0);
-    signal uart_din_valid   : std_logic;
-    
     constant BAUD_RATE  : integer := 115200;
     constant PARITY_BIT : string := "none";
     constant USE_DEBOUNCER  : boolean := True;
+    
+    constant UART_BUS_WIDTH : integer := 8;
+    
+    signal pe_to_uart           : std_logic_vector(7 downto 0);
+    signal pe_to_uart_valid     : std_logic;
+    
+    signal uart_tx_ready        : std_logic;
+    signal uart_tx_data         : std_logic_vector(7 downto 0);
+    signal uart_tx_data_valid   : std_logic;
+    
+    signal uart_tx_buffer_read_valid    : std_logic;
+    signal uart_tx_buffer_full, uart_tx_buffer_empty    : std_logic;
 
 begin
 
     reset   <= not reset_n;
 
     -- Instantiate node
-    out_char    <= uart_din;
-    out_char_en <= uart_din_valid;
+    out_char    <= pe_to_uart;
+    out_char_en <= pe_to_uart_valid;
 
     FOX_NODE_INITIALISE: fox_node
         generic map (
@@ -285,8 +314,8 @@ begin
             
             LED                 => LED,
     
-            out_char            => uart_din,
-            out_char_en         => uart_din_valid,
+            out_char            => pe_to_uart,
+            out_char_en         => pe_to_uart_valid,
             
             -- Messages incoming to router
             x_in                => x_in,
@@ -305,6 +334,36 @@ begin
             out_matrix_end_row  => out_matrix_end_row,
             out_matrix_end      => out_matrix_end
         );
+        
+    UART_BUFFER: fifo_sync
+        generic map (
+            BUS_WIDTH   => UART_BUS_WIDTH,
+            FIFO_DEPTH  => UART_FIFO_DEPTH
+        )
+        port map (
+            clk         => clk,
+            reset_n     => reset_n,
+
+            write_en    => pe_to_uart_valid,
+            write_data  => pe_to_uart,
+
+            read_en     => uart_tx_ready,
+            read_data   => uart_tx_data,
+
+            full        => uart_tx_buffer_full,
+            empty       => uart_tx_buffer_empty
+        );
+        
+    TX_BUFFER_READ_VALID: process (clk)
+    begin
+        if (rising_edge(clk)) then
+            if (reset_n = '0') then
+                uart_tx_buffer_read_valid   <= '0';
+            else
+                uart_tx_buffer_read_valid   <= uart_tx_ready;
+            end if;
+        end if;
+    end process TX_BUFFER_READ_VALID;    
 
     UART_GEN: if (ENABLE_UART = True) generate
         UART_INITIALISE: UART
@@ -322,9 +381,9 @@ begin
                 UART_TXD     => uart_tx,
                 UART_RXD     => '1',
                 
-                DIN          => uart_din, 
-                DIN_VLD      => uart_din_valid, 
-                DIN_RDY      => open,
+                DIN          => uart_tx_data, 
+                DIN_VLD      => uart_tx_buffer_read_valid, 
+                DIN_RDY      => uart_tx_ready,
 
                 DOUT         => open,
                 DOUT_VLD     => open, 
