@@ -46,14 +46,22 @@ architecture Behavioral of top_tb is
         generic (
             -- Fox's algorithm network paramters
             FOX_NETWORK_STAGES  : integer := 2;
-            FOX_NETWORK_NODES   : integer := 4
+            FOX_NETWORK_NODES   : integer := 4;
+            
+            CLK_FREQ            : integer := 50e6;
+            ENABLE_UART         : boolean := False
         );
         port (
             clk                 : in std_logic;
             reset_n             : in std_logic;
+            
             LED                 : out STD_LOGIC_VECTOR((FOX_NETWORK_NODES-1) downto 0);
+            
             out_char            : out t_Char;
             out_char_en         : out t_MessageValid;
+            
+            uart_tx             : out std_logic;
+            
             out_matrix          : out t_Matrix;
             out_matrix_en       : out t_MessageValid;
             out_matrix_end_row  : out t_MessageValid;
@@ -63,12 +71,15 @@ architecture Behavioral of top_tb is
     
     signal clk          : std_logic := '0';
     constant clk_period : time := 10 ns;
+    constant CLK_FREQ   : integer := 100e6;
     
     signal reset_n      : std_logic;
     
     signal LED      : std_logic_vector((FOX_NETWORK_NODES-1) downto 0);
     
     signal count    : integer;
+    
+    signal uart_tx  : std_logic;
 
     signal out_char     : t_Char;
     signal out_char_en  : t_MessageValid;
@@ -106,14 +117,22 @@ begin
     FOX_TOP: top
         generic map (
             FOX_NETWORK_STAGES  => FOX_NETWORK_STAGES,
-            FOX_NETWORK_NODES   => FOX_NETWORK_NODES
+            FOX_NETWORK_NODES   => FOX_NETWORK_NODES,
+            
+            CLK_FREQ            => CLK_FREQ,
+            ENABLE_UART         => True
         )
         port map (
             clk                 => clk,
             reset_n             => reset_n,
+            
             LED                 => LED,
+            
             out_char            => out_char,
             out_char_en         => out_char_en,
+            
+            uart_tx             => uart_tx,
+            
             out_matrix          => out_matrix,
             out_matrix_en       => out_matrix_en,
             out_matrix_end_row  => out_matrix_end_row,

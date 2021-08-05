@@ -40,14 +40,22 @@ entity top is
     Generic (
         -- Fox's algorithm network paramters
         FOX_NETWORK_STAGES  : integer := 2;
-        FOX_NETWORK_NODES   : integer := 4
+        FOX_NETWORK_NODES   : integer := 4;
+        
+        CLK_FREQ            : integer := 50e6;
+        ENABLE_UART         : boolean := False
     );
     Port ( 
            reset_n              : in STD_LOGIC;
            clk                  : in STD_LOGIC;
+           
            LED                  : out STD_LOGIC_VECTOR((FOX_NETWORK_NODES-1) downto 0);
+           
            out_char             : out t_Char;
            out_char_en          : out t_MessageValid;
+           
+           uart_tx             : out std_logic;
+           
            out_matrix           : out t_Matrix;
            out_matrix_en        : out t_MessageValid;
            out_matrix_end_row   : out t_MessageValid;
@@ -128,9 +136,44 @@ architecture Behavioral of top is
             out_matrix_end      : out std_logic
         );
     end component fox_node;
+    
+    component UART is
+        Generic (
+            CLK_FREQ      : integer := 50e6;   -- system clock frequency in Hz
+            BAUD_RATE     : integer := 115200; -- baud rate value
+            PARITY_BIT    : string  := "none"; -- type of parity: "none", "even", "odd", "mark", "space"
+            USE_DEBOUNCER : boolean := True    -- enable/disable debouncer
+        );
+        Port (
+            -- CLOCK AND RESET
+            CLK          : in  std_logic; -- system clock
+            RST          : in  std_logic; -- high active synchronous reset
+            -- UART INTERFACE
+            UART_TXD     : out std_logic; -- serial transmit data
+            UART_RXD     : in  std_logic; -- serial receive data
+            -- USER DATA INPUT INTERFACE
+            DIN          : in  std_logic_vector(7 downto 0); -- input data to be transmitted over UART
+            DIN_VLD      : in  std_logic; -- when DIN_VLD = 1, input data (DIN) are valid
+            DIN_RDY      : out std_logic; -- when DIN_RDY = 1, transmitter is ready and valid input data will be accepted for transmiting
+            -- USER DATA OUTPUT INTERFACE
+            DOUT         : out std_logic_vector(7 downto 0); -- output data received via UART
+            DOUT_VLD     : out std_logic; -- when DOUT_VLD = 1, output data (DOUT) are valid (is assert only for one clock cycle)
+            FRAME_ERROR  : out std_logic; -- when FRAME_ERROR = 1, stop bit was invalid (is assert only for one clock cycle)
+            PARITY_ERROR : out std_logic  -- when PARITY_ERROR = 1, parity bit was invalid (is assert only for one clock cycle)
+        );
+    end component UART;
+    
+    
+    signal reset    : std_logic;
+    
+    signal uart_din         : std_logic_vector(7 downto 0);
+    signal uart_din_valid   : std_logic;
+    
+    constant BAUD_RATE  : integer := 115200;
+    constant PARITY_BIT : string := "none";
+    constant USE_DEBOUNCER  : boolean := True;
 
     -- Result node parameters
-    -- TODO Implement result node
     constant RESULT_X_COORD  : integer := 0;
     constant RESULT_Y_COORD  : integer := 0;
     
@@ -151,6 +194,8 @@ architecture Behavioral of top is
     constant RESULT_MEM_SIZE        : integer := 8192;
 
 begin
+
+    reset   <= not reset_n;
 
     -- Generate the network
     NETWORK_ROW_GEN: for i in 0 to (NETWORK_ROWS-1) generate
@@ -174,6 +219,9 @@ begin
         
             -- Instantiate node
             RESULT_GEN: if (curr_x = RESULT_X_COORD and curr_y = RESULT_Y_COORD) generate
+                out_char(curr_x, curr_y)    <= uart_din;
+                out_char_en(curr_x, curr_y) <= uart_din_valid;
+            
                 RESULT_NODE_INITIALISE: fox_node
                 generic map (
                     -- Entire network parameters
@@ -227,8 +275,8 @@ begin
                     
                     LED                 => LED(node_number),
 
-                    out_char            => out_char(curr_x, curr_y),
-                    out_char_en         => out_char_en(curr_x, curr_y),
+                    out_char            => uart_din,
+                    out_char_en         => uart_din_valid,
                     
                     -- Messages incoming to router
                     x_in                => x_messages_in(curr_x, curr_y),
@@ -246,7 +294,34 @@ begin
                     out_matrix_en       => out_matrix_en(curr_x, curr_y),
                     out_matrix_end_row  => out_matrix_end_row(curr_x, curr_y),
                     out_matrix_end      => out_matrix_end(curr_x, curr_y)
-                );           
+                );  
+                
+                UART_GEN: if (ENABLE_UART = True) generate                
+                    UART_INITIALISE: UART
+                        generic map (
+                            CLK_FREQ      => CLK_FREQ,   -- system clock frequency in Hz
+                            BAUD_RATE     => BAUD_RATE, -- baud rate value
+                            PARITY_BIT    => PARITY_BIT, -- type of parity: "none", "even", "odd", "mark", "space"
+                            USE_DEBOUNCER => USE_DEBOUNCER    -- enable/disable debouncer
+                        )
+                        port map (
+                            -- CLOCK AND RESET
+                            CLK          => clk, -- system clock
+                            RST          => reset, -- high active synchronous reset
+                            -- UART INTERFACE
+                            UART_TXD     => uart_tx, -- serial transmit data
+                            UART_RXD     => '1',     -- serial receive data
+                            -- USER DATA INPUT INTERFACE
+                            DIN          => uart_din, -- input data to be transmitted over UART
+                            DIN_VLD      => uart_din_valid, -- when DIN_VLD = 1, input data (DIN) are valid
+                            DIN_RDY      => open, -- when DIN_RDY = 1, transmitter is ready and valid input data will be accepted for transmiting
+                            -- USER DATA OUTPUT INTERFACE
+                            DOUT         => open, -- output data received via UART
+                            DOUT_VLD     => open, -- when DOUT_VLD = 1, output data (DOUT) are valid (is assert only for one clock cycle)
+                            FRAME_ERROR  => open, -- when FRAME_ERROR = 1, stop bit was invalid (is assert only for one clock cycle)
+                            PARITY_ERROR => open  -- when PARITY_ERROR = 1, parity bit was invalid (is assert only for one clock cycle)
+                        );
+                end generate UART_GEN;      
             end generate RESULT_GEN;
             
             FOX_GEN: if (curr_x /= RESULT_X_COORD or curr_y /= RESULT_Y_COORD) generate
