@@ -352,25 +352,21 @@ begin
             write_en    => pe_to_uart_valid,
             write_data  => pe_to_uart,
 
-            read_en     => uart_tx_ready,
+            read_en     => uart_tx_buffer_read_valid,
             read_data   => uart_tx_data,
 
             full        => uart_tx_buffer_full,
             empty       => uart_tx_buffer_empty
         );
-        
-    uart_tx_buffer_read_valid   <= uart_tx_ready;
-        
---    TX_BUFFER_READ_VALID: process (clk)
---    begin
---        if (rising_edge(clk)) then
---            if (reset_n = '0') then
---                uart_tx_buffer_read_valid   <= '0';
---            else
---                uart_tx_buffer_read_valid   <= uart_tx_ready;
---            end if;
---        end if;
---    end process TX_BUFFER_READ_VALID;
+
+    TX_BUFFER_READ_VALID: process (uart_tx_ready, uart_tx_buffer_empty)
+    begin
+        if (uart_tx_buffer_empty = '0') then
+            uart_tx_buffer_read_valid   <= uart_tx_ready;
+        else
+            uart_tx_buffer_read_valid   <= '0';
+        end if;
+    end process TX_BUFFER_READ_VALID;
 
     UART_GEN: if (ENABLE_UART = True) generate
         UART_INITIALISE: UART

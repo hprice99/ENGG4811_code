@@ -114,6 +114,21 @@ begin
 
     full    <= full_flag;
     empty   <= empty_flag;
+    
+    -- synthesis translate_off
+    FLAG_ASSERTIONS: process (clk)
+    begin
+        if rising_edge(clk) then
+            if (write_en = '1' and full_flag = '1') then
+                report "FAILURE - Trying to write to a full FIFO" severity failure;
+            end if;
+    
+            if (read_en = '1' and empty_flag = '1') then
+                report "FAILURE - Trying to read from an empty FIFO" severity failure;
+            end if;
+        end if;
+    end process FLAG_ASSERTIONS;
+    -- synthesis translate_on
 
 end Behavioural;
 

@@ -237,7 +237,7 @@ architecture Behavioral of top is
     constant FOX_MEM_SIZE           : integer := 4096;
     constant RESULT_MEM_SIZE        : integer := 8192;
 
-    constant UART_FIFO_DEPTH    : integer := 500;
+    constant UART_FIFO_DEPTH    : integer := 512;
 
 begin
 
