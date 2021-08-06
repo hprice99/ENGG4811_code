@@ -14,10 +14,6 @@ int my_x_coord;
 int my_y_coord;
 int my_node_number;
 
-#ifdef RESULT
-char message[] = "Test\n";
-#endif
-
 void tb_output_matrix(char* label, long* matrix, int rows, int cols) {
 
     print_string(label);
@@ -176,10 +172,6 @@ void main() {
 
     LED_OUTPUT = ledValue;
 
-    #ifdef RESULT
-    int charIndex = 0;
-    #endif
-
     while (1) {
 
         if (loopCount > LOOP_DELAY) {
@@ -190,11 +182,14 @@ void main() {
             LED_OUTPUT = ledValue;
 
             #ifdef RESULT
-            if (charIndex < 6) {
+            print_string("LED ");
 
-                print_char(message[charIndex]);
+            if (ledValue == 0) {
+                
+                print_string("off\n");
+            } else if (ledValue == 1) {
 
-                charIndex++;
+                print_string("on\n");
             }
             #endif
 
