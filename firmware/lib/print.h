@@ -9,6 +9,10 @@
 #define CHAR_OUTPUT (*(volatile char*)0x10000000)
 #endif
 
+#ifndef CHAR_OUTPUT_READY_INPUT
+#define CHAR_OUTPUT_READY_INPUT     1
+#endif
+
 void print_char(char c);
 
 void print_string(const char *s);

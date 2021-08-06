@@ -40,14 +40,22 @@ entity top is
     Generic (
         -- Fox's algorithm network paramters
         FOX_NETWORK_STAGES  : integer := 2;
-        FOX_NETWORK_NODES   : integer := 4
+        FOX_NETWORK_NODES   : integer := 4;
+        
+        CLK_FREQ            : integer := 50e6;
+        ENABLE_UART         : boolean := False
     );
     Port ( 
            reset_n              : in STD_LOGIC;
            clk                  : in STD_LOGIC;
+           
            LED                  : out STD_LOGIC_VECTOR((FOX_NETWORK_NODES-1) downto 0);
+           
            out_char             : out t_Char;
            out_char_en          : out t_MessageValid;
+           
+           uart_tx              : out std_logic;
+           
            out_matrix           : out t_Matrix;
            out_matrix_en        : out t_MessageValid;
            out_matrix_end_row   : out t_MessageValid;
@@ -111,6 +119,7 @@ architecture Behavioral of top is
 
             out_char            : out std_logic_vector(7 downto 0);
             out_char_en         : out std_logic;
+            out_char_ready      : in std_logic;
             
             x_in                : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
             x_in_valid          : in STD_LOGIC;
@@ -129,8 +138,86 @@ architecture Behavioral of top is
         );
     end component fox_node;
 
+    component result_node is
+        Generic (
+            -- Entire network parameters
+            NETWORK_ROWS    : integer := 2;
+            NETWORK_COLS    : integer := 2;
+            NETWORK_NODES   : integer := 4;
+    
+            -- Fox's algorithm network paramters
+            FOX_NETWORK_STAGES  : integer := 2;
+            FOX_NETWORK_NODES   : integer := 4;
+    
+            -- Result node parameters
+            RESULT_X_COORD  : integer := 0;
+            RESULT_Y_COORD  : integer := 2;
+        
+            -- Node parameters
+            X_COORD         : integer := 0;
+            Y_COORD         : integer := 0;
+            NODE_NUMBER     : integer := 0;
+    
+            -- Packet parameters
+            COORD_BITS              : integer := 2;
+            MULTICAST_GROUP_BITS    : integer := 1;
+            MATRIX_TYPE_BITS        : integer := 1;
+            MATRIX_COORD_BITS       : integer := 8;
+            MATRIX_ELEMENT_BITS     : integer := 32;
+            BUS_WIDTH               : integer := 56;
+    
+            -- Matrix parameters
+            TOTAL_MATRIX_SIZE       : integer := 32;
+            FOX_MATRIX_SIZE         : integer := 16;
+            MATRIX_FILE             : string  := "none";
+    
+            -- Matrix offset for node
+            MATRIX_X_OFFSET : integer := 0;
+            MATRIX_Y_OFFSET : integer := 0;
+    
+            -- NIC parameters
+            NIC_FIFO_DEPTH     : integer := 32;
+    
+            -- UART parameters
+            CLK_FREQ           : integer := 50e6;
+            ENABLE_UART        : boolean := False;
+            UART_FIFO_DEPTH    : integer := 50;
+            
+            -- PicoRV32 core parameters
+            DIVIDE_ENABLED     : std_logic := '0';
+            MULTIPLY_ENABLED   : std_logic := '1';
+            FIRMWARE           : string    := "firmware.hex";
+            MEM_SIZE           : integer   := 4096
+        );
+        Port (
+            clk                 : in std_logic;
+            reset_n             : in std_logic;
+    
+            LED                 : out std_logic;
+    
+            out_char            : out std_logic_vector(7 downto 0);
+            out_char_en         : out std_logic;
+
+            uart_tx             : out std_logic;
+            
+            x_in                : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
+            x_in_valid          : in STD_LOGIC;
+            y_in                : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
+            y_in_valid          : in STD_LOGIC;
+            
+            x_out               : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
+            x_out_valid         : out STD_LOGIC;
+            y_out               : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
+            y_out_valid         : out STD_LOGIC;
+    
+            out_matrix          : out std_logic_vector(31 downto 0);
+            out_matrix_en       : out std_logic;
+            out_matrix_end_row  : out std_logic;
+            out_matrix_end      : out std_logic
+        );
+    end component result_node;
+
     -- Result node parameters
-    -- TODO Implement result node
     constant RESULT_X_COORD  : integer := 0;
     constant RESULT_Y_COORD  : integer := 0;
     
@@ -149,6 +236,8 @@ architecture Behavioral of top is
 
     constant FOX_MEM_SIZE           : integer := 4096;
     constant RESULT_MEM_SIZE        : integer := 8192;
+
+    constant UART_FIFO_DEPTH    : integer := 512;
 
 begin
 
@@ -174,7 +263,7 @@ begin
         
             -- Instantiate node
             RESULT_GEN: if (curr_x = RESULT_X_COORD and curr_y = RESULT_Y_COORD) generate
-                RESULT_NODE_INITIALISE: fox_node
+                RESULT_NODE_INITIALISE: result_node
                 generic map (
                     -- Entire network parameters
                     NETWORK_ROWS    => NETWORK_ROWS,
@@ -213,7 +302,12 @@ begin
                     MATRIX_Y_OFFSET => y_offset,
 
                     -- NIC parameters
-                    FIFO_DEPTH      => RESULT_FIFO_DEPTH,
+                    NIC_FIFO_DEPTH  => FOX_FIFO_DEPTH,
+
+                    -- UART parameters
+                    CLK_FREQ        => CLK_FREQ,
+                    ENABLE_UART     => ENABLE_UART,
+                    UART_FIFO_DEPTH => UART_FIFO_DEPTH,
                     
                     -- PicoRV32 core parameters
                     DIVIDE_ENABLED     => RESULT_DIVIDE_ENABLED,
@@ -229,6 +323,8 @@ begin
 
                     out_char            => out_char(curr_x, curr_y),
                     out_char_en         => out_char_en(curr_x, curr_y),
+                    
+                    uart_tx             => uart_tx,
                     
                     -- Messages incoming to router
                     x_in                => x_messages_in(curr_x, curr_y),
@@ -246,7 +342,7 @@ begin
                     out_matrix_en       => out_matrix_en(curr_x, curr_y),
                     out_matrix_end_row  => out_matrix_end_row(curr_x, curr_y),
                     out_matrix_end      => out_matrix_end(curr_x, curr_y)
-                );           
+                );
             end generate RESULT_GEN;
             
             FOX_GEN: if (curr_x /= RESULT_X_COORD or curr_y /= RESULT_Y_COORD) generate
@@ -305,6 +401,7 @@ begin
 
                     out_char            => out_char(curr_x, curr_y),
                     out_char_en         => out_char_en(curr_x, curr_y),
+                    out_char_ready      => '1',
                     
                     -- Messages incoming to router
                     x_in                => x_messages_in(curr_x, curr_y),

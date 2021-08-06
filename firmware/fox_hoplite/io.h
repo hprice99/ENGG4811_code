@@ -1,7 +1,8 @@
 #ifndef IO_H
 #define IO_H
 
-#define CHAR_OUTPUT     (*(volatile char*)0x10000000)
+#define CHAR_OUTPUT                 (*(volatile char*)0x10000000)
+#define CHAR_OUTPUT_READY_INPUT     (*(volatile char*)0x10000010)
 
 // PE to network
 #define MESSAGE_OUT_READY_INPUT     (*(volatile char*)0x20000000)
@@ -17,7 +18,7 @@
 #define PACKET_COMPLETE_OUTPUT      (*(volatile char*)0x20000100)
 
 // LEDs
-#define LED_OUTPUT    (*(volatile char*)0x30000000)
+#define LED_OUTPUT                  (*(volatile char*)0x30000000)
 
 // Network to PE
 #define MESSAGE_VALID_INPUT         (*(volatile char*)0x50000000)

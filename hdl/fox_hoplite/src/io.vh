@@ -1,7 +1,8 @@
 `ifndef IO_VH
 `define IO_VH
 
-`define CHAR_OUTPUT     32'h1000_0000
+`define CHAR_OUTPUT                 32'h1000_0000
+`define CHAR_OUTPUT_READY_INPUT     32'h1000_0010
 
 // PE to network
 `define MESSAGE_OUT_READY_INPUT     32'h2000_0000

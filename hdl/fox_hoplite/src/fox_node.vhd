@@ -88,6 +88,7 @@ entity fox_node is
 
         out_char            : out std_logic_vector(7 downto 0);
         out_char_en         : out std_logic;
+        out_char_ready      : in std_logic;
         
         x_in                : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
         x_in_valid          : in STD_LOGIC;
@@ -295,6 +296,7 @@ architecture Behavioral of fox_node is
             
             out_char                : out std_logic_vector(7 downto 0);
             out_char_en             : out std_logic;
+            out_char_ready          : in std_logic;
             
             x_coord_out                 : out std_logic_vector((COORD_BITS-1) downto 0);
             x_coord_out_valid           : out std_logic;
@@ -607,6 +609,7 @@ begin
 
             out_char                => out_char,
             out_char_en             => out_char_en,
+            out_char_ready          => out_char_ready,
             
             x_coord_out                 => processor_out_message_x_coord,
             x_coord_out_valid           => processor_out_message_x_coord_valid,

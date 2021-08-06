@@ -47,6 +47,7 @@ module system #(
     // UART
     output reg[7:0]     out_char,
     output reg          out_char_en,
+    input wire          out_char_ready,
 
     // Network connections
     output reg[COORD_BITS-1:0] x_coord_out,
@@ -258,6 +259,10 @@ module system #(
             
             if (mem_la_read) begin
             case(mem_la_addr)
+                `CHAR_OUTPUT_READY_INPUT: begin
+                    mem_rdata   <= out_char_ready;
+                end
+            
                 `MESSAGE_OUT_READY_INPUT: begin
                     mem_rdata   <= message_out_ready;
                 end

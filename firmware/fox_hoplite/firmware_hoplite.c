@@ -180,6 +180,19 @@ void main() {
             ledValue = 1 - ledValue;
 
             LED_OUTPUT = ledValue;
+
+            #ifdef RESULT
+            print_string("LED ");
+
+            if (ledValue == 0) {
+                
+                print_string("off\n");
+            } else if (ledValue == 1) {
+
+                print_string("on\n");
+            }
+            #endif
+
         }
 
         loopCount++;

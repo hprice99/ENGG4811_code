@@ -41,7 +41,8 @@ entity board_top is
     Port ( 
            CPU_RESETN   : in STD_LOGIC;
            clk          : in STD_LOGIC;
-           LED          : out STD_LOGIC_VECTOR(3 downto 0)
+           LED          : out STD_LOGIC_VECTOR(3 downto 0);
+           UART_RXD_OUT : out std_logic
     );
 end board_top;
 
@@ -51,14 +52,22 @@ architecture Behavioral of board_top is
         generic (
             -- Fox's algorithm network paramters
             FOX_NETWORK_STAGES  : integer := 2;
-            FOX_NETWORK_NODES   : integer := 4
+            FOX_NETWORK_NODES   : integer := 4;
+            
+            CLK_FREQ            : integer := 50e6;
+            ENABLE_UART         : boolean := False
         );
         port (
             clk                 : in std_logic;
             reset_n             : in std_logic;
+            
             LED                 : out STD_LOGIC_VECTOR((FOX_NETWORK_NODES-1) downto 0);
+            
             out_char            : out t_Char;
             out_char_en         : out t_MessageValid;
+            
+            uart_tx             : out std_logic;
+            
             out_matrix          : out t_Matrix;
             out_matrix_en       : out t_MessageValid;
             out_matrix_end_row  : out t_MessageValid;
@@ -67,6 +76,9 @@ architecture Behavioral of board_top is
     end component top;
     
     signal clkdiv2  : std_logic := '0';
+    
+    constant CLK_FREQ       : integer := 50e6;
+    constant ENABLE_UART    : boolean := True;
 
 begin
 
@@ -81,14 +93,22 @@ begin
     FOX_TOP: top
         generic map (
             FOX_NETWORK_STAGES  => FOX_NETWORK_STAGES,
-            FOX_NETWORK_NODES   => FOX_NETWORK_NODES
+            FOX_NETWORK_NODES   => FOX_NETWORK_NODES,
+            
+            CLK_FREQ            => CLK_FREQ,
+            ENABLE_UART         => ENABLE_UART
         )
         port map (
             clk                 => clkdiv2,
             reset_n             => CPU_RESETN,
+            
             LED                 => LED,
+            
             out_char            => open,
             out_char_en         => open,
+            
+            uart_tx             => UART_RXD_OUT,
+            
             out_matrix          => open,
             out_matrix_en       => open,
             out_matrix_end_row  => open,

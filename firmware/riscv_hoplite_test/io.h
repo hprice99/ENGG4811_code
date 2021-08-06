@@ -1,7 +1,8 @@
 #ifndef IO_H
 #define IO_H
 
-#define CHAR_OUTPUT     (*(volatile char*)0x10000000)
+#define CHAR_OUTPUT                 (*(volatile char*)0x10000000)
+#define CHAR_OUTPUT_READY_INPUT     1
 
 // PE to network
 #define MESSAGE_OUT_READY_INPUT     (*(volatile char*)0x20000000)
