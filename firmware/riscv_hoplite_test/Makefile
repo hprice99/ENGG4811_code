@@ -37,4 +37,4 @@ firmware_$(PROJ_NAME)_switch_debug: firmware_$(PROJ_NAME)_switch.c io.h $(LIB_SR
 	&& python3 ../makehex.py firmware_$(PROJ_NAME)_switch.bin $(MEM_SIZE) > firmware_$(PROJ_NAME)_switch.hex
 
 clean:
-	rm *.bin *.hex *.elf *.map
+	-rm *.bin *.hex *.elf *.map

@@ -63,4 +63,4 @@ firmware_$(PROJ_NAME)_result_debug_tb: firmware_$(PROJ_NAME).c io.h $(LIB_SRCS) 
 	&& python3 ../makehex.py firmware_$(PROJ_NAME)_result_tb.bin $(RESULT_MEM_SIZE) > firmware_$(PROJ_NAME)_result_tb.hex
 
 clean:
-	rm *.bin *.hex *.elf *.map
+	-rm *.bin *.hex *.elf *.map

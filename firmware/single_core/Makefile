@@ -30,5 +30,5 @@ firmware_$(PROJ_NAME)_debug: firmware_$(PROJ_NAME).c $(LIB_SRCS) $(LIB_HEADERS) 
 	&& python3 ../makehex.py firmware_$(PROJ_NAME).bin $(MEM_SIZE) > firmware_$(PROJ_NAME).hex
 
 clean:
-	rm *.bin *.hex *.elf *.map
+	-rm *.bin *.hex *.elf *.map
 
