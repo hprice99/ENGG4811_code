@@ -98,7 +98,7 @@ enum FoxError send_ready(int my_x_coord, int my_y_coord,
     return FOX_SUCCESS;
 }
 
-bool a_broadcast_ready(int my_x_coord, int my_y_coord, int fox_rows) {
+bool is_a_broadcast_ready(int my_x_coord, int my_y_coord, int fox_rows) {
 
     int nodesReady = 0;
     int broadcastDestinations = fox_rows - 1;
@@ -180,7 +180,7 @@ enum FoxError send_A(int my_x_coord, int my_y_coord, int fox_rows) {
     return FOX_SUCCESS;
 }
 
-bool b_ready(int my_x_coord, int my_y_coord, int fox_cols) {
+bool is_b_send_ready(int my_x_coord, int my_y_coord, int fox_cols) {
 
     int nodesReady = 0;
     int bDestinations = 1;
@@ -522,6 +522,16 @@ enum FoxError fox_algorithm(int my_x_coord, int my_y_coord) {
 
     int broadcastNodeX = -1;
 
+    int receiveBFrom;
+
+    if (my_y_coord == foxStages - 1) {
+
+        receiveBFrom = 0;
+    } else {
+
+        receiveBFrom = my_y_coord + 1;
+    }
+
     for (int stage = 0; stage < foxStages; stage++) {
 
         broadcastNodeX = 
@@ -530,11 +540,20 @@ enum FoxError fox_algorithm(int my_x_coord, int my_y_coord) {
         // Broadcast A
         if (my_x_coord == broadcastNodeX) {
 
+            // Wait for all receivers to be ready
+            while (!is_a_broadcast_ready(my_x_coord, my_y_coord, foxStages)) {
+
+                __asm__("nop");
+            }
+
             send_A(my_x_coord, my_y_coord, foxStages);
 
             // Assign my_A
             assign_my_A();
         } else {
+
+            send_ready(my_x_coord, my_y_coord, A_type, broadcastNodeX, 
+                    my_y_coord);
 
             receive_matrix(A_type);
         }
@@ -544,6 +563,15 @@ enum FoxError fox_algorithm(int my_x_coord, int my_y_coord) {
 
         // Don't need to send B matrix after last multiplication operation
         if (stage != foxStages - 1) {
+
+            send_ready(my_x_coord, my_y_coord, B_type, my_x_coord, 
+                    receiveBFrom);
+            
+            // Wait for receiver to be ready
+            while (!is_b_send_ready(my_x_coord, my_y_coord, foxStages)) {
+
+                __asm__("nop");
+            }
 
             // Rotate B matrix up
             send_B(my_x_coord, my_y_coord, foxStages);

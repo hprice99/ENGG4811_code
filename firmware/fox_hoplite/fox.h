@@ -42,11 +42,11 @@ enum FoxError receive_fox_packet(struct MatrixPacket* packet);
 enum FoxError send_ready(int my_x_coord, int my_y_coord, 
         enum MatrixType matrixType, int dest_x_coord, int dest_y_coord);
 
-bool a_broadcast_ready(int my_x_coord, int my_y_coord, int fox_rows);
+bool is_a_broadcast_ready(int my_x_coord, int my_y_coord, int fox_rows);
 
 enum FoxError send_A(int my_x_coord, int my_y_coord, int fox_rows);
 
-bool b_ready(int my_x_coord, int my_y_coord, int fox_cols);
+bool is_b_send_ready(int my_x_coord, int my_y_coord, int fox_cols);
 
 enum FoxError send_B(int my_x_coord, int my_y_coord, int fox_cols);
 
