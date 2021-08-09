@@ -14,6 +14,7 @@ int my_x_coord;
 int my_y_coord;
 int my_node_number;
 
+#ifdef TB_PRINT
 void tb_output_matrix(char* label, long* matrix, int rows, int cols) {
 
     print_string(label);
@@ -35,6 +36,7 @@ void tb_output_matrix(char* label, long* matrix, int rows, int cols) {
 
     print_string("] \n");
 }
+#endif
 
 void create_my_A(void) {
 
@@ -47,9 +49,6 @@ void create_my_A(void) {
             // my_A[index] = my_node_number + x + y + 1;
         }
     }
-
-    tb_output_matrix("A", my_A, MATRIX_SIZE, MATRIX_SIZE);
-    print_string("\n");
 }
 
 void create_initial_stage_B(void) {
@@ -64,9 +63,6 @@ void create_initial_stage_B(void) {
             // stage_B[index] = 2 * my_node_number + x + y + 4;
         }
     }
-
-    tb_output_matrix("B", stage_B, MATRIX_SIZE, MATRIX_SIZE);
-    print_string("\n");
 }
 
 void initialise_C(void) {
@@ -142,35 +138,57 @@ void main() {
     print_hex(resultXCoord, 1);
     print_string(", resultYCoord = ");
     print_hex(resultYCoord, 1);
-    print_string("\n\n");
+    print_char('\n');
+    print_char('\n');
 
     int ledValue = 1;
     long loopCount = 0;
 
     create_my_A();
+    #ifdef TB_PRINT
+    tb_output_matrix("A", my_A, MATRIX_SIZE, MATRIX_SIZE);
+    print_char('\n');
+    #endif
+
     create_initial_stage_B();
+    #ifdef TB_PRINT
+    tb_output_matrix("B", stage_B, MATRIX_SIZE, MATRIX_SIZE);
+    print_char('\n');
+    #endif
+
     initialise_C();
 
     #ifdef RESULT
     print_string("Result node ");
     print_dec(my_node_number);
-    print_string("\n\n");
+    print_char('\n');
+    print_char('\n');
+    #endif
+
+    #ifdef TB_PRINT
+    print_string("TB_PRINT defined\n");
     #endif
 
     fox_algorithm(my_x_coord, my_y_coord);
 
+    #ifdef TB_PRINT
     tb_output_matrix("Matrix multiplication complete. C", result_C, 
             MATRIX_SIZE, MATRIX_SIZE);
+    #endif
 
+    
     #ifdef RESULT
+    // Receive results and print to UART
     assign_my_C();
     receive_result();
     print_C();
     #else
+    // Send the results to the result node
     send_C(my_x_coord, my_y_coord);
     #endif
 
     LED_OUTPUT = ledValue;
+    int ledToggles = 0;
 
     while (1) {
 
@@ -178,6 +196,7 @@ void main() {
 
             loopCount = 0;
             ledValue = 1 - ledValue;
+            ledToggles++;
 
             LED_OUTPUT = ledValue;
 
@@ -186,11 +205,15 @@ void main() {
 
             if (ledValue == 0) {
                 
-                print_string("off\n");
+                print_string("off");
             } else if (ledValue == 1) {
 
-                print_string("on\n");
+                print_string("on");
             }
+
+            print_string(", ledToggles = ");
+            print_dec(ledToggles);
+            print_char('\n');
             #endif
 
         }
