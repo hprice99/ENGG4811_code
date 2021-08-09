@@ -115,6 +115,9 @@ void main() {
     resultXCoord = RESULT_X_COORD_INPUT;
     resultYCoord = RESULT_Y_COORD_INPUT;
 
+    foxStages = FOX_NETWORK_STAGES_INPUT;
+
+    #ifdef TB_PRINT
     print_string("Node coordinates (");
     print_hex(my_x_coord, 1);
     print_string(", ");
@@ -122,7 +125,6 @@ void main() {
     print_string("), node number = ");
     print_hex(my_node_number, 1);
 
-    foxStages = FOX_NETWORK_STAGES_INPUT;
     print_string(", Fox stages = ");
     print_hex(foxStages, 1);
     print_string(", xOffset = ");
@@ -140,6 +142,7 @@ void main() {
     print_hex(resultYCoord, 1);
     print_char('\n');
     print_char('\n');
+    #endif
 
     int ledValue = 1;
     long loopCount = 0;
@@ -205,13 +208,13 @@ void main() {
 
             if (ledValue == 0) {
                 
-                print_string("off");
+                print_string("off, ");
             } else if (ledValue == 1) {
 
-                print_string("on");
+                print_string("on,  ");
             }
 
-            print_string(", ledToggles = ");
+            print_string("ledToggles = ");
             print_dec(ledToggles);
             print_char('\n');
             #endif
