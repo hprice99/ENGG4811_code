@@ -42,6 +42,10 @@ entity top is
         FOX_NETWORK_STAGES  : integer := 2;
         FOX_NETWORK_NODES   : integer := 4;
         
+        FOX_FIRMWARE           : string := "firmware_hoplite.hex";
+        RESULT_FIRMWARE        : string := "firmware_hoplite_result.hex";
+
+        
         CLK_FREQ            : integer := 50e6;
         ENABLE_UART         : boolean := False
     );
@@ -231,9 +235,6 @@ architecture Behavioral of top is
     constant RESULT_DIVIDE_ENABLED  : std_logic := '1';
     constant MULTIPLY_ENABLED       : std_logic := '1';
     
-    constant FOX_FIRMWARE           : string := "firmware_hoplite.hex";
-    constant RESULT_FIRMWARE        : string := "firmware_hoplite_result.hex";
-
     constant FOX_MEM_SIZE           : integer := 4096;
     constant RESULT_MEM_SIZE        : integer := 8192;
 

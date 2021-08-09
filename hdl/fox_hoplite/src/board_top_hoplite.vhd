@@ -54,6 +54,9 @@ architecture Behavioral of board_top is
             FOX_NETWORK_STAGES  : integer := 2;
             FOX_NETWORK_NODES   : integer := 4;
             
+            FOX_FIRMWARE           : string := "firmware_hoplite.hex";
+            RESULT_FIRMWARE        : string := "firmware_hoplite_result.hex";
+            
             CLK_FREQ            : integer := 50e6;
             ENABLE_UART         : boolean := False
         );
@@ -79,6 +82,9 @@ architecture Behavioral of board_top is
     
     constant CLK_FREQ       : integer := 50e6;
     constant ENABLE_UART    : boolean := True;
+    
+    constant FOX_FIRMWARE       : string := "firmware_hoplite.hex";
+    constant RESULT_FIRMWARE    : string := "firmware_hoplite_result.hex";
 
 begin
 
@@ -94,6 +100,9 @@ begin
         generic map (
             FOX_NETWORK_STAGES  => FOX_NETWORK_STAGES,
             FOX_NETWORK_NODES   => FOX_NETWORK_NODES,
+            
+            FOX_FIRMWARE        => FOX_FIRMWARE,
+            RESULT_FIRMWARE     => RESULT_FIRMWARE,
             
             CLK_FREQ            => CLK_FREQ,
             ENABLE_UART         => ENABLE_UART

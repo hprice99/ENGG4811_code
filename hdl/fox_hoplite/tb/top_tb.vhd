@@ -48,6 +48,9 @@ architecture Behavioral of top_tb is
             FOX_NETWORK_STAGES  : integer := 2;
             FOX_NETWORK_NODES   : integer := 4;
             
+            FOX_FIRMWARE           : string := "firmware_hoplite.hex";
+            RESULT_FIRMWARE        : string := "firmware_hoplite_result.hex";
+            
             CLK_FREQ            : integer := 50e6;
             ENABLE_UART         : boolean := False
         );
@@ -100,6 +103,9 @@ architecture Behavioral of top_tb is
     
     signal reset_n      : std_logic;
     signal reset        : std_logic;
+    
+    constant FOX_FIRMWARE       : string := "firmware_hoplite_tb.hex";
+    constant RESULT_FIRMWARE    : string := "firmware_hoplite_result_tb.hex";
     
     signal LED      : std_logic_vector((FOX_NETWORK_NODES-1) downto 0);
     
@@ -155,6 +161,9 @@ begin
         generic map (
             FOX_NETWORK_STAGES  => FOX_NETWORK_STAGES,
             FOX_NETWORK_NODES   => FOX_NETWORK_NODES,
+            
+            FOX_FIRMWARE        => FOX_FIRMWARE,
+            RESULT_FIRMWARE     => RESULT_FIRMWARE,
             
             CLK_FREQ            => CLK_FREQ,
             ENABLE_UART         => True
