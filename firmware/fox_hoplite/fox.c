@@ -23,6 +23,107 @@ int cElementsReceived;
 int aElementsReceived;
 int bElementsReceived;
 
+enum FoxError receive_fox_packet(struct MatrixPacket* packet) {
+
+    enum NetworkError networkError = NETWORK_ERROR;
+
+    int receiveLoopsLevel1 = 0;
+    int receiveLoopsLevel2 = 0;
+
+    while (receiveLoopsLevel1 < FOX_NETWORK_WAIT && 
+            networkError != NETWORK_SUCCESS) {
+        
+        while (receiveLoopsLevel2 < FOX_NETWORK_WAIT && 
+                networkError != NETWORK_SUCCESS) {
+
+            networkError = receive_message(packet);
+            receiveLoopsLevel2++;
+        }
+
+        receiveLoopsLevel2 = 0;
+
+        receiveLoopsLevel1++;
+    }
+    
+    if (receiveLoopsLevel1 == FOX_NETWORK_WAIT) {
+
+        return FOX_NETWORK_TIMEOUT_ERROR;
+    }
+
+    if (networkError == NETWORK_ERROR || 
+            networkError == NETWORK_MESSAGE_IN_UNAVAILABLE) {
+
+        print_string("receive_fox_packet network timeout error\n");
+
+        return FOX_NETWORK_TIMEOUT_ERROR;
+    }
+
+    return FOX_SUCCESS;
+}
+
+enum FoxError send_ready(int my_x_coord, int my_y_coord, 
+        enum MatrixType matrixType, int dest_x_coord, int dest_y_coord) {
+    
+    enum NetworkError networkError = NETWORK_ERROR;
+
+    struct MatrixPacket packet;
+
+    packet.doneFlag = true;
+    packet.resultFlag = false;
+    packet.matrixType = matrixType;
+
+    if (matrixType == A_type) {
+
+        packet.multicastGroup = 1;
+    } else {
+
+        packet.multicastGroup = 0;
+    }
+
+    packet.destX = dest_x_coord;
+    packet.destY = dest_y_coord;
+
+    packet.matrixX = my_x_coord;
+    packet.matrixY = my_y_coord;
+
+    networkError = send_message(packet);
+
+    if (networkError == NETWORK_ERROR) {
+
+        print_string("send_ready network error\n");
+
+        return FOX_NETWORK_ERROR;
+    }
+
+    return FOX_SUCCESS;
+}
+
+bool a_broadcast_ready(int my_x_coord, int my_y_coord, int fox_rows) {
+
+    int nodesReady = 0;
+    int broadcastDestinations = fox_rows - 1;
+
+    // Receive ready packets
+    struct MatrixPacket packet;
+
+    while (nodesReady < broadcastDestinations) {
+
+        receive_fox_packet(&packet);
+
+        #ifdef DEBUG_PRINT
+        print_matrix_packet("a_broadcast_ready", packet);
+        #endif
+
+        // Check if the packet is broadcast
+        if (packet.doneFlag == 1 && packet.matrixType == A_type) {
+
+            nodesReady++;
+        }
+    }
+
+    return true;
+}
+
 enum FoxError send_A(int my_x_coord, int my_y_coord, int fox_rows) {
 
     enum NetworkError networkError = NETWORK_ERROR;
@@ -77,6 +178,32 @@ enum FoxError send_A(int my_x_coord, int my_y_coord, int fox_rows) {
     }
 
     return FOX_SUCCESS;
+}
+
+bool b_ready(int my_x_coord, int my_y_coord, int fox_cols) {
+
+    int nodesReady = 0;
+    int bDestinations = 1;
+
+    // Receive ready packets
+    struct MatrixPacket packet;
+
+    while (nodesReady < bDestinations) {
+
+        receive_fox_packet(&packet);
+
+        #ifdef DEBUG_PRINT
+        print_matrix_packet("b_broadcast_ready", packet);
+        #endif
+
+        // Check if the packet is broadcast
+        if (packet.doneFlag == 1 && packet.matrixType == B_type) {
+
+            nodesReady++;
+        }
+    }
+
+    return true;
 }
 
 enum FoxError send_B(int my_x_coord, int my_y_coord, int fox_cols) {
@@ -254,48 +381,16 @@ enum FoxError assign_my_A(void) {
 
 enum FoxError receive_matrix(enum MatrixType matrixType) {
 
-    enum NetworkError networkError;
     struct MatrixPacket packet;
-
-    long receiveLoopsLevel1 = 0;
-    long receiveLoopsLevel2 = 0;
 
     while ((matrixType == A_type && aElementsReceived < MATRIX_ELEMENTS) || 
             (matrixType == B_type && bElementsReceived < MATRIX_ELEMENTS)) {
 
-        // Reset networkError before trying to receive each packet
-        networkError = NETWORK_ERROR;
-
-        receiveLoopsLevel1 = 0;
-        receiveLoopsLevel2 = 0;
-
-        while (receiveLoopsLevel1 < FOX_NETWORK_WAIT && 
-                networkError != NETWORK_SUCCESS) {
-            
-            while (receiveLoopsLevel2 < FOX_NETWORK_WAIT && 
-                    networkError != NETWORK_SUCCESS) {
-
-                networkError = receive_message(&packet);
-                receiveLoopsLevel2++;
-            }
-
-            receiveLoopsLevel2 = 0;
-
-            receiveLoopsLevel1++;
-        }
-        receiveLoopsLevel1 = 0;
+        receive_fox_packet(&packet);
 
         #ifdef DEBUG_PRINT
         print_matrix_packet("receive_matrix", packet);
         #endif
-
-        if (networkError == NETWORK_ERROR || 
-                networkError == NETWORK_MESSAGE_IN_UNAVAILABLE) {
-
-            print_string("receive_matrix network timeout error\n");
-
-            return FOX_NETWORK_TIMEOUT_ERROR;
-        }
 
         assign_element(packet);
     }
@@ -346,47 +441,15 @@ enum FoxError assign_my_C(void) {
 
 enum FoxError receive_result(void) {
 
-    enum NetworkError networkError;
     struct MatrixPacket packet;
-
-    long receiveLoopsLevel1 = 0;
-    long receiveLoopsLevel2 = 0;
 
     while (cElementsReceived < TOTAL_MATRIX_ELEMENTS) {
 
-        // Reset networkError before trying to receive each packet
-        networkError = NETWORK_ERROR;
-
-        receiveLoopsLevel1 = 0;
-        receiveLoopsLevel2 = 0;
-
-        while (receiveLoopsLevel1 < FOX_NETWORK_WAIT && 
-                networkError != NETWORK_SUCCESS) {
-            
-            while (receiveLoopsLevel2 < FOX_NETWORK_WAIT && 
-                    networkError != NETWORK_SUCCESS) {
-
-                networkError = receive_message(&packet);
-                receiveLoopsLevel2++;
-            }
-
-            receiveLoopsLevel2 = 0;
-
-            receiveLoopsLevel1++;
-        }
-        receiveLoopsLevel1 = 0;
+        receive_fox_packet(&packet);
 
         #ifdef DEBUG_PRINT
         print_matrix_packet("receive_matrix", packet);
         #endif
-
-        if (networkError == NETWORK_ERROR || 
-                networkError == NETWORK_MESSAGE_IN_UNAVAILABLE) {
-
-            print_string("receive_matrix network timeout error\n");
-
-            return FOX_NETWORK_TIMEOUT_ERROR;
-        }
 
         assign_result(packet);
     }
@@ -435,7 +498,7 @@ enum FoxError assign_result(struct MatrixPacket packet) {
 }
 #endif
 
-bool is_broadcast_stage(int my_x_coord, int my_y_coord, int stage) {
+int get_broadcast_stage_node(int my_x_coord, int my_y_coord, int stage) {
 
     int broadcastXCoord = stage + my_y_coord;
 
@@ -445,7 +508,7 @@ bool is_broadcast_stage(int my_x_coord, int my_y_coord, int stage) {
         broadcastXCoord = broadcastXCoord - foxStages;
     }
 
-    return (my_x_coord == broadcastXCoord);
+    return broadcastXCoord;
 }
 
 enum FoxError fox_algorithm(int my_x_coord, int my_y_coord) {
@@ -457,10 +520,15 @@ enum FoxError fox_algorithm(int my_x_coord, int my_y_coord) {
     cElementsReceived = 0;
     #endif
 
+    int broadcastNodeX = -1;
+
     for (int stage = 0; stage < foxStages; stage++) {
 
+        broadcastNodeX = 
+                get_broadcast_stage_node(my_x_coord, my_y_coord, stage);
+
         // Broadcast A
-        if (is_broadcast_stage(my_x_coord, my_y_coord, stage)) {
+        if (my_x_coord == broadcastNodeX) {
 
             send_A(my_x_coord, my_y_coord, foxStages);
 
@@ -484,13 +552,4 @@ enum FoxError fox_algorithm(int my_x_coord, int my_y_coord) {
             receive_matrix(B_type);
         }
     }
-
-    /*
-    #ifdef RESULT
-    assign_my_C();
-    receive_result();
-    #else
-    send_C(my_x_coord, my_y_coord);
-    #endif
-    */
 }
