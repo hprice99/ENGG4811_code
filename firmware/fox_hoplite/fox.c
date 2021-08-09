@@ -546,6 +546,10 @@ enum FoxError fox_algorithm(int my_x_coord, int my_y_coord) {
                 __asm__("nop");
             }
 
+            #ifdef TB_PRINT
+            print_string("broadcast_A ready\n");
+            #endif
+
             send_A(my_x_coord, my_y_coord, foxStages);
 
             // Assign my_A
@@ -572,6 +576,10 @@ enum FoxError fox_algorithm(int my_x_coord, int my_y_coord) {
 
                 __asm__("nop");
             }
+
+            #ifdef TB_PRINT
+            print_string("broadcast_B ready\n");
+            #endif
 
             // Rotate B matrix up
             send_B(my_x_coord, my_y_coord, foxStages);
