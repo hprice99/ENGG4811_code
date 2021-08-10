@@ -171,7 +171,6 @@ architecture Behavioral of fox_node is
             network_to_pe_empty : out std_logic
         );
     end component nic_dual;
-    
    
     component message_encoder
         generic (
