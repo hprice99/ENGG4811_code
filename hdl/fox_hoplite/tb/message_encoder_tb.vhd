@@ -534,10 +534,14 @@ begin
             
             -- Process to print encoded packets
             PRINT_OUTPUT: process (clk)
-                variable my_encoder_output_line     : line;
-                variable my_encoder_file_line       : line;
-                constant my_encoder_file_name       : string := "Encoded Node " & integer'image(node_number) & ".txt";
-                file WriteEncodeFile                : text open WRITE_MODE is my_encoder_file_name;
+                variable my_encoder_output_line             : line;
+                variable my_encoder_binary_file_line        : line;
+                constant my_encoder_binary_file_name        : string := "Encoded Node " & integer'image(node_number) & " binary.txt";
+                file WriteEncodeBinaryFile                  : text open WRITE_MODE is my_encoder_binary_file_name;
+                
+                variable my_encoder_hex_file_line           : line;
+                constant my_encoder_hex_file_name           : string := "Encoded Node " & integer'image(node_number) & " hex.txt";
+                file WriteEncodeHexFile                     : text open WRITE_MODE is my_encoder_hex_file_name;
 
                 variable my_decoder_output_line     : line;
                 variable my_decoder_file_line       : line;
@@ -554,13 +558,19 @@ begin
                         hwrite(my_encoder_output_line, encoder_packet_out(curr_x, curr_y));
                         writeline(output, my_encoder_output_line);
                         
-                        write(my_encoder_file_line, encoder_packet_out(curr_x, curr_y));
-                        writeline(WriteEncodeFile, my_encoder_file_line);
+                        write(my_encoder_binary_file_line, encoder_packet_out(curr_x, curr_y));
+                        writeline(WriteEncodeBinaryFile, my_encoder_binary_file_line);
+                        
+                        hwrite(my_encoder_hex_file_line, encoder_packet_out(curr_x, curr_y));
+                        writeline(WriteEncodeHexFile, my_encoder_hex_file_line);
                     end if;
                     
-                    if (decoder_packet_out_valid(curr_x, curr_y) = '1') then
+                    if (decoder_packet_read(curr_x, curr_y) = '1') then
                         write(my_decoder_output_line, string'("Node number = "));
                         write(my_decoder_output_line, node_number);
+                        write(my_decoder_output_line, string'(", encoded packet: "));
+                        hwrite(my_decoder_output_line, decoder_packet_in(curr_x, curr_y));
+                        
                         write(my_decoder_output_line, string'(", decoded packet: "));
                         
                         write(my_decoder_output_line, string'("dest = ("));
@@ -594,8 +604,8 @@ begin
 
                         write(my_decoder_file_line, string'("Node number = "));
                         write(my_decoder_file_line, node_number);
-                        write(my_encoder_output_line, string'(", encoded packet: "));
-                        hwrite(my_encoder_output_line, decoder_packet_in(curr_x, curr_y));
+                        write(my_decoder_file_line, string'(", encoded packet: "));
+                        hwrite(my_decoder_file_line, decoder_packet_in(curr_x, curr_y));
                         
                         write(my_decoder_file_line, string'(", decoded packet: "));
                         
