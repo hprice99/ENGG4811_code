@@ -594,6 +594,9 @@ begin
 
                         write(my_decoder_file_line, string'("Node number = "));
                         write(my_decoder_file_line, node_number);
+                        write(my_encoder_output_line, string'(", encoded packet: "));
+                        hwrite(my_encoder_output_line, decoder_packet_in(curr_x, curr_y));
+                        
                         write(my_decoder_file_line, string'(", decoded packet: "));
                         
                         write(my_decoder_file_line, string'("dest = ("));
