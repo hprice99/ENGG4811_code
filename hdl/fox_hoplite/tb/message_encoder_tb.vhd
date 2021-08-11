@@ -394,6 +394,8 @@ begin
                     matrix_y_coord_valid(curr_x, curr_y)    <= '0';
                     matrix_element_valid(curr_x, curr_y)    <= '0';
                     
+                    encoder_packet_complete(curr_x, curr_y) <= '0';
+                    
                     decoder_packet_read(curr_x, curr_y)     <= '0';
                 
                     if (reset_n = '0') then
@@ -533,11 +535,14 @@ begin
             -- Process to print encoded packets
             PRINT_OUTPUT: process (clk)
                 variable my_encoder_output_line     : line;
+                variable my_encoder_file_line       : line;
+                constant my_encoder_file_name       : string := "Encoded Node " & integer'image(node_number) & ".txt";
+                file WriteEncodeFile                : text open WRITE_MODE is my_encoder_file_name;
+
                 variable my_decoder_output_line     : line;
-                variable my_file_line               : line;
-                
-                constant my_file_name : string := "Node " & integer'image(node_number) & ".txt";
-                file WriteFile : TEXT open WRITE_MODE is my_file_name;
+                variable my_decoder_file_line       : line;
+                constant my_decoder_file_name       : string := "Decoded Node " & integer'image(node_number) & ".txt";
+                file WriteDecodeFile                : text open WRITE_MODE is my_decoder_file_name;
             begin
                 if (rising_edge(clk) and reset_n = '1') then
                     if (encoder_packet_out_valid(curr_x, curr_y) = '1') then
@@ -549,8 +554,8 @@ begin
                         hwrite(my_encoder_output_line, encoder_packet_out(curr_x, curr_y));
                         writeline(output, my_encoder_output_line);
                         
-                        write(my_file_line, encoder_packet_out(curr_x, curr_y));
-                        writeline(WriteFile, my_file_line);
+                        write(my_encoder_file_line, encoder_packet_out(curr_x, curr_y));
+                        writeline(WriteEncodeFile, my_encoder_file_line);
                     end if;
                     
                     if (decoder_packet_out_valid(curr_x, curr_y) = '1') then
@@ -586,6 +591,39 @@ begin
                         write(my_decoder_output_line, slv_to_int(decoder_matrix_element_out(curr_x, curr_y)));
                         
                         writeline(output, my_decoder_output_line);
+
+                        write(my_decoder_file_line, string'("Node number = "));
+                        write(my_decoder_file_line, node_number);
+                        write(my_decoder_file_line, string'(", decoded packet: "));
+                        
+                        write(my_decoder_file_line, string'("dest = ("));
+                        write(my_decoder_file_line, slv_to_int(decoder_x_coord_out(curr_x, curr_y)));
+                        write(my_decoder_file_line, string'(", "));
+                        write(my_decoder_file_line, slv_to_int(decoder_y_coord_out(curr_x, curr_y)));
+                        write(my_decoder_file_line, string'(")"));
+                        
+                        write(my_decoder_file_line, string'(", multicast group = "));
+                        write(my_decoder_file_line, slv_to_int(decoder_multicast_group_out(curr_x, curr_y)));
+                        
+                        write(my_decoder_file_line, string'(", done flag = "));
+                        write(my_decoder_file_line, decoder_done_flag_out(curr_x, curr_y));
+                        
+                        write(my_decoder_file_line, string'(", result flag = "));
+                        write(my_decoder_file_line, decoder_result_flag_out(curr_x, curr_y));
+                        
+                        write(my_decoder_file_line, string'(", matrix type = "));
+                        write(my_decoder_file_line, slv_to_int(decoder_matrix_type_out(curr_x, curr_y)));
+                        
+                        write(my_decoder_file_line, string'(", matrix coordinate = ("));
+                        write(my_decoder_file_line, slv_to_int(decoder_matrix_x_coord_out(curr_x, curr_y)));
+                        write(my_decoder_file_line, string'(", "));
+                        write(my_decoder_file_line, slv_to_int(decoder_matrix_y_coord_out(curr_x, curr_y)));
+                        write(my_decoder_file_line, string'(")"));
+                        
+                        write(my_decoder_file_line, string'(", matrix element = "));
+                        write(my_decoder_file_line, slv_to_int(decoder_matrix_element_out(curr_x, curr_y)));
+                        
+                        writeline(WriteDecodeFile, my_decoder_file_line);
                     end if;
                 end if;
             end process PRINT_OUTPUT;
