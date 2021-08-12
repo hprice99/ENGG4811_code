@@ -265,6 +265,11 @@ architecture Behavioral of message_encoder_tb is
     signal decoder_packet_out_valid     : t_MessageValid;
     signal decoder_packet_read          : t_MessageValid;
 
+    type t_State is (START, SET_A, SET_B, SEND, DECODE, INCREMENT, CHOOSE_MATRIX, DONE);
+    type t_States is array (0 to (NETWORK_COLS-1), 0 to (NETWORK_ROWS-1)) of t_State;
+    signal current_state    : t_States;
+    signal next_state       : t_States;
+
 begin
 
     -- Generate clk and reset_n
@@ -300,6 +305,187 @@ begin
             constant y_offset       : integer := i * (FOX_MATRIX_SIZE);
             constant x_offset       : integer := j * (FOX_MATRIX_SIZE);
         begin
+            STATE_MEMORY: process (clk)
+            begin
+                if (rising_edge(clk)) then
+                    if (reset_n = '0') then
+                        current_state(curr_x, curr_y)   <= START;
+                    else
+                        current_state(curr_x, curr_y)   <= next_state(curr_x, curr_y);
+                    end if;
+                end if;
+            end process STATE_MEMORY;
+
+            STATE_TRANSITION: process (current_state(curr_x, curr_y), 
+                    encoder_packet_out_valid(curr_x, curr_y), 
+                    decoder_packet_out_valid(curr_x, curr_y),
+                    a_packets_received(curr_x, curr_y),
+                    b_packets_received(curr_x, curr_y))
+            begin
+                case current_state(curr_x, curr_y) is
+                    when START => 
+                        next_state(curr_x, curr_y)  <= SET_A;
+                    when SET_A =>
+                        next_state(curr_x, curr_y)  <= SEND;
+                    when SET_B =>
+                        next_state(curr_x, curr_y)  <= SEND;
+                    when SEND =>
+                        if (encoder_packet_out_valid(curr_x, curr_y) = '1') then
+                            next_state(curr_x, curr_y)  <= DECODE;
+                        else
+                            next_state(curr_x, curr_y)  <= SEND;
+                        end if;
+                    when DECODE =>
+                        next_state(curr_x, curr_y) <= INCREMENT;
+                    when INCREMENT =>
+                        next_state(curr_x, curr_y) <= CHOOSE_MATRIX;
+                    when CHOOSE_MATRIX =>
+                        if (a_packets_received(curr_x, curr_y) < FOX_MATRIX_ELEMENTS) then
+                            next_state(curr_x, curr_y) <= SET_A;
+                        elsif (b_packets_received(curr_x, curr_y) < FOX_MATRIX_ELEMENTS) then
+                            next_state(curr_x, curr_y) <= SET_B;
+                        else
+                            next_state(curr_x, curr_y) <= DONE;
+                        end if;
+                    when others =>
+                        next_state(curr_x, curr_y) <= current_state(curr_x, curr_y);
+                end case;
+            end process STATE_TRANSITION;
+
+            STATE_OUTPUT: process (current_state(curr_x, curr_y), 
+                    encoder_packet_out_valid(curr_x, curr_y), 
+                    decoder_packet_out_valid(curr_x, curr_y),
+                    a_packets_received(curr_x, curr_y),
+                    b_packets_received(curr_x, curr_y))
+            begin
+                -- Reset valid signals
+                x_dest_valid(curr_x, curr_y)            <= '0';
+                y_dest_valid(curr_x, curr_y)            <= '0';
+                multicast_group_valid(curr_x, curr_y)   <= '0';
+                done_flag_valid(curr_x, curr_y)         <= '0';
+                result_flag_valid(curr_x, curr_y)       <= '0';
+                matrix_type_valid(curr_x, curr_y)       <= '0';
+                matrix_x_coord_valid(curr_x, curr_y)    <= '0';
+                matrix_y_coord_valid(curr_x, curr_y)    <= '0';
+                matrix_element_valid(curr_x, curr_y)    <= '0';
+
+                encoder_packet_complete(curr_x, curr_y) <= '0';
+                decoder_packet_read(curr_x, curr_y)     <= '0';
+            
+                case current_state(curr_x, curr_y) is
+                    when START =>
+                        x_dest_valid(curr_x, curr_y)            <= '0';
+                        y_dest_valid(curr_x, curr_y)            <= '0';
+                        multicast_group_valid(curr_x, curr_y)   <= '0';
+                        done_flag_valid(curr_x, curr_y)         <= '0';
+                        result_flag_valid(curr_x, curr_y)       <= '0';
+                        matrix_type_valid(curr_x, curr_y)       <= '0';
+                        matrix_x_coord_valid(curr_x, curr_y)    <= '0';
+                        matrix_y_coord_valid(curr_x, curr_y)    <= '0';
+                        matrix_element_valid(curr_x, curr_y)    <= '0';
+                        
+                        encoder_packet_complete(curr_x, curr_y) <= '0';
+                        
+                        decoder_packet_read(curr_x, curr_y)     <= '0';
+                    when SET_A =>
+                        x_dest(curr_x, curr_y)                  <= int_to_slv(curr_x, COORD_BITS);
+                        x_dest_valid(curr_x, curr_y)            <= '1';
+
+                        y_dest(curr_x, curr_y)                  <= int_to_slv(curr_y, COORD_BITS);
+                        y_dest_valid(curr_x, curr_y)            <= '1';
+
+                        multicast_group(curr_x, curr_y)         <= "1";
+                        multicast_group_valid(curr_x, curr_y)   <= '1';
+
+                        done_flag(curr_x, curr_y)               <= '0';
+                        done_flag_valid(curr_x, curr_y)         <= '1';
+
+                        result_flag(curr_x, curr_y)             <= '0';
+                        result_flag_valid(curr_x, curr_y)       <= '1';
+
+                        matrix_type(curr_x, curr_y)             <= "0";
+                        matrix_type_valid(curr_x, curr_y)       <= '1';
+
+                        matrix_x_coord(curr_x, curr_y)          <= int_to_slv(matrix_x_coord_lookup(a_packets_received(curr_x, curr_y)), MATRIX_COORD_BITS);
+                        matrix_x_coord_valid(curr_x, curr_y)    <= '1';
+
+                        matrix_y_coord(curr_x, curr_y)          <= int_to_slv(matrix_y_coord_lookup(a_packets_received(curr_x, curr_y)), MATRIX_COORD_BITS);
+                        matrix_y_coord_valid(curr_x, curr_y)    <= '1';
+
+                        matrix_element(curr_x, curr_y)          <= A_matrices(curr_y, curr_x)(a_packets_received(curr_x, curr_y));
+                        matrix_element_valid(curr_x, curr_y)    <= '1';
+                    
+                    when SET_B =>
+                        x_dest(curr_x, curr_y)                  <= int_to_slv(curr_x, COORD_BITS);
+                        x_dest_valid(curr_x, curr_y)            <= '1';
+
+                        y_dest(curr_x, curr_y)                  <= int_to_slv(curr_y, COORD_BITS);
+                        y_dest_valid(curr_x, curr_y)            <= '1';
+
+                        multicast_group(curr_x, curr_y)         <= "0";
+                        multicast_group_valid(curr_x, curr_y)   <= '1';
+
+                        done_flag(curr_x, curr_y)               <= '0';
+                        done_flag_valid(curr_x, curr_y)         <= '1';
+
+                        result_flag(curr_x, curr_y)             <= '0';
+                        result_flag_valid(curr_x, curr_y)       <= '1';
+
+                        matrix_type(curr_x, curr_y)             <= "1";
+                        matrix_type_valid(curr_x, curr_y)       <= '1';
+
+                        matrix_x_coord(curr_x, curr_y)          <= int_to_slv(matrix_x_coord_lookup(b_packets_received(curr_x, curr_y)), MATRIX_COORD_BITS);
+                        matrix_x_coord_valid(curr_x, curr_y)    <= '1';
+
+                        matrix_y_coord(curr_x, curr_y)          <= int_to_slv(matrix_y_coord_lookup(b_packets_received(curr_x, curr_y)), MATRIX_COORD_BITS);
+                        matrix_y_coord_valid(curr_x, curr_y)    <= '1';
+
+                        matrix_element(curr_x, curr_y)          <= B_matrices(curr_y, curr_x)(b_packets_received(curr_x, curr_y));
+                        matrix_element_valid(curr_x, curr_y)    <= '1';
+
+                    when SEND =>
+                        encoder_packet_complete(curr_x, curr_y) <= '1';
+
+                    when DECODE =>
+                        -- Packet read out of decoder
+                        decoder_packet_read(curr_x, curr_y) <= '1';
+
+                    when INCREMENT =>
+                        encoder_packet_complete(curr_x, curr_y) <= '0';
+                    when others =>
+                        -- Reset valid signals
+                        x_dest_valid(curr_x, curr_y)            <= '0';
+                        y_dest_valid(curr_x, curr_y)            <= '0';
+                        multicast_group_valid(curr_x, curr_y)   <= '0';
+                        done_flag_valid(curr_x, curr_y)         <= '0';
+                        result_flag_valid(curr_x, curr_y)       <= '0';
+                        matrix_type_valid(curr_x, curr_y)       <= '0';
+                        matrix_x_coord_valid(curr_x, curr_y)    <= '0';
+                        matrix_y_coord_valid(curr_x, curr_y)    <= '0';
+                        matrix_element_valid(curr_x, curr_y)    <= '0';
+                        
+                        encoder_packet_complete(curr_x, curr_y) <= '0';
+                        
+                        decoder_packet_read(curr_x, curr_y)     <= '0';
+                end case;
+            end process STATE_OUTPUT;
+            
+            ELEMENT_COUNTER: process (clk)
+            begin
+                if (rising_edge(clk) and reset_n = '1') then
+                    if (current_state(curr_x, curr_y) = START) then
+                        a_packets_received(curr_x, curr_y)    <= 0;
+                        b_packets_received(curr_x, curr_y)    <= 0;
+                    elsif (current_state(curr_x, curr_y) = INCREMENT) then
+                        if (a_packets_received(curr_x, curr_y) < FOX_MATRIX_ELEMENTS) then
+                            a_packets_received(curr_x, curr_y) <= a_packets_received(curr_x, curr_y) + 1;
+                        elsif (b_packets_received(curr_x, curr_y) < FOX_MATRIX_ELEMENTS) then
+                            b_packets_received(curr_x, curr_y) <= b_packets_received(curr_x, curr_y) + 1;
+                        end if;
+                    end if;
+                end if;
+            end process ELEMENT_COUNTER;
+
             ENCODER: message_encoder
                 generic map (
                     COORD_BITS              => COORD_BITS,
@@ -348,7 +534,7 @@ begin
                 
             decoder_packet_in(curr_x, curr_y)       <= encoder_packet_out(curr_x, curr_y);
             decoder_packet_in_valid(curr_x, curr_y) <= encoder_packet_out_valid(curr_x, curr_y);
-                
+
             DECODER: message_decoder
                 generic map (
                     COORD_BITS              => COORD_BITS,
@@ -378,174 +564,21 @@ begin
                     packet_out_valid    => decoder_packet_out_valid(curr_x, curr_y),
                     packet_read         => decoder_packet_read(curr_x, curr_y)
                 );
-                
-            -- Process to send fields to encoder
-            MESSAGE_SEND: process (clk)
-            begin
-                if (rising_edge(clk)) then
-                    -- Reset valid signals
-                    x_dest_valid(curr_x, curr_y)            <= '0';
-                    y_dest_valid(curr_x, curr_y)            <= '0';
-                    multicast_group_valid(curr_x, curr_y)   <= '0';
-                    done_flag_valid(curr_x, curr_y)         <= '0';
-                    result_flag_valid(curr_x, curr_y)       <= '0';
-                    matrix_type_valid(curr_x, curr_y)       <= '0';
-                    matrix_x_coord_valid(curr_x, curr_y)    <= '0';
-                    matrix_y_coord_valid(curr_x, curr_y)    <= '0';
-                    matrix_element_valid(curr_x, curr_y)    <= '0';
-                    
-                    encoder_packet_complete(curr_x, curr_y) <= '0';
-                    
-                    decoder_packet_read(curr_x, curr_y)     <= '0';
-                
-                    if (reset_n = '0') then
-                        -- Internal signals
-                        packet_sent(curr_x, curr_y)          <= '0';
-                        
-                        a_packets_received(curr_x, curr_y)    <= 0;
-                        b_packets_received(curr_x, curr_y)    <= 0;
-                       
-                        current_matrix_type(curr_x, curr_y)   <= A;
-                        
-                        a_packets_done(curr_x, curr_y)        <= '0';
-                        b_packets_done(curr_x, curr_y)        <= '0';
-                    
-                        -- Encoder signals
-                        x_dest(curr_x, curr_y)                  <= (others => '0');
-                        x_dest_valid(curr_x, curr_y)            <= '0';
 
-                        y_dest(curr_x, curr_y)                  <= (others => '0');
-                        y_dest_valid(curr_x, curr_y)            <= '0';
-
-                        multicast_group(curr_x, curr_y)         <= (others => '0');
-                        multicast_group_valid(curr_x, curr_y)   <= '0';
-
-                        done_flag(curr_x, curr_y)               <= '0';
-                        done_flag_valid(curr_x, curr_y)         <= '0';
-
-                        result_flag(curr_x, curr_y)             <= '0';
-                        result_flag_valid(curr_x, curr_y)       <= '0';
-
-                        matrix_type(curr_x, curr_y)             <= (others => '0');
-                        matrix_type_valid(curr_x, curr_y)       <= '0';
-
-                        matrix_x_coord(curr_x, curr_y)          <= (others => '0');
-                        matrix_x_coord_valid(curr_x, curr_y)    <= '0';
-
-                        matrix_y_coord(curr_x, curr_y)          <= (others => '0');
-                        matrix_y_coord_valid(curr_x, curr_y)    <= '0';
-
-                        matrix_element(curr_x, curr_y)          <= (others => '0');
-                        matrix_element_valid(curr_x, curr_y)    <= '0';
-
-                        encoder_packet_complete(curr_x, curr_y) <= '0';
-                        
-                        decoder_packet_read(curr_x, curr_y)     <= '0';
-                    else
-                        if (current_matrix_type(curr_x, curr_y) = A and 
-                                a_packets_received(curr_x, curr_y) < FOX_MATRIX_ELEMENTS and 
-                                packet_sent(curr_x, curr_y) = '0') then
-                            x_dest(curr_x, curr_y)                  <= int_to_slv(curr_x, COORD_BITS);
-                            x_dest_valid(curr_x, curr_y)            <= '1';
-    
-                            y_dest(curr_x, curr_y)                  <= int_to_slv(curr_y, COORD_BITS);
-                            y_dest_valid(curr_x, curr_y)            <= '1';
-    
-                            multicast_group(curr_x, curr_y)         <= "1";
-                            multicast_group_valid(curr_x, curr_y)   <= '1';
-    
-                            done_flag(curr_x, curr_y)               <= '0';
-                            done_flag_valid(curr_x, curr_y)         <= '1';
-    
-                            result_flag(curr_x, curr_y)             <= '0';
-                            result_flag_valid(curr_x, curr_y)       <= '1';
-    
-                            matrix_type(curr_x, curr_y)             <= "0";
-                            matrix_type_valid(curr_x, curr_y)       <= '1';
-    
-                            matrix_x_coord(curr_x, curr_y)          <= int_to_slv(matrix_x_coord_lookup(a_packets_received(curr_x, curr_y)), MATRIX_COORD_BITS);
-                            matrix_x_coord_valid(curr_x, curr_y)    <= '1';
-    
-                            matrix_y_coord(curr_x, curr_y)          <= int_to_slv(matrix_y_coord_lookup(a_packets_received(curr_x, curr_y)), MATRIX_COORD_BITS);
-                            matrix_y_coord_valid(curr_x, curr_y)    <= '1';
-    
-                            matrix_element(curr_x, curr_y)          <= A_matrices(curr_x, curr_y)(a_packets_received(curr_x, curr_y));
-                            matrix_element_valid(curr_x, curr_y)    <= '1';
-                            
-                            packet_sent(curr_x, curr_y)             <= '1';
-                            
-                        elsif (current_matrix_type(curr_x, curr_y) = B and 
-                                b_packets_received(curr_x, curr_y) < FOX_MATRIX_ELEMENTS and 
-                                packet_sent(curr_x, curr_y) = '0') then
-                            x_dest(curr_x, curr_y)                  <= int_to_slv(curr_x, COORD_BITS);
-                            x_dest_valid(curr_x, curr_y)            <= '1';
-    
-                            y_dest(curr_x, curr_y)                  <= int_to_slv(curr_y, COORD_BITS);
-                            y_dest_valid(curr_x, curr_y)            <= '1';
-    
-                            multicast_group(curr_x, curr_y)         <= "0";
-                            multicast_group_valid(curr_x, curr_y)   <= '1';
-    
-                            done_flag(curr_x, curr_y)               <= '0';
-                            done_flag_valid(curr_x, curr_y)         <= '1';
-    
-                            result_flag(curr_x, curr_y)             <= '0';
-                            result_flag_valid(curr_x, curr_y)       <= '1';
-    
-                            matrix_type(curr_x, curr_y)             <= "1";
-                            matrix_type_valid(curr_x, curr_y)       <= '1';
-    
-                            matrix_x_coord(curr_x, curr_y)          <= int_to_slv(matrix_x_coord_lookup(b_packets_received(curr_x, curr_y)), MATRIX_COORD_BITS);
-                            matrix_x_coord_valid(curr_x, curr_y)    <= '1';
-    
-                            matrix_y_coord(curr_x, curr_y)          <= int_to_slv(matrix_y_coord_lookup(b_packets_received(curr_x, curr_y)), MATRIX_COORD_BITS);
-                            matrix_y_coord_valid(curr_x, curr_y)    <= '1';
-    
-                            matrix_element(curr_x, curr_y)          <= A_matrices(curr_x, curr_y)(b_packets_received(curr_x, curr_y));
-                            matrix_element_valid(curr_x, curr_y)    <= '1';
-                            
-                            packet_sent(curr_x, curr_y)             <= '1';
-                        
-                        -- packet_sent asserted after packet fields sent and until packet is received
-                        elsif (packet_sent(curr_x, curr_y) = '1') then
-                            encoder_packet_complete(curr_x, curr_y)         <= '1';
-                            
-                            if (encoder_packet_out_valid(curr_x, curr_y) = '1') then
-                                if (current_matrix_type(curr_x, curr_y) = A) then
-                                    a_packets_received(curr_x, curr_y)    <= a_packets_received(curr_x, curr_y) + 1;
-                                    
-                                    if (a_packets_received(curr_x, curr_y) = FOX_MATRIX_ELEMENTS) then
-                                        current_matrix_type(curr_x, curr_y)   <= B;
-                                    end if;
-                                elsif (current_matrix_type(curr_x, curr_y) = B) then
-                                   b_packets_received(curr_x, curr_y) <= b_packets_received(curr_x, curr_y) + 1;
-                                end if;
-                                
-                                -- Reset packet_sent after the encoded packet has been received
-                                packet_sent(curr_x, curr_y)  <= '0';
-                                
-                                -- Packet read out of decoder
-                                decoder_packet_read(curr_x, curr_y) <= '1';
-                            end if;
-                        end if;
-                    end if;
-                end if;
-            end process MESSAGE_SEND;
-            
             -- Process to print encoded packets
             PRINT_OUTPUT: process (clk)
                 variable my_encoder_output_line             : line;
                 variable my_encoder_binary_file_line        : line;
-                constant my_encoder_binary_file_name        : string := "Encoded Node " & integer'image(node_number) & " binary.txt";
+                constant my_encoder_binary_file_name        : string := "encoded_node" & integer'image(node_number) & "_binary.txt";
                 file WriteEncodeBinaryFile                  : text open WRITE_MODE is my_encoder_binary_file_name;
                 
                 variable my_encoder_hex_file_line           : line;
-                constant my_encoder_hex_file_name           : string := "Encoded Node " & integer'image(node_number) & " hex.txt";
+                constant my_encoder_hex_file_name           : string := "encoded_node" & integer'image(node_number) & "_hex.txt";
                 file WriteEncodeHexFile                     : text open WRITE_MODE is my_encoder_hex_file_name;
 
                 variable my_decoder_output_line     : line;
                 variable my_decoder_file_line       : line;
-                constant my_decoder_file_name       : string := "Decoded Node " & integer'image(node_number) & ".txt";
+                constant my_decoder_file_name       : string := "decoded_node" & integer'image(node_number) & ".txt";
                 file WriteDecodeFile                : text open WRITE_MODE is my_decoder_file_name;
             begin
                 if (rising_edge(clk) and reset_n = '1') then
@@ -589,7 +622,12 @@ begin
                         write(my_decoder_output_line, decoder_result_flag_out(curr_x, curr_y));
                         
                         write(my_decoder_output_line, string'(", matrix type = "));
-                        write(my_decoder_output_line, slv_to_int(decoder_matrix_type_out(curr_x, curr_y)));
+                        
+                        if (slv_to_int(decoder_matrix_type_out(curr_x, curr_y)) = 0) then
+                            write(my_decoder_output_line, string'("A"));
+                        elsif (slv_to_int(decoder_matrix_type_out(curr_x, curr_y)) = 1) then
+                            write(my_decoder_output_line, string'("B"));
+                        end if;
                         
                         write(my_decoder_output_line, string'(", matrix coordinate = ("));
                         write(my_decoder_output_line, slv_to_int(decoder_matrix_x_coord_out(curr_x, curr_y)));
@@ -625,8 +663,13 @@ begin
                         write(my_decoder_file_line, decoder_result_flag_out(curr_x, curr_y));
                         
                         write(my_decoder_file_line, string'(", matrix type = "));
-                        write(my_decoder_file_line, slv_to_int(decoder_matrix_type_out(curr_x, curr_y)));
                         
+                        if (slv_to_int(decoder_matrix_type_out(curr_x, curr_y)) = 0) then
+                            write(my_decoder_file_line, string'("A"));
+                        elsif (slv_to_int(decoder_matrix_type_out(curr_x, curr_y)) = 1) then
+                            write(my_decoder_file_line, string'("B"));
+                        end if;
+
                         write(my_decoder_file_line, string'(", matrix coordinate = ("));
                         write(my_decoder_file_line, slv_to_int(decoder_matrix_x_coord_out(curr_x, curr_y)));
                         write(my_decoder_file_line, string'(", "));
