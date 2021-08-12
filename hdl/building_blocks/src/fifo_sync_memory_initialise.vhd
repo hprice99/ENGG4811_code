@@ -66,8 +66,7 @@ architecture Behavioural of fifo_sync_memory_initialise is
 begin
     
     assert (INITIALISATION_LENGTH <= FIFO_DEPTH) report "Initialisation file cannot be larger than FIFO depth" severity failure;
-    assert (INITIALISATION_LENGTH = FIFO_DEPTH) report "Initialisation file length must equal FIFO depth" severity failure;
-    
+
     PROC_ENTRY_COUNT: process (clk)
     begin
         if (rising_edge(clk)) then

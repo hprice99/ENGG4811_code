@@ -68,7 +68,13 @@ architecture Behavioral of fifo_sync_memory_initialise_tb is
     end component fifo_sync_memory_initialise;
     
     constant matrix_file        : string := "matrix.txt";
-    constant matrix_file_length : integer := FOX_FIFO_DEPTH;
+    constant matrix_file_length : integer := 2 * FOX_MATRIX_ELEMENTS;
+    
+    constant padded_matrix_file         : string := "matrix_padded.txt";
+    constant padded_matrix_file_length  : integer := 8;
+    constant padded_matrix_fifo_depth   : integer := 10;
+    
+    constant use_padded_file : Boolean := True;
     
     signal write_en     : std_logic;
     signal write_data   : std_logic_vector((BUS_WIDTH-1) downto 0);
@@ -150,27 +156,53 @@ begin
     write_en    <= '0';
     write_data  <= (others => '0');
 
-    FIFO: fifo_sync_memory_initialise
-        generic map (
-            BUS_WIDTH   => BUS_WIDTH,
-            FIFO_DEPTH  => FOX_FIFO_DEPTH,
-            
-            INITIALISATION_FILE     => matrix_file,
-            INITIALISATION_LENGTH   => matrix_file_length
-        )
-        port map (
-            clk         => clk,
-            reset_n     => reset_n,
-            
-            write_en    => write_en,
-            write_data  => write_data,
-            
-            read_en     => read_en,
-            read_data   => read_data,
-            
-            full        => full,
-            empty       => empty
-        );
+    USE_PAD: if (use_padded_file = True) generate
+        PADDED_FIFO: fifo_sync_memory_initialise
+            generic map (
+                BUS_WIDTH   => BUS_WIDTH,
+                FIFO_DEPTH  => padded_matrix_fifo_depth,
+    
+                INITIALISATION_FILE     => padded_matrix_file,
+                INITIALISATION_LENGTH   => padded_matrix_file_length
+            )
+            port map (
+                clk         => clk,
+                reset_n     => reset_n,
+                
+                write_en    => write_en,
+                write_data  => write_data,
+                
+                read_en     => read_en,
+                read_data   => read_data,
+                
+                full        => full,
+                empty       => empty
+            );
+    end generate USE_PAD;
+    
+    DONT_USE_PAD: if (use_padded_file = False) generate
+        UNPADDED_FIFO: fifo_sync_memory_initialise
+            generic map (
+                BUS_WIDTH   => BUS_WIDTH,
+                FIFO_DEPTH  => FOX_FIFO_DEPTH,
+    
+                INITIALISATION_FILE     => matrix_file,
+                INITIALISATION_LENGTH   => matrix_file_length
+            )
+            port map (
+                clk         => clk,
+                reset_n     => reset_n,
+                
+                write_en    => write_en,
+                write_data  => write_data,
+                
+                read_en     => read_en,
+                read_data   => read_data,
+                
+                full        => full,
+                empty       => empty
+            );
+    end generate DONT_USE_PAD;
         
     decoder_packet_in       <= read_data;
     decoder_packet_in_valid <= read_en;
