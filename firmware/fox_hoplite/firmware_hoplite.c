@@ -40,6 +40,17 @@ void tb_output_matrix(char* label, long* matrix, int rows, int cols) {
 
 void create_my_A(void) {
 
+    if (MATRIX_INIT_FROM_FILE_INPUT) {
+
+        // TODO Fix initial receive to assign to my_A
+        // receive_matrix(A_type);
+
+        print_string("Matrix initialisation file found\n");
+    } else {
+
+        print_string("Matrix initialisation file not found\n");
+    }
+
     for (long x = 0; x < MATRIX_SIZE; x++) {
         for (long y = 0; y < MATRIX_SIZE; y++) {
 
@@ -52,6 +63,16 @@ void create_my_A(void) {
 }
 
 void create_initial_stage_B(void) {
+
+    if (MATRIX_INIT_FROM_FILE_INPUT) {
+
+        // TODO Fix initial receive
+        // receive_matrix(B_type);
+        print_string("Matrix initialisation file found\n");
+    } else {
+
+        print_string("Matrix initialisation file not found\n");
+    }
 
     for (long x = 0; x < MATRIX_SIZE; x++) {
         for (long y = 0; y < MATRIX_SIZE; y++) {

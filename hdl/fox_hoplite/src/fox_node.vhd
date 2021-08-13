@@ -275,6 +275,8 @@ architecture Behavioral of fox_node is
 
             FOX_MATRIX_SIZE : integer := 16;
             
+            MATRIX_FILE     : string  := "none";
+            
             -- Matrix offset for node
             MATRIX_X_OFFSET : integer := 0;
             MATRIX_Y_OFFSET : integer := 0;
@@ -597,6 +599,8 @@ begin
             NODE_NUMBER     => NODE_NUMBER,
 
             FOX_MATRIX_SIZE => FOX_MATRIX_SIZE,
+            
+            MATRIX_FILE     => MATRIX_FILE,
             
             MATRIX_X_OFFSET => MATRIX_X_OFFSET,
             MATRIX_Y_OFFSET => MATRIX_Y_OFFSET,

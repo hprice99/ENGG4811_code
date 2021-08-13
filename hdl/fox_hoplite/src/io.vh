@@ -33,11 +33,12 @@
 `define MESSAGE_READ_OUTPUT         32'h5000_0090
 
 // Node details
-`define X_COORD_INPUT           32'h6000_0000
-`define Y_COORD_INPUT           32'h6000_0010
-`define NODE_NUMBER_INPUT       32'h6000_0020
-`define MATRIX_X_OFFSET_INPUT   32'h6000_0030
-`define MATRIX_Y_OFFSET_INPUT   32'h6000_0040
+`define X_COORD_INPUT               32'h6000_0000
+`define Y_COORD_INPUT               32'h6000_0010
+`define NODE_NUMBER_INPUT           32'h6000_0020
+`define MATRIX_X_OFFSET_INPUT       32'h6000_0030
+`define MATRIX_Y_OFFSET_INPUT       32'h6000_0040
+`define MATRIX_INIT_FROM_FILE_INPUT 32'h6000_0050
 
 // Matrix
 `define MATRIX_OUTPUT           32'h7000_0000
