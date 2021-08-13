@@ -65,7 +65,9 @@ entity fox_node is
         -- Matrix parameters
         TOTAL_MATRIX_SIZE       : integer := 32;
         FOX_MATRIX_SIZE         : integer := 16;
+        
         MATRIX_FILE             : string  := "none";
+        MATRIX_FILE_LENGTH      : integer := 0;
 
         -- Matrix offset for node
         MATRIX_X_OFFSET : integer := 0;
@@ -142,7 +144,9 @@ architecture Behavioral of fox_node is
         generic (
             BUS_WIDTH   : integer := 32;
             FIFO_DEPTH  : integer := 64;
-            INIT_FILE   : string  := "none"
+            
+            INITIALISATION_FILE     : string := "none";
+            INITIALISATION_LENGTH   : integer := 0
         );
         port (
             clk                 : in std_logic;
@@ -465,7 +469,9 @@ begin
         generic map (
             BUS_WIDTH   => BUS_WIDTH,
             FIFO_DEPTH  => FIFO_DEPTH,
-            INIT_FILE   => MATRIX_FILE
+           
+            INITIALISATION_FILE     => MATRIX_FILE,
+            INITIALISATION_LENGTH   => MATRIX_FILE_LENGTH
         )
         port map (
             clk                 => clk,

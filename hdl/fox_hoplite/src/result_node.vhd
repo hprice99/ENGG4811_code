@@ -67,8 +67,10 @@ entity result_node is
         -- Matrix parameters
         TOTAL_MATRIX_SIZE       : integer := 32;
         FOX_MATRIX_SIZE         : integer := 16;
+        
         MATRIX_FILE             : string  := "none";
-
+        MATRIX_FILE_LENGTH      : integer := 0;
+        
         -- Matrix offset for node
         MATRIX_X_OFFSET : integer := 0;
         MATRIX_Y_OFFSET : integer := 0;
@@ -148,7 +150,9 @@ architecture Behavioral of result_node is
             -- Matrix parameters
             TOTAL_MATRIX_SIZE   : integer := 32;
             FOX_MATRIX_SIZE     : integer := 16;
-            MATRIX_FILE         : string  := "none";
+            
+            MATRIX_FILE             : string  := "none";
+            MATRIX_FILE_LENGTH      : integer := 0;
             
             -- Matrix offset for node
             MATRIX_X_OFFSET : integer := 0;
@@ -294,8 +298,9 @@ begin
             -- Matrix parameters
             TOTAL_MATRIX_SIZE       => TOTAL_MATRIX_SIZE,
             FOX_MATRIX_SIZE         => FOX_MATRIX_SIZE,
-            -- TODO Implement matrix initialisation files for each node
-            MATRIX_FILE     => "none",
+            
+            MATRIX_FILE             => MATRIX_FILE,
+            MATRIX_FILE_LENGTH      => MATRIX_FILE_LENGTH,
             
             -- Matrix offset for node
             MATRIX_X_OFFSET => MATRIX_X_OFFSET,

@@ -45,7 +45,6 @@ entity top is
         FOX_FIRMWARE           : string := "firmware_hoplite.hex";
         RESULT_FIRMWARE        : string := "firmware_hoplite_result.hex";
 
-        
         CLK_FREQ            : integer := 50e6;
         ENABLE_UART         : boolean := False
     );
@@ -100,7 +99,9 @@ architecture Behavioral of top is
             -- Matrix parameters
             TOTAL_MATRIX_SIZE   : integer := 32;
             FOX_MATRIX_SIZE     : integer := 16;
-            MATRIX_FILE         : string  := "none";
+                
+            MATRIX_FILE             : string  := "none";
+            MATRIX_FILE_LENGTH      : integer := 0;
             
             -- Matrix offset for node
             MATRIX_X_OFFSET : integer := 0;
@@ -173,7 +174,9 @@ architecture Behavioral of top is
             -- Matrix parameters
             TOTAL_MATRIX_SIZE       : integer := 32;
             FOX_MATRIX_SIZE         : integer := 16;
+            
             MATRIX_FILE             : string  := "none";
+            MATRIX_FILE_LENGTH      : integer := 0;
     
             -- Matrix offset for node
             MATRIX_X_OFFSET : integer := 0;
@@ -295,8 +298,10 @@ begin
                     -- Matrix parameters
                     TOTAL_MATRIX_SIZE       => TOTAL_MATRIX_SIZE,
                     FOX_MATRIX_SIZE         => FOX_MATRIX_SIZE,
+                    
                     -- TODO Implement matrix initialisation files for each node
-                    MATRIX_FILE     => "none",
+                    MATRIX_FILE             => "none",
+                    MATRIX_FILE_LENGTH      => 0,
                     
                     -- Matrix offset for node
                     MATRIX_X_OFFSET => x_offset,
@@ -378,8 +383,10 @@ begin
                     -- Matrix parameters
                     TOTAL_MATRIX_SIZE       => TOTAL_MATRIX_SIZE,
                     FOX_MATRIX_SIZE         => FOX_MATRIX_SIZE,
+                    
                     -- TODO Implement matrix initialisation files for each node
-                    MATRIX_FILE     => "none",
+                    MATRIX_FILE             => "none",
+                    MATRIX_FILE_LENGTH      => 0,
                     
                     -- Matrix offset for node
                     MATRIX_X_OFFSET => x_offset,
