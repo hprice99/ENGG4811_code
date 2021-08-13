@@ -42,22 +42,38 @@ void create_my_A(void) {
 
     if (MATRIX_INIT_FROM_FILE_INPUT) {
 
-        // TODO Fix initial receive to assign to my_A
-        // receive_matrix(A_type);
+        print_string("Loading A from file\n");
 
-        print_string("Matrix initialisation file found\n");
+        int aElementsReceived = 0;
+        struct MatrixPacket packet;
+        enum FoxError foxError = FOX_NETWORK_ERROR;
+
+        while (aElementsReceived < MATRIX_ELEMENTS) {
+
+            foxError = receive_fox_packet(&packet);
+
+            if (packet.matrixType != A_type) {
+
+                print_string("Expected to receive A matrix\n");
+                return;
+            }
+
+            int index = COORDINATE_TO_INDEX(packet.matrixX, packet.matrixY);
+
+            my_A[index] = packet.matrixElement;
+            
+            aElementsReceived++;
+        }
     } else {
 
-        print_string("Matrix initialisation file not found\n");
-    }
+        for (long x = 0; x < MATRIX_SIZE; x++) {
+            for (long y = 0; y < MATRIX_SIZE; y++) {
 
-    for (long x = 0; x < MATRIX_SIZE; x++) {
-        for (long y = 0; y < MATRIX_SIZE; y++) {
+                int index = COORDINATE_TO_INDEX(x, y);
 
-            int index = COORDINATE_TO_INDEX(x, y);
-
-            my_A[index] = my_node_number + 1;
-            // my_A[index] = my_node_number + x + y + 1;
+                my_A[index] = my_node_number + 1;
+                // my_A[index] = my_node_number + x + y + 1;
+            }
         }
     }
 }
@@ -66,22 +82,39 @@ void create_initial_stage_B(void) {
 
     if (MATRIX_INIT_FROM_FILE_INPUT) {
 
-        // TODO Fix initial receive
-        // receive_matrix(B_type);
-        print_string("Matrix initialisation file found\n");
+        print_string("Loading B from file\n");
+
+        int bElementsReceived = 0;
+        struct MatrixPacket packet;
+        enum FoxError foxError = FOX_NETWORK_ERROR;
+
+        while (bElementsReceived < MATRIX_ELEMENTS) {
+
+            foxError = receive_fox_packet(&packet);
+
+            if (packet.matrixType != B_type) {
+
+                print_string("Expected to receive A matrix\n");
+                return;
+            }
+
+            int index = COORDINATE_TO_INDEX(packet.matrixX, packet.matrixY);
+
+            stage_B[index] = packet.matrixElement;
+            
+            bElementsReceived++;
+        }
     } else {
 
-        print_string("Matrix initialisation file not found\n");
-    }
+        for (long x = 0; x < MATRIX_SIZE; x++) {
+            for (long y = 0; y < MATRIX_SIZE; y++) {
 
-    for (long x = 0; x < MATRIX_SIZE; x++) {
-        for (long y = 0; y < MATRIX_SIZE; y++) {
+                int index = COORDINATE_TO_INDEX(x, y);
 
-            int index = COORDINATE_TO_INDEX(x, y);
-
-            stage_B[index] = my_node_number + 1;
-            // stage_B[index] = 2 * my_node_number + 4;
-            // stage_B[index] = 2 * my_node_number + x + y + 4;
+                stage_B[index] = my_node_number + 1;
+                // stage_B[index] = 2 * my_node_number + 4;
+                // stage_B[index] = 2 * my_node_number + x + y + 4;
+            }
         }
     }
 }

@@ -243,6 +243,11 @@ architecture Behavioral of top is
 
     constant UART_FIFO_DEPTH    : integer := 512;
 
+    constant MATRIX_INIT_FILE_PREFIX    : string := "encoded_node";
+    constant MATRIX_INIT_FILE_SUFFIX    : string := "_binary.txt";
+    
+    constant MATRIX_INIT_FILE_LENGTH    : integer := 2*FOX_MATRIX_ELEMENTS;
+
 begin
 
     -- Generate the network
@@ -257,6 +262,7 @@ begin
             constant node_number    : integer := i * NETWORK_ROWS + j;
             constant y_offset       : integer := i * (FOX_MATRIX_SIZE);
             constant x_offset       : integer := j * (FOX_MATRIX_SIZE);
+            constant matrix_file    : string  := MATRIX_INIT_FILE_PREFIX & integer'image(node_number) & MATRIX_INIT_FILE_SUFFIX;
         begin
             -- Connect in and out messages
             x_messages_in(curr_x, curr_y)       <= x_messages_out(prev_x, curr_y);
@@ -300,15 +306,15 @@ begin
                     FOX_MATRIX_SIZE         => FOX_MATRIX_SIZE,
                     
                     -- TODO Implement matrix initialisation files for each node
-                    MATRIX_FILE             => "none",
-                    MATRIX_FILE_LENGTH      => 0,
+                    MATRIX_FILE             => matrix_file,
+                    MATRIX_FILE_LENGTH      => MATRIX_INIT_FILE_LENGTH,
                     
                     -- Matrix offset for node
                     MATRIX_X_OFFSET => x_offset,
                     MATRIX_Y_OFFSET => y_offset,
 
                     -- NIC parameters
-                    NIC_FIFO_DEPTH  => FOX_FIFO_DEPTH,
+                    NIC_FIFO_DEPTH  => RESULT_FIFO_DEPTH,
 
                     -- UART parameters
                     CLK_FREQ        => CLK_FREQ,
@@ -385,8 +391,8 @@ begin
                     FOX_MATRIX_SIZE         => FOX_MATRIX_SIZE,
                     
                     -- TODO Implement matrix initialisation files for each node
-                    MATRIX_FILE             => "none",
-                    MATRIX_FILE_LENGTH      => 0,
+                    MATRIX_FILE             => matrix_file,
+                    MATRIX_FILE_LENGTH      => MATRIX_INIT_FILE_LENGTH,
                     
                     -- Matrix offset for node
                     MATRIX_X_OFFSET => x_offset,
