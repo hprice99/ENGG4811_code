@@ -49,7 +49,7 @@ class FoxPacket:
         matrixElementField = FoxPacket.create_packet_field(matrixElement, self.matrixElementBits)
 
         # Put the fields together
-        packet = matrixElementField + matrixYCoordField + matrixXCoordField + matrixTypeField + resultFlagField + doneFlagField + multicastGroupField + destYCoordField + destXCoordField
+        packet = matrixElementField + matrixYCoordField + matrixXCoordField + matrixTypeField + resultFlagField + doneFlagField + multicastGroupField + destYCoordField + destXCoordField + '\n'
 
         return packet
 
