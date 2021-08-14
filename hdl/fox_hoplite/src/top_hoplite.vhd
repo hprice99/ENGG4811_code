@@ -243,8 +243,8 @@ architecture Behavioral of top is
 
     constant UART_FIFO_DEPTH    : integer := 512;
 
-    constant MATRIX_INIT_FILE_PREFIX    : string := "encoded_node";
-    constant MATRIX_INIT_FILE_SUFFIX    : string := "_binary.txt";
+    constant MATRIX_INIT_FILE_PREFIX    : string := "node";
+    constant MATRIX_INIT_FILE_SUFFIX    : string := ".mif";
     
     constant MATRIX_INIT_FILE_LENGTH    : integer := 2*FOX_MATRIX_ELEMENTS;
 

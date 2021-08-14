@@ -24,8 +24,8 @@ foxNetwork = FoxNetwork(networkRows=networkRows, networkCols=networkCols, result
                     matrixTypeBits=matrixTypeBits, matrixCoordBits=matrixCoordBits)
 
 # %%
-A = np.array([[1, 1, 2, 2], [1, 1, 2, 2], [3, 3, 4, 4], [3, 3, 4, 4]])
-B = np.array([[1, 1, 2, 2], [1, 1, 2, 2], [3, 3, 4, 4], [3, 3, 4, 4]])
+A = np.array([[1, 2, 2, 3], [3, 4, 4, 5], [5, 6, 6, 7], [7, 8, 8, 9]])
+B = np.array([[4, 4, 6, 6], [4, 4, 6, 6], [8, 8, 10, 10], [8, 8, 10, 10]])
 
 foxNetwork.set_matrices(A=A, B=B)
 

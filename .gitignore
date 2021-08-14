@@ -199,3 +199,6 @@ dkms.conf
 
 # Vivado projects
 /vivado/*/
+
+# Memory-initialisation files
+*.mif
