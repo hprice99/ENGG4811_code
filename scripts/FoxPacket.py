@@ -28,6 +28,9 @@ class FoxPacket:
 
         return field
 
+    '''
+    Encode a matrix packet to a string
+    '''
     def create_matrix_packet(self, *, destCoord, multicastGroup, doneFlag, resultFlag, matrixType, matrixCoord, matrixElement):
 
         destXCoordField = FoxPacket.create_packet_field(destCoord['x'], self.coordBits)
@@ -49,3 +52,21 @@ class FoxPacket:
         packet = matrixElementField + matrixYCoordField + matrixXCoordField + matrixTypeField + resultFlagField + doneFlagField + multicastGroupField + destYCoordField + destXCoordField
 
         return packet
+
+    '''
+    Encode a matrix to a list of packets
+    '''
+    def encode_matrix(self, *, destCoord, multicastGroup, doneFlag, resultFlag, matrixType, matrix):
+
+        packets = []
+
+        for matrixY in range(np.ndim(matrix)):
+            for matrixX in range(np.ndim(matrix)):
+                matrixCoord = {'x' : matrixX, 'y' : matrixY}
+                matrixElement = matrix[matrixY, matrixX]
+
+                packet = self.create_matrix_packet(destCoord=destCoord, multicastGroup=multicastGroup, resultFlag=resultFlag, doneFlag=doneFlag, matrixType=matrixType, matrixCoord=matrixCoord, matrixElement=matrixElement)
+
+                packets.append(packet)
+
+        return packets
