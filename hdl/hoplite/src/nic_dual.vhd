@@ -6,7 +6,9 @@ entity nic_dual is
     generic (
         BUS_WIDTH   : integer := 32;
         FIFO_DEPTH  : integer := 64;
-        INIT_FILE   : string  := "none"
+        
+        INITIALISATION_FILE     : string := "none";
+        INITIALISATION_LENGTH   : integer := 0
     );
     port (
         clk                 : in std_logic;
@@ -39,25 +41,28 @@ end nic_dual;
 
 architecture Behavioural of nic_dual is
 
-    component fifo_sync
+    component fifo_sync_wrapper
         generic (
             BUS_WIDTH   : integer := 32;
-            FIFO_DEPTH  : integer := 64
+            FIFO_DEPTH  : integer := 64;
+            
+            INITIALISATION_FILE     : string := "none";
+            INITIALISATION_LENGTH   : integer := 0
         );
         port (
             clk         : in std_logic;
             reset_n     : in std_logic;
-
+    
             write_en    : in std_logic;
             write_data  : in std_logic_vector((BUS_WIDTH-1) downto 0);
-
+            
             read_en     : in std_logic;
             read_data   : out std_logic_vector((BUS_WIDTH-1) downto 0);
-
+            
             full        : out std_logic;
             empty       : out std_logic
         );
-    end component fifo_sync;
+    end component fifo_sync_wrapper;
 
     signal pe_to_network_fifo_write_en, pe_to_network_fifo_read_en      : std_logic;
     signal pe_to_network_fifo_full, pe_to_network_fifo_empty            : std_logic;
@@ -71,10 +76,13 @@ begin
 
     ----------------------------------------------------------------
     -- PE to network FIFO
-    PE_TO_NETWORK_FIFO: fifo_sync
+    PE_TO_NETWORK_FIFO: fifo_sync_wrapper
     generic map (
         BUS_WIDTH   => BUS_WIDTH,
-        FIFO_DEPTH  => FIFO_DEPTH
+        FIFO_DEPTH  => FIFO_DEPTH,
+        
+        INITIALISATION_FILE     => "none",
+        INITIALISATION_LENGTH   => 0
     )
     port map (
         clk         => clk,
@@ -127,10 +135,13 @@ begin
     
     ----------------------------------------------------------------
     -- Network to PE FIFO
-    NETWORK_TO_PE_FIFO: fifo_sync
+    NETWORK_TO_PE_FIFO: fifo_sync_wrapper
     generic map (
         BUS_WIDTH   => BUS_WIDTH,
-        FIFO_DEPTH  => FIFO_DEPTH
+        FIFO_DEPTH  => FIFO_DEPTH,
+        
+        INITIALISATION_FILE     => INITIALISATION_FILE,
+        INITIALISATION_LENGTH   => INITIALISATION_LENGTH
     )
     port map (
         clk         => clk,

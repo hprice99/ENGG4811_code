@@ -578,7 +578,7 @@ enum FoxError fox_algorithm(int my_x_coord, int my_y_coord) {
             }
 
             #ifdef TB_PRINT
-            print_string("broadcast_B ready\n");
+            print_string("send_B ready\n");
             #endif
 
             // Rotate B matrix up

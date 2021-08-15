@@ -45,7 +45,6 @@ entity top is
         FOX_FIRMWARE           : string := "firmware_hoplite.hex";
         RESULT_FIRMWARE        : string := "firmware_hoplite_result.hex";
 
-        
         CLK_FREQ            : integer := 50e6;
         ENABLE_UART         : boolean := False
     );
@@ -100,7 +99,9 @@ architecture Behavioral of top is
             -- Matrix parameters
             TOTAL_MATRIX_SIZE   : integer := 32;
             FOX_MATRIX_SIZE     : integer := 16;
-            MATRIX_FILE         : string  := "none";
+                
+            MATRIX_FILE             : string  := "none";
+            MATRIX_FILE_LENGTH      : integer := 0;
             
             -- Matrix offset for node
             MATRIX_X_OFFSET : integer := 0;
@@ -173,7 +174,9 @@ architecture Behavioral of top is
             -- Matrix parameters
             TOTAL_MATRIX_SIZE       : integer := 32;
             FOX_MATRIX_SIZE         : integer := 16;
+            
             MATRIX_FILE             : string  := "none";
+            MATRIX_FILE_LENGTH      : integer := 0;
     
             -- Matrix offset for node
             MATRIX_X_OFFSET : integer := 0;
@@ -240,6 +243,11 @@ architecture Behavioral of top is
 
     constant UART_FIFO_DEPTH    : integer := 512;
 
+    constant MATRIX_INIT_FILE_PREFIX    : string := "node";
+    constant MATRIX_INIT_FILE_SUFFIX    : string := ".mif";
+    
+    constant MATRIX_INIT_FILE_LENGTH    : integer := 2*FOX_MATRIX_ELEMENTS;
+
 begin
 
     -- Generate the network
@@ -254,6 +262,7 @@ begin
             constant node_number    : integer := i * NETWORK_ROWS + j;
             constant y_offset       : integer := i * (FOX_MATRIX_SIZE);
             constant x_offset       : integer := j * (FOX_MATRIX_SIZE);
+            constant matrix_file    : string  := MATRIX_INIT_FILE_PREFIX & integer'image(node_number) & MATRIX_INIT_FILE_SUFFIX;
         begin
             -- Connect in and out messages
             x_messages_in(curr_x, curr_y)       <= x_messages_out(prev_x, curr_y);
@@ -295,15 +304,17 @@ begin
                     -- Matrix parameters
                     TOTAL_MATRIX_SIZE       => TOTAL_MATRIX_SIZE,
                     FOX_MATRIX_SIZE         => FOX_MATRIX_SIZE,
+                    
                     -- TODO Implement matrix initialisation files for each node
-                    MATRIX_FILE     => "none",
+                    MATRIX_FILE             => matrix_file,
+                    MATRIX_FILE_LENGTH      => MATRIX_INIT_FILE_LENGTH,
                     
                     -- Matrix offset for node
                     MATRIX_X_OFFSET => x_offset,
                     MATRIX_Y_OFFSET => y_offset,
 
                     -- NIC parameters
-                    NIC_FIFO_DEPTH  => FOX_FIFO_DEPTH,
+                    NIC_FIFO_DEPTH  => RESULT_FIFO_DEPTH,
 
                     -- UART parameters
                     CLK_FREQ        => CLK_FREQ,
@@ -378,8 +389,10 @@ begin
                     -- Matrix parameters
                     TOTAL_MATRIX_SIZE       => TOTAL_MATRIX_SIZE,
                     FOX_MATRIX_SIZE         => FOX_MATRIX_SIZE,
+                    
                     -- TODO Implement matrix initialisation files for each node
-                    MATRIX_FILE     => "none",
+                    MATRIX_FILE             => matrix_file,
+                    MATRIX_FILE_LENGTH      => MATRIX_INIT_FILE_LENGTH,
                     
                     -- Matrix offset for node
                     MATRIX_X_OFFSET => x_offset,

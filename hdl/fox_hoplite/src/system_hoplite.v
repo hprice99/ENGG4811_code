@@ -22,6 +22,8 @@ module system #(
 
     parameter FOX_MATRIX_SIZE   = 32,
     
+    parameter MATRIX_FILE   = "none",
+    
     // Matrix coordinate offset
     parameter MATRIX_X_OFFSET   = 0,
     parameter MATRIX_Y_OFFSET   = 0,
@@ -323,6 +325,13 @@ module system #(
                 end
                 `RESULT_Y_COORD_INPUT: begin
                     mem_rdata   <= RESULT_Y_COORD;
+                end
+                `MATRIX_INIT_FROM_FILE_INPUT: begin
+                    if (MATRIX_FILE == "none") begin
+                        mem_rdata   <= 0;
+                    end else begin
+                        mem_rdata   <= 1;
+                    end
                 end
             endcase
             end
