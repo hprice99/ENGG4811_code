@@ -74,7 +74,7 @@ verilogHeader = open(verilogHeaderFile, 'w')
 verilogHeader.write(verilogOutput)
 verilogHeader.close()
 
-verilogHeaderFile = '../hdl/fox_hoplite/src/io_generated.vh'
+verilogHeaderFile = '../hdl/fox_hoplite/src/io.vh'
 verilogHeader = open(verilogHeaderFile, 'w')
 verilogHeader.write(verilogOutput)
 verilogHeader.close()
@@ -89,7 +89,7 @@ cHeader = open(cHeaderFile, 'w')
 cHeader.write(cOutput)
 cHeader.close()
 
-cHeaderFile = '../firmware/fox_hoplite/io_generated.h'
+cHeaderFile = '../firmware/fox_hoplite/io.h'
 cHeader = open(cHeaderFile, 'w')
 cHeader.write(cOutput)
 cHeader.close()
