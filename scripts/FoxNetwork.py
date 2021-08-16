@@ -159,3 +159,31 @@ class FoxNetwork():
 
                 self.pad_matrix_file(matrixFile=matrixFileName, nodeCoord=nodeCoord, paddingRequired=paddingRequired)
 
+    '''
+    Generate VHDL package containing network parameters
+    '''
+    def write_header_file(self, fileName="fox_defs.vhd"):
+        from jinja2 import Environment, FileSystemLoader
+        import os
+
+        scriptLocation = os.path.realpath(__file__)
+        scriptDirectory = os.path.dirname(scriptLocation)
+        fileLoader = FileSystemLoader('{directory}/templates'.format(directory=scriptDirectory))
+
+        # fileLoader = FileSystemLoader('templates')
+        env = Environment(loader=fileLoader, trim_blocks=False, lstrip_blocks=False)
+
+        template = env.get_template('fox_defs.vhd')
+        output = template.render(foxNetwork=self)
+
+        # Write output to file
+        '''
+        headerFile = open(fileName, 'w')
+        headerFile.write(output)
+        headerFile.close()
+        '''
+
+        headerFileName = '{directory}/../hdl/fox_hoplite/src/{fileName}'.format(directory=scriptDirectory, fileName=fileName)
+        headerFile = open(headerFileName, 'w')
+        headerFile.write(output)
+        headerFile.close()

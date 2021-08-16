@@ -2,7 +2,7 @@
 from port import *
 
 from jinja2 import Environment, FileSystemLoader
-import sys, os
+import os
 
 scriptLocation = os.path.realpath(__file__)
 scriptDirectory = os.path.dirname(scriptLocation)

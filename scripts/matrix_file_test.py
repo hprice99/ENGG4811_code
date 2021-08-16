@@ -1,5 +1,6 @@
 # %%
 import numpy as np
+import math
 from FoxNetwork import *
 
 networkRows = 2
@@ -11,7 +12,7 @@ totalMatrixSize = 4
 
 foxNetworkStages = 2
 
-coordBits = 1
+coordBits = math.ceil(math.log2(max(networkRows, networkCols)))
 multicastGroupBits = 1
 doneFlagBits = 1
 resultFlagBits = 1
@@ -32,3 +33,4 @@ foxNetwork.set_matrices(A=A, B=B)
 foxNetwork.create_matrix_init_files()
 
 # %%
+foxNetwork.write_header_file()
