@@ -2,8 +2,13 @@
 from port import *
 
 from jinja2 import Environment, FileSystemLoader
+import sys, os
 
-fileLoader = FileSystemLoader('templates')
+scriptLocation = os.path.realpath(__file__)
+scriptDirectory = os.path.dirname(scriptLocation)
+fileLoader = FileSystemLoader('{directory}/templates'.format(directory=scriptDirectory))
+
+# fileLoader = FileSystemLoader('templates')
 env = Environment(loader=fileLoader, trim_blocks=False, lstrip_blocks=False)
 
 # %%
@@ -69,27 +74,33 @@ verilogTemplate = env.get_template('io.vh')
 verilogOutput = verilogTemplate.render(charIo=charIo, peToNetworkIo=peToNetworkIo, ledIo=ledIo, networkToPeIo=networkToPeIo, nodeIo=nodeIo, matrixIo=matrixIo, networkIo=networkIo)
 
 # Write output to file
+'''
 verilogHeaderFile = 'io.vh'
 verilogHeader = open(verilogHeaderFile, 'w')
 verilogHeader.write(verilogOutput)
 verilogHeader.close()
+'''
 
-verilogHeaderFile = '../hdl/fox_hoplite/src/io.vh'
+verilogHeaderFile = '{directory}/../hdl/fox_hoplite/src/io.vh'.format(directory=scriptDirectory)
 verilogHeader = open(verilogHeaderFile, 'w')
 verilogHeader.write(verilogOutput)
 verilogHeader.close()
 
 # %%
+
 cTemplate = env.get_template('io.h')
 cOutput = cTemplate.render(charIo=charIo, peToNetworkIo=peToNetworkIo, ledIo=ledIo, networkToPeIo=networkToPeIo, nodeIo=nodeIo, matrixIo=matrixIo, networkIo=networkIo)
 
 # Write output to file
+'''
 cHeaderFile = 'io.h'
 cHeader = open(cHeaderFile, 'w')
 cHeader.write(cOutput)
 cHeader.close()
+'''
 
 cHeaderFile = '../firmware/fox_hoplite/io.h'
+cHeaderFile = '{directory}/../firmware/fox_hoplite/io.h'.format(directory=scriptDirectory)
 cHeader = open(cHeaderFile, 'w')
 cHeader.write(cOutput)
 cHeader.close()
