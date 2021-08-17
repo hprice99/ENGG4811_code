@@ -7,9 +7,9 @@ from numpy.matrixlib.defmatrix import matrix
 from FoxPacket import *
 
 class FoxNetwork():
-    def __init__(self, *, networkRows, networkCols, resultNodeCoord, totalMatrixSize, \
-            foxNetworkStages, multicastGroupBits, doneFlagBits, resultFlagBits, \
-            matrixTypeBits, matrixCoordBits):
+    def __init__(self, *, networkRows, networkCols, resultNodeCoord, \
+            totalMatrixSize, foxNetworkStages, multicastGroupBits, \
+            doneFlagBits, resultFlagBits, matrixTypeBits, matrixCoordBits):
         
         # Entire network details
         self.networkRows = networkRows
@@ -20,20 +20,20 @@ class FoxNetwork():
         # Fox algorithm network details
         self.foxNetworkStages = foxNetworkStages
         self.foxNetworkNodes = (self.foxNetworkStages ** 2)
-        
-        # Matrix details
-        self.totalMatrixSize = totalMatrixSize
-        self.totalMatrixElements = (self.totalMatrixSize ** 2)
-
-        self.foxMatrixSize = self.totalMatrixSize / self.foxNetworkStages
-        self.foxMatrixElements = (self.foxMatrixSize ** 2)
 
         coordBits = math.ceil(math.log2(max(self.networkRows, self.networkCols)))
         matrixElementBits = 32
 
         self.packetFormat = FoxPacket(coordBits=coordBits, multicastGroupBits=multicastGroupBits, doneFlagBits=doneFlagBits, \
             resultFlagBits=resultFlagBits, matrixTypeBits=matrixTypeBits, matrixCoordBits=matrixCoordBits, matrixElementBits=matrixElementBits)
-        
+
+        # Matrix details
+        self.totalMatrixSize = totalMatrixSize
+        self.totalMatrixElements = (self.totalMatrixSize ** 2)
+
+        self.foxMatrixSize = int(self.totalMatrixSize / self.foxNetworkStages)
+        self.foxMatrixElements = (self.foxMatrixSize ** 2)
+
         self.foxFifoDepth = 2 * self.foxMatrixElements
         self.resultFifoDepth = self.totalMatrixElements
 
@@ -63,6 +63,9 @@ class FoxNetwork():
     Set the A and B matrices that will be multiplied using Fox's algorithm
     '''
     def set_matrices(self, *, A, B):
+        assert A.shape[0] == self.totalMatrixSize, "A matrix dimensions do not match totalMatrixSize"
+        assert B.shape[0] == self.totalMatrixSize, "B matrix dimensions do not match totalMatrixSize"
+
         self.A = A
         self.B = B
 
@@ -187,3 +190,35 @@ class FoxNetwork():
         headerFile = open(headerFileName, 'w')
         headerFile.write(output)
         headerFile.close()
+
+    '''
+    Write matrix config files
+    '''
+    def write_matrix_config_file(self, vhdlFileName="matrix_config.vhd", \
+            cFileName="matrix_config.h"):
+        from jinja2 import Environment, FileSystemLoader
+        import os
+
+        scriptLocation = os.path.realpath(__file__)
+        scriptDirectory = os.path.dirname(scriptLocation)
+        fileLoader = FileSystemLoader('{directory}/templates'.format(directory=scriptDirectory))
+
+        env = Environment(loader=fileLoader, trim_blocks=False, lstrip_blocks=False)
+
+        vhdlTemplate = env.get_template('matrix_config.vhd')
+        vhdlOutput = vhdlTemplate.render(foxNetwork=self)
+
+        # Write output to file
+        vhdlHeaderFileName = '{directory}/../hdl/fox_hoplite/src/{fileName}'.format(directory=scriptDirectory, fileName=vhdlFileName)
+        vhdlHeaderFile = open(vhdlHeaderFileName, 'w')
+        vhdlHeaderFile.write(vhdlOutput)
+        vhdlHeaderFile.close()
+
+        cTemplate = env.get_template('matrix_config.h')
+        cOutput = cTemplate.render(foxNetwork=self)
+
+        # Write output to file
+        cHeaderFileName = '{directory}/../firmware/fox_hoplite/{fileName}'.format(directory=scriptDirectory, fileName=cFileName)
+        cHeaderFile = open(cHeaderFileName, 'w')
+        cHeaderFile.write(cOutput)
+        cHeaderFile.close()

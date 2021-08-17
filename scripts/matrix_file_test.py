@@ -34,3 +34,6 @@ foxNetwork.create_matrix_init_files()
 
 # %%
 foxNetwork.write_header_file()
+
+# %%
+foxNetwork.write_matrix_config_file()
