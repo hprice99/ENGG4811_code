@@ -44,8 +44,11 @@ entity top is
         FOX_NETWORK_STAGES  : integer := 2;
         FOX_NETWORK_NODES   : integer := 4;
         
-        FOX_FIRMWARE           : string := "firmware_hoplite.hex";
-        RESULT_FIRMWARE        : string := "firmware_hoplite_result.hex";
+        FOX_FIRMWARE            : string := "firmware_hoplite.hex";
+        FOX_FIRMWARE_MEM_SIZE   : integer := 4096; 
+        
+        RESULT_FIRMWARE             : string := "firmware_hoplite_result.hex";
+        RESULT_FIRMWARE_MEM_SIZE    : integer := 8192;
 
         CLK_FREQ            : integer := 50e6;
         ENABLE_UART         : boolean := False
@@ -320,7 +323,7 @@ begin
                     DIVIDE_ENABLED     => RESULT_DIVIDE_ENABLED,
                     MULTIPLY_ENABLED   => MULTIPLY_ENABLED,
                     FIRMWARE           => RESULT_FIRMWARE,
-                    MEM_SIZE           => RESULT_MEM_SIZE
+                    MEM_SIZE           => RESULT_FIRMWARE_MEM_SIZE
                 )
                 port map (
                     clk                 => clk,
@@ -400,7 +403,7 @@ begin
                     DIVIDE_ENABLED     => FOX_DIVIDE_ENABLED,
                     MULTIPLY_ENABLED   => MULTIPLY_ENABLED,
                     FIRMWARE           => FOX_FIRMWARE,
-                    MEM_SIZE           => FOX_MEM_SIZE
+                    MEM_SIZE           => FOX_FIRMWARE_MEM_SIZE
                 )
                 port map (
                     clk                 => clk,
