@@ -35,6 +35,7 @@ use IEEE.math_real.all;
 
 library xil_defaultlib;
 use xil_defaultlib.math_functions.all;
+use xil_defaultlib.firmware_config.all;
 use xil_defaultlib.fox_defs.all;
 
 entity board_top is
@@ -82,9 +83,6 @@ architecture Behavioral of board_top is
     
     constant CLK_FREQ       : integer := 50e6;
     constant ENABLE_UART    : boolean := True;
-    
-    constant FOX_FIRMWARE       : string := "firmware_hoplite.hex";
-    constant RESULT_FIRMWARE    : string := "firmware_hoplite_result.hex";
 
 begin
 

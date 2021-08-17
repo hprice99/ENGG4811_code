@@ -11,7 +11,7 @@ class FoxNetwork():
     def __init__(self, *, networkRows, networkCols, resultNodeCoord, \
             totalMatrixSize, foxNetworkStages, multicastGroupBits, \
             doneFlagBits, resultFlagBits, matrixTypeBits, matrixCoordBits, \
-            foxFirmware, resultFirmware):
+            foxFirmware, resultFirmware, A=None, B=None):
 
         # Entire network details
         self.networkRows = networkRows
@@ -40,8 +40,12 @@ class FoxNetwork():
         self.resultFifoDepth = self.totalMatrixElements
 
         # Do not set A or B by default
-        self.A = None
-        self.B = None
+        self.A = A
+        self.B = B
+
+        if A is not None or B is not None:
+            assert A.shape[0] == self.totalMatrixSize, "A matrix dimensions do not match totalMatrixSize"
+            assert B.shape[0] == self.totalMatrixSize, "B matrix dimensions do not match totalMatrixSize"
 
         self.foxFirmware = foxFirmware
         self.resultFirmware = resultFirmware
@@ -118,6 +122,7 @@ class FoxNetwork():
             print("Matrices not initialised")
             return
         
+        # TODO Move save location of mif files
         initFilePrefix = "node"
         initFileSuffix = ".mif"
 

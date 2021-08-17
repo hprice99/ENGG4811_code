@@ -27,11 +27,6 @@ use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
 use ieee.std_logic_unsigned.all;
 
--- Uncomment the following library declaration if instantiating
--- any Xilinx leaf cells in this code.
---library UNISIM;
---use UNISIM.VComponents.all;
-
 library xil_defaultlib;
 use xil_defaultlib.math_functions.all;
 use xil_defaultlib.fox_defs.all;

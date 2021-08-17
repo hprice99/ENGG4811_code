@@ -35,6 +35,8 @@ use ieee.std_logic_unsigned.all;
 library xil_defaultlib;
 use xil_defaultlib.math_functions.all;
 use xil_defaultlib.fox_defs.all;
+use xil_defaultlib.matrix_config.all;
+use xil_defaultlib.firmware_config.all;
 
 entity top is
     Generic (
