@@ -5,12 +5,14 @@ import os
 from numpy.matrixlib.defmatrix import matrix
 
 from FoxPacket import *
+from Firmware import *
 
 class FoxNetwork():
     def __init__(self, *, networkRows, networkCols, resultNodeCoord, \
             totalMatrixSize, foxNetworkStages, multicastGroupBits, \
-            doneFlagBits, resultFlagBits, matrixTypeBits, matrixCoordBits):
-        
+            doneFlagBits, resultFlagBits, matrixTypeBits, matrixCoordBits, \
+            foxFirmware, resultFirmware):
+
         # Entire network details
         self.networkRows = networkRows
         self.networkCols = networkCols
@@ -40,6 +42,9 @@ class FoxNetwork():
         # Do not set A or B by default
         self.A = None
         self.B = None
+
+        self.foxFirmware = foxFirmware
+        self.resultFirmware = resultFirmware
 
     '''
     Convert a node's (x, y) coordinates into a node number
@@ -174,7 +179,7 @@ class FoxNetwork():
         fileLoader = FileSystemLoader('{directory}/templates'.format(directory=scriptDirectory))
 
         # fileLoader = FileSystemLoader('templates')
-        env = Environment(loader=fileLoader, trim_blocks=False, lstrip_blocks=False)
+        env = Environment(loader=fileLoader, trim_blocks=True, lstrip_blocks=True)
 
         template = env.get_template('fox_defs.vhd')
         output = template.render(foxNetwork=self)
@@ -203,7 +208,7 @@ class FoxNetwork():
         scriptDirectory = os.path.dirname(scriptLocation)
         fileLoader = FileSystemLoader('{directory}/templates'.format(directory=scriptDirectory))
 
-        env = Environment(loader=fileLoader, trim_blocks=False, lstrip_blocks=False)
+        env = Environment(loader=fileLoader, trim_blocks=True, lstrip_blocks=True)
 
         vhdlTemplate = env.get_template('matrix_config.vhd')
         vhdlOutput = vhdlTemplate.render(foxNetwork=self)
@@ -222,3 +227,25 @@ class FoxNetwork():
         cHeaderFile = open(cHeaderFileName, 'w')
         cHeaderFile.write(cOutput)
         cHeaderFile.close()
+
+    '''
+    Write firmware config files
+    '''
+    def write_firmware_config_file(self, vhdlFileName="firmware_config.vhd"):
+        from jinja2 import Environment, FileSystemLoader
+        import os
+
+        scriptLocation = os.path.realpath(__file__)
+        scriptDirectory = os.path.dirname(scriptLocation)
+        fileLoader = FileSystemLoader('{directory}/templates'.format(directory=scriptDirectory))
+
+        env = Environment(loader=fileLoader, trim_blocks=True, lstrip_blocks=True)
+
+        vhdlTemplate = env.get_template('firmware_config.vhd')
+        vhdlOutput = vhdlTemplate.render(foxNetwork=self)
+
+        # Write output to file
+        vhdlHeaderFileName = '{directory}/../hdl/fox_hoplite/src/{fileName}'.format(directory=scriptDirectory, fileName=vhdlFileName)
+        vhdlHeaderFile = open(vhdlHeaderFileName, 'w')
+        vhdlHeaderFile.write(vhdlOutput)
+        vhdlHeaderFile.close()
