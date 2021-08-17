@@ -233,9 +233,6 @@ architecture Behavioral of top is
     constant FOX_DIVIDE_ENABLED     : std_logic := '0';
     constant RESULT_DIVIDE_ENABLED  : std_logic := '1';
     constant MULTIPLY_ENABLED       : std_logic := '1';
-    
-    constant FOX_MEM_SIZE           : integer := 4096;
-    constant RESULT_MEM_SIZE        : integer := 8192;
 
     constant UART_FIFO_DEPTH    : integer := 512;
 

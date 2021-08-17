@@ -9,7 +9,7 @@ scriptDirectory = os.path.dirname(scriptLocation)
 fileLoader = FileSystemLoader('{directory}/templates'.format(directory=scriptDirectory))
 
 # fileLoader = FileSystemLoader('templates')
-env = Environment(loader=fileLoader, trim_blocks=False, lstrip_blocks=False)
+env = Environment(loader=fileLoader, trim_blocks=True, lstrip_blocks=True)
 
 # %%
 # Generate the IO ports
