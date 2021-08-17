@@ -3,6 +3,7 @@ use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
 
 library xil_defaultlib;
+use xil_defaultlib.matrix_config.all;
 use xil_defaultlib.math_functions.all;
 
 package fox_defs is 
@@ -11,18 +12,10 @@ package fox_defs is
     constant NETWORK_ROWS   : integer := 2;
     constant NETWORK_COLS   : integer := 2;
     constant NETWORK_NODES  : integer := NETWORK_ROWS * NETWORK_COLS;
-    
-    -- Matrix parameters
-    -- Matrix has dimensions (TOTAL_MATRIX_SIZE * TOTAL_MATRIX_SIZE)
-    constant TOTAL_MATRIX_SIZE      : integer := 4;
-    constant TOTAL_MATRIX_ELEMENTS  : integer := (TOTAL_MATRIX_SIZE ** 2);
-    
+
     -- Fox's algorithm network paramters
     constant FOX_NETWORK_STAGES  : integer := 2;
     constant FOX_NETWORK_NODES   : integer := FOX_NETWORK_STAGES ** 2;
-    -- Each processor operates on a (FOX_MATRIX_SIZE * FOX_MATRIX_SIZE) matrix
-    constant FOX_MATRIX_SIZE     : integer := TOTAL_MATRIX_SIZE / FOX_NETWORK_STAGES;
-    constant FOX_MATRIX_ELEMENTS : integer := (FOX_MATRIX_SIZE ** 2);
     
     -- Size of message data in packets
     constant COORD_BITS             : integer := 1;
