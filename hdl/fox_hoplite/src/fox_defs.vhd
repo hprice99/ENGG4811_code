@@ -16,6 +16,10 @@ package fox_defs is
     -- Fox's algorithm network paramters
     constant FOX_NETWORK_STAGES  : integer := 2;
     constant FOX_NETWORK_NODES   : integer := FOX_NETWORK_STAGES ** 2;
+
+    -- Result node parameters
+    constant RESULT_X_COORD  : integer := 0;
+    constant RESULT_Y_COORD  : integer := 0;
     
     -- Size of message data in packets
     constant COORD_BITS             : integer := 1;

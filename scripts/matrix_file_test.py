@@ -20,9 +20,12 @@ matrixTypeBits = 1
 matrixCoordBits = 8
 matrixElementBits = 32
 
-foxNetwork = FoxNetwork(networkRows=networkRows, networkCols=networkCols, resultNodeCoord=resultNodeCoord, totalMatrixSize=totalMatrixSize, \
-                    foxNetworkStages=foxNetworkStages, multicastGroupBits=multicastGroupBits, doneFlagBits=doneFlagBits, resultFlagBits=resultFlagBits, \
-                    matrixTypeBits=matrixTypeBits, matrixCoordBits=matrixCoordBits)
+foxNetwork = FoxNetwork(networkRows=networkRows, networkCols=networkCols, \
+            resultNodeCoord=resultNodeCoord, totalMatrixSize=totalMatrixSize, \
+            foxNetworkStages=foxNetworkStages, \
+            multicastGroupBits=multicastGroupBits,\
+            doneFlagBits=doneFlagBits, resultFlagBits=resultFlagBits, \
+            matrixTypeBits=matrixTypeBits, matrixCoordBits=matrixCoordBits)
 
 # %%
 A = np.array([[1, 2, 2, 3], [3, 4, 4, 5], [5, 6, 6, 7], [7, 8, 8, 9]])

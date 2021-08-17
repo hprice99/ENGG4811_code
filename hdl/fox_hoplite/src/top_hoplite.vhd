@@ -223,10 +223,6 @@ architecture Behavioral of top is
             out_matrix_end      : out std_logic
         );
     end component result_node;
-
-    -- Result node parameters
-    constant RESULT_X_COORD  : integer := 0;
-    constant RESULT_Y_COORD  : integer := 0;
     
     -- Array of message interfaces between nodes
     signal x_messages_out, y_messages_out : t_Message;

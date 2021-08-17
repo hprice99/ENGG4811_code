@@ -16,6 +16,10 @@ package fox_defs is
     -- Fox's algorithm network paramters
     constant FOX_NETWORK_STAGES  : integer := {{ foxNetwork.foxNetworkStages }};
     constant FOX_NETWORK_NODES   : integer := FOX_NETWORK_STAGES ** 2;
+
+    -- Result node parameters
+    constant RESULT_X_COORD  : integer := {{ foxNetwork.resultNodeCoord['x'] }};
+    constant RESULT_Y_COORD  : integer := {{ foxNetwork.resultNodeCoord['y'] }};
     
     -- Size of message data in packets
     constant COORD_BITS             : integer := {{ foxNetwork.packetFormat.coordBits }};
