@@ -125,8 +125,12 @@ class FoxNetwork():
             print("Matrices not initialised")
             return
         
+        import os
+        scriptLocation = os.path.realpath(__file__)
+        scriptDirectory = os.path.dirname(scriptLocation)
+
         # TODO Move save location of mif files
-        initFilePrefix = "node"
+        initFilePrefix = "{directory}/node".format(directory=scriptDirectory)
         initFileSuffix = ".mif"
 
         # Loop through the nodes
@@ -193,12 +197,6 @@ class FoxNetwork():
         output = template.render(foxNetwork=self)
 
         # Write output to file
-        '''
-        headerFile = open(fileName, 'w')
-        headerFile.write(output)
-        headerFile.close()
-        '''
-
         headerFileName = '{directory}/../hdl/fox_hoplite/src/{fileName}'.format(directory=scriptDirectory, fileName=fileName)
         headerFile = open(headerFileName, 'w')
         headerFile.write(output)

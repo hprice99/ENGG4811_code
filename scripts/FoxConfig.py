@@ -4,7 +4,7 @@ import math
 
 # %%
 # Matix configuration
-matrixSize = 4
+matrixSize = 8
 
 A = np.random.randint(5, size=(matrixSize, matrixSize))
 B = np.random.randint(5, size=(matrixSize, matrixSize))
