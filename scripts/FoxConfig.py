@@ -1,6 +1,7 @@
 # %%
 import numpy as np
 import math
+import yaml
 
 # %%
 # Matix configuration
@@ -12,22 +13,25 @@ B = np.random.randint(5, size=(matrixSize, matrixSize))
 print(A @ B)
 
 # Fox network configuration
-networkRows = 2
-networkCols = 2
+stream = open("FoxConfig.yaml", 'r')
+configDict = yaml.safe_load(stream)
 
-resultNodeCoord = {'x' : 0, 'y' : 0}
+networkRows = configDict['networkRows']
+networkCols = configDict['networkCols']
+
+resultNodeCoord = configDict['resultNodeCoord']
 
 totalMatrixSize = matrixSize
 
-foxNetworkStages = 2
+foxNetworkStages = configDict['foxNetworkStages']
 
 coordBits = math.ceil(math.log2(max(networkRows, networkCols)))
-multicastGroupBits = 1
-doneFlagBits = 1
-resultFlagBits = 1
-matrixTypeBits = 1
-matrixCoordBits = 8
-matrixElementBits = 32
+multicastGroupBits = configDict['packetFormat']['multicastGroupBits']
+doneFlagBits = configDict['packetFormat']['doneFlagBits']
+resultFlagBits = configDict['packetFormat']['resultFlagBits']
+matrixTypeBits = configDict['packetFormat']['matrixTypeBits']
+matrixCoordBits = configDict['packetFormat']['matrixCoordBits']
+matrixElementBits = configDict['packetFormat']['matrixElementBits']
 
 # %%
 # Firmware configuration
