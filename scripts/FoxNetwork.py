@@ -47,6 +47,9 @@ class FoxNetwork():
             assert A.shape[0] == self.totalMatrixSize, "A matrix dimensions do not match totalMatrixSize"
             assert B.shape[0] == self.totalMatrixSize, "B matrix dimensions do not match totalMatrixSize"
 
+            print(self.A)
+            print(self.B)
+
         self.foxFirmware = foxFirmware
         self.resultFirmware = resultFirmware
 

@@ -23,13 +23,6 @@ class Firmware:
         fileName = os.path.splitext(self.binaryName)[0] + '.S'
 
         # Write output to file
-        '''
-        ldsFileName = '{fileName}'.format(directory=scriptDirectory, firmwareFolder=firmwareFolder, fileName=fileName)
-        ldsFile = open(ldsFileName, 'w')
-        ldsFile.write(output)
-        ldsFile.close()
-        '''
-
         ldsFileName = '{directory}/../firmware/{firmwareFolder}/{fileName}'.format(directory=scriptDirectory, firmwareFolder=firmwareFolder, fileName=fileName)
         ldsFile = open(ldsFileName, 'w')
         ldsFile.write(output)
