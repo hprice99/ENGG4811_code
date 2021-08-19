@@ -43,7 +43,7 @@ class FoxNetwork():
         self.A = A
         self.B = B
 
-        if A is not None or B is not None:
+        if A is not None and B is not None:
             assert A.shape[0] == self.totalMatrixSize, "A matrix dimensions do not match totalMatrixSize"
             assert B.shape[0] == self.totalMatrixSize, "B matrix dimensions do not match totalMatrixSize"
 
