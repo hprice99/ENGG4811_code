@@ -73,7 +73,7 @@ networkToPeIo:
     direction: input
     width: 8
   - name: matrix_element
-    direction: output
+    direction: input
     width: 32
   - name: message_read
     direction: output
