@@ -4,32 +4,35 @@ from MatrixConfig import *
 
 # %%
 # Fox network configuration
-stream = open("FoxConfig.yaml", 'r')
-configDict = yaml.safe_load(stream)
+foxNetworkStream = open("FoxConfig.yaml", 'r')
+foxConfig = yaml.safe_load(foxNetworkStream)
 
-networkRows = configDict['networkRows']
-networkCols = configDict['networkCols']
+networkRows = foxConfig['networkRows']
+networkCols = foxConfig['networkCols']
 
-resultNodeCoord = configDict['resultNodeCoord']
+resultNodeCoord = foxConfig['resultNodeCoord']
 
 totalMatrixSize = matrixSize
 
-foxNetworkStages = configDict['foxNetworkStages']
+foxNetworkStages = foxConfig['foxNetworkStages']
 
 coordBits = math.ceil(math.log2(max(networkRows, networkCols)))
-multicastGroupBits = configDict['packetFormat']['multicastGroupBits']
-doneFlagBits = configDict['packetFormat']['doneFlagBits']
-resultFlagBits = configDict['packetFormat']['resultFlagBits']
-matrixTypeBits = configDict['packetFormat']['matrixTypeBits']
-matrixCoordBits = configDict['packetFormat']['matrixCoordBits']
-matrixElementBits = configDict['packetFormat']['matrixElementBits']
+multicastGroupBits = foxConfig['packetFormat']['multicastGroupBits']
+doneFlagBits = foxConfig['packetFormat']['doneFlagBits']
+resultFlagBits = foxConfig['packetFormat']['resultFlagBits']
+matrixTypeBits = foxConfig['packetFormat']['matrixTypeBits']
+matrixCoordBits = foxConfig['packetFormat']['matrixCoordBits']
+matrixElementBits = foxConfig['packetFormat']['matrixElementBits']
 
 # %%
 # Firmware configuration
-firmwareFolder = "fox_hoplite"
+firmwareStream = open("FirmwareConfig.yaml", 'r')
+firmwareConfig = yaml.safe_load(firmwareStream)
 
-foxFirmware = "firmware_hoplite"
-foxFirmwareMemSize = 4096
+firmwareFolder = firmwareConfig['firmwareFolder']
 
-resultFirmware = "firmware_hoplite_result"
-resultFirmwareMemSize = 8192
+foxFirmware = firmwareConfig['foxFirmware']['name']
+foxFirmwareMemSize = firmwareConfig['foxFirmware']['memory_size']
+
+resultFirmware = firmwareConfig['resultFirmware']['name']
+resultFirmwareMemSize = firmwareConfig['resultFirmware']['memory_size']

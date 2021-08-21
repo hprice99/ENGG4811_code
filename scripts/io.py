@@ -18,6 +18,7 @@ stream = open("IOConfig.yaml", 'r')
 dictionary = yaml.safe_load(stream)
 
 charIo = [Port(name=element["name"], direction=element["direction"], width=element["width"]) for element in dictionary["charIo"]]
+
 peToNetworkIo = [Port(name=element["name"], direction=element["direction"], width=element["width"]) for element in dictionary["peToNetworkIo"]]
 
 ledIo = [Port(name=element["name"], direction=element["direction"], width=element["width"]) for element in dictionary["ledIo"]]
