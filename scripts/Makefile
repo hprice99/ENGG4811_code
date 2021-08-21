@@ -9,4 +9,4 @@ config:
 
 # TODO Clean headers in firmware and hdl directories
 clean: 
-	rm *.h *.vh
+	-rm *.h *.vh
