@@ -28,8 +28,8 @@ matrixElementBits = configDict['packetFormat']['matrixElementBits']
 # Firmware configuration
 firmwareFolder = "fox_hoplite"
 
-foxFirmware = "firmware_hoplite.hex"
+foxFirmware = "firmware_hoplite"
 foxFirmwareMemSize = 4096
 
-resultFirmware = "firmware_hoplite_result.hex"
+resultFirmware = "firmware_hoplite_result"
 resultFirmwareMemSize = 8192

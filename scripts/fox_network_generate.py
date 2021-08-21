@@ -5,11 +5,15 @@ from FoxConfig import *
 
 # %%
 # TODO Write script to take memory sizes from command line arguments
-foxFirmware = Firmware(binaryName=foxFirmware, memSize=foxFirmwareMemSize)
-resultFirmware = Firmware(binaryName=resultFirmware, memSize=resultFirmwareMemSize)
+foxFirmware = Firmware(name=foxFirmware, memSize=foxFirmwareMemSize)
+resultFirmware = Firmware(name=resultFirmware, memSize=resultFirmwareMemSize)
 
 foxFirmware.write_assembly_file(firmwareFolder)
 resultFirmware.write_assembly_file(firmwareFolder)
+
+# %%
+foxFirmware.write_makefile_variables(firmwareFolder)
+resultFirmware.write_makefile_variables(firmwareFolder)
 
 # %%
 foxNetwork = FoxNetwork(networkRows=networkRows, networkCols=networkCols, \
