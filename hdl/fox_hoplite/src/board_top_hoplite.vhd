@@ -82,20 +82,39 @@ architecture Behavioral of board_top is
         );
     end component top;
     
-    signal clkdiv2  : std_logic := '0';
-    
+    component clock_divider 
+        Port ( 
+            CLK_50MHZ   : out STD_LOGIC;
+            reset       : in STD_LOGIC;
+            locked      : out STD_LOGIC;
+            clk_in1     : in STD_LOGIC
+        );
+    end component clock_divider;
+        
+    signal reset    : std_logic;
+    signal locked   : std_logic;
+        
+    signal clkdiv2  : std_logic;
+        
     constant CLK_FREQ       : integer := 50e6;
     constant ENABLE_UART    : boolean := True;
+    
+    signal reset_n  : std_logic;
 
 begin
 
+    reset   <= not CPU_RESETN;
+
     -- Clock divider
-    CLOCK_DIVIDER: process (clk)
-    begin
-        if (rising_edge(clk)) then   
-            clkdiv2 <= not clkdiv2;
-        end if;
-    end process CLOCK_DIVIDER;
+    DIVIDER: clock_divider
+        port map (
+            clk_in1     => clk,
+            reset       => reset,
+            locked      => locked,
+            CLK_50MHZ   => clkdiv2
+        );
+    
+    reset_n <= CPU_RESETN and locked;
 
     FOX_TOP: top
         generic map (
@@ -113,7 +132,7 @@ begin
         )
         port map (
             clk                 => clkdiv2,
-            reset_n             => CPU_RESETN,
+            reset_n             => reset_n,
             
             LED                 => LED,
             

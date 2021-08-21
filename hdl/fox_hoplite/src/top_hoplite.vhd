@@ -239,7 +239,7 @@ architecture Behavioral of top is
     constant RESULT_DIVIDE_ENABLED  : std_logic := '1';
     constant MULTIPLY_ENABLED       : std_logic := '1';
 
-    constant UART_FIFO_DEPTH    : integer := 512;
+    constant UART_FIFO_DEPTH    : integer := 1024;
 
     constant MATRIX_INIT_FILE_PREFIX    : string := "node";
     constant MATRIX_INIT_FILE_SUFFIX    : string := ".mif";

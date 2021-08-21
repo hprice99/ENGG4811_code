@@ -6,8 +6,6 @@
 ## Clock signal
 set_property -dict {PACKAGE_PIN E3 IOSTANDARD LVCMOS33} [get_ports clk]
 create_clock -period 10.000 -name clk -waveform {0.000 5.000} -add [get_ports clk]
-create_generated_clock -name clkdiv2 -source [get_ports clk] -divide_by 2 [get_pins REGA/Q]; 
-
 
 ##Switches
 #set_property -dict {PACKAGE_PIN J15 IOSTANDARD LVCMOS33} [get_ports {SW[0]}]

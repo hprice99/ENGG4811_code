@@ -108,8 +108,8 @@ architecture Behavioral of top_tb is
     signal reset_n      : std_logic;
     signal reset        : std_logic;
     
-    constant FOX_FIRMWARE       : string := "firmware_hoplite_tb.hex";
-    constant RESULT_FIRMWARE    : string := "firmware_hoplite_result_tb.hex";
+--    constant FOX_FIRMWARE       : string := "firmware_hoplite_tb.hex";
+--    constant RESULT_FIRMWARE    : string := "firmware_hoplite_result_tb.hex";
     
 --    constant FOX_FIRMWARE       : string := "firmware_hoplite.hex";
 --    constant RESULT_FIRMWARE    : string := "firmware_hoplite_result.hex";

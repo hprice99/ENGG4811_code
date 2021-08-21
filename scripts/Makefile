@@ -1,8 +1,6 @@
 .PHONY: all
 all: io config
 
-# TODO Add matrix target
-
 io:
 	python3 io.py
 
