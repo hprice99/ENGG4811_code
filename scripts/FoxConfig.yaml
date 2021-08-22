@@ -15,3 +15,5 @@ packetFormat:
   matrixTypeBits: 1
   matrixCoordBits: 8
   matrixElementBits: 32
+
+useMatrixInitFile: True

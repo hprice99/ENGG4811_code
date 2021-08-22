@@ -16,6 +16,13 @@ package matrix_config is
     constant FOX_MATRIX_SIZE     : integer := 8;
     constant FOX_MATRIX_ELEMENTS : integer := (FOX_MATRIX_SIZE ** 2);
 
+    constant USE_MATRIX_INIT_FILE   : boolean := True;
+
+    constant MATRIX_INIT_FILE_PREFIX    : string := "node";
+    constant MATRIX_INIT_FILE_SUFFIX    : string := ".mif";
+    
+    constant MATRIX_INIT_FILE_LENGTH    : integer := 2*FOX_MATRIX_ELEMENTS;
+
 end package matrix_config;
 
 package body matrix_config is

@@ -22,7 +22,8 @@ foxNetwork = FoxNetwork(networkRows=networkRows, networkCols=networkCols, \
             multicastGroupBits=multicastGroupBits,\
             doneFlagBits=doneFlagBits, resultFlagBits=resultFlagBits, \
             matrixTypeBits=matrixTypeBits, matrixCoordBits=matrixCoordBits, \
-            foxFirmware=foxFirmware, resultFirmware=resultFirmware, A=A, B=B)
+            foxFirmware=foxFirmware, resultFirmware=resultFirmware, A=A, B=B, \
+            useMatrixInitFile=useMatrixInitFile)
 
 # %%
 foxNetwork.create_matrix_init_files()

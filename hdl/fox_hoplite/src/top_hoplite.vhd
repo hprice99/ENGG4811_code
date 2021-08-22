@@ -104,7 +104,8 @@ architecture Behavioral of top is
             -- Matrix parameters
             TOTAL_MATRIX_SIZE   : integer := 32;
             FOX_MATRIX_SIZE     : integer := 16;
-                
+
+            USE_INITIALISATION_FILE : boolean := True;
             MATRIX_FILE             : string  := "none";
             MATRIX_FILE_LENGTH      : integer := 0;
             
@@ -180,6 +181,7 @@ architecture Behavioral of top is
             TOTAL_MATRIX_SIZE       : integer := 32;
             FOX_MATRIX_SIZE         : integer := 16;
             
+            USE_INITIALISATION_FILE : boolean := True;
             MATRIX_FILE             : string  := "none";
             MATRIX_FILE_LENGTH      : integer := 0;
     
@@ -241,11 +243,6 @@ architecture Behavioral of top is
 
     constant UART_FIFO_DEPTH    : integer := 1024;
 
-    constant MATRIX_INIT_FILE_PREFIX    : string := "node";
-    constant MATRIX_INIT_FILE_SUFFIX    : string := ".mif";
-    
-    constant MATRIX_INIT_FILE_LENGTH    : integer := 2*FOX_MATRIX_ELEMENTS;
-
 begin
 
     -- Generate the network
@@ -303,7 +300,7 @@ begin
                     TOTAL_MATRIX_SIZE       => TOTAL_MATRIX_SIZE,
                     FOX_MATRIX_SIZE         => FOX_MATRIX_SIZE,
                     
-                    -- TODO Implement matrix initialisation files for each node
+                    USE_INITIALISATION_FILE => USE_MATRIX_INIT_FILE,
                     MATRIX_FILE             => matrix_file,
                     MATRIX_FILE_LENGTH      => MATRIX_INIT_FILE_LENGTH,
                     
@@ -388,7 +385,7 @@ begin
                     TOTAL_MATRIX_SIZE       => TOTAL_MATRIX_SIZE,
                     FOX_MATRIX_SIZE         => FOX_MATRIX_SIZE,
                     
-                    -- TODO Implement matrix initialisation files for each node
+                    USE_INITIALISATION_FILE => USE_MATRIX_INIT_FILE,
                     MATRIX_FILE             => matrix_file,
                     MATRIX_FILE_LENGTH      => MATRIX_INIT_FILE_LENGTH,
                     

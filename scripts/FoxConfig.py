@@ -24,6 +24,8 @@ matrixTypeBits = foxConfig['packetFormat']['matrixTypeBits']
 matrixCoordBits = foxConfig['packetFormat']['matrixCoordBits']
 matrixElementBits = foxConfig['packetFormat']['matrixElementBits']
 
+useMatrixInitFile = foxConfig['useMatrixInitFile']
+
 # %%
 # Firmware configuration
 firmwareStream = open("FirmwareConfig.yaml", 'r')

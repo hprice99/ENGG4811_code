@@ -66,6 +66,7 @@ entity fox_node is
         TOTAL_MATRIX_SIZE       : integer := 32;
         FOX_MATRIX_SIZE         : integer := 16;
         
+        USE_INITIALISATION_FILE : boolean := True;
         MATRIX_FILE             : string  := "none";
         MATRIX_FILE_LENGTH      : integer := 0;
 
@@ -139,12 +140,12 @@ architecture Behavioral of fox_node is
         );
     end component hoplite_router;
     
-    -- TODO Add matrix initialisation (and matrix initialisation file)
     component nic_dual
         generic (
             BUS_WIDTH   : integer := 32;
             FIFO_DEPTH  : integer := 64;
             
+            USE_INITIALISATION_FILE : boolean := True;
             INITIALISATION_FILE     : string := "none";
             INITIALISATION_LENGTH   : integer := 0
         );
@@ -275,7 +276,7 @@ architecture Behavioral of fox_node is
 
             FOX_MATRIX_SIZE : integer := 16;
             
-            MATRIX_FILE     : string  := "none";
+            USE_MATRIX_INIT_FILE    : boolean  := True;
             
             -- Matrix offset for node
             MATRIX_X_OFFSET : integer := 0;
@@ -472,6 +473,7 @@ begin
             BUS_WIDTH   => BUS_WIDTH,
             FIFO_DEPTH  => FIFO_DEPTH,
            
+            USE_INITIALISATION_FILE => USE_INITIALISATION_FILE,
             INITIALISATION_FILE     => MATRIX_FILE,
             INITIALISATION_LENGTH   => MATRIX_FILE_LENGTH
         )
@@ -600,7 +602,7 @@ begin
 
             FOX_MATRIX_SIZE => FOX_MATRIX_SIZE,
             
-            MATRIX_FILE     => MATRIX_FILE,
+            USE_MATRIX_INIT_FILE    => USE_INITIALISATION_FILE,
             
             MATRIX_X_OFFSET => MATRIX_X_OFFSET,
             MATRIX_Y_OFFSET => MATRIX_Y_OFFSET,

@@ -11,7 +11,8 @@ class FoxNetwork():
     def __init__(self, *, networkRows, networkCols, resultNodeCoord, \
             totalMatrixSize, foxNetworkStages, multicastGroupBits, \
             doneFlagBits, resultFlagBits, matrixTypeBits, matrixCoordBits, \
-            foxFirmware, resultFirmware, A=None, B=None):
+            foxFirmware, resultFirmware, A=None, B=None, \
+            useMatrixInitFile=True):
 
         # Entire network details
         self.networkRows = networkRows
@@ -42,6 +43,7 @@ class FoxNetwork():
         # Do not set A or B by default
         self.A = A
         self.B = B
+        self.useMatrixInitFile = useMatrixInitFile
 
         if A is not None and B is not None:
             assert A.shape[0] == self.totalMatrixSize, "A matrix dimensions do not match totalMatrixSize"
@@ -121,9 +123,14 @@ class FoxNetwork():
     Create memory initialisation files for each node and each matrix
     '''
     def create_matrix_init_files(self):
+        if self.useMatrixInitFile == False:
+            print("Matrix init file not used")
+            return
+
         if self.A is None or self.B is None:
             print("Matrices not initialised")
             return
+
         
         import os
         scriptLocation = os.path.realpath(__file__)
