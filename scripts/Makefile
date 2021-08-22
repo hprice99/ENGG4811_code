@@ -1,5 +1,6 @@
-.PHONY: all
 all: io config
+
+.PHONY: all io config
 
 io:
 	python3 io.py

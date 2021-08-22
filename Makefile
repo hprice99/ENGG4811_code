@@ -2,8 +2,8 @@ MAKE = make
 FIRMWARE_DIR = firmware
 SCRIPT_DIR = scripts
 
-.PHONY: all
 all: scripts sw
+.PHONY: all scripts sw
 
 scripts:
 	cd $(SCRIPT_DIR) && $(MAKE) all
