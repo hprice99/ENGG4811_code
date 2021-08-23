@@ -35,6 +35,7 @@ use IEEE.math_real.all;
 
 library xil_defaultlib;
 use xil_defaultlib.math_functions.all;
+use xil_defaultlib.firmware_config.all;
 use xil_defaultlib.fox_defs.all;
 
 entity board_top is
@@ -54,8 +55,11 @@ architecture Behavioral of board_top is
             FOX_NETWORK_STAGES  : integer := 2;
             FOX_NETWORK_NODES   : integer := 4;
             
-            FOX_FIRMWARE           : string := "firmware_hoplite.hex";
-            RESULT_FIRMWARE        : string := "firmware_hoplite_result.hex";
+            FOX_FIRMWARE            : string := "firmware_hoplite.hex";
+            FOX_FIRMWARE_MEM_SIZE   : integer := 4096; 
+            
+            RESULT_FIRMWARE             : string := "firmware_hoplite_result.hex";
+            RESULT_FIRMWARE_MEM_SIZE    : integer := 8192;
             
             CLK_FREQ            : integer := 50e6;
             ENABLE_UART         : boolean := False
@@ -78,38 +82,57 @@ architecture Behavioral of board_top is
         );
     end component top;
     
-    signal clkdiv2  : std_logic := '0';
-    
+    component clock_divider 
+        Port ( 
+            CLK_50MHZ   : out STD_LOGIC;
+            reset       : in STD_LOGIC;
+            locked      : out STD_LOGIC;
+            clk_in1     : in STD_LOGIC
+        );
+    end component clock_divider;
+        
+    signal reset    : std_logic;
+    signal locked   : std_logic;
+        
+    signal clkdiv2  : std_logic;
+        
     constant CLK_FREQ       : integer := 50e6;
     constant ENABLE_UART    : boolean := True;
     
-    constant FOX_FIRMWARE       : string := "firmware_hoplite.hex";
-    constant RESULT_FIRMWARE    : string := "firmware_hoplite_result.hex";
+    signal reset_n  : std_logic;
 
 begin
 
+    reset   <= not CPU_RESETN;
+
     -- Clock divider
-    CLOCK_DIVIDER: process (clk)
-    begin
-        if (rising_edge(clk)) then   
-            clkdiv2 <= not clkdiv2;
-        end if;
-    end process CLOCK_DIVIDER;
+    DIVIDER: clock_divider
+        port map (
+            clk_in1     => clk,
+            reset       => reset,
+            locked      => locked,
+            CLK_50MHZ   => clkdiv2
+        );
+    
+    reset_n <= CPU_RESETN and locked;
 
     FOX_TOP: top
         generic map (
             FOX_NETWORK_STAGES  => FOX_NETWORK_STAGES,
             FOX_NETWORK_NODES   => FOX_NETWORK_NODES,
             
-            FOX_FIRMWARE        => FOX_FIRMWARE,
-            RESULT_FIRMWARE     => RESULT_FIRMWARE,
+            FOX_FIRMWARE            => FOX_FIRMWARE,
+            FOX_FIRMWARE_MEM_SIZE   => FOX_MEM_SIZE,
+            
+            RESULT_FIRMWARE             => RESULT_FIRMWARE,
+            RESULT_FIRMWARE_MEM_SIZE    => RESULT_MEM_SIZE,
             
             CLK_FREQ            => CLK_FREQ,
             ENABLE_UART         => ENABLE_UART
         )
         port map (
             clk                 => clkdiv2,
-            reset_n             => CPU_RESETN,
+            reset_n             => reset_n,
             
             LED                 => LED,
             

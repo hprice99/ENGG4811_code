@@ -26,16 +26,12 @@ use IEEE.STD_LOGIC_1164.ALL;
 -- arithmetic functions with Signed or Unsigned values
 use IEEE.NUMERIC_STD.ALL;
 
--- Uncomment the following library declaration if instantiating
--- any Xilinx leaf cells in this code.
---library UNISIM;
---use UNISIM.VComponents.all;
-
 use STD.textio.all;
 use IEEE.std_logic_textio.all;
 
 library xil_defaultlib;
 use xil_defaultlib.fox_defs.all;
+use xil_defaultlib.firmware_config.all;
 
 entity top_tb is
 end top_tb;
@@ -48,8 +44,11 @@ architecture Behavioral of top_tb is
             FOX_NETWORK_STAGES  : integer := 2;
             FOX_NETWORK_NODES   : integer := 4;
             
-            FOX_FIRMWARE           : string := "firmware_hoplite.hex";
-            RESULT_FIRMWARE        : string := "firmware_hoplite_result.hex";
+            FOX_FIRMWARE            : string := "firmware_hoplite.hex";
+            FOX_FIRMWARE_MEM_SIZE   : integer := 4096; 
+            
+            RESULT_FIRMWARE             : string := "firmware_hoplite_result.hex";
+            RESULT_FIRMWARE_MEM_SIZE    : integer := 8192;
             
             CLK_FREQ            : integer := 50e6;
             ENABLE_UART         : boolean := False
@@ -104,8 +103,8 @@ architecture Behavioral of top_tb is
     signal reset_n      : std_logic;
     signal reset        : std_logic;
     
-    constant FOX_FIRMWARE       : string := "firmware_hoplite_tb.hex";
-    constant RESULT_FIRMWARE    : string := "firmware_hoplite_result_tb.hex";
+--    constant FOX_FIRMWARE       : string := "firmware_hoplite_tb.hex";
+--    constant RESULT_FIRMWARE    : string := "firmware_hoplite_result_tb.hex";
     
 --    constant FOX_FIRMWARE       : string := "firmware_hoplite.hex";
 --    constant RESULT_FIRMWARE    : string := "firmware_hoplite_result.hex";
@@ -165,8 +164,11 @@ begin
             FOX_NETWORK_STAGES  => FOX_NETWORK_STAGES,
             FOX_NETWORK_NODES   => FOX_NETWORK_NODES,
             
-            FOX_FIRMWARE        => FOX_FIRMWARE,
-            RESULT_FIRMWARE     => RESULT_FIRMWARE,
+            FOX_FIRMWARE            => FOX_FIRMWARE,
+            FOX_FIRMWARE_MEM_SIZE   => FOX_MEM_SIZE,
+            
+            RESULT_FIRMWARE             => RESULT_FIRMWARE,
+            RESULT_FIRMWARE_MEM_SIZE    => RESULT_MEM_SIZE,
             
             CLK_FREQ            => CLK_FREQ,
             ENABLE_UART         => True

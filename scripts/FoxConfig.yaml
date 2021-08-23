@@ -1,0 +1,19 @@
+---
+networkRows: 2
+networkCols: 2
+
+foxNetworkStages: 2
+
+resultNodeCoord:
+  x: 0
+  y: 0
+
+packetFormat:
+  multicastGroupBits: 1
+  doneFlagBits: 1
+  resultFlagBits: 1
+  matrixTypeBits: 1
+  matrixCoordBits: 8
+  matrixElementBits: 32
+
+useMatrixInitFile: True

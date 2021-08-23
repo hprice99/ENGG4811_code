@@ -9,26 +9,26 @@ use xil_defaultlib.math_functions.all;
 package fox_defs is 
 
     -- Constants
-    constant NETWORK_ROWS   : integer := 2;
-    constant NETWORK_COLS   : integer := 2;
+    constant NETWORK_ROWS   : integer := {{ foxNetwork.networkRows }};
+    constant NETWORK_COLS   : integer := {{ foxNetwork.networkCols }};
     constant NETWORK_NODES  : integer := NETWORK_ROWS * NETWORK_COLS;
 
     -- Fox's algorithm network paramters
-    constant FOX_NETWORK_STAGES  : integer := 2;
+    constant FOX_NETWORK_STAGES  : integer := {{ foxNetwork.foxNetworkStages }};
     constant FOX_NETWORK_NODES   : integer := FOX_NETWORK_STAGES ** 2;
 
     -- Result node parameters
-    constant RESULT_X_COORD  : integer := 0;
-    constant RESULT_Y_COORD  : integer := 0;
+    constant RESULT_X_COORD  : integer := {{ foxNetwork.resultNodeCoord['x'] }};
+    constant RESULT_Y_COORD  : integer := {{ foxNetwork.resultNodeCoord['y'] }};
     
     -- Size of message data in packets
-    constant COORD_BITS             : integer := 1;
-    constant MULTICAST_GROUP_BITS   : integer := 1;
-    constant DONE_FLAG_BITS         : integer := 1;
-    constant RESULT_FLAG_BITS       : integer := 1;
-    constant MATRIX_TYPE_BITS       : integer := 1;
-    constant MATRIX_COORD_BITS      : integer := 8;
-    constant MATRIX_ELEMENT_BITS    : integer := 32;
+    constant COORD_BITS             : integer := {{ foxNetwork.packetFormat.coordBits }};
+    constant MULTICAST_GROUP_BITS   : integer := {{ foxNetwork.packetFormat.multicastGroupBits }};
+    constant DONE_FLAG_BITS         : integer := {{ foxNetwork.packetFormat.doneFlagBits }};
+    constant RESULT_FLAG_BITS       : integer := {{ foxNetwork.packetFormat.resultFlagBits }};
+    constant MATRIX_TYPE_BITS       : integer := {{ foxNetwork.packetFormat.matrixTypeBits }};
+    constant MATRIX_COORD_BITS      : integer := {{ foxNetwork.packetFormat.matrixCoordBits }};
+    constant MATRIX_ELEMENT_BITS    : integer := {{ foxNetwork.packetFormat.matrixElementBits }};
     constant BUS_WIDTH              : integer := 
             2*COORD_BITS + MULTICAST_GROUP_BITS + DONE_FLAG_BITS + 
             RESULT_FLAG_BITS + MATRIX_TYPE_BITS + 2*MATRIX_COORD_BITS + 

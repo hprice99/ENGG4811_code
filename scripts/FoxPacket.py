@@ -60,8 +60,8 @@ class FoxPacket:
 
         packets = []
 
-        for matrixY in range(np.ndim(matrix)):
-            for matrixX in range(np.ndim(matrix)):
+        for matrixY in range(matrix.shape[1]):
+            for matrixX in range(matrix.shape[0]):
                 matrixCoord = {'x' : matrixX, 'y' : matrixY}
                 matrixElement = matrix[matrixY, matrixX]
 
