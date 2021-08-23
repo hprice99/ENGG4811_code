@@ -36,6 +36,7 @@ entity fifo_sync_wrapper is
         BUS_WIDTH   : integer := 32;
         FIFO_DEPTH  : integer := 64;
         
+        USE_INITIALISATION_FILE : boolean := True;
         INITIALISATION_FILE     : string := "none";
         INITIALISATION_LENGTH   : integer := 0
     );
@@ -101,7 +102,7 @@ architecture Behavioral of fifo_sync_wrapper is
 
 begin
 
-    UNINITIALISED_FIFO_GEN: if (INITIALISATION_FILE = "none") generate
+    UNINITIALISED_FIFO_GEN: if (INITIALISATION_FILE = "none" or USE_INITIALISATION_FILE = False) generate
         UNINITIALISED_FIFO: fifo_sync
             generic map (
                 BUS_WIDTH   => BUS_WIDTH,
@@ -122,7 +123,7 @@ begin
             );
     end generate UNINITIALISED_FIFO_GEN;
 
-    INITIALISED_FIFO_GEN: if (INITIALISATION_FILE /= "none") generate
+    INITIALISED_FIFO_GEN: if (INITIALISATION_FILE /= "none" and USE_INITIALISATION_FILE = True) generate
         INITIALISED_FIFO: fifo_sync_memory_initialise
             generic map (
                 BUS_WIDTH   => BUS_WIDTH,

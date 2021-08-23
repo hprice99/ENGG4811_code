@@ -7,6 +7,7 @@ entity nic_dual is
         BUS_WIDTH   : integer := 32;
         FIFO_DEPTH  : integer := 64;
         
+        USE_INITIALISATION_FILE : boolean := True;
         INITIALISATION_FILE     : string := "none";
         INITIALISATION_LENGTH   : integer := 0
     );
@@ -46,6 +47,7 @@ architecture Behavioural of nic_dual is
             BUS_WIDTH   : integer := 32;
             FIFO_DEPTH  : integer := 64;
             
+            USE_INITIALISATION_FILE : boolean := True;
             INITIALISATION_FILE     : string := "none";
             INITIALISATION_LENGTH   : integer := 0
         );
@@ -81,6 +83,7 @@ begin
         BUS_WIDTH   => BUS_WIDTH,
         FIFO_DEPTH  => FIFO_DEPTH,
         
+        USE_INITIALISATION_FILE => False,
         INITIALISATION_FILE     => "none",
         INITIALISATION_LENGTH   => 0
     )
@@ -140,6 +143,7 @@ begin
         BUS_WIDTH   => BUS_WIDTH,
         FIFO_DEPTH  => FIFO_DEPTH,
         
+        USE_INITIALISATION_FILE => USE_INITIALISATION_FILE,
         INITIALISATION_FILE     => INITIALISATION_FILE,
         INITIALISATION_LENGTH   => INITIALISATION_LENGTH
     )

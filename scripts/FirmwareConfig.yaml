@@ -1,0 +1,10 @@
+---
+firmwareFolder: fox_hoplite
+
+foxFirmware:
+  name: firmware_hoplite
+  memory_size: 4096
+
+resultFirmware:
+  name: firmware_hoplite_result
+  memory_size: 8192

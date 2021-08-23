@@ -27,11 +27,6 @@ use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
 use ieee.std_logic_unsigned.all;
 
--- Uncomment the following library declaration if instantiating
--- any Xilinx leaf cells in this code.
---library UNISIM;
---use UNISIM.VComponents.all;
-
 library xil_defaultlib;
 use xil_defaultlib.math_functions.all;
 use xil_defaultlib.fox_defs.all;
@@ -68,6 +63,7 @@ entity result_node is
         TOTAL_MATRIX_SIZE       : integer := 32;
         FOX_MATRIX_SIZE         : integer := 16;
         
+        USE_INITIALISATION_FILE : boolean := True;
         MATRIX_FILE             : string  := "none";
         MATRIX_FILE_LENGTH      : integer := 0;
         
@@ -151,6 +147,7 @@ architecture Behavioral of result_node is
             TOTAL_MATRIX_SIZE   : integer := 32;
             FOX_MATRIX_SIZE     : integer := 16;
             
+            USE_INITIALISATION_FILE : boolean := True;
             MATRIX_FILE             : string  := "none";
             MATRIX_FILE_LENGTH      : integer := 0;
             
@@ -242,8 +239,8 @@ architecture Behavioral of result_node is
 
     signal reset    : std_logic;
     
-    constant BAUD_RATE  : integer := 115200;
-    constant PARITY_BIT : string := "none";
+    constant BAUD_RATE      : integer := 115200;
+    constant PARITY_BIT     : string := "none";
     constant USE_DEBOUNCER  : boolean := True;
     
     constant UART_BUS_WIDTH : integer := 8;
@@ -299,6 +296,7 @@ begin
             TOTAL_MATRIX_SIZE       => TOTAL_MATRIX_SIZE,
             FOX_MATRIX_SIZE         => FOX_MATRIX_SIZE,
             
+            USE_INITIALISATION_FILE => USE_INITIALISATION_FILE,
             MATRIX_FILE             => MATRIX_FILE,
             MATRIX_FILE_LENGTH      => MATRIX_FILE_LENGTH,
             

@@ -35,6 +35,8 @@ use ieee.std_logic_unsigned.all;
 library xil_defaultlib;
 use xil_defaultlib.math_functions.all;
 use xil_defaultlib.fox_defs.all;
+use xil_defaultlib.matrix_config.all;
+use xil_defaultlib.firmware_config.all;
 
 entity top is
     Generic (
@@ -42,8 +44,11 @@ entity top is
         FOX_NETWORK_STAGES  : integer := 2;
         FOX_NETWORK_NODES   : integer := 4;
         
-        FOX_FIRMWARE           : string := "firmware_hoplite.hex";
-        RESULT_FIRMWARE        : string := "firmware_hoplite_result.hex";
+        FOX_FIRMWARE            : string := "firmware_hoplite.hex";
+        FOX_FIRMWARE_MEM_SIZE   : integer := 4096; 
+        
+        RESULT_FIRMWARE             : string := "firmware_hoplite_result.hex";
+        RESULT_FIRMWARE_MEM_SIZE    : integer := 8192;
 
         CLK_FREQ            : integer := 50e6;
         ENABLE_UART         : boolean := False
@@ -99,7 +104,8 @@ architecture Behavioral of top is
             -- Matrix parameters
             TOTAL_MATRIX_SIZE   : integer := 32;
             FOX_MATRIX_SIZE     : integer := 16;
-                
+
+            USE_INITIALISATION_FILE : boolean := True;
             MATRIX_FILE             : string  := "none";
             MATRIX_FILE_LENGTH      : integer := 0;
             
@@ -175,6 +181,7 @@ architecture Behavioral of top is
             TOTAL_MATRIX_SIZE       : integer := 32;
             FOX_MATRIX_SIZE         : integer := 16;
             
+            USE_INITIALISATION_FILE : boolean := True;
             MATRIX_FILE             : string  := "none";
             MATRIX_FILE_LENGTH      : integer := 0;
     
@@ -223,10 +230,6 @@ architecture Behavioral of top is
             out_matrix_end      : out std_logic
         );
     end component result_node;
-
-    -- Result node parameters
-    constant RESULT_X_COORD  : integer := 0;
-    constant RESULT_Y_COORD  : integer := 0;
     
     -- Array of message interfaces between nodes
     signal x_messages_out, y_messages_out : t_Message;
@@ -237,16 +240,8 @@ architecture Behavioral of top is
     constant FOX_DIVIDE_ENABLED     : std_logic := '0';
     constant RESULT_DIVIDE_ENABLED  : std_logic := '1';
     constant MULTIPLY_ENABLED       : std_logic := '1';
-    
-    constant FOX_MEM_SIZE           : integer := 4096;
-    constant RESULT_MEM_SIZE        : integer := 8192;
 
-    constant UART_FIFO_DEPTH    : integer := 512;
-
-    constant MATRIX_INIT_FILE_PREFIX    : string := "node";
-    constant MATRIX_INIT_FILE_SUFFIX    : string := ".mif";
-    
-    constant MATRIX_INIT_FILE_LENGTH    : integer := 2*FOX_MATRIX_ELEMENTS;
+    constant UART_FIFO_DEPTH    : integer := 1024;
 
 begin
 
@@ -305,7 +300,7 @@ begin
                     TOTAL_MATRIX_SIZE       => TOTAL_MATRIX_SIZE,
                     FOX_MATRIX_SIZE         => FOX_MATRIX_SIZE,
                     
-                    -- TODO Implement matrix initialisation files for each node
+                    USE_INITIALISATION_FILE => USE_MATRIX_INIT_FILE,
                     MATRIX_FILE             => matrix_file,
                     MATRIX_FILE_LENGTH      => MATRIX_INIT_FILE_LENGTH,
                     
@@ -325,7 +320,7 @@ begin
                     DIVIDE_ENABLED     => RESULT_DIVIDE_ENABLED,
                     MULTIPLY_ENABLED   => MULTIPLY_ENABLED,
                     FIRMWARE           => RESULT_FIRMWARE,
-                    MEM_SIZE           => RESULT_MEM_SIZE
+                    MEM_SIZE           => RESULT_FIRMWARE_MEM_SIZE
                 )
                 port map (
                     clk                 => clk,
@@ -390,7 +385,7 @@ begin
                     TOTAL_MATRIX_SIZE       => TOTAL_MATRIX_SIZE,
                     FOX_MATRIX_SIZE         => FOX_MATRIX_SIZE,
                     
-                    -- TODO Implement matrix initialisation files for each node
+                    USE_INITIALISATION_FILE => USE_MATRIX_INIT_FILE,
                     MATRIX_FILE             => matrix_file,
                     MATRIX_FILE_LENGTH      => MATRIX_INIT_FILE_LENGTH,
                     
@@ -405,7 +400,7 @@ begin
                     DIVIDE_ENABLED     => FOX_DIVIDE_ENABLED,
                     MULTIPLY_ENABLED   => MULTIPLY_ENABLED,
                     FIRMWARE           => FOX_FIRMWARE,
-                    MEM_SIZE           => FOX_MEM_SIZE
+                    MEM_SIZE           => FOX_FIRMWARE_MEM_SIZE
                 )
                 port map (
                     clk                 => clk,
