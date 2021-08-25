@@ -66,7 +66,7 @@ end hoplite_tb_node;
 
 architecture Behavioral of hoplite_tb_node is
 
-    component hoplite_router
+    component hoplite_router_multicast
         generic (
             BUS_WIDTH   : integer := 32;
             X_COORD     : integer := 0;
@@ -92,7 +92,7 @@ architecture Behavioral of hoplite_tb_node is
             pe_out_valid    : out STD_LOGIC;
             pe_backpressure : out STD_LOGIC
         );
-    end component hoplite_router;
+    end component hoplite_router_multicast;
     
     component nic_dual
         generic (
@@ -192,7 +192,7 @@ architecture Behavioral of hoplite_tb_node is
 
 begin
 
-    ROUTER: hoplite_router
+    ROUTER: hoplite_router_multicast
         generic map (
             BUS_WIDTH   => BUS_WIDTH,
             X_COORD     => X_COORD,

@@ -47,31 +47,43 @@ end hoplite_router_tb;
 
 architecture Behavioral of hoplite_router_tb is
     
-    component hoplite_router
+    component hoplite_router_multicast
         generic (
-            BUS_WIDTH   : integer := 32;
-            X_COORD     : integer := 0;
-            Y_COORD     : integer := 0;
-            COORD_BITS  : integer := 1
+            BUS_WIDTH               : integer := 32;
+            X_COORD                 : integer := 0;
+            Y_COORD                 : integer := 0;
+            COORD_BITS              : integer := 1;
+            MULTICAST_GROUP_BITS    : integer := 1
         );
         port (
             clk             : in STD_LOGIC;
             reset_n         : in STD_LOGIC;
+            
+            -- Input (messages received by router)
             x_in            : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
             x_in_valid      : in STD_LOGIC;
+            
             y_in            : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
             y_in_valid      : in STD_LOGIC;
+            
             pe_in           : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
             pe_in_valid     : in STD_LOGIC;
+            pe_backpressure : out STD_LOGIC;
+            
+            -- Output (messages sent out of router)
             x_out           : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
             x_out_valid     : out STD_LOGIC;
+            
             y_out           : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
             y_out_valid     : out STD_LOGIC;
+            
             pe_out          : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
             pe_out_valid    : out STD_LOGIC;
-            pe_backpressure : out STD_LOGIC
+            
+            multicast_out       : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
+            multicast_out_valid : out STD_LOGIC
         );
-    end component hoplite_router;
+    end component hoplite_router_multicast;
 
     component fifo_sync
         generic (
@@ -124,11 +136,12 @@ architecture Behavioral of hoplite_router_tb is
     constant VALID_THRESHOLD    : real := 0.75;
     constant PE_IN_THRESHOLD    : real := 0.10;
     
-    constant X_COORD    : integer := 0;
-    constant Y_COORD    : integer := 0;
-    constant COORD_BITS : integer := 2;
-    constant BUS_WIDTH  : integer := 4 * COORD_BITS;
-    constant DATA_WIDTH : integer := BUS_WIDTH - 2*COORD_BITS;
+    constant X_COORD                : integer := 0;
+    constant Y_COORD                : integer := 0;
+    constant COORD_BITS             : integer := 2;
+    constant MULTICAST_GROUP_BITS   : integer := 1;
+    constant DATA_WIDTH             : integer := 4;
+    constant BUS_WIDTH              : integer := 2*COORD_BITS + MULTICAST_GROUP_BITS + DATA_WIDTH;
     
     constant NETWORK_ROWS   : integer := 2 ** COORD_BITS;
     constant NETWORK_COLS   : integer := 2 ** COORD_BITS;
@@ -141,6 +154,9 @@ architecture Behavioral of hoplite_router_tb is
 
     type t_Coordinate is array (0 to 1) of std_logic_vector((COORD_BITS-1) downto 0);
     signal x_message_dest, y_message_dest, pe_message_dest : t_Coordinate;
+    
+    subtype t_MulticastGroup is std_logic_vector((MULTICAST_GROUP_BITS-1) downto 0);
+    signal x_message_multicast_group, y_message_multicast_group, pe_message_multicast_group : t_MulticastGroup;
     
     signal x_message_data, y_message_data, pe_message_data : std_logic_vector((DATA_WIDTH-1) downto 0);
     
@@ -165,10 +181,13 @@ architecture Behavioral of hoplite_router_tb is
     signal y_out        : std_logic_vector((BUS_WIDTH-1) downto 0);
     signal y_out_valid  : std_logic;
     
-    signal pe_out           :    std_logic_vector((BUS_WIDTH-1) downto 0);
+    signal pe_out               : std_logic_vector((BUS_WIDTH-1) downto 0);
     signal pe_out_valid         : std_logic;
     signal pe_backpressure      : std_logic;
     signal not_pe_backpressure  : std_logic;
+    
+    signal multicast_out        : std_logic_vector((BUS_WIDTH-1) downto 0);
+    signal multicast_out_valid  : std_logic;
     
     constant FIFO_ADDRESS_WIDTH     : natural := ceil_log2(MAX_CYCLES);
     constant FIFO_DEPTH             : natural := 2 ** FIFO_ADDRESS_WIDTH;
@@ -235,27 +254,32 @@ begin
             if (reset_n = '0') then                
                 x_message_dest(X_INDEX)     <= (others => '0');
                 x_message_dest(Y_INDEX)     <= (others => '0');
+                x_message_multicast_group   <= (others => '0');
                 x_message_data              <= (others => '0');
                 x_message_b_valid           <= '0';
 
                 y_message_dest(X_INDEX)     <= (others => '0');
                 y_message_dest(Y_INDEX)     <= (others => '0');
+                y_message_multicast_group   <= (others => '0');
                 y_message_data              <= (others => '0');
                 y_message_b_valid           <= '0';
                 
                 pe_message_dest(X_INDEX)    <= (others => '0');
                 pe_message_dest(Y_INDEX)    <= (others => '0');
+                pe_message_multicast_group  <= (others => '0');
                 pe_message_data             <= (others => '0');
                 pe_message_b_valid          <= '0';
             else
                 x_message_dest(X_INDEX)     <= rand_slv(COORD_BITS, count);
                 x_message_dest(Y_INDEX)     <= rand_slv(COORD_BITS, 2*count);
+                x_message_multicast_group   <= rand_slv(MULTICAST_GROUP_BITS, count);
                 x_message_data              <= rand_slv(DATA_WIDTH, 3*count);
                 x_message_b_valid           <= rand_logic(VALID_THRESHOLD, count);
                 
                 -- Incoming Y messages are already in the correct column
                 y_message_dest(X_INDEX)     <= "00";
                 y_message_dest(Y_INDEX)     <= rand_slv(COORD_BITS, 2*MAX_CYCLES-count);
+                y_message_multicast_group   <= rand_slv(MULTICAST_GROUP_BITS, MAX_CYCLES-count);
                 y_message_data              <= rand_slv(DATA_WIDTH, 3*MAX_CYCLES-count);
                 y_message_b_valid           <= rand_logic(VALID_THRESHOLD, MAX_CYCLES-count);
                 
@@ -267,6 +291,8 @@ begin
                     pe_message_dest(X_INDEX)    <= rand_slv(COORD_BITS, count + NETWORK_NODES);
                     pe_message_dest(Y_INDEX)    <= rand_slv(COORD_BITS, 2*count + NETWORK_NODES);
                 end if;
+                -- pe_message_multicast_group  <= rand_slv(MULTICAST_GROUP_BITS, count + NETWORK_NODES);
+                pe_message_multicast_group  <= (others => '0');
                 pe_message_data             <= rand_slv(DATA_WIDTH, 3*count + NETWORK_NODES);
                 pe_message_b_valid          <= rand_logic(PE_IN_THRESHOLD, count + NETWORK_NODES);
             end if;
@@ -274,9 +300,9 @@ begin
     end process CONSTRUCT_MESSAGE;
     
     -- Packet format LSB x_dest|y_dest|data MSB                    
-    x_message_b     <= x_message_data & x_message_dest(Y_INDEX) & x_message_dest(X_INDEX);
-    y_message_b     <= y_message_data & y_message_dest(Y_INDEX) & y_message_dest(X_INDEX);
-    pe_message_b    <= pe_message_data & pe_message_dest(Y_INDEX) & pe_message_dest(X_INDEX);
+    x_message_b     <= x_message_data & x_message_multicast_group & x_message_dest(Y_INDEX) & x_message_dest(X_INDEX);
+    y_message_b     <= y_message_data & y_message_multicast_group & y_message_dest(Y_INDEX) & y_message_dest(X_INDEX);
+    pe_message_b    <= pe_message_data & pe_message_multicast_group & pe_message_dest(Y_INDEX) & pe_message_dest(X_INDEX);
     
     MESSAGE_FF: process (clk)
     begin
@@ -333,7 +359,7 @@ begin
         empty               => open
     );
     
-    DUT: hoplite_router
+    DUT: hoplite_router_multicast
     generic map (
         BUS_WIDTH   => BUS_WIDTH,
         X_COORD     => X_COORD,
@@ -343,19 +369,23 @@ begin
     port map (
         clk                 => clk,
         reset_n             => reset_n,
+        
         x_in                => x_in,
         x_in_valid          => x_in_valid,
         y_in                => y_in,
         y_in_valid          => y_in_valid,
         pe_in               => pe_in,
         pe_in_valid         => pe_in_valid,
+        pe_backpressure     => pe_backpressure,
+        
         x_out               => x_out,
         x_out_valid         => x_out_valid,
         y_out               => y_out,
         y_out_valid         => y_out_valid,
         pe_out              => pe_out,
         pe_out_valid        => pe_out_valid,
-        pe_backpressure     => pe_backpressure
+        multicast_out       => multicast_out,
+        multicast_out_valid => multicast_out_valid
     );
     
     -- FIFO for checking output messages    
