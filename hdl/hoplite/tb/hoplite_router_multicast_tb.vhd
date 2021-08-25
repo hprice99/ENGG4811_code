@@ -192,10 +192,6 @@ architecture Behavioral of hoplite_router_tb is
     constant FIFO_ADDRESS_WIDTH     : natural := ceil_log2(MAX_CYCLES);
     constant FIFO_DEPTH             : natural := 2 ** FIFO_ADDRESS_WIDTH;
     constant FIFO_DATA_WIDTH        : natural := BUS_WIDTH; 
-    
-    signal pe_fifo_en_w, pe_fifo_en_r               : std_logic;
-    signal pe_fifo_empty, pe_fifo_full              : std_logic;
-    signal pe_fifo_data_w, pe_fifo_data_r           : std_logic_vector((BUS_WIDTH-1) downto 0);
         
     signal check_dest_fifo_en_w, check_dest_fifo_en_r       : std_logic;
     signal check_dest_fifo_empty, check_dest_fifo_full      : std_logic;
@@ -204,16 +200,21 @@ architecture Behavioral of hoplite_router_tb is
     signal check_pe_message_fifo_en_w, check_pe_message_fifo_en_r       : std_logic;
     signal check_pe_message_fifo_empty, check_pe_message_fifo_full      : std_logic;
     signal check_pe_message_fifo_data_w, check_pe_message_fifo_data_r   : std_logic_vector((BUS_WIDTH-1) downto 0);
+        
+    signal check_multicast_out_fifo_en_w, check_multicast_out_fifo_en_r       : std_logic;
+    signal check_multicast_out_fifo_empty, check_multicast_out_fifo_full      : std_logic;
+    signal check_multicast_out_fifo_data_w, check_multicast_out_fifo_data_r   : std_logic_vector((BUS_WIDTH-1) downto 0);
     
     constant PRINT_X_IN         : boolean := true;
     constant PRINT_Y_IN         : boolean := true;
     constant PRINT_PE_IN        : boolean := true;
     constant PRINT_PE_FIFO_IN   : boolean := true;
     
-    constant PRINT_X_OUT            : boolean := true;
-    constant PRINT_Y_OUT            : boolean := true;
-    constant PRINT_PE_OUT           : boolean := true;
-    constant PRINT_CHECK_FIFO_OUT   : boolean := true;
+    constant PRINT_X_OUT                : boolean := true;
+    constant PRINT_Y_OUT                : boolean := true;
+    constant PRINT_PE_OUT               : boolean := true;
+    constant PRINT_CHECK_FIFO_OUT       : boolean := true;
+    constant PRINT_CHECK_MULTICAST_OUT  : boolean := true;
     
 begin
 
@@ -491,6 +492,59 @@ begin
         end if;
     end process CHECK_PE_MESSAGE_FIFO_READ_ENABLE;
     
+    -- FIFO for checking outgoing multicast messages
+    CHECK_MULTICAST_OUT_FIFO: fifo_sync
+    generic map (
+        BUS_WIDTH   => FIFO_DATA_WIDTH,
+        FIFO_DEPTH  => FIFO_DEPTH
+    )
+    port map (       
+        clk         => clk,
+        reset_n     => reset_n,
+        
+        write_en    => check_multicast_out_fifo_en_w,
+        write_data  => check_multicast_out_fifo_data_w,
+
+        read_en     => check_multicast_out_fifo_en_r,
+        read_data   => check_multicast_out_fifo_data_r,
+        
+        full        => check_multicast_out_fifo_full,
+        empty       => check_multicast_out_fifo_empty
+    );
+    
+    -- Writing to FIFO
+    CHECK_MULTICAST_OUT_FIFO_WRITE: process (clk)
+    begin
+        if (rising_edge(clk) and count <= MAX_CYCLES) then
+            if (reset_n = '0') then
+                check_multicast_out_fifo_data_w <= (others => '0');
+                check_multicast_out_fifo_en_w   <= '0';
+            elsif (check_multicast_out_fifo_full = '0') then
+                 if (x_message_b_valid = '1' and 
+                        x_message_multicast_group /= "0") then
+                    check_multicast_out_fifo_data_w     <= x_message_b;
+                    check_multicast_out_fifo_en_w       <= '1';
+                 elsif (y_message_b_valid = '1' and 
+                            y_message_multicast_group /= "0") then
+                    check_multicast_out_fifo_data_w     <= y_message_b;
+                    check_multicast_out_fifo_en_w       <= '1';
+                 else
+                    check_multicast_out_fifo_en_w       <= '0';
+                 end if;
+            end if;
+        end if;
+    end process CHECK_MULTICAST_OUT_FIFO_WRITE;
+    
+    -- Read from FIFO
+    CHECK_MULTICAST_OUT_FIFO_READ_ENABLE: process (check_multicast_out_fifo_empty, multicast_out_valid)
+    begin
+        if (check_multicast_out_fifo_empty = '0') then
+            check_multicast_out_fifo_en_r   <= multicast_out_valid;
+        else
+            check_multicast_out_fifo_en_r   <= '0';
+        end if;
+    end process CHECK_MULTICAST_OUT_FIFO_READ_ENABLE;
+    
     -- Check messages received   
     PRINT_MESSAGE_RECEIVED: process (clk)
     variable my_line : line;
@@ -607,6 +661,21 @@ begin
                 writeline(output, my_line);
             end if;
             
+            if (check_multicast_out_fifo_en_r = '1' and PRINT_CHECK_MULTICAST_OUT) then
+                write(my_line, string'("check_multicast_out_fifo_out: destination = ("));
+                write(my_line, to_integer(unsigned(check_multicast_out_fifo_data_r((COORD_BITS-1) downto 0))));
+                write(my_line, string'(", "));
+                write(my_line, to_integer(unsigned(check_multicast_out_fifo_data_r((2*COORD_BITS-1) downto COORD_BITS))));
+                write(my_line, string'("), multicast_group = "));
+                write(my_line, check_multicast_out_fifo_data_r((2*COORD_BITS + MULTICAST_GROUP_BITS - 1) downto 2*COORD_BITS));
+                write(my_line, string'(", data = "));
+                write(my_line, check_multicast_out_fifo_data_r((BUS_WIDTH-1) downto (2*COORD_BITS + MULTICAST_GROUP_BITS)));
+                write(my_line, string'(", raw = "));
+                write(my_line, check_multicast_out_fifo_data_r((BUS_WIDTH-1) downto 0));
+                
+                writeline(output, my_line);
+            end if;
+            
             -- Print a new line
             write(my_line, string'(""));
             writeline(output, my_line);
@@ -614,7 +683,7 @@ begin
     end process PRINT_MESSAGE_RECEIVED;
     
     CHECK_DEST_MESSAGE: process (clk)
-    variable my_line : line;
+        variable my_line : line;
     begin
         if (rising_edge(clk) and reset_n = '1' and count <= MAX_CYCLES) then
             if (check_dest_fifo_en_r = '1') then
@@ -665,9 +734,66 @@ begin
         end if;
     end process CHECK_DEST_MESSAGE;
     
+    -- Check multicast_out messages
+    CHECK_MULTICAST_OUT_MESSAGE: process (clk)
+        variable my_line : line;
+    begin
+        if (rising_edge(clk) and reset_n = '1' and count <= MAX_CYCLES) then
+            if (check_multicast_out_fifo_en_r = '1') then
+                if (unsigned(check_multicast_out_fifo_data_r) /= unsigned(multicast_out)) then
+                    write(my_line, string'(HT & "multicast_out message "));
+                    write(my_line, count-1);
+                    write(my_line, string'(" does not match"));
+                    writeline(output, my_line);
+                    
+                    write(my_line, string'(HT & "multicast_out: destination = ("));
+                    write(my_line, to_integer(unsigned(multicast_out((COORD_BITS-1) downto 0))));
+                    write(my_line, string'(", "));
+                    write(my_line, to_integer(unsigned(multicast_out((2*COORD_BITS-1) downto COORD_BITS))));
+                    write(my_line, string'("), multicast_group = "));
+                    write(my_line, multicast_out((2*COORD_BITS + MULTICAST_GROUP_BITS - 1) downto 2*COORD_BITS));
+                    write(my_line, string'(", data = "));
+                    write(my_line, multicast_out((BUS_WIDTH-1) downto (2*COORD_BITS + MULTICAST_GROUP_BITS)));
+                    write(my_line, string'(", raw = "));
+                    write(my_line, multicast_out((BUS_WIDTH-1) downto 0));
+                    
+                    writeline(output, my_line);
+                    
+                    write(my_line, string'(HT & "check_multicast_out_fifo_out: destination = ("));
+                    write(my_line, to_integer(unsigned(check_multicast_out_fifo_data_r((COORD_BITS-1) downto 0))));
+                    write(my_line, string'(", "));
+                    write(my_line, to_integer(unsigned(check_multicast_out_fifo_data_r((2*COORD_BITS-1) downto COORD_BITS))));
+                    write(my_line, string'("), multicast_group = "));
+                    write(my_line, check_multicast_out_fifo_data_r((2*COORD_BITS + MULTICAST_GROUP_BITS - 1) downto 2*COORD_BITS));
+                    write(my_line, string'(", data = "));
+                    write(my_line, check_multicast_out_fifo_data_r((BUS_WIDTH-1) downto (2*COORD_BITS + MULTICAST_GROUP_BITS)));
+                    write(my_line, string'(", raw = "));
+                    write(my_line, check_multicast_out_fifo_data_r((BUS_WIDTH-1) downto 0));
+                    
+                    writeline(output, my_line);
+                    
+                    -- Print a new line
+                    write(my_line, string'(""));
+                    writeline(output, my_line);
+                    
+                    finish;
+                else
+                    write(my_line, string'(HT & "multicast_out message "));
+                    write(my_line, count-1);
+                    write(my_line, string'(" matches"));
+                    writeline(output, my_line);
+                    
+                    -- Print a new line
+                    write(my_line, string'(""));
+                    writeline(output, my_line);
+                end if;
+            end if;
+        end if;
+    end process CHECK_MULTICAST_OUT_MESSAGE;
+    
     -- Check messages sent from processing element   
     CHECK_PE_MESSAGE: process (clk)
-    variable my_line : line;
+        variable my_line : line;
     begin
         if (rising_edge(clk) and reset_n = '1' and count <= MAX_CYCLES) then
             if (check_pe_message_fifo_en_r = '1') then
