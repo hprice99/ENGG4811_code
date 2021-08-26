@@ -282,14 +282,14 @@ begin
             else
                 x_message_dest(X_INDEX)     <= rand_slv(COORD_BITS, count);
                 x_message_dest(Y_INDEX)     <= rand_slv(COORD_BITS, 2*count);
-                x_message_multicast_group   <= rand_slv(MULTICAST_GROUP_BITS, count);
+                x_message_multicast_group   <= rand_slv_threshold(MULTICAST_THRESHOLD, MULTICAST_GROUP_BITS, count);
                 x_message_data              <= rand_slv(DATA_WIDTH, 3*count);
                 x_message_b_valid           <= rand_logic(VALID_THRESHOLD, count);
                 
                 -- Incoming Y messages are already in the correct column
                 y_message_dest(X_INDEX)     <= "00";
                 y_message_dest(Y_INDEX)     <= rand_slv(COORD_BITS, 2*MAX_CYCLES-count);
-                y_message_multicast_group   <= rand_slv(MULTICAST_GROUP_BITS, MAX_CYCLES-count);
+                y_message_multicast_group   <= rand_slv_threshold(MULTICAST_THRESHOLD, MULTICAST_GROUP_BITS, MAX_CYCLES-count);
                 y_message_data              <= rand_slv(DATA_WIDTH, 3*MAX_CYCLES-count);
                 y_message_b_valid           <= rand_logic(VALID_THRESHOLD, MAX_CYCLES-count);
                 
@@ -301,7 +301,7 @@ begin
                     pe_message_dest(X_INDEX)    <= rand_slv(COORD_BITS, count + NETWORK_NODES);
                     pe_message_dest(Y_INDEX)    <= rand_slv(COORD_BITS, 2*count + NETWORK_NODES);
                 end if;
-                -- pe_message_multicast_group  <= rand_slv(MULTICAST_GROUP_BITS, count + NETWORK_NODES);
+--                pe_message_multicast_group  <= rand_slv_threshold(MULTICAST_THRESHOLD, MULTICAST_GROUP_BITS, count + NETWORK_NODES);
                 pe_message_multicast_group  <= (others => '0');
                 pe_message_data             <= rand_slv(DATA_WIDTH, 3*count + NETWORK_NODES);
                 pe_message_b_valid          <= rand_logic(PE_IN_THRESHOLD, count + NETWORK_NODES);
@@ -537,7 +537,11 @@ begin
                 check_multicast_out_fifo_data_w <= (others => '0');
                 check_multicast_out_fifo_en_w   <= '0';
             elsif (check_multicast_out_fifo_full = '0') then
-                 if (x_message_b_valid = '1' and USE_MULTICAST = true 
+                 if (pe_message_b_valid = '1' and USE_MULTICAST = true 
+                        and to_integer(unsigned(pe_message_multicast_group)) = MULTICAST_GROUP) then
+                    check_multicast_out_fifo_data_w     <= pe_message_b;
+                    check_multicast_out_fifo_en_w       <= '1';
+                 elsif (x_message_b_valid = '1' and USE_MULTICAST = true 
                         and to_integer(unsigned(x_message_multicast_group)) = MULTICAST_GROUP) then
                     check_multicast_out_fifo_data_w     <= x_message_b;
                     check_multicast_out_fifo_en_w       <= '1';
@@ -577,8 +581,10 @@ begin
                 write(my_line, to_integer(unsigned(x_in((COORD_BITS-1) downto 0))));
                 write(my_line, string'(", "));
                 write(my_line, to_integer(unsigned(x_in((2*COORD_BITS-1) downto COORD_BITS))));
-                write(my_line, string'("), data = "));
-                write(my_line, x_in((BUS_WIDTH-1) downto 2*COORD_BITS));
+                write(my_line, string'("), multicast_group = "));
+                write(my_line, x_in((2*COORD_BITS + MULTICAST_GROUP_BITS - 1) downto 2*COORD_BITS));
+                write(my_line, string'(", data = "));
+                write(my_line, x_in((BUS_WIDTH-1) downto (2*COORD_BITS + MULTICAST_GROUP_BITS)));
                 write(my_line, string'(", raw = "));
                 write(my_line, x_in((BUS_WIDTH-1) downto 0));
                 
@@ -590,8 +596,10 @@ begin
                 write(my_line, to_integer(unsigned(y_in((COORD_BITS-1) downto 0))));
                 write(my_line, string'(", "));
                 write(my_line, to_integer(unsigned(y_in((2*COORD_BITS-1) downto COORD_BITS))));
-                write(my_line, string'("), data = "));
-                write(my_line, y_in((BUS_WIDTH-1) downto 2*COORD_BITS));
+                write(my_line, string'("), multicast_group = "));
+                write(my_line, y_in((2*COORD_BITS + MULTICAST_GROUP_BITS - 1) downto 2*COORD_BITS));
+                write(my_line, string'(", data = "));
+                write(my_line, y_in((BUS_WIDTH-1) downto (2*COORD_BITS + MULTICAST_GROUP_BITS)));
                 write(my_line, string'(", raw = "));
                 write(my_line, y_in((BUS_WIDTH-1) downto 0));
                 
@@ -606,8 +614,10 @@ begin
                 write(my_line, to_integer(unsigned(pe_message_r((COORD_BITS-1) downto 0))));
                 write(my_line, string'(", "));
                 write(my_line, to_integer(unsigned(pe_message_r((2*COORD_BITS-1) downto COORD_BITS))));
-                write(my_line, string'("), data = "));
-                write(my_line, pe_message_r((BUS_WIDTH-1) downto 2*COORD_BITS));
+                write(my_line, string'("), multicast_group = "));
+                write(my_line, pe_message_r((2*COORD_BITS + MULTICAST_GROUP_BITS - 1) downto 2*COORD_BITS));
+                write(my_line, string'(", data = "));
+                write(my_line, pe_message_r((BUS_WIDTH-1) downto (2*COORD_BITS + MULTICAST_GROUP_BITS)));
                 write(my_line, string'(", raw = "));
                 write(my_line, pe_message_r((BUS_WIDTH-1) downto 0));
                 
@@ -619,8 +629,10 @@ begin
                 write(my_line, to_integer(unsigned(pe_in((COORD_BITS-1) downto 0))));
                 write(my_line, string'(", "));
                 write(my_line, to_integer(unsigned(pe_in((2*COORD_BITS-1) downto COORD_BITS))));
-                write(my_line, string'("), data = "));
-                write(my_line, pe_in((BUS_WIDTH-1) downto 2*COORD_BITS));
+                write(my_line, string'("), multicast_group = "));
+                write(my_line, pe_in((2*COORD_BITS + MULTICAST_GROUP_BITS - 1) downto 2*COORD_BITS));
+                write(my_line, string'(", data = "));
+                write(my_line, pe_in((BUS_WIDTH-1) downto (2*COORD_BITS + MULTICAST_GROUP_BITS)));
                 write(my_line, string'(", raw = "));
                 write(my_line, pe_in((BUS_WIDTH-1) downto 0));
                 
@@ -632,8 +644,10 @@ begin
                 write(my_line, to_integer(unsigned(x_out((COORD_BITS-1) downto 0))));
                 write(my_line, string'(", "));
                 write(my_line, to_integer(unsigned(x_out((2*COORD_BITS-1) downto COORD_BITS))));
-                write(my_line, string'("), data = "));
-                write(my_line, x_out((BUS_WIDTH-1) downto 2*COORD_BITS));
+                write(my_line, string'("), multicast_group = "));
+                write(my_line, x_out((2*COORD_BITS + MULTICAST_GROUP_BITS - 1) downto 2*COORD_BITS));
+                write(my_line, string'(", data = "));
+                write(my_line, x_out((BUS_WIDTH-1) downto (2*COORD_BITS + MULTICAST_GROUP_BITS)));
                 write(my_line, string'(", raw = "));
                 write(my_line, x_out((BUS_WIDTH-1) downto 0));
                 
@@ -645,8 +659,10 @@ begin
                 write(my_line, to_integer(unsigned(y_out((COORD_BITS-1) downto 0))));
                 write(my_line, string'(", "));
                 write(my_line, to_integer(unsigned(y_out((2*COORD_BITS-1) downto COORD_BITS))));
-                write(my_line, string'("), data = "));
-                write(my_line, y_out((BUS_WIDTH-1) downto 2*COORD_BITS));
+                write(my_line, string'("), multicast_group = "));
+                write(my_line, y_out((2*COORD_BITS + MULTICAST_GROUP_BITS - 1) downto 2*COORD_BITS));
+                write(my_line, string'(", data = "));
+                write(my_line, y_out((BUS_WIDTH-1) downto (2*COORD_BITS + MULTICAST_GROUP_BITS)));
                 write(my_line, string'(", raw = "));
                 write(my_line, y_out((BUS_WIDTH-1) downto 0));
                 
@@ -658,8 +674,10 @@ begin
                 write(my_line, to_integer(unsigned(pe_out((COORD_BITS-1) downto 0))));
                 write(my_line, string'(", "));
                 write(my_line, to_integer(unsigned(pe_out((2*COORD_BITS-1) downto COORD_BITS))));
-                write(my_line, string'("), data = "));
-                write(my_line, pe_out((BUS_WIDTH-1) downto 2*COORD_BITS));
+                write(my_line, string'("), multicast_group = "));
+                write(my_line, pe_out((2*COORD_BITS + MULTICAST_GROUP_BITS - 1) downto 2*COORD_BITS));
+                write(my_line, string'(", data = "));
+                write(my_line, pe_out((BUS_WIDTH-1) downto (2*COORD_BITS + MULTICAST_GROUP_BITS)));
                 write(my_line, string'(", raw = "));
                 write(my_line, pe_out((BUS_WIDTH-1) downto 0));
                 
@@ -671,8 +689,10 @@ begin
                 write(my_line, to_integer(unsigned(check_dest_fifo_data_r((COORD_BITS-1) downto 0))));
                 write(my_line, string'(", "));
                 write(my_line, to_integer(unsigned(check_dest_fifo_data_r((2*COORD_BITS-1) downto COORD_BITS))));
-                write(my_line, string'("), data = "));
-                write(my_line, check_dest_fifo_data_r((BUS_WIDTH-1) downto 2*COORD_BITS));
+                write(my_line, string'("), multicast_group = "));
+                write(my_line, check_dest_fifo_data_r((2*COORD_BITS + MULTICAST_GROUP_BITS - 1) downto 2*COORD_BITS));
+                write(my_line, string'(", data = "));
+                write(my_line, check_dest_fifo_data_r((BUS_WIDTH-1) downto (2*COORD_BITS + MULTICAST_GROUP_BITS)));
                 write(my_line, string'(", raw = "));
                 write(my_line, check_dest_fifo_data_r((BUS_WIDTH-1) downto 0));
                 
@@ -715,8 +735,10 @@ begin
                     write(my_line, to_integer(unsigned(pe_out((COORD_BITS-1) downto 0))));
                     write(my_line, string'(", "));
                     write(my_line, to_integer(unsigned(pe_out((2*COORD_BITS-1) downto COORD_BITS))));
-                    write(my_line, string'("), data = "));
-                    write(my_line, pe_out((BUS_WIDTH-1) downto 2*COORD_BITS));
+                    write(my_line, string'("), multicast_group = "));
+                    write(my_line, pe_out((2*COORD_BITS + MULTICAST_GROUP_BITS - 1) downto 2*COORD_BITS));
+                    write(my_line, string'(", data = "));
+                    write(my_line, pe_out((BUS_WIDTH-1) downto (2*COORD_BITS + MULTICAST_GROUP_BITS)));
                     write(my_line, string'(", raw = "));
                     write(my_line, pe_out((BUS_WIDTH-1) downto 0));
                     
@@ -726,8 +748,10 @@ begin
                     write(my_line, to_integer(unsigned(check_dest_fifo_data_r((COORD_BITS-1) downto 0))));
                     write(my_line, string'(", "));
                     write(my_line, to_integer(unsigned(check_dest_fifo_data_r((2*COORD_BITS-1) downto COORD_BITS))));
-                    write(my_line, string'("), data = "));
-                    write(my_line, check_dest_fifo_data_r((BUS_WIDTH-1) downto 2*COORD_BITS));
+                    write(my_line, string'("), multicast_group = "));
+                    write(my_line, check_dest_fifo_data_r((2*COORD_BITS + MULTICAST_GROUP_BITS - 1) downto 2*COORD_BITS));
+                    write(my_line, string'(", data = "));
+                    write(my_line, check_dest_fifo_data_r((BUS_WIDTH-1) downto (2*COORD_BITS + MULTICAST_GROUP_BITS)));
                     write(my_line, string'(", raw = "));
                     write(my_line, check_dest_fifo_data_r((BUS_WIDTH-1) downto 0));
                     
@@ -825,8 +849,10 @@ begin
                     write(my_line, to_integer(unsigned(check_pe_message_fifo_data_r((COORD_BITS-1) downto 0))));
                     write(my_line, string'(", "));
                     write(my_line, to_integer(unsigned(check_pe_message_fifo_data_r((2*COORD_BITS-1) downto COORD_BITS))));
-                    write(my_line, string'("), data = "));
-                    write(my_line, check_pe_message_fifo_data_r((BUS_WIDTH-1) downto 2*COORD_BITS));
+                    write(my_line, string'("), multicast_group = "));
+                    write(my_line, check_pe_message_fifo_data_r((2*COORD_BITS + MULTICAST_GROUP_BITS - 1) downto 2*COORD_BITS));
+                    write(my_line, string'(", data = "));
+                    write(my_line, check_pe_message_fifo_data_r((BUS_WIDTH-1) downto (2*COORD_BITS + MULTICAST_GROUP_BITS)));
                     write(my_line, string'(", raw = "));
                     write(my_line, check_pe_message_fifo_data_r((BUS_WIDTH-1) downto 0));
                     
@@ -836,8 +862,10 @@ begin
                     write(my_line, to_integer(unsigned(pe_in((COORD_BITS-1) downto 0))));
                     write(my_line, string'(", "));
                     write(my_line, to_integer(unsigned(pe_in((2*COORD_BITS-1) downto COORD_BITS))));
-                    write(my_line, string'("), data = "));
-                    write(my_line, pe_in((BUS_WIDTH-1) downto 2*COORD_BITS));
+                    write(my_line, string'("), multicast_group = "));
+                    write(my_line, pe_in((2*COORD_BITS + MULTICAST_GROUP_BITS - 1) downto 2*COORD_BITS));
+                    write(my_line, string'(", data = "));
+                    write(my_line, pe_in((BUS_WIDTH-1) downto (2*COORD_BITS + MULTICAST_GROUP_BITS)));
                     write(my_line, string'(", raw = "));
                     write(my_line, pe_in((BUS_WIDTH-1) downto 0));
                     
@@ -859,8 +887,10 @@ begin
                     write(my_line, to_integer(unsigned(check_pe_message_fifo_data_r((COORD_BITS-1) downto 0))));
                     write(my_line, string'(", "));
                     write(my_line, to_integer(unsigned(check_pe_message_fifo_data_r((2*COORD_BITS-1) downto COORD_BITS))));
-                    write(my_line, string'("), data = "));
-                    write(my_line, check_pe_message_fifo_data_r((BUS_WIDTH-1) downto 2*COORD_BITS));
+                    write(my_line, string'("), multicast_group = "));
+                    write(my_line, check_pe_message_fifo_data_r((2*COORD_BITS + MULTICAST_GROUP_BITS - 1) downto 2*COORD_BITS));
+                    write(my_line, string'(", data = "));
+                    write(my_line, check_pe_message_fifo_data_r((BUS_WIDTH-1) downto (2*COORD_BITS + MULTICAST_GROUP_BITS)));
                     write(my_line, string'(", raw = "));
                     write(my_line, check_pe_message_fifo_data_r((BUS_WIDTH-1) downto 0));
                     
@@ -870,8 +900,10 @@ begin
                     write(my_line, to_integer(unsigned(pe_in((COORD_BITS-1) downto 0))));
                     write(my_line, string'(", "));
                     write(my_line, to_integer(unsigned(pe_in((2*COORD_BITS-1) downto COORD_BITS))));
-                    write(my_line, string'("), data = "));
-                    write(my_line, pe_in((BUS_WIDTH-1) downto 2*COORD_BITS));
+                    write(my_line, string'("), multicast_group = "));
+                    write(my_line, pe_in((2*COORD_BITS + MULTICAST_GROUP_BITS - 1) downto 2*COORD_BITS));
+                    write(my_line, string'(", data = "));
+                    write(my_line, pe_in((BUS_WIDTH-1) downto (2*COORD_BITS + MULTICAST_GROUP_BITS)));
                     write(my_line, string'(", raw = "));
                     write(my_line, pe_in((BUS_WIDTH-1) downto 0));
                     
