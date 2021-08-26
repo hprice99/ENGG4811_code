@@ -165,7 +165,13 @@ begin
         -- Switch y_out to act as pe_out
         if (x_in_valid_d = '1' and (to_integer(unsigned(x_in_dest_d(X_INDEX))) = X_COORD)
                 and (to_integer(unsigned(x_in_dest_d(Y_INDEX))) = Y_COORD)) then
-            y_next <= '0';
+            -- Both x_in and y_in are destined for the PE, so y_in must be deflected
+            if (y_in_valid_d = '1' and (to_integer(unsigned(y_in_dest_d(X_INDEX))) = X_COORD)
+                    and (to_integer(unsigned(y_in_dest_d(Y_INDEX))) = Y_COORD)) then
+                y_next <= '1';
+            else
+                y_next <= '0';
+            end if;
             
         elsif (y_in_valid_d = '1' and (to_integer(unsigned(y_in_dest_d(X_INDEX))) = X_COORD)
                 and (to_integer(unsigned(y_in_dest_d(Y_INDEX))) = Y_COORD)) then
