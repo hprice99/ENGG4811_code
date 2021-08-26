@@ -139,7 +139,7 @@ architecture Behavioral of hoplite_router_tb is
     
     constant VALID_THRESHOLD        : real := 0.75;
     constant PE_IN_THRESHOLD        : real := 0.10;
-    constant MULTICAST_THRESHOLD    : real := 0.25;
+    constant MULTICAST_THRESHOLD    : real := 0.10;
     
     constant X_COORD                : integer := 0;
     constant Y_COORD                : integer := 0;
@@ -162,6 +162,7 @@ architecture Behavioral of hoplite_router_tb is
 
     type t_Coordinate is array (0 to 1) of std_logic_vector((COORD_BITS-1) downto 0);
     signal x_message_dest, y_message_dest, pe_message_dest : t_Coordinate;
+    signal pe_in_dest   : t_Coordinate;
     
     subtype t_MulticastGroup is std_logic_vector((MULTICAST_GROUP_BITS-1) downto 0);
     signal x_message_multicast_group, y_message_multicast_group, pe_message_multicast_group : t_MulticastGroup;
@@ -189,13 +190,26 @@ architecture Behavioral of hoplite_router_tb is
     signal y_out        : std_logic_vector((BUS_WIDTH-1) downto 0);
     signal y_out_valid  : std_logic;
     
+    signal x_out_r          : std_logic_vector((BUS_WIDTH-1) downto 0);
+    signal x_out_r_valid    : std_logic;
+    
+    signal y_out_r          : std_logic_vector((BUS_WIDTH-1) downto 0);
+    signal y_out_r_valid    : std_logic;
+    
     signal pe_out               : std_logic_vector((BUS_WIDTH-1) downto 0);
     signal pe_out_valid         : std_logic;
+    
+    signal pe_out_r             : std_logic_vector((BUS_WIDTH-1) downto 0);
+    signal pe_out_r_valid       : std_logic;
+    
     signal pe_backpressure      : std_logic;
     signal not_pe_backpressure  : std_logic;
     
     signal multicast_out        : std_logic_vector((BUS_WIDTH-1) downto 0);
     signal multicast_out_valid  : std_logic;
+    
+    signal multicast_out_r          : std_logic_vector((BUS_WIDTH-1) downto 0);
+    signal multicast_out_r_valid    : std_logic;
     
     constant FIFO_ADDRESS_WIDTH     : natural := ceil_log2(MAX_CYCLES);
     constant FIFO_DEPTH             : natural := 2 ** FIFO_ADDRESS_WIDTH;
@@ -221,6 +235,7 @@ architecture Behavioral of hoplite_router_tb is
     constant PRINT_X_OUT                : boolean := true;
     constant PRINT_Y_OUT                : boolean := true;
     constant PRINT_PE_OUT               : boolean := true;
+    constant PRINT_MULTICAST_OUT        : boolean := true;
     constant PRINT_CHECK_FIFO_OUT       : boolean := true;
     constant PRINT_CHECK_MULTICAST_OUT  : boolean := true;
     
@@ -301,8 +316,7 @@ begin
                     pe_message_dest(X_INDEX)    <= rand_slv(COORD_BITS, count + NETWORK_NODES);
                     pe_message_dest(Y_INDEX)    <= rand_slv(COORD_BITS, 2*count + NETWORK_NODES);
                 end if;
---                pe_message_multicast_group  <= rand_slv_threshold(MULTICAST_THRESHOLD, MULTICAST_GROUP_BITS, count + NETWORK_NODES);
-                pe_message_multicast_group  <= (others => '0');
+                pe_message_multicast_group  <= rand_slv_threshold(MULTICAST_THRESHOLD, MULTICAST_GROUP_BITS, count + NETWORK_NODES);
                 pe_message_data             <= rand_slv(DATA_WIDTH, 3*count + NETWORK_NODES);
                 pe_message_b_valid          <= rand_logic(PE_IN_THRESHOLD, count + NETWORK_NODES);
             end if;
@@ -370,6 +384,9 @@ begin
         empty               => open
     );
     
+    pe_in_dest(X_INDEX) <= pe_in(COORD_BITS-1 downto 0);
+    pe_in_dest(Y_INDEX) <= pe_in(2*COORD_BITS-1 downto COORD_BITS);
+    
     DUT: hoplite_router_multicast
     generic map (
         BUS_WIDTH   => BUS_WIDTH,
@@ -403,6 +420,37 @@ begin
         multicast_out_valid => multicast_out_valid
     );
     
+    DUT_OUTPUT_FF: process (clk)
+    begin
+        if (rising_edge(clk)) then
+            if (reset_n = '0') then
+                x_out_r                 <= (others => '0');
+                x_out_r_valid           <= '0';
+                
+                y_out_r                 <= (others => '0');
+                y_out_r_valid           <= '0';
+                
+                pe_out_r                <= (others => '0');
+                pe_out_r_valid          <= '0';
+            
+                multicast_out_r         <= (others => '0');
+                multicast_out_r_valid   <= '0';
+            else
+                x_out_r                 <= x_out;
+                x_out_r_valid           <= x_out_valid;
+                
+                y_out_r                 <= y_out;
+                y_out_r_valid           <= y_out_valid;
+                
+                pe_out_r                <= pe_out;
+                pe_out_r_valid          <= pe_out_valid;
+            
+                multicast_out_r         <= multicast_out;
+                multicast_out_r_valid   <= multicast_out_valid;
+            end if;
+        end if;
+    end process DUT_OUTPUT_FF;
+    
     -------------------------------------------------------------------------------------------------
     -- FIFO for checking output messages    
     CHECK_DEST_FIFO: fifo_sync
@@ -432,7 +480,12 @@ begin
                 check_dest_fifo_data_w <= (others => '0');
                 check_dest_fifo_en_w   <= '0';
             elsif (check_dest_fifo_full = '0') then
-                 if (x_message_b_valid = '1' and 
+                 if (pe_in_valid = '1' and 
+                        to_integer(unsigned(pe_in_dest(X_INDEX))) = X_COORD and 
+                        to_integer(unsigned(pe_in_dest(Y_INDEX))) = Y_COORD) then
+                    check_dest_fifo_data_w     <= pe_in;
+                    check_dest_fifo_en_w       <= '1';
+                 elsif (x_message_b_valid = '1' and 
                         to_integer(unsigned(x_message_dest(X_INDEX))) = X_COORD and 
                         to_integer(unsigned(x_message_dest(Y_INDEX))) = Y_COORD) then
                     check_dest_fifo_data_w     <= x_message_b;
@@ -450,10 +503,10 @@ begin
     end process CHECK_DEST_FIFO_WRITE;
     
     -- Read from FIFO
-    CHECK_DEST_FIFO_READ_ENABLE: process (check_dest_fifo_empty, pe_out_valid)
+    CHECK_DEST_FIFO_READ_ENABLE: process (check_dest_fifo_empty, pe_out_r_valid)
     begin
         if (check_dest_fifo_empty = '0') then
-            check_dest_fifo_en_r   <= pe_out_valid;
+            check_dest_fifo_en_r   <= pe_out_r_valid;
         else
             check_dest_fifo_en_r   <= '0';
         end if;
@@ -537,9 +590,9 @@ begin
                 check_multicast_out_fifo_data_w <= (others => '0');
                 check_multicast_out_fifo_en_w   <= '0';
             elsif (check_multicast_out_fifo_full = '0') then
-                 if (pe_message_b_valid = '1' and USE_MULTICAST = true 
-                        and to_integer(unsigned(pe_message_multicast_group)) = MULTICAST_GROUP) then
-                    check_multicast_out_fifo_data_w     <= pe_message_b;
+                 if (pe_in_valid = '1' and USE_MULTICAST = true 
+                        and to_integer(unsigned(pe_in(2*COORD_BITS + MULTICAST_GROUP_BITS - 1 downto 2*COORD_BITS))) = MULTICAST_GROUP) then
+                    check_multicast_out_fifo_data_w     <= pe_in;
                     check_multicast_out_fifo_en_w       <= '1';
                  elsif (x_message_b_valid = '1' and USE_MULTICAST = true 
                         and to_integer(unsigned(x_message_multicast_group)) = MULTICAST_GROUP) then
@@ -557,10 +610,10 @@ begin
     end process CHECK_MULTICAST_OUT_FIFO_WRITE;
     
     -- Read from FIFO
-    CHECK_MULTICAST_OUT_FIFO_READ_ENABLE: process (check_multicast_out_fifo_empty, multicast_out_valid)
+    CHECK_MULTICAST_OUT_FIFO_READ_ENABLE: process (check_multicast_out_fifo_empty, multicast_out_r_valid)
     begin
         if (check_multicast_out_fifo_empty = '0') then
-            check_multicast_out_fifo_en_r   <= multicast_out_valid;
+            check_multicast_out_fifo_en_r   <= multicast_out_r_valid;
         else
             check_multicast_out_fifo_en_r   <= '0';
         end if;
@@ -669,6 +722,21 @@ begin
                 writeline(output, my_line);
             end if;
             
+            if (multicast_out_valid = '1' and PRINT_MULTICAST_OUT) then
+                write(my_line, string'("multicast_out: destination = ("));
+                write(my_line, to_integer(unsigned(multicast_out((COORD_BITS-1) downto 0))));
+                write(my_line, string'(", "));
+                write(my_line, to_integer(unsigned(multicast_out((2*COORD_BITS-1) downto COORD_BITS))));
+                write(my_line, string'("), multicast_group = "));
+                write(my_line, multicast_out((2*COORD_BITS + MULTICAST_GROUP_BITS - 1) downto 2*COORD_BITS));
+                write(my_line, string'(", data = "));
+                write(my_line, multicast_out((BUS_WIDTH-1) downto (2*COORD_BITS + MULTICAST_GROUP_BITS)));
+                write(my_line, string'(", raw = "));
+                write(my_line, multicast_out((BUS_WIDTH-1) downto 0));
+                
+                writeline(output, my_line);
+            end if;
+            
             if (pe_out_valid = '1' and PRINT_PE_OUT) then
                 write(my_line, string'("pe_out: destination = ("));
                 write(my_line, to_integer(unsigned(pe_out((COORD_BITS-1) downto 0))));
@@ -725,22 +793,22 @@ begin
     begin
         if (rising_edge(clk) and reset_n = '1' and count <= MAX_CYCLES) then
             if (check_dest_fifo_en_r = '1') then
-                if (unsigned(check_dest_fifo_data_r) /= unsigned(pe_out)) then
+                if (unsigned(check_dest_fifo_data_r) /= unsigned(pe_out_r)) then
                     write(my_line, string'(HT & "pe_out message "));
                     write(my_line, count-1);
                     write(my_line, string'(" does not match"));
                     writeline(output, my_line);
                     
-                    write(my_line, string'(HT & "pe_out: destination = ("));
-                    write(my_line, to_integer(unsigned(pe_out((COORD_BITS-1) downto 0))));
+                    write(my_line, string'(HT & "pe_out_r: destination = ("));
+                    write(my_line, to_integer(unsigned(pe_out_r((COORD_BITS-1) downto 0))));
                     write(my_line, string'(", "));
-                    write(my_line, to_integer(unsigned(pe_out((2*COORD_BITS-1) downto COORD_BITS))));
+                    write(my_line, to_integer(unsigned(pe_out_r((2*COORD_BITS-1) downto COORD_BITS))));
                     write(my_line, string'("), multicast_group = "));
-                    write(my_line, pe_out((2*COORD_BITS + MULTICAST_GROUP_BITS - 1) downto 2*COORD_BITS));
+                    write(my_line, pe_out_r((2*COORD_BITS + MULTICAST_GROUP_BITS - 1) downto 2*COORD_BITS));
                     write(my_line, string'(", data = "));
-                    write(my_line, pe_out((BUS_WIDTH-1) downto (2*COORD_BITS + MULTICAST_GROUP_BITS)));
+                    write(my_line, pe_out_r((BUS_WIDTH-1) downto (2*COORD_BITS + MULTICAST_GROUP_BITS)));
                     write(my_line, string'(", raw = "));
-                    write(my_line, pe_out((BUS_WIDTH-1) downto 0));
+                    write(my_line, pe_out_r((BUS_WIDTH-1) downto 0));
                     
                     writeline(output, my_line);
                     
@@ -782,22 +850,22 @@ begin
     begin
         if (rising_edge(clk) and reset_n = '1' and count <= MAX_CYCLES) then
             if (check_multicast_out_fifo_en_r = '1') then
-                if (unsigned(check_multicast_out_fifo_data_r) /= unsigned(multicast_out)) then
+                if (unsigned(check_multicast_out_fifo_data_r) /= unsigned(multicast_out_r)) then
                     write(my_line, string'(HT & "multicast_out message "));
                     write(my_line, count-1);
                     write(my_line, string'(" does not match"));
                     writeline(output, my_line);
                     
-                    write(my_line, string'(HT & "multicast_out: destination = ("));
-                    write(my_line, to_integer(unsigned(multicast_out((COORD_BITS-1) downto 0))));
+                    write(my_line, string'(HT & "multicast_out_r: destination = ("));
+                    write(my_line, to_integer(unsigned(multicast_out_r((COORD_BITS-1) downto 0))));
                     write(my_line, string'(", "));
-                    write(my_line, to_integer(unsigned(multicast_out((2*COORD_BITS-1) downto COORD_BITS))));
+                    write(my_line, to_integer(unsigned(multicast_out_r((2*COORD_BITS-1) downto COORD_BITS))));
                     write(my_line, string'("), multicast_group = "));
-                    write(my_line, multicast_out((2*COORD_BITS + MULTICAST_GROUP_BITS - 1) downto 2*COORD_BITS));
+                    write(my_line, multicast_out_r((2*COORD_BITS + MULTICAST_GROUP_BITS - 1) downto 2*COORD_BITS));
                     write(my_line, string'(", data = "));
-                    write(my_line, multicast_out((BUS_WIDTH-1) downto (2*COORD_BITS + MULTICAST_GROUP_BITS)));
+                    write(my_line, multicast_out_r((BUS_WIDTH-1) downto (2*COORD_BITS + MULTICAST_GROUP_BITS)));
                     write(my_line, string'(", raw = "));
-                    write(my_line, multicast_out((BUS_WIDTH-1) downto 0));
+                    write(my_line, multicast_out_r((BUS_WIDTH-1) downto 0));
                     
                     writeline(output, my_line);
                     
@@ -823,6 +891,19 @@ begin
                     write(my_line, string'(HT & "multicast_out message "));
                     write(my_line, count-1);
                     write(my_line, string'(" matches"));
+                    writeline(output, my_line);
+                    
+                    write(my_line, string'(HT & "multicast_out_r: destination = ("));
+                    write(my_line, to_integer(unsigned(multicast_out_r((COORD_BITS-1) downto 0))));
+                    write(my_line, string'(", "));
+                    write(my_line, to_integer(unsigned(multicast_out_r((2*COORD_BITS-1) downto COORD_BITS))));
+                    write(my_line, string'("), multicast_group = "));
+                    write(my_line, multicast_out_r((2*COORD_BITS + MULTICAST_GROUP_BITS - 1) downto 2*COORD_BITS));
+                    write(my_line, string'(", data = "));
+                    write(my_line, multicast_out_r((BUS_WIDTH-1) downto (2*COORD_BITS + MULTICAST_GROUP_BITS)));
+                    write(my_line, string'(", raw = "));
+                    write(my_line, multicast_out_r((BUS_WIDTH-1) downto 0));
+                    
                     writeline(output, my_line);
                     
                     -- Print a new line
