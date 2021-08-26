@@ -61,7 +61,7 @@ end hoplite_router;
 
 architecture Behavioral of hoplite_router is
     
-    signal x_d, x_q, y_d, y_q, pe_d, pe_q : std_logic_vector((BUS_WIDTH-1) downto 0);
+    signal x_d, x_q, y_d, y_q, pe_d : std_logic_vector((BUS_WIDTH-1) downto 0);
     signal sel : std_logic_vector(1 downto 0);
     signal x_next, y_next : std_logic;
     
@@ -117,7 +117,7 @@ begin
     -- Apply backpressure to the connected PE
     with sel select
         pe_backpressure <=  '0' when "00",
-                            '0' when "10",
+                            '1' when "10",
                             '1' when others;
     
     OUTPUT_FF : process (clk)
@@ -126,14 +126,12 @@ begin
             if (reset_n = '0') then
                 x_q         <= (others => '0');
                 y_q         <= (others => '0');
-                pe_q        <= (others => '0');
                 
                 pe_out      <= (others => '0');
                 pe_out_valid    <= '0';
             else
                 x_q <= x_d;
                 y_q <= y_d;
-                pe_q    <= pe_d;
                
                 if (pe_in_valid = '1' and (to_integer(unsigned(pe_in_dest_d(X_INDEX))) = X_COORD)
                         and (to_integer(unsigned(pe_in_dest_d(Y_INDEX))) = Y_COORD)) then
@@ -162,7 +160,7 @@ begin
     x_out <= x_q;
     y_out <= y_q;
 
-     NEXT_VALID: process (x_in_valid_d, y_in_valid_d, x_in_dest_d, y_in_dest_d, pe_in_valid)
+     NEXT_VALID: process (x_in_valid_d, y_in_valid_d, x_in_dest_d, y_in_dest_d, pe_in_valid, pe_in_dest_d)
      begin
         x_next  <= '0';
         y_next  <= '0';
@@ -170,6 +168,9 @@ begin
         if (x_in_valid_d = '1' and ((to_integer(unsigned(x_in_dest_d(X_INDEX))) /= X_COORD)
                 or (to_integer(unsigned(x_in_dest_d(Y_INDEX))) /= Y_COORD))) then
             x_next <= '1';
+        elsif (pe_in_valid = '1' and (to_integer(unsigned(pe_in_dest_d(X_INDEX))) = X_COORD)
+                and (to_integer(unsigned(pe_in_dest_d(Y_INDEX))) = Y_COORD)) then
+            x_next <= '0';
         else
             x_next <= pe_in_valid;
         end if;
@@ -196,6 +197,10 @@ begin
         elsif (x_in_valid_d = '1' and ((to_integer(unsigned(x_in_dest_d(X_INDEX))) /= X_COORD)
                 or (to_integer(unsigned(x_in_dest_d(Y_INDEX))) /= Y_COORD))) then
             y_next <= '1';
+        
+        elsif (pe_in_valid = '1' and (to_integer(unsigned(pe_in_dest_d(X_INDEX))) = X_COORD)
+                and (to_integer(unsigned(pe_in_dest_d(Y_INDEX))) = Y_COORD)) then
+            y_next <= '0';
             
         else
             y_next <= pe_in_valid;

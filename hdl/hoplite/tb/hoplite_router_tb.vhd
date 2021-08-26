@@ -259,12 +259,13 @@ begin
                 if (count <= 10) then
                     pe_message_dest(X_INDEX)    <= "00";
                     pe_message_dest(Y_INDEX)    <= "00";
+                    pe_message_b_valid          <= rand_logic(0.75, count + NETWORK_NODES);
                 else
                     pe_message_dest(X_INDEX)    <= rand_slv(COORD_BITS, count + NETWORK_NODES);
                     pe_message_dest(Y_INDEX)    <= rand_slv(COORD_BITS, 2*count + NETWORK_NODES);
+                    pe_message_b_valid          <= rand_logic(PE_IN_THRESHOLD, count + NETWORK_NODES);
                 end if;
                 pe_message_data             <= rand_slv(DATA_WIDTH, 3*count + NETWORK_NODES);
-                pe_message_b_valid          <= rand_logic(PE_IN_THRESHOLD, count + NETWORK_NODES);
             end if;
         end if;
     end process CONSTRUCT_MESSAGE;
