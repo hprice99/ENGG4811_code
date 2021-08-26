@@ -53,7 +53,10 @@ architecture Behavioral of hoplite_router_tb is
             X_COORD                 : integer := 0;
             Y_COORD                 : integer := 0;
             COORD_BITS              : integer := 1;
-            MULTICAST_GROUP_BITS    : integer := 1
+            
+            MULTICAST_GROUP_BITS    : integer := 1;
+            MULTICAST_GROUP         : integer := -1;
+            USE_MULTICAST           : boolean := False
         );
         port (
             clk             : in STD_LOGIC;
@@ -133,8 +136,10 @@ architecture Behavioral of hoplite_router_tb is
     signal reset_n      : std_logic;
 
     constant MAX_CYCLES         : integer := 500;
-    constant VALID_THRESHOLD    : real := 0.75;
-    constant PE_IN_THRESHOLD    : real := 0.10;
+    
+    constant VALID_THRESHOLD        : real := 0.75;
+    constant PE_IN_THRESHOLD        : real := 0.10;
+    constant MULTICAST_THRESHOLD    : real := 0.25;
     
     constant X_COORD                : integer := 0;
     constant Y_COORD                : integer := 0;
@@ -146,6 +151,9 @@ architecture Behavioral of hoplite_router_tb is
     constant NETWORK_ROWS   : integer := 2 ** COORD_BITS;
     constant NETWORK_COLS   : integer := 2 ** COORD_BITS;
     constant NETWORK_NODES  : integer := NETWORK_ROWS * NETWORK_COLS;
+    
+    constant MULTICAST_GROUP    : integer := 1;
+    constant USE_MULTICAST      : boolean := True;
     
     signal count        : integer;
     
@@ -248,6 +256,7 @@ begin
         end if;
     end process COUNTER;
     
+    -------------------------------------------------------------------------------------------------
     -- Construct message
     CONSTRUCT_MESSAGE: process (clk)
     begin
@@ -336,6 +345,7 @@ begin
     y_in        <= y_message_r;
     y_in_valid  <= y_message_r_valid;
     
+    -------------------------------------------------------------------------------------------------
     -- Processing element network interface controller
     not_pe_backpressure <= not pe_backpressure;
 
@@ -365,7 +375,11 @@ begin
         BUS_WIDTH   => BUS_WIDTH,
         X_COORD     => X_COORD,
         Y_COORD     => Y_COORD,
-        COORD_BITS  => COORD_BITS
+        COORD_BITS  => COORD_BITS,
+        
+        MULTICAST_GROUP_BITS    => MULTICAST_GROUP_BITS,
+        MULTICAST_GROUP         => MULTICAST_GROUP,
+        USE_MULTICAST           => USE_MULTICAST
     )
     port map (
         clk                 => clk,
@@ -389,6 +403,7 @@ begin
         multicast_out_valid => multicast_out_valid
     );
     
+    -------------------------------------------------------------------------------------------------
     -- FIFO for checking output messages    
     CHECK_DEST_FIFO: fifo_sync
     generic map (
@@ -444,6 +459,7 @@ begin
         end if;
     end process CHECK_DEST_FIFO_READ_ENABLE;
     
+    -------------------------------------------------------------------------------------------------
     -- FIFO for checking messages sent from processing element
     CHECK_PE_MESSAGE_FIFO: fifo_sync
     generic map (
@@ -492,6 +508,7 @@ begin
         end if;
     end process CHECK_PE_MESSAGE_FIFO_READ_ENABLE;
     
+    -------------------------------------------------------------------------------------------------
     -- FIFO for checking outgoing multicast messages
     CHECK_MULTICAST_OUT_FIFO: fifo_sync
     generic map (
@@ -520,12 +537,12 @@ begin
                 check_multicast_out_fifo_data_w <= (others => '0');
                 check_multicast_out_fifo_en_w   <= '0';
             elsif (check_multicast_out_fifo_full = '0') then
-                 if (x_message_b_valid = '1' and 
-                        x_message_multicast_group /= "0") then
+                 if (x_message_b_valid = '1' and USE_MULTICAST = true 
+                        and to_integer(unsigned(x_message_multicast_group)) = MULTICAST_GROUP) then
                     check_multicast_out_fifo_data_w     <= x_message_b;
                     check_multicast_out_fifo_en_w       <= '1';
-                 elsif (y_message_b_valid = '1' and 
-                            y_message_multicast_group /= "0") then
+                 elsif (y_message_b_valid = '1' and USE_MULTICAST = true 
+                        and to_integer(unsigned(y_message_multicast_group)) = MULTICAST_GROUP) then
                     check_multicast_out_fifo_data_w     <= y_message_b;
                     check_multicast_out_fifo_en_w       <= '1';
                  else
@@ -545,6 +562,7 @@ begin
         end if;
     end process CHECK_MULTICAST_OUT_FIFO_READ_ENABLE;
     
+    -------------------------------------------------------------------------------------------------
     -- Check messages received   
     PRINT_MESSAGE_RECEIVED: process (clk)
     variable my_line : line;

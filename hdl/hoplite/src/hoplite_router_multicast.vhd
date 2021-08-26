@@ -23,15 +23,6 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
 
--- Uncomment the following library declaration if using
--- arithmetic functions with Signed or Unsigned values
---use IEEE.NUMERIC_STD.ALL;
-
--- Uncomment the following library declaration if instantiating
--- any Xilinx leaf cells in this code.
---library UNISIM;
---use UNISIM.VComponents.all;
-
 -- TODO Change pe_in and pe_out to pe_to_network and network_to_pe
 entity hoplite_router_multicast is
     Generic (
@@ -39,7 +30,10 @@ entity hoplite_router_multicast is
         X_COORD                 : integer := 0;
         Y_COORD                 : integer := 0;
         COORD_BITS              : integer := 1;
-        MULTICAST_GROUP_BITS    : integer := 1
+        
+        MULTICAST_GROUP_BITS    : integer := 1;
+        MULTICAST_GROUP         : integer := -1;
+        USE_MULTICAST           : boolean := False
     );
     Port ( 
         clk             : in STD_LOGIC;
@@ -101,6 +95,9 @@ architecture Behavioral of hoplite_router_multicast is
     signal x_in_multicast_group_q, y_in_multicast_group_q   : t_MulticastGroup;
 
 begin
+
+    -- If multicast is to be used, then MULTICAST_GROUP must be positive
+    assert ((USE_MULTICAST = true and MULTICAST_GROUP > 0) or USE_MULTICAST = False) report "MULTICAST_GROUP must be set when USE_MULTICAST is enabled" severity failure;
 
     -- Assign destination coordinates   
     x_in_dest_d(X_INDEX) <= x_d(X_INDEX_HEADER_END downto X_INDEX_HEADER_START);
@@ -172,12 +169,14 @@ begin
                 end if;
                 
                 -- multicast_out
-                if (x_in_valid = '1' and x_in_multicast_group_d /= "0") then
+                if (x_in_valid = '1' and USE_MULTICAST = true 
+                        and to_integer(unsigned(x_in_multicast_group_d)) = MULTICAST_GROUP) then
                     multicast_out_valid     <= '1'; 
                     multicast_out           <= x_d;
                     
                 -- TODO Ensure that re-routed multicast packet is kept within the scope of the multicast group
-                elsif (y_in_valid = '1' and y_in_multicast_group_d /= "0") then
+                elsif (y_in_valid = '1' and USE_MULTICAST = true 
+                        and to_integer(unsigned(y_in_multicast_group_d)) = MULTICAST_GROUP) then
                     multicast_out_valid    <= '1';
                     multicast_out          <= y_d;
                 
