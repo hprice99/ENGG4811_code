@@ -67,10 +67,10 @@ package body random is
         for i in slv'range loop
             uniform(seed1, seed2, r);
             
-            if (r < threshold) then
-                slv(i) := '1';
-            else
+            if (r > threshold) then
                 slv(i) := '0';
+            else
+                slv(i) := '1';
             end if;
         end loop;
         
@@ -91,7 +91,7 @@ package body random is
             uniform(seed1, seed2, r);
         end loop;
         
-        if (r < threshold) then
+        if (r > threshold) then
             b := '0';
         else
             b := '1';
