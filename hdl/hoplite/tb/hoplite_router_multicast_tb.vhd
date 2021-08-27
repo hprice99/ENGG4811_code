@@ -166,6 +166,7 @@ architecture Behavioral of hoplite_router_tb is
     
     subtype t_MulticastGroup is std_logic_vector((MULTICAST_GROUP_BITS-1) downto 0);
     signal x_message_multicast_group, y_message_multicast_group, pe_message_multicast_group : t_MulticastGroup;
+    signal pe_in_multicast_group : t_MulticastGroup;
     
     signal x_message_data, y_message_data, pe_message_data : std_logic_vector((DATA_WIDTH-1) downto 0);
     
@@ -297,16 +298,27 @@ begin
             else
                 x_message_dest(X_INDEX)     <= rand_slv(COORD_BITS, count);
                 x_message_dest(Y_INDEX)     <= rand_slv(COORD_BITS, 2*count);
-                x_message_multicast_group   <= rand_slv_threshold(MULTICAST_THRESHOLD, MULTICAST_GROUP_BITS, count);
                 x_message_data              <= rand_slv(DATA_WIDTH, 3*count);
-                x_message_b_valid           <= rand_logic(VALID_THRESHOLD, count);
                 
                 -- Incoming Y messages are already in the correct column
                 y_message_dest(X_INDEX)     <= "00";
                 y_message_dest(Y_INDEX)     <= rand_slv(COORD_BITS, 2*MAX_CYCLES-count);
-                y_message_multicast_group   <= rand_slv_threshold(MULTICAST_THRESHOLD, MULTICAST_GROUP_BITS, MAX_CYCLES-count);
                 y_message_data              <= rand_slv(DATA_WIDTH, 3*MAX_CYCLES-count);
-                y_message_b_valid           <= rand_logic(VALID_THRESHOLD, MAX_CYCLES-count);
+                
+                -- Test what happens when both x_in and y_in are multicast packets
+                if (count = 250) then
+                    x_message_multicast_group   <= "1";
+                    x_message_b_valid           <= '1';
+                    
+                    y_message_multicast_group   <= "1";
+                    y_message_b_valid           <= '1';
+                else
+                    x_message_multicast_group   <= rand_slv_threshold(MULTICAST_THRESHOLD, MULTICAST_GROUP_BITS, count);
+                    x_message_b_valid           <= rand_logic(VALID_THRESHOLD, count);
+                    
+                    y_message_multicast_group   <= rand_slv_threshold(MULTICAST_THRESHOLD, MULTICAST_GROUP_BITS, MAX_CYCLES-count);
+                    y_message_b_valid           <= rand_logic(VALID_THRESHOLD, MAX_CYCLES-count);
+                end if;
                 
                 -- Test a PE message where the destination is the same as the source
                 if (count <= 10) then
@@ -386,6 +398,7 @@ begin
     
     pe_in_dest(X_INDEX) <= pe_in(COORD_BITS-1 downto 0);
     pe_in_dest(Y_INDEX) <= pe_in(2*COORD_BITS-1 downto COORD_BITS);
+    pe_in_multicast_group <= pe_in(2*COORD_BITS+MULTICAST_GROUP_BITS-1 downto 2*COORD_BITS);
     
     DUT: hoplite_router_multicast
     generic map (
@@ -482,17 +495,20 @@ begin
             elsif (check_dest_fifo_full = '0') then
                  if (pe_in_valid = '1' and 
                         to_integer(unsigned(pe_in_dest(X_INDEX))) = X_COORD and 
-                        to_integer(unsigned(pe_in_dest(Y_INDEX))) = Y_COORD) then
+                        to_integer(unsigned(pe_in_dest(Y_INDEX))) = Y_COORD and
+                        (USE_MULTICAST = false or to_integer(unsigned(pe_in_multicast_group)) /= MULTICAST_GROUP)) then
                     check_dest_fifo_data_w     <= pe_in;
                     check_dest_fifo_en_w       <= '1';
                  elsif (x_message_b_valid = '1' and 
                         to_integer(unsigned(x_message_dest(X_INDEX))) = X_COORD and 
-                        to_integer(unsigned(x_message_dest(Y_INDEX))) = Y_COORD) then
+                        to_integer(unsigned(x_message_dest(Y_INDEX))) = Y_COORD and
+                        (USE_MULTICAST = false or to_integer(unsigned(x_message_multicast_group)) /= MULTICAST_GROUP)) then
                     check_dest_fifo_data_w     <= x_message_b;
                     check_dest_fifo_en_w       <= '1';
                  elsif (y_message_b_valid = '1' and 
                             to_integer(unsigned(y_message_dest(X_INDEX))) = X_COORD and 
-                            to_integer(unsigned(y_message_dest(Y_INDEX))) = Y_COORD) then
+                            to_integer(unsigned(y_message_dest(Y_INDEX))) = Y_COORD and
+                            (USE_MULTICAST = false or to_integer(unsigned(y_message_multicast_group)) /= MULTICAST_GROUP)) then
                     check_dest_fifo_data_w     <= y_message_b;
                     check_dest_fifo_en_w       <= '1';
                  else
@@ -591,7 +607,7 @@ begin
                 check_multicast_out_fifo_en_w   <= '0';
             elsif (check_multicast_out_fifo_full = '0') then
                  if (pe_in_valid = '1' and USE_MULTICAST = true 
-                        and to_integer(unsigned(pe_in(2*COORD_BITS + MULTICAST_GROUP_BITS - 1 downto 2*COORD_BITS))) = MULTICAST_GROUP) then
+                        and to_integer(unsigned(pe_in_multicast_group)) = MULTICAST_GROUP) then
                     check_multicast_out_fifo_data_w     <= pe_in;
                     check_multicast_out_fifo_en_w       <= '1';
                  elsif (x_message_b_valid = '1' and USE_MULTICAST = true 

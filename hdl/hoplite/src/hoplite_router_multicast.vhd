@@ -116,6 +116,7 @@ begin
     
     x_in_valid_d <= x_in_valid;
     y_in_valid_d <= y_in_valid;
+    pe_in_valid_d   <= pe_in_valid;
 
     -- Output routing
     sel <= y_in_valid & x_in_valid;
@@ -158,18 +159,22 @@ begin
                 y_q <= y_d;
                
                 -- pe_out
+                -- Multicast packets can only be sent to the PE through multicast_in
                 if (pe_in_valid = '1' and (to_integer(unsigned(pe_in_dest_d(X_INDEX))) = X_COORD)
-                        and (to_integer(unsigned(pe_in_dest_d(Y_INDEX))) = Y_COORD)) then
+                        and (to_integer(unsigned(pe_in_dest_d(Y_INDEX))) = Y_COORD)
+                        and (USE_MULTICAST = false or to_integer(unsigned(pe_in_multicast_group_d)) /= MULTICAST_GROUP)) then
                     pe_out_valid    <= '1';
                     pe_out          <= pe_d;
                 
                 elsif (x_in_valid = '1' and (to_integer(unsigned(x_in_dest_d(X_INDEX))) = X_COORD)
-                        and (to_integer(unsigned(x_in_dest_d(Y_INDEX))) = Y_COORD)) then
+                        and (to_integer(unsigned(x_in_dest_d(Y_INDEX))) = Y_COORD)
+                        and (USE_MULTICAST = false or to_integer(unsigned(x_in_multicast_group_d)) /= MULTICAST_GROUP)) then
                     pe_out_valid    <= '1'; 
                     pe_out          <= x_d;
                     
                 elsif (y_in_valid = '1' and (to_integer(unsigned(y_in_dest_d(X_INDEX))) = X_COORD)
-                        and (to_integer(unsigned(y_in_dest_d(Y_INDEX))) = Y_COORD)) then
+                        and (to_integer(unsigned(y_in_dest_d(Y_INDEX))) = Y_COORD)
+                        and (USE_MULTICAST = false or to_integer(unsigned(y_in_multicast_group_d)) /= MULTICAST_GROUP)) then
                     pe_out_valid    <= '1';
                     pe_out          <= y_d;
                 
@@ -207,24 +212,49 @@ begin
     x_out <= x_q;
     y_out <= y_q;
 
-     NEXT_VALID: process (x_in_valid_d, y_in_valid_d, x_in_dest_d, y_in_dest_d, pe_in_valid, pe_in_dest_d)
+     NEXT_VALID: process (x_in_valid_d, y_in_valid_d, x_in_dest_d, y_in_dest_d, pe_in_valid_d, pe_in_dest_d, pe_in_multicast_group_d)
      begin
         x_next  <= '0';
         y_next  <= '0';
      
+        -- Only route multicast packets out of multicast_out
         if (x_in_valid_d = '1' and ((to_integer(unsigned(x_in_dest_d(X_INDEX))) /= X_COORD)
+                or (to_integer(unsigned(x_in_dest_d(Y_INDEX))) /= Y_COORD))
+                and (USE_MULTICAST = true and to_integer(unsigned(x_in_multicast_group_d)) = MULTICAST_GROUP)) then
+            x_next <= '0';
+            
+        elsif (pe_in_valid_d = '1' and ((to_integer(unsigned(pe_in_dest_d(X_INDEX))) /= X_COORD)
+                or (to_integer(unsigned(pe_in_dest_d(Y_INDEX))) /= Y_COORD))
+                and (USE_MULTICAST = true and to_integer(unsigned(pe_in_multicast_group_d)) = MULTICAST_GROUP)) then
+            x_next <= '0';
+
+        elsif (x_in_valid_d = '1' and ((to_integer(unsigned(x_in_dest_d(X_INDEX))) /= X_COORD)
                 or (to_integer(unsigned(x_in_dest_d(Y_INDEX))) /= Y_COORD))) then
             x_next <= '1';
-        elsif (pe_in_valid = '1' and (to_integer(unsigned(pe_in_dest_d(X_INDEX))) = X_COORD)
+            
+        elsif (pe_in_valid_d = '1' and (to_integer(unsigned(pe_in_dest_d(X_INDEX))) = X_COORD)
                 and (to_integer(unsigned(pe_in_dest_d(Y_INDEX))) = Y_COORD)) then
             x_next <= '0';
+            
         else
-            x_next <= pe_in_valid;
+            x_next <= pe_in_valid_d;
+            
         end if;
         
+        -- Only route multicast packet out of y_out if multicast_out is already used
+        if (y_in_valid_d = '0' and x_in_valid_d = '1' and ((to_integer(unsigned(x_in_dest_d(X_INDEX))) /= X_COORD)
+                or (to_integer(unsigned(x_in_dest_d(Y_INDEX))) /= Y_COORD))
+                and (USE_MULTICAST = true and to_integer(unsigned(x_in_multicast_group_d)) = MULTICAST_GROUP)) then
+            y_next <= '0';
+            
+        elsif (pe_in_valid_d = '1' and ((to_integer(unsigned(pe_in_dest_d(X_INDEX))) /= X_COORD)
+                or (to_integer(unsigned(pe_in_dest_d(Y_INDEX))) /= Y_COORD))
+                and (USE_MULTICAST = true and to_integer(unsigned(pe_in_multicast_group_d)) = MULTICAST_GROUP)) then
+            y_next <= '0';
+        
         -- Switch y_out to act as pe_out
-        if (x_in_valid_d = '1' and (to_integer(unsigned(x_in_dest_d(X_INDEX))) = X_COORD)
-                and (to_integer(unsigned(x_in_dest_d(Y_INDEX))) = Y_COORD)) then
+        elsif (x_in_valid_d = '1' and (to_integer(unsigned(x_in_dest_d(X_INDEX))) = X_COORD)
+                and (to_integer(unsigned(x_in_dest_d(Y_INDEX))) = Y_COORD)) then  
             -- Both x_in and y_in are destined for the PE, so y_in must be deflected
             if (y_in_valid_d = '1' and (to_integer(unsigned(y_in_dest_d(X_INDEX))) = X_COORD)
                     and (to_integer(unsigned(y_in_dest_d(Y_INDEX))) = Y_COORD)) then
@@ -245,49 +275,15 @@ begin
                 or (to_integer(unsigned(x_in_dest_d(Y_INDEX))) /= Y_COORD))) then
             y_next <= '1';
         
-        elsif (pe_in_valid = '1' and (to_integer(unsigned(pe_in_dest_d(X_INDEX))) = X_COORD)
+        elsif (pe_in_valid_d = '1' and (to_integer(unsigned(pe_in_dest_d(X_INDEX))) = X_COORD)
                 and (to_integer(unsigned(pe_in_dest_d(Y_INDEX))) = Y_COORD)) then
             y_next <= '0';
             
         else
-            y_next <= pe_in_valid;
+            y_next <= pe_in_valid_d;
             
         end if;
     end process NEXT_VALID;
-    
---    NEXT_VALID: process (clk)
---    begin
---        if (rising_edge(clk) and reset_n = '1') then
---            if (x_in_valid_d = '1' and ((to_integer(unsigned(x_in_dest_d(X_INDEX))) /= X_COORD)
---                    or (to_integer(unsigned(x_in_dest_d(Y_INDEX))) /= Y_COORD))) then
---                x_next <= '1';
---            else
---                x_next <= pe_in_valid;
---            end if;
-            
---            -- Switch y_out to act as pe_out
---            if (x_in_valid_d = '1' and (to_integer(unsigned(x_in_dest_d(X_INDEX))) = X_COORD)
---                    and (to_integer(unsigned(x_in_dest_d(Y_INDEX))) = Y_COORD)) then
---                y_next <= '0';
-                
---            elsif (y_in_valid_d = '1' and (to_integer(unsigned(y_in_dest_d(X_INDEX))) = X_COORD)
---                    and (to_integer(unsigned(y_in_dest_d(Y_INDEX))) = Y_COORD)) then
---                y_next <= '0';
-                
---            elsif (y_in_valid_d = '1' and ((to_integer(unsigned(y_in_dest_d(X_INDEX))) /= X_COORD)
---                    or (to_integer(unsigned(y_in_dest_d(Y_INDEX))) /= Y_COORD))) then
---                y_next <= '1';
-                
---            elsif (x_in_valid_d = '1' and ((to_integer(unsigned(x_in_dest_d(X_INDEX))) /= X_COORD)
---                    or (to_integer(unsigned(x_in_dest_d(Y_INDEX))) /= Y_COORD))) then
---                y_next <= '1';
-                
---            else
---                y_next <= pe_in_valid;
-                
---            end if;
---        end if;
---    end process NEXT_VALID;
     
     -- Valid signal routing    
     OUTPUT_VALID_FF: process(clk)
