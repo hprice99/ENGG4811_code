@@ -73,6 +73,9 @@ architecture Behavioral of hoplite_router_tb is
             pe_in_valid     : in STD_LOGIC;
             pe_backpressure : out STD_LOGIC;
             
+            multicast_in        : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
+            multicast_in_valid  : in STD_LOGIC;
+            
             -- Output (messages sent out of router)
             x_out           : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
             x_out_valid     : out STD_LOGIC;
@@ -139,7 +142,7 @@ architecture Behavioral of hoplite_router_tb is
     
     constant VALID_THRESHOLD        : real := 0.75;
     constant PE_IN_THRESHOLD        : real := 0.10;
-    constant MULTICAST_THRESHOLD    : real := 0.10;
+    constant MULTICAST_THRESHOLD    : real := 0.25;
     
     constant X_COORD                : integer := 0;
     constant Y_COORD                : integer := 0;
@@ -161,20 +164,20 @@ architecture Behavioral of hoplite_router_tb is
     constant Y_INDEX    : integer := 1;
 
     type t_Coordinate is array (0 to 1) of std_logic_vector((COORD_BITS-1) downto 0);
-    signal x_message_dest, y_message_dest, pe_message_dest : t_Coordinate;
+    signal x_message_dest, y_message_dest, pe_message_dest, multicast_in_message_dest : t_Coordinate;
     signal pe_in_dest   : t_Coordinate;
     
     subtype t_MulticastGroup is std_logic_vector((MULTICAST_GROUP_BITS-1) downto 0);
-    signal x_message_multicast_group, y_message_multicast_group, pe_message_multicast_group : t_MulticastGroup;
+    signal x_message_multicast_group, y_message_multicast_group, pe_message_multicast_group, multicast_in_message_multicast_group : t_MulticastGroup;
     signal pe_in_multicast_group : t_MulticastGroup;
     
-    signal x_message_data, y_message_data, pe_message_data : std_logic_vector((DATA_WIDTH-1) downto 0);
+    signal x_message_data, y_message_data, pe_message_data, multicast_in_message_data : std_logic_vector((DATA_WIDTH-1) downto 0);
     
-    signal x_message_b, y_message_b, pe_message_b                   : std_logic_vector((BUS_WIDTH-1) downto 0);
-    signal x_message_b_valid, y_message_b_valid, pe_message_b_valid : std_logic;
+    signal x_message_b, y_message_b, pe_message_b, multicast_in_message_b                           : std_logic_vector((BUS_WIDTH-1) downto 0);
+    signal x_message_b_valid, y_message_b_valid, pe_message_b_valid, multicast_in_message_b_valid   : std_logic;
     
-    signal x_message_r, y_message_r, pe_message_r                   : std_logic_vector((BUS_WIDTH-1) downto 0);
-    signal x_message_r_valid, y_message_r_valid, pe_message_r_valid : std_logic;
+    signal x_message_r, y_message_r, pe_message_r, multicast_in_message_r                           : std_logic_vector((BUS_WIDTH-1) downto 0);
+    signal x_message_r_valid, y_message_r_valid, pe_message_r_valid, multicast_in_message_r_valid   : std_logic;
     
     signal x_in        : std_logic_vector((BUS_WIDTH-1) downto 0);
     signal x_in_valid  : std_logic;
@@ -184,6 +187,9 @@ architecture Behavioral of hoplite_router_tb is
     
     signal pe_in           : std_logic_vector((BUS_WIDTH-1) downto 0);
     signal pe_in_valid     : std_logic;
+    
+    signal multicast_in         : std_logic_vector((BUS_WIDTH-1) downto 0);
+    signal multicast_in_valid   : std_logic;
     
     signal x_out        : std_logic_vector((BUS_WIDTH-1) downto 0);
     signal x_out_valid  : std_logic;
@@ -212,6 +218,11 @@ architecture Behavioral of hoplite_router_tb is
     signal multicast_out_r          : std_logic_vector((BUS_WIDTH-1) downto 0);
     signal multicast_out_r_valid    : std_logic;
     
+    signal multicast_out_rr         : std_logic_vector((BUS_WIDTH-1) downto 0);
+    signal multicast_out_rr_valid   : std_logic;
+    
+    signal first_multicast_out_read : std_logic;
+    
     constant FIFO_ADDRESS_WIDTH     : natural := ceil_log2(MAX_CYCLES);
     constant FIFO_DEPTH             : natural := 2 ** FIFO_ADDRESS_WIDTH;
     constant FIFO_DATA_WIDTH        : natural := BUS_WIDTH; 
@@ -228,10 +239,13 @@ architecture Behavioral of hoplite_router_tb is
     signal check_multicast_out_fifo_empty, check_multicast_out_fifo_full      : std_logic;
     signal check_multicast_out_fifo_data_w, check_multicast_out_fifo_data_r   : std_logic_vector((BUS_WIDTH-1) downto 0);
     
+    signal check_multicast_out_fifo_empty_r : std_logic;
+    
     constant PRINT_X_IN         : boolean := true;
     constant PRINT_Y_IN         : boolean := true;
     constant PRINT_PE_IN        : boolean := true;
     constant PRINT_PE_FIFO_IN   : boolean := true;
+    constant PRINT_MULTICAST_IN : boolean := true;
     
     constant PRINT_X_OUT                : boolean := true;
     constant PRINT_Y_OUT                : boolean := true;
@@ -290,6 +304,12 @@ begin
                 y_message_data              <= (others => '0');
                 y_message_b_valid           <= '0';
                 
+                multicast_in_message_dest(X_INDEX)     <= (others => '0');
+                multicast_in_message_dest(Y_INDEX)     <= (others => '0');
+                multicast_in_message_multicast_group   <= (others => '0');
+                multicast_in_message_data              <= (others => '0');
+                multicast_in_message_b_valid           <= '0';
+                
                 pe_message_dest(X_INDEX)    <= (others => '0');
                 pe_message_dest(Y_INDEX)    <= (others => '0');
                 pe_message_multicast_group  <= (others => '0');
@@ -320,6 +340,12 @@ begin
                     y_message_b_valid           <= rand_logic(VALID_THRESHOLD, MAX_CYCLES-count);
                 end if;
                 
+                multicast_in_message_dest(X_INDEX)      <= "00";
+                multicast_in_message_dest(Y_INDEX)      <= "00";
+                multicast_in_message_multicast_group    <= "1";
+                multicast_in_message_data               <= rand_slv(DATA_WIDTH, 10*count);
+                multicast_in_message_b_valid            <= rand_logic(MULTICAST_THRESHOLD, 15*count);
+                
                 -- Test a PE message where the destination is the same as the source
                 if (count <= 10) then
                     pe_message_dest(X_INDEX)    <= "00";
@@ -339,6 +365,7 @@ begin
     x_message_b     <= x_message_data & x_message_multicast_group & x_message_dest(Y_INDEX) & x_message_dest(X_INDEX);
     y_message_b     <= y_message_data & y_message_multicast_group & y_message_dest(Y_INDEX) & y_message_dest(X_INDEX);
     pe_message_b    <= pe_message_data & pe_message_multicast_group & pe_message_dest(Y_INDEX) & pe_message_dest(X_INDEX);
+    multicast_in_message_b  <= multicast_in_message_data & multicast_in_message_multicast_group & multicast_in_message_dest(Y_INDEX) & multicast_in_message_dest(X_INDEX);
     
     MESSAGE_FF: process (clk)
     begin
@@ -350,6 +377,9 @@ begin
                 y_message_r         <= (others => '0');
                 y_message_r_valid   <= '0';
                 
+                multicast_in_message_r          <= (others => '0');
+                multicast_in_message_r_valid    <= '0';
+                
                 pe_message_r        <= (others => '0');
                 pe_message_r_valid  <= '0';
             else
@@ -358,6 +388,9 @@ begin
                 
                 y_message_r         <= y_message_b;
                 y_message_r_valid   <= y_message_b_valid;
+                
+                multicast_in_message_r          <= multicast_in_message_b;
+                multicast_in_message_r_valid    <= multicast_in_message_b_valid;
                 
                 pe_message_r        <= pe_message_b;
                 pe_message_r_valid  <= pe_message_b_valid;
@@ -370,6 +403,9 @@ begin
     
     y_in        <= y_message_r;
     y_in_valid  <= y_message_r_valid;
+    
+    multicast_in        <= multicast_in_message_r;
+    multicast_in_valid  <= multicast_in_message_r_valid;
     
     -------------------------------------------------------------------------------------------------
     -- Processing element network interface controller
@@ -422,6 +458,8 @@ begin
         pe_in               => pe_in,
         pe_in_valid         => pe_in_valid,
         pe_backpressure     => pe_backpressure,
+        multicast_in        => multicast_in,
+        multicast_in_valid  => multicast_in_valid,
         
         x_out               => x_out,
         x_out_valid         => x_out_valid,
@@ -448,6 +486,9 @@ begin
             
                 multicast_out_r         <= (others => '0');
                 multicast_out_r_valid   <= '0';
+                
+                multicast_out_rr        <= (others => '0');
+                multicast_out_rr_valid  <= '0';
             else
                 x_out_r                 <= x_out;
                 x_out_r_valid           <= x_out_valid;
@@ -460,6 +501,9 @@ begin
             
                 multicast_out_r         <= multicast_out;
                 multicast_out_r_valid   <= multicast_out_valid;
+                
+                multicast_out_rr        <= multicast_out_r;
+                multicast_out_rr_valid  <= multicast_out_r_valid;
             end if;
         end if;
     end process DUT_OUTPUT_FF;
@@ -493,7 +537,10 @@ begin
                 check_dest_fifo_data_w <= (others => '0');
                 check_dest_fifo_en_w   <= '0';
             elsif (check_dest_fifo_full = '0') then
-                 if (pe_in_valid = '1' and 
+                 if (multicast_in_message_b_valid = '1' and to_integer(unsigned(multicast_in_message_multicast_group)) = MULTICAST_GROUP) then
+                    check_dest_fifo_data_w     <= multicast_in_message_b;
+                    check_dest_fifo_en_w       <= '1';
+                 elsif (pe_in_valid = '1' and 
                         to_integer(unsigned(pe_in_dest(X_INDEX))) = X_COORD and 
                         to_integer(unsigned(pe_in_dest(Y_INDEX))) = Y_COORD and
                         (USE_MULTICAST = false or to_integer(unsigned(pe_in_multicast_group)) /= MULTICAST_GROUP)) then
@@ -625,6 +672,22 @@ begin
         end if;
     end process CHECK_MULTICAST_OUT_FIFO_WRITE;
     
+    -- Handle first-word fall-through
+--    FIRST_MULTICAST_READ: process (clk)
+--    begin
+--        if (rising_edge(clk)) then
+--            if (reset_n = '0') then
+--                first_multicast_out_read    <= '0';
+                
+--            else
+--                if (check_multicast_out_fifo_empty = '0' and first_multicast_out_read = '0') then
+--                    first_multicast_out_read    <= '1';
+--                elsif (first_multicast_out_read)
+--                end if;
+--            end if;
+--        end if;
+--    end
+    
     -- Read from FIFO
     CHECK_MULTICAST_OUT_FIFO_READ_ENABLE: process (check_multicast_out_fifo_empty, multicast_out_r_valid)
     begin
@@ -671,6 +734,21 @@ begin
                 write(my_line, y_in((BUS_WIDTH-1) downto (2*COORD_BITS + MULTICAST_GROUP_BITS)));
                 write(my_line, string'(", raw = "));
                 write(my_line, y_in((BUS_WIDTH-1) downto 0));
+                
+                writeline(output, my_line);
+            end if;
+            
+            if (multicast_in_valid = '1' and PRINT_MULTICAST_IN) then
+                write(my_line, string'("multicast_in: destination = ("));
+                write(my_line, to_integer(unsigned(multicast_in((COORD_BITS-1) downto 0))));
+                write(my_line, string'(", "));
+                write(my_line, to_integer(unsigned(multicast_in((2*COORD_BITS-1) downto COORD_BITS))));
+                write(my_line, string'("), multicast_group = "));
+                write(my_line, multicast_in((2*COORD_BITS + MULTICAST_GROUP_BITS - 1) downto 2*COORD_BITS));
+                write(my_line, string'(", data = "));
+                write(my_line, multicast_in((BUS_WIDTH-1) downto (2*COORD_BITS + MULTICAST_GROUP_BITS)));
+                write(my_line, string'(", raw = "));
+                write(my_line, multicast_in((BUS_WIDTH-1) downto 0));
                 
                 writeline(output, my_line);
             end if;
@@ -865,7 +943,7 @@ begin
         variable my_line : line;
     begin
         if (rising_edge(clk) and reset_n = '1' and count <= MAX_CYCLES) then
-            if (check_multicast_out_fifo_en_r = '1') then
+             if (check_multicast_out_fifo_en_r = '1') then
                 if (unsigned(check_multicast_out_fifo_data_r) /= unsigned(multicast_out_r)) then
                     write(my_line, string'(HT & "multicast_out message "));
                     write(my_line, count-1);

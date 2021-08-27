@@ -50,6 +50,9 @@ entity hoplite_router_multicast is
         pe_in_valid     : in STD_LOGIC;
         pe_backpressure : out STD_LOGIC;
         
+        multicast_in        : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
+        multicast_in_valid  : in STD_LOGIC;
+        
         -- Output (messages sent out of router)
         x_out           : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
         x_out_valid     : out STD_LOGIC;
@@ -67,18 +70,26 @@ end hoplite_router_multicast;
 
 architecture Behavioral of hoplite_router_multicast is
     
-    signal x_d, x_q, y_d, y_q, pe_d : std_logic_vector((BUS_WIDTH-1) downto 0);
+    signal x_d, x_q : std_logic_vector((BUS_WIDTH-1) downto 0);
+    signal y_d, y_q : std_logic_vector((BUS_WIDTH-1) downto 0);
+    signal pe_d : std_logic_vector((BUS_WIDTH-1) downto 0);
+    signal multicast_in_d, multicast_in_q : std_logic_vector((BUS_WIDTH-1) downto 0);
+    
     signal sel : std_logic_vector(1 downto 0);
     signal x_next, y_next : std_logic;
     
-    signal x_in_valid_d, y_in_valid_d, pe_in_valid_d : std_logic;
+    signal x_in_valid_d : std_logic;
+    signal y_in_valid_d : std_logic;
+    signal pe_in_valid_d : std_logic;
+    signal multicast_in_valid_d : std_logic;
     
     -- Received packet destinations
     type t_Coordinate is array (0 to 1) of std_logic_vector((COORD_BITS-1) downto 0);
     constant X_INDEX    : integer := 0;
     constant Y_INDEX    : integer := 1;
-    signal x_in_dest_d, y_in_dest_d, pe_in_dest_d : t_Coordinate;
-    signal x_in_dest_q, y_in_dest_q, pe_in_dest_q : t_Coordinate;
+    signal x_in_dest_d, x_in_dest_q : t_Coordinate;
+    signal y_in_dest_d, y_in_dest_q : t_Coordinate;
+    signal pe_in_dest_d, pe_in_dest_q : t_Coordinate;
     
     constant X_INDEX_HEADER_START   : integer := 0;
     constant X_INDEX_HEADER_END     : integer := X_INDEX_HEADER_START + COORD_BITS - 1;
@@ -91,8 +102,10 @@ architecture Behavioral of hoplite_router_multicast is
     constant MULTICAST_GROUP_INDEX_HEADER_END    : integer := MULTICAST_GROUP_INDEX_HEADER_START + MULTICAST_GROUP_BITS - 1;
     
     subtype t_MulticastGroup is std_logic_vector((MULTICAST_GROUP_BITS-1) downto 0);
-    signal x_in_multicast_group_d, y_in_multicast_group_d, pe_in_multicast_group_d   : t_MulticastGroup;
-    signal x_in_multicast_group_q, y_in_multicast_group_q, pe_in_multicast_group_q   : t_MulticastGroup;
+    signal x_in_multicast_group_d, x_in_multicast_group_q   : t_MulticastGroup;
+    signal y_in_multicast_group_d, y_in_multicast_group_q   : t_MulticastGroup;
+    signal pe_in_multicast_group_d, pe_in_multicast_group_q : t_MulticastGroup;
+    signal multicast_in_multicast_group_d, multicast_in_multicast_group_q   : t_MulticastGroup;
 
 begin
 
@@ -113,10 +126,12 @@ begin
     x_in_multicast_group_d  <= x_d(MULTICAST_GROUP_INDEX_HEADER_END downto MULTICAST_GROUP_INDEX_HEADER_START);
     y_in_multicast_group_d  <= y_d(MULTICAST_GROUP_INDEX_HEADER_END downto MULTICAST_GROUP_INDEX_HEADER_START);
     pe_in_multicast_group_d <= pe_d(MULTICAST_GROUP_INDEX_HEADER_END downto MULTICAST_GROUP_INDEX_HEADER_START);
+    multicast_in_multicast_group_d  <= multicast_in_d(MULTICAST_GROUP_INDEX_HEADER_END downto MULTICAST_GROUP_INDEX_HEADER_START);
     
     x_in_valid_d <= x_in_valid;
     y_in_valid_d <= y_in_valid;
     pe_in_valid_d   <= pe_in_valid;
+    multicast_in_valid_d    <= multicast_in_valid;
 
     -- Output routing
     sel <= y_in_valid & x_in_valid;
@@ -136,6 +151,7 @@ begin
                y_in     when others;
                
     pe_d    <= pe_in;
+    multicast_in_d  <= multicast_in;
                
     -- Apply backpressure to the connected PE
     with sel select
@@ -148,6 +164,7 @@ begin
             if (reset_n = '0') then
                 x_q             <= (others => '0');
                 y_q             <= (others => '0');
+                multicast_in_q  <= (others => '0');
                 
                 pe_out          <= (others => '0');
                 pe_out_valid    <= '0';
@@ -157,10 +174,16 @@ begin
             else
                 x_q <= x_d;
                 y_q <= y_d;
+                multicast_in_q  <= multicast_in_d;
                
                 -- pe_out
                 -- Multicast packets can only be sent to the PE through multicast_in
-                if (pe_in_valid = '1' and (to_integer(unsigned(pe_in_dest_d(X_INDEX))) = X_COORD)
+                if (multicast_in_valid = '1' 
+                        and (USE_MULTICAST = True and to_integer(unsigned(multicast_in_multicast_group_d)) = MULTICAST_GROUP)) then
+                    pe_out_valid    <= '1';
+                    pe_out          <= multicast_in_d;
+                
+                elsif (pe_in_valid = '1' and (to_integer(unsigned(pe_in_dest_d(X_INDEX))) = X_COORD)
                         and (to_integer(unsigned(pe_in_dest_d(Y_INDEX))) = Y_COORD)
                         and (USE_MULTICAST = false or to_integer(unsigned(pe_in_multicast_group_d)) /= MULTICAST_GROUP)) then
                     pe_out_valid    <= '1';
@@ -212,7 +235,10 @@ begin
     x_out <= x_q;
     y_out <= y_q;
 
-     NEXT_VALID: process (x_in_valid_d, y_in_valid_d, x_in_dest_d, y_in_dest_d, pe_in_valid_d, pe_in_dest_d, pe_in_multicast_group_d)
+     NEXT_VALID: process (x_in_valid_d, x_in_dest_d, x_in_multicast_group_d,
+                            y_in_valid_d, y_in_dest_d, y_in_multicast_group_d,
+                            pe_in_valid_d, pe_in_dest_d, pe_in_multicast_group_d,
+                            multicast_in_valid_d, multicast_in_multicast_group_d)
      begin
         x_next  <= '0';
         y_next  <= '0';
@@ -254,10 +280,15 @@ begin
         
         -- Switch y_out to act as pe_out
         elsif (x_in_valid_d = '1' and (to_integer(unsigned(x_in_dest_d(X_INDEX))) = X_COORD)
-                and (to_integer(unsigned(x_in_dest_d(Y_INDEX))) = Y_COORD)) then  
+                and (to_integer(unsigned(x_in_dest_d(Y_INDEX))) = Y_COORD)) then
+                
             -- Both x_in and y_in are destined for the PE, so y_in must be deflected
             if (y_in_valid_d = '1' and (to_integer(unsigned(y_in_dest_d(X_INDEX))) = X_COORD)
                     and (to_integer(unsigned(y_in_dest_d(Y_INDEX))) = Y_COORD)) then
+                y_next <= '1';
+            -- multicast_in is destined for the PE, so y_in must be deflected
+            elsif (multicast_in_valid = '1' 
+                        and (USE_MULTICAST = True and to_integer(unsigned(multicast_in_multicast_group_d)) = MULTICAST_GROUP)) then
                 y_next <= '1';
             else
                 y_next <= '0';
@@ -265,11 +296,29 @@ begin
             
         elsif (y_in_valid_d = '1' and (to_integer(unsigned(y_in_dest_d(X_INDEX))) = X_COORD)
                 and (to_integer(unsigned(y_in_dest_d(Y_INDEX))) = Y_COORD)) then
-            y_next <= '0';
+                
+            -- multicast_in is destined for the PE, so y_in must be deflected
+            if (multicast_in_valid = '1' 
+                        and (USE_MULTICAST = True and to_integer(unsigned(multicast_in_multicast_group_d)) = MULTICAST_GROUP)) then
+                
+                -- Route y_in out of multicast_out only 
+                if (to_integer(unsigned(y_in_multicast_group_d)) = MULTICAST_GROUP) then
+                    y_next <= '0';
+                else
+                    y_next <= '1';
+                end if;  
+            else
+                y_next <= '0';
+            end if;
             
         elsif (y_in_valid_d = '1' and ((to_integer(unsigned(y_in_dest_d(X_INDEX))) /= X_COORD)
                 or (to_integer(unsigned(y_in_dest_d(Y_INDEX))) /= Y_COORD))) then
-            y_next <= '1';
+            -- Route y_in out of multicast_out only 
+            if (to_integer(unsigned(y_in_multicast_group_d)) = MULTICAST_GROUP) then
+                y_next <= '0';
+            else
+                y_next <= '1';
+            end if;  
             
         elsif (x_in_valid_d = '1' and ((to_integer(unsigned(x_in_dest_d(X_INDEX))) /= X_COORD)
                 or (to_integer(unsigned(x_in_dest_d(Y_INDEX))) /= Y_COORD))) then
@@ -277,7 +326,14 @@ begin
         
         elsif (pe_in_valid_d = '1' and (to_integer(unsigned(pe_in_dest_d(X_INDEX))) = X_COORD)
                 and (to_integer(unsigned(pe_in_dest_d(Y_INDEX))) = Y_COORD)) then
-            y_next <= '0';
+            
+            -- multicast_in is destined for the PE, so y_in must be deflected
+            if (multicast_in_valid = '1' 
+                        and (USE_MULTICAST = True and to_integer(unsigned(multicast_in_multicast_group_d)) = MULTICAST_GROUP)) then
+                y_next <= '1';
+            else
+                y_next <= '0';
+            end if;
             
         else
             y_next <= pe_in_valid_d;
