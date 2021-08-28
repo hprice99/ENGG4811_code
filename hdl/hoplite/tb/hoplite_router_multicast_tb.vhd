@@ -140,11 +140,6 @@ architecture Behavioral of hoplite_router_tb is
 
     constant MAX_CYCLES         : integer := 500;
     
-    constant PE_MULTICAST_START : integer := 0;
-    constant PE_MULTICAST_END   : integer := 100;
-    
-    constant XY_START           : integer := PE_MULTICAST_END + 20;
-    
     constant VALID_THRESHOLD        : real := 0.75;
     constant PE_IN_THRESHOLD        : real := 0.10;
     constant MULTICAST_THRESHOLD    : real := 0.25;
@@ -233,8 +228,6 @@ architecture Behavioral of hoplite_router_tb is
     signal multicast_out_rr_valid   : std_logic;
     
     signal multicast_out_multicast_group    : t_MulticastGroup;
-    
-    signal first_multicast_out_read : std_logic;
     
     constant FIFO_ADDRESS_WIDTH     : natural := ceil_log2(MAX_CYCLES);
     constant FIFO_DEPTH             : natural := 2 ** FIFO_ADDRESS_WIDTH;
@@ -349,7 +342,7 @@ begin
                     
                     y_message_multicast_group   <= "1";
                     y_message_b_valid           <= '1';
-                elsif (count >= XY_START) then
+                else
                     x_message_multicast_group   <= rand_slv_threshold(MULTICAST_THRESHOLD, MULTICAST_GROUP_BITS, count);
                     x_message_b_valid           <= rand_logic(VALID_THRESHOLD, count);
                     
@@ -372,11 +365,7 @@ begin
                     pe_message_dest(Y_INDEX)    <= rand_slv(COORD_BITS, 2*count + NETWORK_NODES);
                 end if;
                 
-                if (count >= PE_MULTICAST_START and count <= PE_MULTICAST_END) then
-                    pe_message_multicast_group  <= rand_slv_threshold(MULTICAST_THRESHOLD, MULTICAST_GROUP_BITS, count + NETWORK_NODES);
-                else
-                    pe_message_multicast_group  <= (others => '0');
-                end if;
+                pe_message_multicast_group  <= rand_slv_threshold(MULTICAST_THRESHOLD, MULTICAST_GROUP_BITS, count + NETWORK_NODES);
                 pe_message_data             <= rand_slv(DATA_WIDTH, 3*count + NETWORK_NODES);
                 pe_message_b_valid          <= rand_logic(PE_IN_THRESHOLD, count + NETWORK_NODES);
             end if;
@@ -689,13 +678,13 @@ begin
                         and to_integer(unsigned(pe_in_multicast_group)) = MULTICAST_GROUP) then
                     expected_multicast_out_fifo_data_w     <= pe_in;
                     expected_multicast_out_fifo_en_w       <= '1';
-                 elsif (x_message_b_valid = '1' and USE_MULTICAST = true 
-                        and to_integer(unsigned(x_message_multicast_group)) = MULTICAST_GROUP) then
-                    expected_multicast_out_fifo_data_w     <= x_message_b;
+                 elsif (x_in_valid = '1' and USE_MULTICAST = true 
+                        and to_integer(unsigned(x_in_multicast_group)) = MULTICAST_GROUP) then
+                    expected_multicast_out_fifo_data_w     <= x_in;
                     expected_multicast_out_fifo_en_w       <= '1';
-                 elsif (y_message_b_valid = '1' and USE_MULTICAST = true 
-                        and to_integer(unsigned(y_message_multicast_group)) = MULTICAST_GROUP) then
-                    expected_multicast_out_fifo_data_w     <= y_message_b;
+                 elsif (y_in_valid = '1' and USE_MULTICAST = true 
+                        and to_integer(unsigned(y_in_multicast_group)) = MULTICAST_GROUP) then
+                    expected_multicast_out_fifo_data_w     <= y_in;
                     expected_multicast_out_fifo_en_w       <= '1';
                  else
                     expected_multicast_out_fifo_en_w       <= '0';
