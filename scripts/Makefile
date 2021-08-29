@@ -1,13 +1,12 @@
-all: io config
+all: io_fox_hoplite config_fox_hoplite
 
-.PHONY: all io config
+.PHONY: all io_fox_hoplite config_fox_hoplite
 
-io:
-	python3 io.py
+io_fox_hoplite:
+	python3 io.py fox_hoplite
 
-config:
-	python3 fox_network_generate.py
+config_fox_hoplite:
+	python3 fox_network_generate.py fox_hoplite
 
-# TODO Clean headers in firmware and hdl directories
 clean: 
 	-rm *.h *.vh
