@@ -1,40 +1,46 @@
 # %%
 import yaml
 from MatrixConfig import *
+import os
 
-# %%
-# Fox network configuration
-foxNetworkStream = open("FoxConfig.yaml", 'r')
-foxConfig = yaml.safe_load(foxNetworkStream)
+class FoxConfig:
+    def __init__(self, *, configFolder):
+        self.configFolder = configFolder
+        
+        scriptLocation = os.path.realpath(__file__)
+        self.scriptDirectory = os.path.dirname(scriptLocation)
+        
+    # Fox network configuration
+    def import_network_config(self):
+        foxNetworkStream = open("{scriptDirectory}/{configFolder}/FoxConfig.yaml".format(scriptDirectory=self.scriptDirectory, configFolder=self.configFolder), 'r')
+        foxConfig = yaml.safe_load(foxNetworkStream)
 
-networkRows = foxConfig['networkRows']
-networkCols = foxConfig['networkCols']
+        self.networkRows = foxConfig['networkRows']
+        self.networkCols = foxConfig['networkCols']
 
-resultNodeCoord = foxConfig['resultNodeCoord']
+        self.resultNodeCoord = foxConfig['resultNodeCoord']
 
-totalMatrixSize = matrixSize
+        self.totalMatrixSize = matrixSize
 
-foxNetworkStages = foxConfig['foxNetworkStages']
+        self.foxNetworkStages = foxConfig['foxNetworkStages']
 
-coordBits = math.ceil(math.log2(max(networkRows, networkCols)))
-multicastGroupBits = foxConfig['packetFormat']['multicastGroupBits']
-doneFlagBits = foxConfig['packetFormat']['doneFlagBits']
-resultFlagBits = foxConfig['packetFormat']['resultFlagBits']
-matrixTypeBits = foxConfig['packetFormat']['matrixTypeBits']
-matrixCoordBits = foxConfig['packetFormat']['matrixCoordBits']
-matrixElementBits = foxConfig['packetFormat']['matrixElementBits']
+        self.coordBits = math.ceil(math.log2(max(self.networkRows, self.networkCols)))
+        self.multicastGroupBits = foxConfig['packetFormat']['multicastGroupBits']
+        self.doneFlagBits = foxConfig['packetFormat']['doneFlagBits']
+        self.resultFlagBits = foxConfig['packetFormat']['resultFlagBits']
+        self.matrixTypeBits = foxConfig['packetFormat']['matrixTypeBits']
+        self.matrixCoordBits = foxConfig['packetFormat']['matrixCoordBits']
+        self.matrixElementBits = foxConfig['packetFormat']['matrixElementBits']
 
-useMatrixInitFile = foxConfig['useMatrixInitFile']
+        self.useMatrixInitFile = foxConfig['useMatrixInitFile']
 
-# %%
-# Firmware configuration
-firmwareStream = open("FirmwareConfig.yaml", 'r')
-firmwareConfig = yaml.safe_load(firmwareStream)
+    # Firmware configuration
+    def import_firmware_config(self):
+        firmwareStream = open("{scriptDirectory}/{configFolder}/FirmwareConfig.yaml".format(scriptDirectory=self.scriptDirectory, configFolder=self.configFolder), 'r')
+        firmwareConfig = yaml.safe_load(firmwareStream)
 
-firmwareFolder = firmwareConfig['firmwareFolder']
+        self.foxFirmware = firmwareConfig['foxFirmware']['name']
+        self.foxFirmwareMemSize = firmwareConfig['foxFirmware']['memory_size']
 
-foxFirmware = firmwareConfig['foxFirmware']['name']
-foxFirmwareMemSize = firmwareConfig['foxFirmware']['memory_size']
-
-resultFirmware = firmwareConfig['resultFirmware']['name']
-resultFirmwareMemSize = firmwareConfig['resultFirmware']['memory_size']
+        self.resultFirmware = firmwareConfig['resultFirmware']['name']
+        self.resultFirmwareMemSize = firmwareConfig['resultFirmware']['memory_size']

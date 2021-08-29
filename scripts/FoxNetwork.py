@@ -7,12 +7,12 @@ from numpy.matrixlib.defmatrix import matrix
 from FoxPacket import *
 from Firmware import *
 
-class FoxNetwork():
+class FoxNetwork:
     def __init__(self, *, networkRows, networkCols, resultNodeCoord, \
             totalMatrixSize, foxNetworkStages, multicastGroupBits, \
             doneFlagBits, resultFlagBits, matrixTypeBits, matrixCoordBits, \
             foxFirmware, resultFirmware, A=None, B=None, \
-            useMatrixInitFile=True):
+            useMatrixInitFile=True, hdlFolder=None, firmwareFolder=None):
 
         # Entire network details
         self.networkRows = networkRows
@@ -54,6 +54,16 @@ class FoxNetwork():
 
         self.foxFirmware = foxFirmware
         self.resultFirmware = resultFirmware
+
+        if hdlFolder is None:
+            raise Exception("HDL folder not given")
+
+        self.hdlFolder = hdlFolder
+
+        if firmwareFolder is None:
+            raise Exception("Firmware folder not given")
+
+        self.firmwareFolder = firmwareFolder
 
     '''
     Convert a node's (x, y) coordinates into a node number
@@ -136,8 +146,7 @@ class FoxNetwork():
         scriptLocation = os.path.realpath(__file__)
         scriptDirectory = os.path.dirname(scriptLocation)
 
-        # TODO Move save location of mif files
-        initFilePrefix = "{directory}/node".format(directory=scriptDirectory)
+        initFilePrefix = "{directory}/../{hdlFolder}/memory/node".format(directory=scriptDirectory, hdlFolder=self.hdlFolder)
         initFileSuffix = ".mif"
 
         # Loop through the nodes
@@ -150,6 +159,10 @@ class FoxNetwork():
                 os.remove(matrixFileName)
             else:
                 print("The file does not exist")
+
+                # Make the memory directory
+                if not os.path.isdir("{directory}/../{hdlFolder}/memory".format(directory=scriptDirectory, hdlFolder=self.hdlFolder)):
+                    os.mkdir("{directory}/../{hdlFolder}/memory".format(directory=scriptDirectory, hdlFolder=self.hdlFolder))
 
             nodeCoord = self.node_number_to_node_coord(nodeNumber)
 
@@ -204,7 +217,7 @@ class FoxNetwork():
         output = template.render(foxNetwork=self)
 
         # Write output to file
-        headerFileName = '{directory}/../hdl/fox_hoplite/src/{fileName}'.format(directory=scriptDirectory, fileName=fileName)
+        headerFileName = '{directory}/../{hdlFolder}/src/{fileName}'.format(directory=scriptDirectory, hdlFolder=self.hdlFolder,  fileName=fileName)
         headerFile = open(headerFileName, 'w')
         headerFile.write(output)
         headerFile.close()
@@ -227,7 +240,7 @@ class FoxNetwork():
         vhdlOutput = vhdlTemplate.render(foxNetwork=self)
 
         # Write output to file
-        vhdlHeaderFileName = '{directory}/../hdl/fox_hoplite/src/{fileName}'.format(directory=scriptDirectory, fileName=vhdlFileName)
+        vhdlHeaderFileName = '{directory}/../{hdlFolder}/src/{fileName}'.format(directory=scriptDirectory, hdlFolder=self.hdlFolder, fileName=vhdlFileName)
         vhdlHeaderFile = open(vhdlHeaderFileName, 'w')
         vhdlHeaderFile.write(vhdlOutput)
         vhdlHeaderFile.close()
@@ -236,7 +249,7 @@ class FoxNetwork():
         cOutput = cTemplate.render(foxNetwork=self)
 
         # Write output to file
-        cHeaderFileName = '{directory}/../firmware/fox_hoplite/{fileName}'.format(directory=scriptDirectory, fileName=cFileName)
+        cHeaderFileName = '{directory}/../{firmwareFolder}/{fileName}'.format(directory=scriptDirectory, firmwareFolder=self.firmwareFolder, fileName=cFileName)
         cHeaderFile = open(cHeaderFileName, 'w')
         cHeaderFile.write(cOutput)
         cHeaderFile.close()
@@ -258,7 +271,7 @@ class FoxNetwork():
         vhdlOutput = vhdlTemplate.render(foxNetwork=self)
 
         # Write output to file
-        vhdlHeaderFileName = '{directory}/../hdl/fox_hoplite/src/{fileName}'.format(directory=scriptDirectory, fileName=vhdlFileName)
+        vhdlHeaderFileName = '{directory}/../{hdlFolder}/src/{fileName}'.format(directory=scriptDirectory, hdlFolder=self.hdlFolder, fileName=vhdlFileName)
         vhdlHeaderFile = open(vhdlHeaderFileName, 'w')
         vhdlHeaderFile.write(vhdlOutput)
         vhdlHeaderFile.close()

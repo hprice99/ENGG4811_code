@@ -173,10 +173,6 @@ architecture Behavioral of hoplite_router_tb is
     constant FIFO_ADDRESS_WIDTH     : natural := ceil_log2(MAX_CYCLES);
     constant FIFO_DEPTH             : natural := 2 ** FIFO_ADDRESS_WIDTH;
     constant FIFO_DATA_WIDTH        : natural := BUS_WIDTH; 
-    
-    signal pe_fifo_en_w, pe_fifo_en_r               : std_logic;
-    signal pe_fifo_empty, pe_fifo_full              : std_logic;
-    signal pe_fifo_data_w, pe_fifo_data_r           : std_logic_vector((BUS_WIDTH-1) downto 0);
         
     signal check_dest_fifo_en_w, check_dest_fifo_en_r       : std_logic;
     signal check_dest_fifo_empty, check_dest_fifo_full      : std_logic;
