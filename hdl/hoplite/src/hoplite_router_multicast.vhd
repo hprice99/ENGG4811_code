@@ -31,6 +31,7 @@ entity hoplite_router_multicast is
         Y_COORD                 : integer := 0;
         COORD_BITS              : integer := 1;
         
+        -- TODO Use multicast coordinates
         MULTICAST_GROUP_BITS    : integer := 1;
         MULTICAST_GROUP         : integer := -1;
         USE_MULTICAST           : boolean := False

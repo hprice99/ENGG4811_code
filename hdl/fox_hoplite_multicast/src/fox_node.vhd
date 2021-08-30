@@ -57,6 +57,7 @@ entity fox_node is
         -- Packet parameters
         COORD_BITS              : integer := 2;
         MULTICAST_GROUP_BITS    : integer := 1;
+        MULTICAST_COORD_BITS    : integer := 1;
         MATRIX_TYPE_BITS        : integer := 1;
         MATRIX_COORD_BITS       : integer := 8;
         MATRIX_ELEMENT_BITS     : integer := 32;
@@ -112,31 +113,47 @@ end fox_node;
 
 architecture Behavioral of fox_node is
 
-    component hoplite_router_multicast
-        generic (
-            BUS_WIDTH   : integer := 32;
-            X_COORD     : integer := 0;
-            Y_COORD     : integer := 0;
-            COORD_BITS  : integer := 1
+    component hoplite_router_multicast is
+        Generic (
+            BUS_WIDTH               : integer := 32;
+            X_COORD                 : integer := 0;
+            Y_COORD                 : integer := 0;
+            COORD_BITS              : integer := 1;
+            
+            MULTICAST_GROUP_BITS    : integer := 1;
+            MULTICAST_GROUP         : integer := -1;
+            USE_MULTICAST           : boolean := False
         );
-        port (
+        Port ( 
             clk             : in STD_LOGIC;
             reset_n         : in STD_LOGIC;
             
+            -- Input (messages received by router)
             x_in            : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
             x_in_valid      : in STD_LOGIC;
+            
             y_in            : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
             y_in_valid      : in STD_LOGIC;
+            
             pe_in           : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
             pe_in_valid     : in STD_LOGIC;
+            pe_backpressure : out STD_LOGIC;
             
+            multicast_in        : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
+            multicast_in_valid  : in STD_LOGIC;
+            
+            -- Output (messages sent out of router)
             x_out           : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
             x_out_valid     : out STD_LOGIC;
+            
             y_out           : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
             y_out_valid     : out STD_LOGIC;
+            
             pe_out          : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
             pe_out_valid    : out STD_LOGIC;
-            pe_backpressure : out STD_LOGIC
+            
+            multicast_out       : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
+            multicast_out_valid : out STD_LOGIC
         );
     end component hoplite_router_multicast;
     
@@ -181,6 +198,7 @@ architecture Behavioral of fox_node is
         generic (
             COORD_BITS              : integer := 2;
             MULTICAST_GROUP_BITS    : integer := 1;
+            MULTICAST_COORD_BITS    : integer := 1;
             MATRIX_TYPE_BITS        : integer := 1;
             MATRIX_COORD_BITS       : integer := 8;
             MATRIX_ELEMENT_BITS     : integer := 32;
@@ -228,6 +246,7 @@ architecture Behavioral of fox_node is
         generic (
             COORD_BITS              : integer := 2;
             MULTICAST_GROUP_BITS    : integer := 1;
+            MULTICAST_COORD_BITS    : integer := 1;
             MATRIX_TYPE_BITS        : integer := 1;
             MATRIX_COORD_BITS       : integer := 8;
             MATRIX_ELEMENT_BITS     : integer := 32;
@@ -435,7 +454,11 @@ begin
             BUS_WIDTH   => BUS_WIDTH,
             X_COORD     => X_COORD,
             Y_COORD     => Y_COORD,
-            COORD_BITS  => COORD_BITS
+            COORD_BITS  => COORD_BITS,
+            
+            MULTICAST_GROUP_BITS    => 2*MULTICAST_COORD_BITS,
+            MULTICAST_GROUP         => -1,
+            USE_MULTICAST           => False
         )
         port map (
             clk                 => clk,
@@ -447,6 +470,9 @@ begin
             y_in_valid          => y_in_valid,
             pe_in               => pe_to_network_message,
             pe_in_valid         => pe_to_network_valid,
+            pe_backpressure     => pe_backpressure,
+            multicast_in        => (others => '0'),
+            multicast_in_valid  => '0',
             
             x_out               => x_out_d,
             x_out_valid         => x_out_valid_d,
@@ -454,7 +480,8 @@ begin
             y_out_valid         => y_out_valid_d,
             pe_out              => network_to_pe_message,
             pe_out_valid        => network_to_pe_valid,
-            pe_backpressure     => pe_backpressure
+            multicast_out       => open,
+            multicast_out_valid => open
         );
     
     -- Connect router ports to node ports
@@ -508,6 +535,7 @@ begin
         generic map (
             COORD_BITS              => COORD_BITS,
             MULTICAST_GROUP_BITS    => MULTICAST_GROUP_BITS,
+            MULTICAST_COORD_BITS    => MULTICAST_COORD_BITS,
             MATRIX_TYPE_BITS        => MATRIX_TYPE_BITS,
             MATRIX_COORD_BITS       => MATRIX_COORD_BITS,
             MATRIX_ELEMENT_BITS     => MATRIX_ELEMENT_BITS,
@@ -554,6 +582,7 @@ begin
         generic map (
             COORD_BITS              => COORD_BITS,
             MULTICAST_GROUP_BITS    => MULTICAST_GROUP_BITS,
+            MULTICAST_COORD_BITS    => MULTICAST_COORD_BITS,
             MATRIX_TYPE_BITS        => MATRIX_TYPE_BITS,
             MATRIX_COORD_BITS       => MATRIX_COORD_BITS,
             MATRIX_ELEMENT_BITS     => MATRIX_ELEMENT_BITS,
