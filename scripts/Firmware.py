@@ -24,7 +24,7 @@ class Firmware:
         fileName = os.path.splitext(self.binaryName)[0] + '.S'
 
         # Write output to file
-        ldsFileName = '{directory}/../firmware/{firmwareFolder}/{fileName}'.format(directory=scriptDirectory, firmwareFolder=firmwareFolder, fileName=fileName)
+        ldsFileName = '{directory}/../{firmwareFolder}/{fileName}'.format(directory=scriptDirectory, firmwareFolder=firmwareFolder, fileName=fileName)
         ldsFile = open(ldsFileName, 'w')
         ldsFile.write(output)
         ldsFile.close()
@@ -49,7 +49,7 @@ class Firmware:
         fileName = os.path.splitext(self.binaryName)[0] + '_config.mk'
 
         # Write output to file
-        mkFileName = '{directory}/../firmware/{firmwareFolder}/{fileName}'.format(directory=scriptDirectory, firmwareFolder=firmwareFolder, fileName=fileName)
+        mkFileName = '{directory}/../{firmwareFolder}/{fileName}'.format(directory=scriptDirectory, firmwareFolder=firmwareFolder, fileName=fileName)
         mkFile = open(mkFileName, 'w')
         mkFile.write(output)
         mkFile.close()
