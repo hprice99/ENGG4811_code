@@ -26,6 +26,7 @@ class FoxConfig:
 
         self.coordBits = math.ceil(math.log2(max(self.networkRows, self.networkCols)))
         self.multicastGroupBits = foxConfig['packetFormat']['multicastGroupBits']
+        self.multicastCoordBits = foxConfig['packetFormat']['multicastCoordBits']
         self.doneFlagBits = foxConfig['packetFormat']['doneFlagBits']
         self.resultFlagBits = foxConfig['packetFormat']['resultFlagBits']
         self.matrixTypeBits = foxConfig['packetFormat']['matrixTypeBits']

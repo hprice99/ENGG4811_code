@@ -10,6 +10,7 @@ resultNodeCoord:
 
 packetFormat:
   multicastGroupBits: 1
+  multicastCoordBits: 1
   doneFlagBits: 1
   resultFlagBits: 1
   matrixTypeBits: 1
