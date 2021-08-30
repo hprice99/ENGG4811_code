@@ -97,7 +97,11 @@ architecture Behavioral of hoplite_tb_node is
     component nic_dual
         generic (
             BUS_WIDTH   : integer := 32;
-            FIFO_DEPTH  : integer := 64
+            FIFO_DEPTH  : integer := 64;
+            
+            USE_INITIALISATION_FILE : boolean := True;
+            INITIALISATION_FILE     : string := "none";
+            INITIALISATION_LENGTH   : integer := 0
         );
         port (
             clk                 : in std_logic;
@@ -242,7 +246,11 @@ begin
     NIC: nic_dual
         generic map (
             BUS_WIDTH   => BUS_WIDTH,
-            FIFO_DEPTH  => FIFO_DEPTH
+            FIFO_DEPTH  => FIFO_DEPTH,
+            
+            USE_INITIALISATION_FILE => False,
+            INITIALISATION_FILE     => "none",
+            INITIALISATION_LENGTH   => 0
         )
         port map (
             clk                 => clk,

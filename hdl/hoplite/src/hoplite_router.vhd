@@ -61,18 +61,17 @@ end hoplite_router;
 
 architecture Behavioral of hoplite_router is
     
-    signal x_d, x_q, y_d, y_q : std_logic_vector((BUS_WIDTH-1) downto 0);
+    signal x_d, x_q, y_d, y_q, pe_d : std_logic_vector((BUS_WIDTH-1) downto 0);
     signal sel : std_logic_vector(1 downto 0);
     signal x_next, y_next : std_logic;
     
-    signal x_in_valid_d, y_in_valid_d : std_logic;
+    signal x_in_valid_d, y_in_valid_d, pe_in_valid_d : std_logic;
     
     type t_Coordinate is array (0 to 1) of std_logic_vector((COORD_BITS-1) downto 0);
     constant X_INDEX    : integer := 0;
     constant Y_INDEX    : integer := 1;
-    signal x_in_dest_d, y_in_dest_d : t_Coordinate;
-    signal x_in_dest_q, y_in_dest_q : t_Coordinate;
-    
+    signal x_in_dest_d, y_in_dest_d, pe_in_dest_d : t_Coordinate;
+    signal x_in_dest_q, y_in_dest_q, pe_in_dest_q : t_Coordinate;
     
     constant X_INDEX_HEADER_START   : integer := 0;
     constant X_INDEX_HEADER_END     : integer := COORD_BITS-1;
@@ -89,8 +88,12 @@ begin
     y_in_dest_d(X_INDEX) <= y_d(X_INDEX_HEADER_END downto X_INDEX_HEADER_START);
     y_in_dest_d(Y_INDEX) <= y_d(Y_INDEX_HEADER_END downto Y_INDEX_HEADER_START);
     
+    pe_in_dest_d(X_INDEX) <= pe_d(X_INDEX_HEADER_END downto X_INDEX_HEADER_START);
+    pe_in_dest_d(Y_INDEX) <= pe_d(Y_INDEX_HEADER_END downto Y_INDEX_HEADER_START);
+    
     x_in_valid_d <= x_in_valid;
     y_in_valid_d <= y_in_valid;
+    pe_in_valid_d   <= pe_in_valid;
 
     -- Output routing
     sel <= y_in_valid & x_in_valid;
@@ -109,10 +112,12 @@ begin
                y_in     when "10",
                y_in     when others;
                
+    pe_d    <= pe_in;
+               
     -- Apply backpressure to the connected PE
     with sel select
         pe_backpressure <=  '0' when "00",
-                            '0' when "10",
+                            '1' when "10",
                             '1' when others;
     
     OUTPUT_FF : process (clk)
@@ -121,14 +126,19 @@ begin
             if (reset_n = '0') then
                 x_q         <= (others => '0');
                 y_q         <= (others => '0');
-                pe_out      <= (others => '0');
                 
+                pe_out      <= (others => '0');
                 pe_out_valid    <= '0';
             else
                 x_q <= x_d;
                 y_q <= y_d;
                
-                if (x_in_valid = '1' and (to_integer(unsigned(x_in_dest_d(X_INDEX))) = X_COORD)
+                if (pe_in_valid = '1' and (to_integer(unsigned(pe_in_dest_d(X_INDEX))) = X_COORD)
+                        and (to_integer(unsigned(pe_in_dest_d(Y_INDEX))) = Y_COORD)) then
+                    pe_out_valid    <= '1'; 
+                    pe_out          <= pe_d;
+               
+                elsif (x_in_valid = '1' and (to_integer(unsigned(x_in_dest_d(X_INDEX))) = X_COORD)
                         and (to_integer(unsigned(x_in_dest_d(Y_INDEX))) = Y_COORD)) then
                     pe_out_valid    <= '1'; 
                     pe_out          <= x_d;
@@ -150,7 +160,7 @@ begin
     x_out <= x_q;
     y_out <= y_q;
 
-     NEXT_VALID: process (x_in_valid_d, y_in_valid_d, x_in_dest_d, y_in_dest_d, pe_in_valid)
+     NEXT_VALID: process (x_in_valid_d, y_in_valid_d, x_in_dest_d, y_in_dest_d, pe_in_valid, pe_in_dest_d)
      begin
         x_next  <= '0';
         y_next  <= '0';
@@ -158,6 +168,9 @@ begin
         if (x_in_valid_d = '1' and ((to_integer(unsigned(x_in_dest_d(X_INDEX))) /= X_COORD)
                 or (to_integer(unsigned(x_in_dest_d(Y_INDEX))) /= Y_COORD))) then
             x_next <= '1';
+        elsif (pe_in_valid = '1' and (to_integer(unsigned(pe_in_dest_d(X_INDEX))) = X_COORD)
+                and (to_integer(unsigned(pe_in_dest_d(Y_INDEX))) = Y_COORD)) then
+            x_next <= '0';
         else
             x_next <= pe_in_valid;
         end if;
@@ -165,7 +178,13 @@ begin
         -- Switch y_out to act as pe_out
         if (x_in_valid_d = '1' and (to_integer(unsigned(x_in_dest_d(X_INDEX))) = X_COORD)
                 and (to_integer(unsigned(x_in_dest_d(Y_INDEX))) = Y_COORD)) then
-            y_next <= '0';
+            -- Both x_in and y_in are destined for the PE, so y_in must be deflected
+            if (y_in_valid_d = '1' and (to_integer(unsigned(y_in_dest_d(X_INDEX))) = X_COORD)
+                    and (to_integer(unsigned(y_in_dest_d(Y_INDEX))) = Y_COORD)) then
+                y_next <= '1';
+            else
+                y_next <= '0';
+            end if;
             
         elsif (y_in_valid_d = '1' and (to_integer(unsigned(y_in_dest_d(X_INDEX))) = X_COORD)
                 and (to_integer(unsigned(y_in_dest_d(Y_INDEX))) = Y_COORD)) then
@@ -178,6 +197,10 @@ begin
         elsif (x_in_valid_d = '1' and ((to_integer(unsigned(x_in_dest_d(X_INDEX))) /= X_COORD)
                 or (to_integer(unsigned(x_in_dest_d(Y_INDEX))) /= Y_COORD))) then
             y_next <= '1';
+        
+        elsif (pe_in_valid = '1' and (to_integer(unsigned(pe_in_dest_d(X_INDEX))) = X_COORD)
+                and (to_integer(unsigned(pe_in_dest_d(Y_INDEX))) = Y_COORD)) then
+            y_next <= '0';
             
         else
             y_next <= pe_in_valid;
