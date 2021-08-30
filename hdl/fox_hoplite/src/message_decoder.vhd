@@ -35,6 +35,7 @@ entity message_decoder is
     Generic (
         COORD_BITS              : integer := 2;
         MULTICAST_GROUP_BITS    : integer := 1;
+        MULTICAST_COORD_BITS    : integer := 1;
         MATRIX_TYPE_BITS        : integer := 1;
         MATRIX_COORD_BITS       : integer := 8;
         MATRIX_ELEMENT_BITS     : integer := 32;
@@ -72,10 +73,16 @@ architecture Behavioral of message_decoder is
     constant Y_COORD_START  : integer := X_COORD_END + 1;
     constant Y_COORD_END    : integer := Y_COORD_START + COORD_BITS - 1;
 
-    constant MULTICAST_GROUP_START  : integer := Y_COORD_END + 1;
-    constant MULTICAST_GROUP_END    : integer := MULTICAST_GROUP_START + MULTICAST_GROUP_BITS - 1;
+    constant MULTICAST_X_COORD_START  : integer := Y_COORD_END + 1;
+    constant MULTICAST_X_COORD_END    : integer := MULTICAST_X_COORD_START + MULTICAST_COORD_BITS - 1;
 
-    constant DONE_FLAG_BIT          : integer := MULTICAST_GROUP_END + 1;
+    constant MULTICAST_Y_COORD_START  : integer := MULTICAST_X_COORD_END + 1;
+    constant MULTICAST_Y_COORD_END    : integer := MULTICAST_Y_COORD_START + MULTICAST_COORD_BITS - 1;
+    
+    signal multicast_x_coord, multicast_y_coord : std_logic_vector((MULTICAST_COORD_BITS-1) downto 0);
+    signal multicast_coord_combined : std_logic_vector((2*MULTICAST_COORD_BITS-1) downto 0);
+
+    constant DONE_FLAG_BIT          : integer := MULTICAST_Y_COORD_END + 1;
 
     constant RESULT_FLAG_BIT        : integer := DONE_FLAG_BIT + 1;
 
@@ -94,10 +101,18 @@ architecture Behavioral of message_decoder is
 begin
     latest_packet       <= packet_in;
 
-    -- Message format 0 -- x_dest | y_dest | multicast_group | done | result | matrix | matrix_x_coord | matrix_y_coord | matrix_element -- (BUS_WIDTH-1)
+    -- Message format 0 -- x_dest | y_dest | multicast_x_coord | multicast_y_coord | done | result | matrix | matrix_x_coord | matrix_y_coord | matrix_element -- (BUS_WIDTH-1)
     x_coord_out         <= latest_packet(X_COORD_END downto X_COORD_START);
     y_coord_out         <= latest_packet(Y_COORD_END downto Y_COORD_START);
-    multicast_group_out <= latest_packet(MULTICAST_GROUP_END downto MULTICAST_GROUP_START);
+    
+    multicast_x_coord   <= latest_packet(MULTICAST_X_COORD_END downto MULTICAST_X_COORD_START);
+    multicast_y_coord   <= latest_packet(MULTICAST_Y_COORD_END downto MULTICAST_Y_COORD_START);
+    multicast_coord_combined    <= multicast_y_coord & multicast_x_coord;
+    
+    with multicast_coord_combined select
+        multicast_group_out <= "0" when "00",
+                               "1" when others;
+    
     done_flag_out       <= latest_packet(DONE_FLAG_BIT);
     result_flag_out     <= latest_packet(RESULT_FLAG_BIT);
     matrix_type_out     <= latest_packet(MATRIX_TYPE_END downto MATRIX_TYPE_START);
