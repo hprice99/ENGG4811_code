@@ -53,6 +53,10 @@ entity fox_node is
         X_COORD         : integer := 0;
         Y_COORD         : integer := 0;
         NODE_NUMBER     : integer := 0;
+        
+        -- Multicast parameters
+        MULTICAST_X_COORD       : integer := 1;
+        MULTICAST_Y_COORD       : integer := 1;
 
         -- Packet parameters
         COORD_BITS              : integer := 2;
@@ -197,8 +201,12 @@ architecture Behavioral of fox_node is
     component message_encoder
         generic (
             COORD_BITS              : integer := 2;
+            
             MULTICAST_GROUP_BITS    : integer := 1;
             MULTICAST_COORD_BITS    : integer := 1;
+            MULTICAST_X_COORD       : integer := 1;
+            MULTICAST_Y_COORD       : integer := 1;
+            
             MATRIX_TYPE_BITS        : integer := 1;
             MATRIX_COORD_BITS       : integer := 8;
             MATRIX_ELEMENT_BITS     : integer := 32;
@@ -245,8 +253,12 @@ architecture Behavioral of fox_node is
     component message_decoder
         generic (
             COORD_BITS              : integer := 2;
+            
             MULTICAST_GROUP_BITS    : integer := 1;
             MULTICAST_COORD_BITS    : integer := 1;
+            MULTICAST_X_COORD       : integer := 1;
+            MULTICAST_Y_COORD       : integer := 1;
+            
             MATRIX_TYPE_BITS        : integer := 1;
             MATRIX_COORD_BITS       : integer := 8;
             MATRIX_ELEMENT_BITS     : integer := 32;
@@ -534,8 +546,12 @@ begin
     ENCODER: message_encoder
         generic map (
             COORD_BITS              => COORD_BITS,
+            
             MULTICAST_GROUP_BITS    => MULTICAST_GROUP_BITS,
             MULTICAST_COORD_BITS    => MULTICAST_COORD_BITS,
+            MULTICAST_X_COORD       => MULTICAST_X_COORD,
+            MULTICAST_Y_COORD       => MULTICAST_Y_COORD,
+            
             MATRIX_TYPE_BITS        => MATRIX_TYPE_BITS,
             MATRIX_COORD_BITS       => MATRIX_COORD_BITS,
             MATRIX_ELEMENT_BITS     => MATRIX_ELEMENT_BITS,
@@ -581,8 +597,12 @@ begin
     DECODER: message_decoder
         generic map (
             COORD_BITS              => COORD_BITS,
+            
             MULTICAST_GROUP_BITS    => MULTICAST_GROUP_BITS,
             MULTICAST_COORD_BITS    => MULTICAST_COORD_BITS,
+            MULTICAST_X_COORD       => MULTICAST_X_COORD,
+            MULTICAST_Y_COORD       => MULTICAST_Y_COORD,
+            
             MATRIX_TYPE_BITS        => MATRIX_TYPE_BITS,
             MATRIX_COORD_BITS       => MATRIX_COORD_BITS,
             MATRIX_ELEMENT_BITS     => MATRIX_ELEMENT_BITS,
