@@ -124,8 +124,9 @@ architecture Behavioral of fox_node is
             Y_COORD                 : integer := 0;
             COORD_BITS              : integer := 1;
             
-            MULTICAST_GROUP_BITS    : integer := 1;
-            MULTICAST_GROUP         : integer := -1;
+            MULTICAST_COORD_BITS    : integer := 1;
+            MULTICAST_X_COORD       : integer := 1;
+            MULTICAST_Y_COORD       : integer := 1;
             USE_MULTICAST           : boolean := False
         );
         Port ( 
@@ -386,17 +387,6 @@ architecture Behavioral of fox_node is
         );
     end component system;
     
-    component pipeline
-        generic (
-            STAGES  : integer := 10
-        );
-        port (
-            clk     : in STD_LOGIC;
-            d_in    : in STD_LOGIC;
-            d_out   : out STD_LOGIC
-        );
-    end component pipeline;
-    
     -- Messages from PE to network
     signal pe_message_out       : STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
     signal pe_message_out_valid : STD_LOGIC;
@@ -468,8 +458,9 @@ begin
             Y_COORD     => Y_COORD,
             COORD_BITS  => COORD_BITS,
             
-            MULTICAST_GROUP_BITS    => 2*MULTICAST_COORD_BITS,
-            MULTICAST_GROUP         => -1,
+            MULTICAST_COORD_BITS    => MULTICAST_COORD_BITS,
+            MULTICAST_X_COORD       => MULTICAST_X_COORD,
+            MULTICAST_Y_COORD       => MULTICAST_Y_COORD,
             USE_MULTICAST           => False
         )
         port map (

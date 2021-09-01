@@ -31,9 +31,9 @@ entity hoplite_router_multicast is
         Y_COORD                 : integer := 0;
         COORD_BITS              : integer := 1;
         
-        -- TODO Use multicast coordinates
-        MULTICAST_GROUP_BITS    : integer := 1;
-        MULTICAST_GROUP         : integer := -1;
+        MULTICAST_COORD_BITS    : integer := 1;
+        MULTICAST_X_COORD       : integer := 1;
+        MULTICAST_Y_COORD       : integer := 1;
         USE_MULTICAST           : boolean := False
     );
     Port ( 
@@ -98,20 +98,25 @@ architecture Behavioral of hoplite_router_multicast is
     constant Y_INDEX_HEADER_START   : integer := X_INDEX_HEADER_END + 1;
     constant Y_INDEX_HEADER_END     : integer := Y_INDEX_HEADER_START + COORD_BITS - 1;
     
-    -- Received packet multicast group
-    constant MULTICAST_GROUP_INDEX_HEADER_START  : integer := Y_INDEX_HEADER_END + 1;
-    constant MULTICAST_GROUP_INDEX_HEADER_END    : integer := MULTICAST_GROUP_INDEX_HEADER_START + MULTICAST_GROUP_BITS - 1;
+    -- Received packet multicast coordinates
+    constant MULTICAST_X_INDEX_HEADER_START  : integer := Y_INDEX_HEADER_END + 1;
+    constant MULTICAST_X_INDEX_HEADER_END    : integer := MULTICAST_X_INDEX_HEADER_START + MULTICAST_COORD_BITS - 1;
     
-    subtype t_MulticastGroup is std_logic_vector((MULTICAST_GROUP_BITS-1) downto 0);
-    signal x_in_multicast_group_d, x_in_multicast_group_q   : t_MulticastGroup;
-    signal y_in_multicast_group_d, y_in_multicast_group_q   : t_MulticastGroup;
-    signal pe_in_multicast_group_d, pe_in_multicast_group_q : t_MulticastGroup;
-    signal multicast_in_multicast_group_d, multicast_in_multicast_group_q   : t_MulticastGroup;
+    constant MULTICAST_Y_INDEX_HEADER_START  : integer := MULTICAST_X_INDEX_HEADER_END + 1;
+    constant MULTICAST_Y_INDEX_HEADER_END    : integer := MULTICAST_Y_INDEX_HEADER_START + MULTICAST_COORD_BITS - 1;
+    
+    subtype t_MulticastCoord is std_logic_vector((MULTICAST_COORD_BITS-1) downto 0);
+    type t_MulticastCoords is array (0 to 1) of t_MulticastCoord;
+    
+    signal x_in_multicast_coord_d, x_in_multicast_coord_q   : t_MulticastCoords;
+    signal y_in_multicast_coord_d, y_in_multicast_coord_q   : t_MulticastCoords;
+    signal pe_in_multicast_coord_d, pe_in_multicast_coord_q : t_MulticastCoords;
+    signal multicast_in_multicast_coord_d, multicast_in_multicast_coord_q   : t_MulticastCoords;
 
 begin
 
-    -- If multicast is to be used, then MULTICAST_GROUP must be positive
-    assert ((USE_MULTICAST = true and MULTICAST_GROUP > 0) or USE_MULTICAST = False) report "MULTICAST_GROUP must be set when USE_MULTICAST is enabled" severity failure;
+    -- If multicast is to be used, then MULTICAST_X_COORD and MULTICAST_Y_COORD must be positive
+    assert ((USE_MULTICAST = true and MULTICAST_X_COORD > 0 and MULTICAST_Y_COORD > 0) or USE_MULTICAST = False) report "MULTICAST_COORDS must be set when USE_MULTICAST is enabled" severity failure;
 
     -- Assign destination coordinates   
     x_in_dest_d(X_INDEX) <= x_d(X_INDEX_HEADER_END downto X_INDEX_HEADER_START);
@@ -123,12 +128,19 @@ begin
     pe_in_dest_d(X_INDEX)   <= pe_d(X_INDEX_HEADER_END downto X_INDEX_HEADER_START);
     pe_in_dest_d(Y_INDEX)   <= pe_d(Y_INDEX_HEADER_END downto Y_INDEX_HEADER_START);
     
-    -- Assign multicast group
-    x_in_multicast_group_d  <= x_d(MULTICAST_GROUP_INDEX_HEADER_END downto MULTICAST_GROUP_INDEX_HEADER_START);
-    y_in_multicast_group_d  <= y_d(MULTICAST_GROUP_INDEX_HEADER_END downto MULTICAST_GROUP_INDEX_HEADER_START);
-    pe_in_multicast_group_d <= pe_d(MULTICAST_GROUP_INDEX_HEADER_END downto MULTICAST_GROUP_INDEX_HEADER_START);
-    multicast_in_multicast_group_d  <= multicast_in_d(MULTICAST_GROUP_INDEX_HEADER_END downto MULTICAST_GROUP_INDEX_HEADER_START);
+    -- Assign multicast coordinates
+    x_in_multicast_coord_d(X_INDEX)  <= x_d(MULTICAST_X_INDEX_HEADER_END downto MULTICAST_X_INDEX_HEADER_START);
+    x_in_multicast_coord_d(Y_INDEX)  <= x_d(MULTICAST_Y_INDEX_HEADER_END downto MULTICAST_Y_INDEX_HEADER_START);
     
+    y_in_multicast_coord_d(X_INDEX)  <= y_d(MULTICAST_X_INDEX_HEADER_END downto MULTICAST_X_INDEX_HEADER_START);
+    y_in_multicast_coord_d(Y_INDEX)  <= y_d(MULTICAST_Y_INDEX_HEADER_END downto MULTICAST_Y_INDEX_HEADER_START);
+    
+    pe_in_multicast_coord_d(X_INDEX)  <= pe_d(MULTICAST_X_INDEX_HEADER_END downto MULTICAST_X_INDEX_HEADER_START);
+    pe_in_multicast_coord_d(Y_INDEX)  <= pe_d(MULTICAST_Y_INDEX_HEADER_END downto MULTICAST_Y_INDEX_HEADER_START);
+    
+    multicast_in_multicast_coord_d(X_INDEX)  <= multicast_in_d(MULTICAST_X_INDEX_HEADER_END downto MULTICAST_X_INDEX_HEADER_START);
+    multicast_in_multicast_coord_d(Y_INDEX)  <= multicast_in_d(MULTICAST_Y_INDEX_HEADER_END downto MULTICAST_Y_INDEX_HEADER_START);
+        
     x_in_valid_d <= x_in_valid;
     y_in_valid_d <= y_in_valid;
     pe_in_valid_d   <= pe_in_valid;
@@ -180,25 +192,33 @@ begin
                 -- pe_out
                 -- Multicast packets can only be sent to the PE through multicast_in
                 if (multicast_in_valid = '1' 
-                        and (USE_MULTICAST = True and to_integer(unsigned(multicast_in_multicast_group_d)) = MULTICAST_GROUP)) then
+                        and (USE_MULTICAST = True 
+                        and to_integer(unsigned(multicast_in_multicast_coord_d(X_INDEX))) = MULTICAST_X_COORD
+                        and to_integer(unsigned(multicast_in_multicast_coord_d(Y_INDEX))) = MULTICAST_Y_COORD)) then
                     pe_out_valid    <= '1';
                     pe_out          <= multicast_in_d;
                 
                 elsif (pe_in_valid = '1' and (to_integer(unsigned(pe_in_dest_d(X_INDEX))) = X_COORD)
                         and (to_integer(unsigned(pe_in_dest_d(Y_INDEX))) = Y_COORD)
-                        and (USE_MULTICAST = false or to_integer(unsigned(pe_in_multicast_group_d)) /= MULTICAST_GROUP)) then
+                        and (USE_MULTICAST = false 
+                        or to_integer(unsigned(pe_in_multicast_coord_d(X_INDEX))) /= MULTICAST_X_COORD 
+                        or to_integer(unsigned(pe_in_multicast_coord_d(Y_INDEX))) /= MULTICAST_Y_COORD)) then
                     pe_out_valid    <= '1';
                     pe_out          <= pe_d;
                 
                 elsif (x_in_valid = '1' and (to_integer(unsigned(x_in_dest_d(X_INDEX))) = X_COORD)
                         and (to_integer(unsigned(x_in_dest_d(Y_INDEX))) = Y_COORD)
-                        and (USE_MULTICAST = false or to_integer(unsigned(x_in_multicast_group_d)) /= MULTICAST_GROUP)) then
+                        and (USE_MULTICAST = false 
+                        or to_integer(unsigned(x_in_multicast_coord_d(X_INDEX))) /= MULTICAST_X_COORD 
+                        or to_integer(unsigned(x_in_multicast_coord_d(Y_INDEX))) /= MULTICAST_Y_COORD)) then
                     pe_out_valid    <= '1'; 
                     pe_out          <= x_d;
                     
                 elsif (y_in_valid = '1' and (to_integer(unsigned(y_in_dest_d(X_INDEX))) = X_COORD)
                         and (to_integer(unsigned(y_in_dest_d(Y_INDEX))) = Y_COORD)
-                        and (USE_MULTICAST = false or to_integer(unsigned(y_in_multicast_group_d)) /= MULTICAST_GROUP)) then
+                        and (USE_MULTICAST = false 
+                        or to_integer(unsigned(y_in_multicast_coord_d(X_INDEX))) /= MULTICAST_X_COORD 
+                        or to_integer(unsigned(y_in_multicast_coord_d(Y_INDEX))) /= MULTICAST_Y_COORD)) then
                     pe_out_valid    <= '1';
                     pe_out          <= y_d;
                 
@@ -208,19 +228,22 @@ begin
                 end if;
                 
                 -- multicast_out
-                if (pe_in_valid = '1' and USE_MULTICAST = true 
-                        and to_integer(unsigned(pe_in_multicast_group_d)) = MULTICAST_GROUP) then
+                if (pe_in_valid = '1' and USE_MULTICAST = True 
+                        and to_integer(unsigned(pe_in_multicast_coord_d(X_INDEX))) = MULTICAST_X_COORD
+                        and to_integer(unsigned(pe_in_multicast_coord_d(Y_INDEX))) = MULTICAST_Y_COORD) then
                     multicast_out_valid     <= '1'; 
                     multicast_out           <= pe_d;
                 
-                elsif (x_in_valid = '1' and USE_MULTICAST = true 
-                        and to_integer(unsigned(x_in_multicast_group_d)) = MULTICAST_GROUP) then
+                elsif (x_in_valid = '1' and USE_MULTICAST = True 
+                        and to_integer(unsigned(x_in_multicast_coord_d(X_INDEX))) = MULTICAST_X_COORD
+                        and to_integer(unsigned(x_in_multicast_coord_d(Y_INDEX))) = MULTICAST_Y_COORD) then
                     multicast_out_valid     <= '1'; 
                     multicast_out           <= x_d;
                     
                 -- TODO Ensure that re-routed multicast packet is kept within the scope of the multicast group
-                elsif (y_in_valid = '1' and USE_MULTICAST = true 
-                        and to_integer(unsigned(y_in_multicast_group_d)) = MULTICAST_GROUP) then
+                elsif (y_in_valid = '1' and USE_MULTICAST = True 
+                        and to_integer(unsigned(y_in_multicast_coord_d(X_INDEX))) = MULTICAST_X_COORD
+                        and to_integer(unsigned(y_in_multicast_coord_d(Y_INDEX))) = MULTICAST_Y_COORD) then
                     multicast_out_valid    <= '1';
                     multicast_out          <= y_d;
                 
@@ -236,10 +259,10 @@ begin
     x_out <= x_q;
     y_out <= y_q;
 
-     NEXT_VALID: process (x_in_valid_d, x_in_dest_d, x_in_multicast_group_d,
-                            y_in_valid_d, y_in_dest_d, y_in_multicast_group_d,
-                            pe_in_valid_d, pe_in_dest_d, pe_in_multicast_group_d,
-                            multicast_in_valid_d, multicast_in_multicast_group_d)
+     NEXT_VALID: process (x_in_valid_d, x_in_dest_d, x_in_multicast_coord_d,
+                            y_in_valid_d, y_in_dest_d, y_in_multicast_coord_d,
+                            pe_in_valid_d, pe_in_dest_d, pe_in_multicast_coord_d,
+                            multicast_in_valid_d, multicast_in_multicast_coord_d)
      begin
         x_next  <= '0';
         y_next  <= '0';
@@ -247,12 +270,16 @@ begin
         -- Only route multicast packets out of multicast_out
         if (x_in_valid_d = '1' and ((to_integer(unsigned(x_in_dest_d(X_INDEX))) /= X_COORD)
                 or (to_integer(unsigned(x_in_dest_d(Y_INDEX))) /= Y_COORD))
-                and (USE_MULTICAST = true and to_integer(unsigned(x_in_multicast_group_d)) = MULTICAST_GROUP)) then
+                and (USE_MULTICAST = True 
+                and to_integer(unsigned(multicast_in_multicast_coord_d(X_INDEX))) = MULTICAST_X_COORD
+                and to_integer(unsigned(multicast_in_multicast_coord_d(Y_INDEX))) = MULTICAST_Y_COORD)) then
             x_next <= '0';
             
         elsif (pe_in_valid_d = '1' and ((to_integer(unsigned(pe_in_dest_d(X_INDEX))) /= X_COORD)
                 or (to_integer(unsigned(pe_in_dest_d(Y_INDEX))) /= Y_COORD))
-                and (USE_MULTICAST = true and to_integer(unsigned(pe_in_multicast_group_d)) = MULTICAST_GROUP)) then
+                and (USE_MULTICAST = True 
+                and to_integer(unsigned(pe_in_multicast_coord_d(X_INDEX))) = MULTICAST_X_COORD
+                and to_integer(unsigned(pe_in_multicast_coord_d(Y_INDEX))) = MULTICAST_Y_COORD)) then
             x_next <= '0';
 
         elsif (x_in_valid_d = '1' and ((to_integer(unsigned(x_in_dest_d(X_INDEX))) /= X_COORD)
@@ -271,12 +298,16 @@ begin
         -- Only route multicast packet out of y_out if multicast_out is already used
         if (y_in_valid_d = '0' and x_in_valid_d = '1' and ((to_integer(unsigned(x_in_dest_d(X_INDEX))) /= X_COORD)
                 or (to_integer(unsigned(x_in_dest_d(Y_INDEX))) /= Y_COORD))
-                and (USE_MULTICAST = true and to_integer(unsigned(x_in_multicast_group_d)) = MULTICAST_GROUP)) then
+                and (USE_MULTICAST = True 
+                and to_integer(unsigned(x_in_multicast_coord_d(X_INDEX))) = MULTICAST_X_COORD
+                and to_integer(unsigned(x_in_multicast_coord_d(Y_INDEX))) = MULTICAST_Y_COORD)) then
             y_next <= '0';
             
         elsif (pe_in_valid_d = '1' and ((to_integer(unsigned(pe_in_dest_d(X_INDEX))) /= X_COORD)
                 or (to_integer(unsigned(pe_in_dest_d(Y_INDEX))) /= Y_COORD))
-                and (USE_MULTICAST = true and to_integer(unsigned(pe_in_multicast_group_d)) = MULTICAST_GROUP)) then
+                and (USE_MULTICAST = True 
+                and to_integer(unsigned(pe_in_multicast_coord_d(X_INDEX))) = MULTICAST_X_COORD
+                and to_integer(unsigned(pe_in_multicast_coord_d(Y_INDEX))) = MULTICAST_Y_COORD)) then
             y_next <= '0';
         
         -- Switch y_out to act as pe_out
@@ -289,7 +320,9 @@ begin
                 y_next <= '1';
             -- multicast_in is destined for the PE, so y_in must be deflected
             elsif (multicast_in_valid = '1' 
-                        and (USE_MULTICAST = True and to_integer(unsigned(multicast_in_multicast_group_d)) = MULTICAST_GROUP)) then
+                        and (USE_MULTICAST = True 
+                        and to_integer(unsigned(multicast_in_multicast_coord_d(X_INDEX))) = MULTICAST_X_COORD
+                        and to_integer(unsigned(multicast_in_multicast_coord_d(Y_INDEX))) = MULTICAST_Y_COORD)) then
                 y_next <= '1';
             else
                 y_next <= '0';
@@ -300,10 +333,13 @@ begin
                 
             -- multicast_in is destined for the PE, so y_in must be deflected
             if (multicast_in_valid = '1' 
-                        and (USE_MULTICAST = True and to_integer(unsigned(multicast_in_multicast_group_d)) = MULTICAST_GROUP)) then
+                        and (USE_MULTICAST = True 
+                        and to_integer(unsigned(multicast_in_multicast_coord_d(X_INDEX))) = MULTICAST_X_COORD
+                        and to_integer(unsigned(multicast_in_multicast_coord_d(Y_INDEX))) = MULTICAST_Y_COORD)) then
                 
                 -- Route y_in out of multicast_out only 
-                if (to_integer(unsigned(y_in_multicast_group_d)) = MULTICAST_GROUP) then
+                if (to_integer(unsigned(y_in_multicast_coord_d(X_INDEX))) = MULTICAST_X_COORD
+                    and to_integer(unsigned(y_in_multicast_coord_d(Y_INDEX))) = MULTICAST_Y_COORD) then
                     y_next <= '0';
                 else
                     y_next <= '1';
@@ -315,7 +351,8 @@ begin
         elsif (y_in_valid_d = '1' and ((to_integer(unsigned(y_in_dest_d(X_INDEX))) /= X_COORD)
                 or (to_integer(unsigned(y_in_dest_d(Y_INDEX))) /= Y_COORD))) then
             -- Route y_in out of multicast_out only 
-            if (to_integer(unsigned(y_in_multicast_group_d)) = MULTICAST_GROUP) then
+            if (to_integer(unsigned(y_in_multicast_coord_d(X_INDEX))) = MULTICAST_X_COORD
+                    and to_integer(unsigned(y_in_multicast_coord_d(Y_INDEX))) = MULTICAST_Y_COORD) then
                 y_next <= '0';
             else
                 y_next <= '1';
@@ -330,7 +367,9 @@ begin
             
             -- multicast_in is destined for the PE, so y_in must be deflected
             if (multicast_in_valid = '1' 
-                        and (USE_MULTICAST = True and to_integer(unsigned(multicast_in_multicast_group_d)) = MULTICAST_GROUP)) then
+                    and (USE_MULTICAST = True 
+                    and to_integer(unsigned(multicast_in_multicast_coord_d(X_INDEX))) = MULTICAST_X_COORD
+                    and to_integer(unsigned(multicast_in_multicast_coord_d(Y_INDEX))) = MULTICAST_Y_COORD)) then
                 y_next <= '1';
             else
                 y_next <= '0';
