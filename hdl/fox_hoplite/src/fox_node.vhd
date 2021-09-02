@@ -57,6 +57,7 @@ entity fox_node is
         -- Packet parameters
         COORD_BITS              : integer := 2;
         MULTICAST_GROUP_BITS    : integer := 1;
+        MULTICAST_COORD_BITS    : integer := 1;
         MATRIX_TYPE_BITS        : integer := 1;
         MATRIX_COORD_BITS       : integer := 8;
         MATRIX_ELEMENT_BITS     : integer := 32;
@@ -181,6 +182,7 @@ architecture Behavioral of fox_node is
         generic (
             COORD_BITS              : integer := 2;
             MULTICAST_GROUP_BITS    : integer := 1;
+            MULTICAST_COORD_BITS    : integer := 1;
             MATRIX_TYPE_BITS        : integer := 1;
             MATRIX_COORD_BITS       : integer := 8;
             MATRIX_ELEMENT_BITS     : integer := 32;
@@ -228,6 +230,7 @@ architecture Behavioral of fox_node is
         generic (
             COORD_BITS              : integer := 2;
             MULTICAST_GROUP_BITS    : integer := 1;
+            MULTICAST_COORD_BITS    : integer := 1;
             MATRIX_TYPE_BITS        : integer := 1;
             MATRIX_COORD_BITS       : integer := 8;
             MATRIX_ELEMENT_BITS     : integer := 32;
@@ -508,6 +511,7 @@ begin
         generic map (
             COORD_BITS              => COORD_BITS,
             MULTICAST_GROUP_BITS    => MULTICAST_GROUP_BITS,
+            MULTICAST_COORD_BITS    => MULTICAST_COORD_BITS,
             MATRIX_TYPE_BITS        => MATRIX_TYPE_BITS,
             MATRIX_COORD_BITS       => MATRIX_COORD_BITS,
             MATRIX_ELEMENT_BITS     => MATRIX_ELEMENT_BITS,
@@ -554,6 +558,7 @@ begin
         generic map (
             COORD_BITS              => COORD_BITS,
             MULTICAST_GROUP_BITS    => MULTICAST_GROUP_BITS,
+            MULTICAST_COORD_BITS    => MULTICAST_COORD_BITS,
             MATRIX_TYPE_BITS        => MATRIX_TYPE_BITS,
             MATRIX_COORD_BITS       => MATRIX_COORD_BITS,
             MATRIX_ELEMENT_BITS     => MATRIX_ELEMENT_BITS,
