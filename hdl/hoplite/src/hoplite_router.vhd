@@ -43,19 +43,23 @@ entity hoplite_router is
     Port ( 
         clk             : in STD_LOGIC;
         reset_n         : in STD_LOGIC;
+        
+        -- Input
         x_in            : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
         x_in_valid      : in STD_LOGIC;
         y_in            : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
         y_in_valid      : in STD_LOGIC;
         pe_in           : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
         pe_in_valid     : in STD_LOGIC;
+        pe_backpressure : out STD_LOGIC;
+        
+        -- Output
         x_out           : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
         x_out_valid     : out STD_LOGIC;
         y_out           : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
         y_out_valid     : out STD_LOGIC;
         pe_out          : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
-        pe_out_valid    : out STD_LOGIC;
-        pe_backpressure : out STD_LOGIC
+        pe_out_valid    : out STD_LOGIC
     );
 end hoplite_router;
 
@@ -78,6 +82,23 @@ architecture Behavioral of hoplite_router is
     
     constant Y_INDEX_HEADER_START   : integer := COORD_BITS;
     constant Y_INDEX_HEADER_END     : integer := 2*COORD_BITS-1;
+    
+    -- Determine if the packet received is destined for this node
+    impure function is_valid_packet_in (packet_in_coord : in t_Coordinate; 
+                                        packet_in_valid : in std_logic) 
+                                        return boolean is
+        variable is_valid   : boolean;  
+    begin
+        if (packet_in_valid = '1'
+                and to_integer(unsigned(packet_in_coord(X_INDEX))) = X_COORD 
+                and to_integer(unsigned(packet_in_coord(Y_INDEX))) = Y_COORD) then
+            is_valid    := True;   
+        else
+            is_valid    := False; 
+        end if;
+        
+        return is_valid;
+    end function is_valid_packet_in;
 
 begin
 
@@ -91,8 +112,8 @@ begin
     pe_in_dest_d(X_INDEX) <= pe_d(X_INDEX_HEADER_END downto X_INDEX_HEADER_START);
     pe_in_dest_d(Y_INDEX) <= pe_d(Y_INDEX_HEADER_END downto Y_INDEX_HEADER_START);
     
-    x_in_valid_d <= x_in_valid;
-    y_in_valid_d <= y_in_valid;
+    x_in_valid_d    <= x_in_valid;
+    y_in_valid_d    <= y_in_valid;
     pe_in_valid_d   <= pe_in_valid;
 
     -- Output routing
@@ -133,18 +154,15 @@ begin
                 x_q <= x_d;
                 y_q <= y_d;
                
-                if (pe_in_valid = '1' and (to_integer(unsigned(pe_in_dest_d(X_INDEX))) = X_COORD)
-                        and (to_integer(unsigned(pe_in_dest_d(Y_INDEX))) = Y_COORD)) then
+                if (is_valid_packet_in(pe_in_dest_d, pe_in_valid) = True) then
                     pe_out_valid    <= '1'; 
                     pe_out          <= pe_d;
                
-                elsif (x_in_valid = '1' and (to_integer(unsigned(x_in_dest_d(X_INDEX))) = X_COORD)
-                        and (to_integer(unsigned(x_in_dest_d(Y_INDEX))) = Y_COORD)) then
+                elsif (is_valid_packet_in(x_in_dest_d, x_in_valid) = True) then
                     pe_out_valid    <= '1'; 
                     pe_out          <= x_d;
                     
-                elsif (y_in_valid = '1' and (to_integer(unsigned(y_in_dest_d(X_INDEX))) = X_COORD)
-                        and (to_integer(unsigned(y_in_dest_d(Y_INDEX))) = Y_COORD)) then
+                elsif (is_valid_packet_in(y_in_dest_d, y_in_valid) = True) then
                     pe_out_valid    <= '1';
                     pe_out          <= y_d;
                 
@@ -160,87 +178,45 @@ begin
     x_out <= x_q;
     y_out <= y_q;
 
-     NEXT_VALID: process (x_in_valid_d, y_in_valid_d, x_in_dest_d, y_in_dest_d, pe_in_valid, pe_in_dest_d)
+     NEXT_VALID: process (x_in_valid_d, y_in_valid_d, x_in_dest_d, y_in_dest_d, pe_in_valid_d, pe_in_dest_d)
      begin
         x_next  <= '0';
         y_next  <= '0';
      
-        if (x_in_valid_d = '1' and ((to_integer(unsigned(x_in_dest_d(X_INDEX))) /= X_COORD)
-                or (to_integer(unsigned(x_in_dest_d(Y_INDEX))) /= Y_COORD))) then
+        if (x_in_valid_d = '1' and is_valid_packet_in(x_in_dest_d, x_in_valid) = False) then
             x_next <= '1';
-        elsif (pe_in_valid = '1' and (to_integer(unsigned(pe_in_dest_d(X_INDEX))) = X_COORD)
-                and (to_integer(unsigned(pe_in_dest_d(Y_INDEX))) = Y_COORD)) then
+        elsif (pe_in_valid_d = '1' and is_valid_packet_in(pe_in_dest_d, pe_in_valid_d) = True) then
             x_next <= '0';
         else
-            x_next <= pe_in_valid;
+            x_next <= pe_in_valid_d;
         end if;
         
         -- Switch y_out to act as pe_out
-        if (x_in_valid_d = '1' and (to_integer(unsigned(x_in_dest_d(X_INDEX))) = X_COORD)
-                and (to_integer(unsigned(x_in_dest_d(Y_INDEX))) = Y_COORD)) then
+        if (x_in_valid_d = '1' and is_valid_packet_in(x_in_dest_d, x_in_valid_d) = True) then
             -- Both x_in and y_in are destined for the PE, so y_in must be deflected
-            if (y_in_valid_d = '1' and (to_integer(unsigned(y_in_dest_d(X_INDEX))) = X_COORD)
-                    and (to_integer(unsigned(y_in_dest_d(Y_INDEX))) = Y_COORD)) then
+            if (y_in_valid_d = '1' and is_valid_packet_in(y_in_dest_d, y_in_valid_d) = True) then
                 y_next <= '1';
             else
                 y_next <= '0';
             end if;
             
-        elsif (y_in_valid_d = '1' and (to_integer(unsigned(y_in_dest_d(X_INDEX))) = X_COORD)
-                and (to_integer(unsigned(y_in_dest_d(Y_INDEX))) = Y_COORD)) then
+        elsif (y_in_valid_d = '1' and is_valid_packet_in(y_in_dest_d, y_in_valid_d) = True) then
             y_next <= '0';
             
-        elsif (y_in_valid_d = '1' and ((to_integer(unsigned(y_in_dest_d(X_INDEX))) /= X_COORD)
-                or (to_integer(unsigned(y_in_dest_d(Y_INDEX))) /= Y_COORD))) then
+        elsif (y_in_valid_d = '1' and is_valid_packet_in(y_in_dest_d, y_in_valid_d) = False) then
             y_next <= '1';
             
-        elsif (x_in_valid_d = '1' and ((to_integer(unsigned(x_in_dest_d(X_INDEX))) /= X_COORD)
-                or (to_integer(unsigned(x_in_dest_d(Y_INDEX))) /= Y_COORD))) then
+        elsif (x_in_valid_d = '1' and is_valid_packet_in(x_in_dest_d, x_in_valid_d) = False) then
             y_next <= '1';
         
-        elsif (pe_in_valid = '1' and (to_integer(unsigned(pe_in_dest_d(X_INDEX))) = X_COORD)
-                and (to_integer(unsigned(pe_in_dest_d(Y_INDEX))) = Y_COORD)) then
+        elsif (pe_in_valid_d = '1' and is_valid_packet_in(pe_in_dest_d, pe_in_valid_d) = True) then
             y_next <= '0';
             
         else
-            y_next <= pe_in_valid;
+            y_next <= pe_in_valid_d;
             
         end if;
     end process NEXT_VALID;
-    
---    NEXT_VALID: process (clk)
---    begin
---        if (rising_edge(clk) and reset_n = '1') then
---            if (x_in_valid_d = '1' and ((to_integer(unsigned(x_in_dest_d(X_INDEX))) /= X_COORD)
---                    or (to_integer(unsigned(x_in_dest_d(Y_INDEX))) /= Y_COORD))) then
---                x_next <= '1';
---            else
---                x_next <= pe_in_valid;
---            end if;
-            
---            -- Switch y_out to act as pe_out
---            if (x_in_valid_d = '1' and (to_integer(unsigned(x_in_dest_d(X_INDEX))) = X_COORD)
---                    and (to_integer(unsigned(x_in_dest_d(Y_INDEX))) = Y_COORD)) then
---                y_next <= '0';
-                
---            elsif (y_in_valid_d = '1' and (to_integer(unsigned(y_in_dest_d(X_INDEX))) = X_COORD)
---                    and (to_integer(unsigned(y_in_dest_d(Y_INDEX))) = Y_COORD)) then
---                y_next <= '0';
-                
---            elsif (y_in_valid_d = '1' and ((to_integer(unsigned(y_in_dest_d(X_INDEX))) /= X_COORD)
---                    or (to_integer(unsigned(y_in_dest_d(Y_INDEX))) /= Y_COORD))) then
---                y_next <= '1';
-                
---            elsif (x_in_valid_d = '1' and ((to_integer(unsigned(x_in_dest_d(X_INDEX))) /= X_COORD)
---                    or (to_integer(unsigned(x_in_dest_d(Y_INDEX))) /= Y_COORD))) then
---                y_next <= '1';
-                
---            else
---                y_next <= pe_in_valid;
-                
---            end if;
---        end if;
---    end process NEXT_VALID;
     
     -- Valid signal routing    
     OUTPUT_VALID_FF: process(clk)
