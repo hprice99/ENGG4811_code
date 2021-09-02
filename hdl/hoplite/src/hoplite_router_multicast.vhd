@@ -113,6 +113,23 @@ architecture Behavioral of hoplite_router_multicast is
     signal pe_in_multicast_coord_d, pe_in_multicast_coord_q : t_MulticastCoords;
     signal multicast_in_multicast_coord_d, multicast_in_multicast_coord_q   : t_MulticastCoords;
     
+    -- Determine if the packet received is destined for this node
+    impure function is_valid_packet_in (packet_in_coord : in t_Coordinate; 
+                                        packet_in_valid : in std_logic) 
+                                        return boolean is
+        variable is_valid   : boolean;  
+    begin
+        if (packet_in_valid = '1'
+                and to_integer(unsigned(packet_in_coord(X_INDEX))) = X_COORD 
+                and to_integer(unsigned(packet_in_coord(Y_INDEX))) = Y_COORD) then
+            is_valid    := True;   
+        else
+            is_valid    := False; 
+        end if;
+        
+        return is_valid;
+    end function is_valid_packet_in;
+    
     -- Determine if the packet received is a multicast packet destined for this node
     impure function is_valid_multicast_in (packet_in_multicast_coord : in t_MulticastCoords; 
                                         packet_in_valid : in std_logic) 
@@ -231,20 +248,17 @@ begin
                     pe_out_valid    <= '1';
                     pe_out          <= multicast_in_d;
                 
-                elsif (pe_in_valid = '1' and to_integer(unsigned(pe_in_dest_d(X_INDEX))) = X_COORD
-                        and to_integer(unsigned(pe_in_dest_d(Y_INDEX))) = Y_COORD
+                elsif (is_valid_packet_in(pe_in_dest_d, pe_in_valid) = True
                         and is_valid_multicast_in(pe_in_multicast_coord_d, pe_in_valid) = False) then
                     pe_out_valid    <= '1';
                     pe_out          <= pe_d;
                 
-                elsif (x_in_valid = '1' and (to_integer(unsigned(x_in_dest_d(X_INDEX))) = X_COORD)
-                        and (to_integer(unsigned(x_in_dest_d(Y_INDEX))) = Y_COORD)
+                elsif (is_valid_packet_in(x_in_dest_d, x_in_valid) = True
                         and is_valid_multicast_in(x_in_multicast_coord_d, x_in_valid) = False) then
                     pe_out_valid    <= '1'; 
                     pe_out          <= x_d;
                     
-                elsif (y_in_valid = '1' and (to_integer(unsigned(y_in_dest_d(X_INDEX))) = X_COORD)
-                        and (to_integer(unsigned(y_in_dest_d(Y_INDEX))) = Y_COORD)
+                elsif (is_valid_packet_in(y_in_dest_d, y_in_valid) = True
                         and is_valid_multicast_in(y_in_multicast_coord_d, y_in_valid) = False) then
                     pe_out_valid    <= '1';
                     pe_out          <= y_d;
@@ -289,22 +303,18 @@ begin
         y_next  <= '0';
      
         -- Only route multicast packets out of multicast_out
-        if (x_in_valid_d = '1' and ((to_integer(unsigned(x_in_dest_d(X_INDEX))) /= X_COORD)
-                or (to_integer(unsigned(x_in_dest_d(Y_INDEX))) /= Y_COORD))
+        if (x_in_valid_d = '1' and is_valid_packet_in(x_in_dest_d, x_in_valid_d) = False
                 and is_valid_multicast_in(multicast_in_multicast_coord_d, multicast_in_valid_d) = True) then
             x_next <= '0';
             
-        elsif (pe_in_valid_d = '1' and ((to_integer(unsigned(pe_in_dest_d(X_INDEX))) /= X_COORD)
-                or (to_integer(unsigned(pe_in_dest_d(Y_INDEX))) /= Y_COORD))
+        elsif (pe_in_valid_d = '1' and is_valid_packet_in(pe_in_dest_d, pe_in_valid_d) = False
                 and is_valid_multicast_in(pe_in_multicast_coord_d, pe_in_valid_d) = True) then
             x_next <= '0';
 
-        elsif (x_in_valid_d = '1' and ((to_integer(unsigned(x_in_dest_d(X_INDEX))) /= X_COORD)
-                or (to_integer(unsigned(x_in_dest_d(Y_INDEX))) /= Y_COORD))) then
+        elsif (x_in_valid_d = '1' and is_valid_packet_in(x_in_dest_d, x_in_valid_d) = False) then
             x_next <= '1';
             
-        elsif (pe_in_valid_d = '1' and (to_integer(unsigned(pe_in_dest_d(X_INDEX))) = X_COORD)
-                and (to_integer(unsigned(pe_in_dest_d(Y_INDEX))) = Y_COORD)) then
+        elsif (pe_in_valid_d = '1' and is_valid_packet_in(pe_in_dest_d, pe_in_valid_d) = True) then
             x_next <= '0';
             
         else
@@ -313,23 +323,19 @@ begin
         end if;
         
         -- Only route multicast packet out of y_out if multicast_out is already used
-        if (y_in_valid_d = '0' and x_in_valid_d = '1' and ((to_integer(unsigned(x_in_dest_d(X_INDEX))) /= X_COORD)
-                or (to_integer(unsigned(x_in_dest_d(Y_INDEX))) /= Y_COORD))
+        if (y_in_valid_d = '0' and x_in_valid_d = '1' and is_valid_packet_in(x_in_dest_d, x_in_valid_d) = False
                 and is_valid_multicast_in(x_in_multicast_coord_d, x_in_valid_d) = True) then
             y_next <= '0';
             
-        elsif (pe_in_valid_d = '1' and ((to_integer(unsigned(pe_in_dest_d(X_INDEX))) /= X_COORD)
-                or (to_integer(unsigned(pe_in_dest_d(Y_INDEX))) /= Y_COORD))
+        elsif (pe_in_valid_d = '1' and is_valid_packet_in(pe_in_dest_d, pe_in_valid_d) = False
                 and is_valid_multicast_in(pe_in_multicast_coord_d, pe_in_valid_d) = True) then
             y_next <= '0';
         
         -- Switch y_out to act as pe_out
-        elsif (x_in_valid_d = '1' and (to_integer(unsigned(x_in_dest_d(X_INDEX))) = X_COORD)
-                and (to_integer(unsigned(x_in_dest_d(Y_INDEX))) = Y_COORD)) then
+        elsif (x_in_valid_d = '1' and is_valid_packet_in(x_in_dest_d, x_in_valid_d) = True) then
                 
             -- Both x_in and y_in are destined for the PE, so y_in must be deflected
-            if (y_in_valid_d = '1' and (to_integer(unsigned(y_in_dest_d(X_INDEX))) = X_COORD)
-                    and (to_integer(unsigned(y_in_dest_d(Y_INDEX))) = Y_COORD)) then
+            if (y_in_valid_d = '1' and is_valid_packet_in(y_in_dest_d, y_in_valid_d) = True) then
                 y_next <= '1';
             -- multicast_in is destined for the PE, so y_in must be deflected
             elsif (multicast_in_valid_d = '1' 
@@ -339,8 +345,7 @@ begin
                 y_next <= '0';
             end if;
             
-        elsif (y_in_valid_d = '1' and (to_integer(unsigned(y_in_dest_d(X_INDEX))) = X_COORD)
-                and (to_integer(unsigned(y_in_dest_d(Y_INDEX))) = Y_COORD)) then
+        elsif (y_in_valid_d = '1' and is_valid_packet_in(y_in_dest_d, y_in_valid_d) = True) then
                 
             -- multicast_in is destined for the PE, so y_in must be deflected
             if (multicast_in_valid_d = '1' 
@@ -356,8 +361,7 @@ begin
                 y_next <= '0';
             end if;
             
-        elsif (y_in_valid_d = '1' and ((to_integer(unsigned(y_in_dest_d(X_INDEX))) /= X_COORD)
-                or (to_integer(unsigned(y_in_dest_d(Y_INDEX))) /= Y_COORD))) then
+        elsif (y_in_valid_d = '1' and is_valid_packet_in(y_in_dest_d, y_in_valid_d) = False) then
             -- Route y_in out of multicast_out only 
             if (is_valid_multicast_in(y_in_multicast_coord_d, y_in_valid_d) = True) then
                 y_next <= '0';
@@ -365,12 +369,10 @@ begin
                 y_next <= '1';
             end if;  
             
-        elsif (x_in_valid_d = '1' and ((to_integer(unsigned(x_in_dest_d(X_INDEX))) /= X_COORD)
-                or (to_integer(unsigned(x_in_dest_d(Y_INDEX))) /= Y_COORD))) then
+        elsif (x_in_valid_d = '1' and is_valid_packet_in(x_in_dest_d, x_in_valid_d) = False) then
             y_next <= '1';
         
-        elsif (pe_in_valid_d = '1' and (to_integer(unsigned(pe_in_dest_d(X_INDEX))) = X_COORD)
-                and (to_integer(unsigned(pe_in_dest_d(Y_INDEX))) = Y_COORD)) then
+        elsif (pe_in_valid_d = '1' and is_valid_packet_in(pe_in_dest_d, pe_in_valid_d) = True) then
             
             -- multicast_in is destined for the PE, so y_in must be deflected
             if (multicast_in_valid_d = '1' 
