@@ -130,6 +130,24 @@ architecture Behavioral of hoplite_router_multicast is
         
         return is_multicast;
     end function is_valid_multicast_in;
+    
+    -- Determine if the packet sent must be sent out as a multicast packet
+    impure function is_valid_multicast_out (packet_out_multicast_coord : in t_MulticastCoords; 
+                                            packet_out_valid : in std_logic) 
+                                            return boolean is
+        variable is_multicast   : boolean;  
+    begin
+        if (USE_MULTICAST = True
+                and packet_out_valid = '1'
+                and to_integer(unsigned(packet_out_multicast_coord(X_INDEX))) /= 0 
+                and to_integer(unsigned(packet_out_multicast_coord(Y_INDEX))) /= 0) then
+            is_multicast    := True;   
+        else
+            is_multicast    := False; 
+        end if;
+        
+        return is_multicast;
+    end function is_valid_multicast_out;
 
 begin
 
@@ -237,23 +255,16 @@ begin
                 end if;
                 
                 -- multicast_out
-                -- TODO Route multicast_out whenever multicast_coord /= (0, 0)
-                if (pe_in_valid = '1' and USE_MULTICAST = True 
-                        and to_integer(unsigned(pe_in_multicast_coord_d(X_INDEX))) = MULTICAST_X_COORD
-                        and to_integer(unsigned(pe_in_multicast_coord_d(Y_INDEX))) = MULTICAST_Y_COORD) then
+                if (is_valid_multicast_out(pe_in_multicast_coord_d, pe_in_valid) = True) then
                     multicast_out_valid     <= '1'; 
                     multicast_out           <= pe_d;
                 
-                elsif (x_in_valid = '1' and USE_MULTICAST = True 
-                        and to_integer(unsigned(x_in_multicast_coord_d(X_INDEX))) = MULTICAST_X_COORD
-                        and to_integer(unsigned(x_in_multicast_coord_d(Y_INDEX))) = MULTICAST_Y_COORD) then
+                elsif (is_valid_multicast_out(x_in_multicast_coord_d, x_in_valid) = True) then
                     multicast_out_valid     <= '1'; 
                     multicast_out           <= x_d;
                     
                 -- TODO Ensure that re-routed multicast packet is kept within the scope of the multicast group
-                elsif (y_in_valid = '1' and USE_MULTICAST = True 
-                        and to_integer(unsigned(y_in_multicast_coord_d(X_INDEX))) = MULTICAST_X_COORD
-                        and to_integer(unsigned(y_in_multicast_coord_d(Y_INDEX))) = MULTICAST_Y_COORD) then
+                elsif (is_valid_multicast_out(y_in_multicast_coord_d, y_in_valid) = True) then
                     multicast_out_valid    <= '1';
                     multicast_out          <= y_d;
                 
