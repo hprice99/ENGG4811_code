@@ -203,7 +203,7 @@ class FoxNetwork:
     '''
     Generate VHDL package containing network parameters
     '''
-    def write_header_file(self, fileName="fox_defs.vhd"):
+    def write_network_header_file(self, fileName="fox_defs.vhd"):
         from jinja2 import Environment, FileSystemLoader
         import os
 
@@ -223,6 +223,12 @@ class FoxNetwork:
         headerFile = open(headerFileName, 'w')
         headerFile.write(output)
         headerFile.close()
+    
+    '''
+    Generate VHDL package containing packet format
+    '''
+    def write_packet_header_file(self, fileName="packet_defs.vhd"):
+        self.packetFormat.write_header_file(hdlFolder=self.hdlFolder, fileName=fileName)
 
     '''
     Write matrix config files
