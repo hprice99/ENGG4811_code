@@ -8,7 +8,7 @@ use xil_defaultlib.packet_defs.all;
 package multicast_defs is 
 
     -- Constants
-    constant MULTICAST_CLUSTER_NODES    : integer := 2;
+    constant MULTICAST_CLUSTER_NODES    : integer := {{ multicastConfig.multicastClusterNodes }};
 
     -- Custom types
     type t_MulticastClusterPackets is array (0 to (MULTICAST_CLUSTER_NODES-1)) of std_logic_vector((BUS_WIDTH-1) downto 0);

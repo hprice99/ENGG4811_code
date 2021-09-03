@@ -18,3 +18,7 @@ packetFormat:
   matrixElementBits: 32
 
 useMatrixInitFile: True
+
+useMulticast: True
+multicastConfig:
+  multicastClusterNodes: 2

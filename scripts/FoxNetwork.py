@@ -5,6 +5,7 @@ import os
 from numpy.matrixlib.defmatrix import matrix
 
 from FoxPacket import *
+from MulticastConfig import *
 from Firmware import *
 
 class FoxNetwork:
@@ -13,7 +14,8 @@ class FoxNetwork:
             multicastCoordBits, \
             doneFlagBits, resultFlagBits, matrixTypeBits, matrixCoordBits, \
             foxFirmware, resultFirmware, A=None, B=None, \
-            useMatrixInitFile=True, hdlFolder=None, firmwareFolder=None):
+            useMatrixInitFile=True, useMulticast, multicastClusterNodes, \
+            hdlFolder=None, firmwareFolder=None):
 
         # Entire network details
         self.networkRows = networkRows
@@ -54,6 +56,13 @@ class FoxNetwork:
 
         self.foxFirmware = foxFirmware
         self.resultFirmware = resultFirmware
+
+        self.useMulticast = useMulticast
+
+        if self.useMulticast == True:
+            self.multicastConfig = MulticastConfig(multicastClusterNodes=multicastClusterNodes)
+        else:
+            self.multicastConfig = None
 
         if hdlFolder is None:
             raise Exception("HDL folder not given")
@@ -203,18 +212,15 @@ class FoxNetwork:
     '''
     Generate VHDL package containing network parameters
     '''
-    def write_header_file(self, fileName="fox_defs.vhd"):
+    def write_network_header_file(self, fileName="fox_defs.vhd"):
         from jinja2 import Environment, FileSystemLoader
         import os
 
         scriptLocation = os.path.realpath(__file__)
         scriptDirectory = os.path.dirname(scriptLocation)
         fileLoader = FileSystemLoader('{directory}/templates'.format(directory=scriptDirectory))
-
-        # fileLoader = FileSystemLoader('templates')
         env = Environment(loader=fileLoader, trim_blocks=True, lstrip_blocks=True)
 
-        # TODO Separate packet format from Fox's algorithm details
         template = env.get_template('fox_defs.vhd')
         output = template.render(foxNetwork=self)
 
@@ -223,6 +229,19 @@ class FoxNetwork:
         headerFile = open(headerFileName, 'w')
         headerFile.write(output)
         headerFile.close()
+    
+    '''
+    Generate VHDL package containing packet format
+    '''
+    def write_packet_header_file(self, fileName="packet_defs.vhd"):
+        self.packetFormat.write_header_file(hdlFolder=self.hdlFolder, fileName=fileName)
+
+    '''
+    Generate VHDL package containing multicast configuration
+    '''
+    def write_multicast_header_file(self, fileName="multicast_defs.vhd"):
+        if self.multicastConfig is not None:
+            self.multicastConfig.write_header_file(hdlFolder=self.hdlFolder, fileName=fileName)
 
     '''
     Write matrix config files

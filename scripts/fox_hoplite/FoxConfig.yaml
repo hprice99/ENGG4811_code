@@ -18,3 +18,5 @@ packetFormat:
   matrixElementBits: 32
 
 useMatrixInitFile: True
+
+useMulticast: False
