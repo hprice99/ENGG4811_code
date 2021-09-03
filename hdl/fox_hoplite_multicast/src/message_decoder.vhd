@@ -34,8 +34,12 @@ use IEEE.NUMERIC_STD.ALL;
 entity message_decoder is
     Generic (
         COORD_BITS              : integer := 2;
+        
         MULTICAST_GROUP_BITS    : integer := 1;
         MULTICAST_COORD_BITS    : integer := 1;
+        MULTICAST_X_COORD       : integer := 1;
+        MULTICAST_Y_COORD       : integer := 1;
+        
         MATRIX_TYPE_BITS        : integer := 1;
         MATRIX_COORD_BITS       : integer := 8;
         MATRIX_ELEMENT_BITS     : integer := 32;
@@ -79,8 +83,7 @@ architecture Behavioral of message_decoder is
     constant MULTICAST_Y_COORD_START  : integer := MULTICAST_X_COORD_END + 1;
     constant MULTICAST_Y_COORD_END    : integer := MULTICAST_Y_COORD_START + MULTICAST_COORD_BITS - 1;
     
-    signal multicast_x_coord, multicast_y_coord : std_logic_vector((MULTICAST_COORD_BITS-1) downto 0);
-    signal multicast_coord_combined : std_logic_vector((2*MULTICAST_COORD_BITS-1) downto 0);
+    signal multicast_x_coord_out, multicast_y_coord_out : std_logic_vector((MULTICAST_COORD_BITS-1) downto 0);
 
     constant DONE_FLAG_BIT          : integer := MULTICAST_Y_COORD_END + 1;
 
@@ -105,13 +108,18 @@ begin
     x_coord_out         <= latest_packet(X_COORD_END downto X_COORD_START);
     y_coord_out         <= latest_packet(Y_COORD_END downto Y_COORD_START);
     
-    multicast_x_coord   <= latest_packet(MULTICAST_X_COORD_END downto MULTICAST_X_COORD_START);
-    multicast_y_coord   <= latest_packet(MULTICAST_Y_COORD_END downto MULTICAST_Y_COORD_START);
-    multicast_coord_combined    <= multicast_y_coord & multicast_x_coord;
+    multicast_x_coord_out       <= latest_packet(MULTICAST_X_COORD_END downto MULTICAST_X_COORD_START);
+    multicast_y_coord_out       <= latest_packet(MULTICAST_Y_COORD_END downto MULTICAST_Y_COORD_START);
     
-    with multicast_coord_combined select
-        multicast_group_out <= "0" when "00",
-                               "1" when others;
+    MULTICAST_GROUP: process (multicast_x_coord_out, multicast_y_coord_out)
+    begin
+        if (to_integer(unsigned(multicast_x_coord_out)) = MULTICAST_X_COORD 
+                and to_integer(unsigned(multicast_y_coord_out)) = MULTICAST_Y_COORD) then
+            multicast_group_out <= (others => '1');
+        else
+            multicast_group_out <= (others => '0');
+        end if;
+    end process MULTICAST_GROUP;
     
     done_flag_out       <= latest_packet(DONE_FLAG_BIT);
     result_flag_out     <= latest_packet(RESULT_FLAG_BIT);

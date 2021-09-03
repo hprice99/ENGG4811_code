@@ -50,6 +50,10 @@ entity result_node is
         X_COORD         : integer := 0;
         Y_COORD         : integer := 0;
         NODE_NUMBER     : integer := 0;
+        
+        -- Multicast parameters
+        MULTICAST_X_COORD       : integer := 1;
+        MULTICAST_Y_COORD       : integer := 1;
 
         -- Packet parameters
         COORD_BITS              : integer := 2;
@@ -135,6 +139,10 @@ architecture Behavioral of result_node is
             X_COORD         : integer := 0;
             Y_COORD         : integer := 0;
             NODE_NUMBER     : integer := 0;
+            
+            -- Multicast parameters
+            MULTICAST_X_COORD       : integer := 1;
+            MULTICAST_Y_COORD       : integer := 1;
 
             -- Packet parameters
             COORD_BITS              : integer := 2;
@@ -285,6 +293,10 @@ begin
             X_COORD         => X_COORD,
             Y_COORD         => Y_COORD,
             NODE_NUMBER     => NODE_NUMBER,
+            
+            -- Multicast parameters
+            MULTICAST_X_COORD   => MULTICAST_X_COORD,
+            MULTICAST_Y_COORD   => MULTICAST_Y_COORD,
     
             -- Packet parameters
             COORD_BITS              => COORD_BITS,

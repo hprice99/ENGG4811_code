@@ -58,6 +58,7 @@ foxNetwork = FoxNetwork(networkRows=config.networkRows, \
                         totalMatrixSize=config.totalMatrixSize, \
                         foxNetworkStages=config.foxNetworkStages, \
                         multicastGroupBits=config.multicastGroupBits,\
+                        multicastCoordBits=config.multicastCoordBits,\
                         doneFlagBits=config.doneFlagBits, \
                         resultFlagBits=config.resultFlagBits, \
                         matrixTypeBits=config.matrixTypeBits, \

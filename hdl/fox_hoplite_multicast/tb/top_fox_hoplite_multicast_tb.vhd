@@ -103,8 +103,8 @@ architecture Behavioral of top_tb is
     signal reset_n      : std_logic;
     signal reset        : std_logic;
     
---    constant FOX_FIRMWARE       : string := "firmware_hoplite_tb.hex";
---    constant RESULT_FIRMWARE    : string := "firmware_hoplite_result_tb.hex";
+--    constant FOX_FIRMWARE       : string := "firmware_fox_hoplite_multicast_tb.hex";
+--    constant RESULT_FIRMWARE    : string := "firmware_fox_hoplite_multicast_result_tb.hex";
     
 --    constant FOX_FIRMWARE       : string := "firmware_hoplite.hex";
 --    constant RESULT_FIRMWARE    : string := "firmware_hoplite_result.hex";
@@ -143,9 +143,9 @@ begin
     CLK_PROCESS: process
     begin
         clk <= '0';
-        wait for clk_period/2;
+        wait for clk_period/2;  --for 0.5 ns signal is '0'.
         clk <= '1';
-        wait for clk_period/2;
+        wait for clk_period/2;  --for next 0.5 ns signal is '1'.
     end process CLK_PROCESS;
 
     COUNTER: process (clk)

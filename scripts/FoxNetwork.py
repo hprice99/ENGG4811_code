@@ -10,6 +10,7 @@ from Firmware import *
 class FoxNetwork:
     def __init__(self, *, networkRows, networkCols, resultNodeCoord, \
             totalMatrixSize, foxNetworkStages, multicastGroupBits, \
+            multicastCoordBits, \
             doneFlagBits, resultFlagBits, matrixTypeBits, matrixCoordBits, \
             foxFirmware, resultFirmware, A=None, B=None, \
             useMatrixInitFile=True, hdlFolder=None, firmwareFolder=None):
@@ -27,8 +28,7 @@ class FoxNetwork:
         coordBits = math.ceil(math.log2(max(self.networkRows, self.networkCols)))
         matrixElementBits = 32
 
-        self.packetFormat = FoxPacket(coordBits=coordBits, multicastGroupBits=multicastGroupBits, doneFlagBits=doneFlagBits, \
-            resultFlagBits=resultFlagBits, matrixTypeBits=matrixTypeBits, matrixCoordBits=matrixCoordBits, matrixElementBits=matrixElementBits)
+        self.packetFormat = FoxPacket(coordBits=coordBits, multicastCoordBits=multicastCoordBits, multicastGroupBits=multicastGroupBits, doneFlagBits=doneFlagBits, resultFlagBits=resultFlagBits, matrixTypeBits=matrixTypeBits, matrixCoordBits=matrixCoordBits, matrixElementBits=matrixElementBits)
 
         # Matrix details
         self.totalMatrixSize = totalMatrixSize
@@ -96,11 +96,11 @@ class FoxNetwork:
     '''
     Encode a matrix to packets and write to file
     '''
-    def write_matrix_to_file(self, *, matrixFile, nodeCoord, multicastGroup, matrixType, matrix):
+    def write_matrix_to_file(self, *, matrixFile, nodeCoord, multicastCoord, matrixType, matrix):
         doneFlag = 0
         resultFlag = 0
 
-        packets = self.packetFormat.encode_matrix(destCoord=nodeCoord, multicastGroup=multicastGroup, \
+        packets = self.packetFormat.encode_matrix(destCoord=nodeCoord, multicastCoord=multicastCoord, \
             resultFlag=resultFlag, doneFlag=doneFlag, matrixType=matrixType, matrix=matrix)
 
         # Append each packet to a file
@@ -117,8 +117,10 @@ class FoxNetwork:
     def pad_matrix_file(self, *, matrixFile, nodeCoord, paddingRequired):
         padding = []
 
+        multicastCoord = {'x' : 0, 'y' : 0}
+
         for _ in range(paddingRequired):
-            padding.append(self.packetFormat.create_matrix_packet(destCoord=nodeCoord, multicastGroup=0, \
+            padding.append(self.packetFormat.create_matrix_packet(destCoord=nodeCoord, multicastCoord=multicastCoord, \
                 doneFlag=0, resultFlag=0, matrixType=MatrixTypes.A, matrixCoord={'x' : 0, 'y' : 0}, matrixElement=0))
 
         # Append padding to a file
@@ -141,7 +143,6 @@ class FoxNetwork:
             print("Matrices not initialised")
             return
 
-        
         import os
         scriptLocation = os.path.realpath(__file__)
         scriptDirectory = os.path.dirname(scriptLocation)
@@ -175,21 +176,21 @@ class FoxNetwork:
 
             # Write A
             nodeA = self.A[nodeMatrixYStart:nodeMatrixYEnd, nodeMatrixXStart:nodeMatrixXEnd]
-            multicastGroup = 1
+            multicastCoord = {'x' : 1, 'y' : 1}
             matrixType = MatrixTypes.A
 
             # Encode the matrix and write to file
-            self.write_matrix_to_file(matrixFile=matrixFileName, nodeCoord=nodeCoord, multicastGroup=multicastGroup, matrixType=matrixType, matrix=nodeA)
+            self.write_matrix_to_file(matrixFile=matrixFileName, nodeCoord=nodeCoord, multicastCoord=multicastCoord, matrixType=matrixType, matrix=nodeA)
 
             elementsWritten += np.size(nodeA)
 
             # Write B
             nodeB = self.B[nodeMatrixYStart:nodeMatrixYEnd, nodeMatrixXStart:nodeMatrixXEnd]
-            multicastGroup = 0
+            multicastCoord = {'x' : 0, 'y' : 0}
             matrixType = MatrixTypes.B
 
             # Encode the matrix and write to file
-            self.write_matrix_to_file(matrixFile=matrixFileName, nodeCoord=nodeCoord, multicastGroup=multicastGroup, matrixType=matrixType, matrix=nodeB)
+            self.write_matrix_to_file(matrixFile=matrixFileName, nodeCoord=nodeCoord, multicastCoord=multicastCoord, matrixType=matrixType, matrix=nodeB)
 
             elementsWritten += np.size(nodeB)
 
@@ -213,6 +214,7 @@ class FoxNetwork:
         # fileLoader = FileSystemLoader('templates')
         env = Environment(loader=fileLoader, trim_blocks=True, lstrip_blocks=True)
 
+        # TODO Separate packet format from Fox's algorithm details
         template = env.get_template('fox_defs.vhd')
         output = template.render(foxNetwork=self)
 

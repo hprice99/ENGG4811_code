@@ -34,6 +34,7 @@ use ieee.std_logic_unsigned.all;
 
 library xil_defaultlib;
 use xil_defaultlib.math_functions.all;
+use xil_defaultlib.packet_defs.all;
 use xil_defaultlib.fox_defs.all;
 use xil_defaultlib.matrix_config.all;
 use xil_defaultlib.firmware_config.all;
@@ -92,6 +93,10 @@ architecture Behavioral of top is
             X_COORD         : integer := 0;
             Y_COORD         : integer := 0;
             NODE_NUMBER     : integer := 0;
+            
+            -- Multicast parameters
+            MULTICAST_X_COORD       : integer := 1;
+            MULTICAST_Y_COORD       : integer := 1;
 
             -- Packet parameters
             COORD_BITS              : integer := 2;
@@ -169,6 +174,10 @@ architecture Behavioral of top is
             X_COORD         : integer := 0;
             Y_COORD         : integer := 0;
             NODE_NUMBER     : integer := 0;
+            
+            -- Multicast parameters
+            MULTICAST_X_COORD       : integer := 1;
+            MULTICAST_Y_COORD       : integer := 1;
     
             -- Packet parameters
             COORD_BITS              : integer := 2;
@@ -260,6 +269,8 @@ begin
             constant y_offset       : integer := i * (FOX_MATRIX_SIZE);
             constant x_offset       : integer := j * (FOX_MATRIX_SIZE);
             constant matrix_file    : string  := MATRIX_INIT_FILE_PREFIX & integer'image(node_number) & MATRIX_INIT_FILE_SUFFIX;
+            constant multicast_x    : integer := 1;
+            constant multicast_y    : integer := 1;
         begin
             -- Connect in and out messages
             x_messages_in(curr_x, curr_y)       <= x_messages_out(prev_x, curr_y);
@@ -289,7 +300,11 @@ begin
                     X_COORD         => curr_x,
                     Y_COORD         => curr_y,
                     NODE_NUMBER     => node_number,
-
+                    
+                    -- Multicast parameters
+                    MULTICAST_X_COORD   => multicast_x,
+                    MULTICAST_Y_COORD   => multicast_y,
+            
                     -- Packet parameters
                     COORD_BITS              => COORD_BITS,
                     MULTICAST_GROUP_BITS    => MULTICAST_GROUP_BITS,
@@ -375,6 +390,10 @@ begin
                     X_COORD         => curr_x,
                     Y_COORD         => curr_y,
                     NODE_NUMBER     => node_number,
+                    
+                    -- Multicast parameters
+                    MULTICAST_X_COORD   => multicast_x,
+                    MULTICAST_Y_COORD   => multicast_y,
 
                     -- Packet parameters
                     COORD_BITS              => COORD_BITS,
