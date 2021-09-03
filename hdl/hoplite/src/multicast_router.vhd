@@ -57,7 +57,7 @@ entity multicast_router is
 end multicast_router;
 
 architecture Behavioral of multicast_router is
-    
+
     signal x_in_d, x_in_q, y_in_d, y_in_q, multicast_in_d : std_logic_vector((BUS_WIDTH-1) downto 0);
     signal sel : std_logic_vector(1 downto 0);
     signal x_next, y_next : std_logic;

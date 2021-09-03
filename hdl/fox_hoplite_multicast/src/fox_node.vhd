@@ -144,9 +144,9 @@ architecture Behavioral of fox_node is
             pe_in_valid     : in STD_LOGIC;
             pe_backpressure : out STD_LOGIC;
             
-            multicast_in        : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
-            multicast_in_valid  : in STD_LOGIC;
-            
+            multicast_in            : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
+            multicast_in_valid      : in STD_LOGIC;
+
             -- Output (messages sent out of router)
             x_out           : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
             x_out_valid     : out STD_LOGIC;
@@ -157,8 +157,9 @@ architecture Behavioral of fox_node is
             pe_out          : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
             pe_out_valid    : out STD_LOGIC;
             
-            multicast_out       : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
-            multicast_out_valid : out STD_LOGIC
+            multicast_out           : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
+            multicast_out_valid     : out STD_LOGIC;
+            multicast_backpressure  : in STD_LOGIC
         );
     end component hoplite_router_multicast;
     
@@ -467,24 +468,26 @@ begin
             clk                 => clk,
             reset_n             => reset_n,
             
-            x_in                => x_in,
-            x_in_valid          => x_in_valid,
-            y_in                => y_in,
-            y_in_valid          => y_in_valid,
-            pe_in               => pe_to_network_message,
-            pe_in_valid         => pe_to_network_valid,
-            pe_backpressure     => pe_backpressure,
-            multicast_in        => (others => '0'),
-            multicast_in_valid  => '0',
+            x_in                    => x_in,
+            x_in_valid              => x_in_valid,
+            y_in                    => y_in,
+            y_in_valid              => y_in_valid,
+            pe_in                   => pe_to_network_message,
+            pe_in_valid             => pe_to_network_valid,
+            pe_backpressure         => pe_backpressure,
+            multicast_in            => (others => '0'),
+            multicast_in_valid      => '0',
             
-            x_out               => x_out_d,
-            x_out_valid         => x_out_valid_d,
-            y_out               => y_out_d,
-            y_out_valid         => y_out_valid_d,
-            pe_out              => network_to_pe_message,
-            pe_out_valid        => network_to_pe_valid,
-            multicast_out       => open,
-            multicast_out_valid => open
+            
+            x_out                   => x_out_d,
+            x_out_valid             => x_out_valid_d,
+            y_out                   => y_out_d,
+            y_out_valid             => y_out_valid_d,
+            pe_out                  => network_to_pe_message,
+            pe_out_valid            => network_to_pe_valid,
+            multicast_out           => open,
+            multicast_out_valid     => open,
+            multicast_backpressure  => '0'
         );
     
     -- Connect router ports to node ports

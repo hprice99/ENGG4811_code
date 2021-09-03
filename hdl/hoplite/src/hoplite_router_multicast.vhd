@@ -51,8 +51,8 @@ entity hoplite_router_multicast is
         pe_in_valid     : in STD_LOGIC;
         pe_backpressure : out STD_LOGIC;
         
-        multicast_in        : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
-        multicast_in_valid  : in STD_LOGIC;
+        multicast_in            : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
+        multicast_in_valid      : in STD_LOGIC;
         
         -- Output (messages sent out of router)
         x_out           : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
@@ -64,8 +64,9 @@ entity hoplite_router_multicast is
         pe_out          : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
         pe_out_valid    : out STD_LOGIC;
         
-        multicast_out       : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
-        multicast_out_valid : out STD_LOGIC
+        multicast_out           : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
+        multicast_out_valid     : out STD_LOGIC;
+        multicast_backpressure  : in STD_LOGIC
     );
 end hoplite_router_multicast;
 
@@ -221,8 +222,8 @@ begin
                
     -- Apply backpressure to the connected PE
     with sel select
-        pe_backpressure <=  '0' when "00",
-                            '1' when others;
+        pe_backpressure <=  multicast_backpressure  when "00",
+                            '1'                     when others;
     
     OUTPUT_FF : process (clk)
     begin

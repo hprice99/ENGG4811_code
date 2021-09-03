@@ -74,8 +74,9 @@ architecture Behavioral of hoplite_router_tb is
             pe_in_valid     : in STD_LOGIC;
             pe_backpressure : out STD_LOGIC;
             
-            multicast_in        : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
-            multicast_in_valid  : in STD_LOGIC;
+            multicast_in            : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
+            multicast_in_valid      : in STD_LOGIC;
+            multicast_backpressure  : in STD_LOGIC;
             
             -- Output (messages sent out of router)
             x_out           : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
@@ -357,7 +358,7 @@ begin
                     x_message_b_valid           <= rand_logic(VALID_THRESHOLD, count);
                     
                     y_message_multicast_coord(X_INDEX)   <= rand_slv_threshold(MULTICAST_THRESHOLD, MULTICAST_COORD_BITS, MAX_CYCLES-count);
-                    y_message_multicast_coord(Y_INDEX)   <= rand_slv_threshold(MULTICAST_THRESHOLD, MULTICAST_COORD_BITS, MAX_CYCLES-2*count);
+                    y_message_multicast_coord(Y_INDEX)   <= rand_slv_threshold(MULTICAST_THRESHOLD, MULTICAST_COORD_BITS, 2*MAX_CYCLES-2*count);
                     y_message_b_valid           <= rand_logic(VALID_THRESHOLD, MAX_CYCLES-count);
                 end if;
                 
@@ -365,8 +366,8 @@ begin
                 multicast_in_message_dest(Y_INDEX)              <= "00";
                 multicast_in_message_multicast_coord(X_INDEX)   <= std_logic_vector(to_unsigned(MULTICAST_X_COORD, MULTICAST_COORD_BITS));
                 multicast_in_message_multicast_coord(Y_INDEX)   <= std_logic_vector(to_unsigned(MULTICAST_Y_COORD, MULTICAST_COORD_BITS));
-                multicast_in_message_data                       <= rand_slv(DATA_WIDTH, 10*count);
-                multicast_in_message_b_valid                    <= rand_logic(MULTICAST_THRESHOLD, 15*count);
+                multicast_in_message_data                       <= rand_slv(DATA_WIDTH, 4*count);
+                multicast_in_message_b_valid                    <= rand_logic(MULTICAST_THRESHOLD, 5*count);
                 
                 -- Test a PE message where the destination is the same as the source
                 if (count <= 10) then
@@ -487,15 +488,16 @@ begin
         clk                 => clk,
         reset_n             => reset_n,
         
-        x_in                => x_in,
-        x_in_valid          => x_in_valid,
-        y_in                => y_in,
-        y_in_valid          => y_in_valid,
-        pe_in               => pe_in,
-        pe_in_valid         => pe_in_valid,
-        pe_backpressure     => pe_backpressure,
-        multicast_in        => multicast_in,
-        multicast_in_valid  => multicast_in_valid,
+        x_in                    => x_in,
+        x_in_valid              => x_in_valid,
+        y_in                    => y_in,
+        y_in_valid              => y_in_valid,
+        pe_in                   => pe_in,
+        pe_in_valid             => pe_in_valid,
+        pe_backpressure         => pe_backpressure,
+        multicast_in            => multicast_in,
+        multicast_in_valid      => multicast_in_valid,
+        multicast_backpressure  => '0',
         
         x_out               => x_out,
         x_out_valid         => x_out_valid,

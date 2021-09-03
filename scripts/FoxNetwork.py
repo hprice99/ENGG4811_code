@@ -143,7 +143,6 @@ class FoxNetwork:
             print("Matrices not initialised")
             return
 
-        
         import os
         scriptLocation = os.path.realpath(__file__)
         scriptDirectory = os.path.dirname(scriptLocation)
@@ -215,6 +214,7 @@ class FoxNetwork:
         # fileLoader = FileSystemLoader('templates')
         env = Environment(loader=fileLoader, trim_blocks=True, lstrip_blocks=True)
 
+        # TODO Separate packet format from Fox's algorithm details
         template = env.get_template('fox_defs.vhd')
         output = template.render(foxNetwork=self)
 
