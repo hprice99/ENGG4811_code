@@ -31,7 +31,11 @@ package hoplite_network_tb_defs is
     constant NETWORK_COLS   : integer := 2;
     constant NETWORK_NODES  : integer := NETWORK_ROWS * NETWORK_COLS;
     constant COORD_BITS     : integer := ceil_log2(max(NETWORK_ROWS, NETWORK_COLS));
-    constant BUS_WIDTH      : integer := 4 * COORD_BITS + MESSAGE_BITS + MESSAGE_TYPE_BITS;
+    
+    -- constant MULTICAST_COORD_BITS   : integer := ceil_log2(NETWORK_ROWS) + 1;
+    constant MULTICAST_COORD_BITS   : integer := 0;
+    
+    constant BUS_WIDTH      : integer := 4 * COORD_BITS + MESSAGE_BITS + MESSAGE_TYPE_BITS + 2 * MULTICAST_COORD_BITS;
     
     constant X_INDEX    : integer := 0;
     constant Y_INDEX    : integer := 1;
@@ -42,6 +46,8 @@ package hoplite_network_tb_defs is
     type t_Message is array (0 to (NETWORK_COLS-1), 0 to (NETWORK_ROWS-1)) of std_logic_vector((BUS_WIDTH-1) downto 0);
     type t_MessageValid is array (0 to (NETWORK_COLS-1), 0 to (NETWORK_ROWS-1)) of std_logic;
     type t_Trigger is array (0 to (NETWORK_COLS-1), 0 to (NETWORK_ROWS-1)) of std_logic;
+    
+    type t_MulticastCoordinate is array (0 to 1) of std_logic_vector((MULTICAST_COORD_BITS-1) downto 0);
     
     -- Message checking FIFOs
     type t_FifoMessage is array (0 to (NETWORK_COLS-1), 0 to (NETWORK_ROWS-1)) of t_Message;

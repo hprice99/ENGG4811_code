@@ -43,32 +43,49 @@ end hoplite_tb;
 architecture Behavioral of hoplite_tb is
 
     component hoplite_tb_node
-    generic (
-        X_COORD     : integer := 0;
-        Y_COORD     : integer := 0;
-        COORD_BITS  : integer := 2;
-        BUS_WIDTH   : integer := 8
+    Generic (
+        BUS_WIDTH               : integer := 32;
+        X_COORD                 : integer := 0;
+        Y_COORD                 : integer := 0;
+        COORD_BITS              : integer := 1;
+        
+        MULTICAST_COORD_BITS    : integer := 1;
+        MULTICAST_X_COORD       : integer := 1;
+        MULTICAST_Y_COORD       : integer := 1;
+        USE_MULTICAST           : boolean := False
     );
-    port ( 
-        clk                     : in STD_LOGIC;
-        reset_n                 : in STD_LOGIC;
-        count                   : in integer;
+    Port ( 
+        clk                 : in STD_LOGIC;
+        reset_n             : in STD_LOGIC;
+        count               : in INTEGER;
         
-        x_dest                  : in STD_LOGIC_VECTOR((COORD_BITS-1) downto 0);
-        y_dest                  : in STD_LOGIC_VECTOR((COORD_BITS-1) downto 0);
-        trig                    : in STD_LOGIC;
-        trig_broadcast          : in STD_LOGIC;
+        x_dest              : in STD_LOGIC_VECTOR((COORD_BITS-1) downto 0);
+        y_dest              : in STD_LOGIC_VECTOR((COORD_BITS-1) downto 0);
+        trig                : in STD_LOGIC;
+        trig_broadcast      : in STD_LOGIC;
         
-        x_in                    : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
-        x_in_valid              : in STD_LOGIC;
-        y_in                    : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
-        y_in_valid              : in STD_LOGIC;
+        -- Input (messages received by node)
+        x_in                : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
+        x_in_valid          : in STD_LOGIC;
         
-        x_out                   : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
-        x_out_valid             : out STD_LOGIC;
-        y_out                   : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
-        y_out_valid             : out STD_LOGIC;
+        y_in                : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
+        y_in_valid          : in STD_LOGIC;
         
+        multicast_in        : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
+        multicast_in_valid  : in STD_LOGIC;
+        
+        -- Output (messages sent by node)
+        x_out               : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
+        x_out_valid         : out STD_LOGIC;
+        
+        y_out               : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
+        y_out_valid         : out STD_LOGIC;
+        
+        multicast_out           : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
+        multicast_out_valid     : out STD_LOGIC;
+        multicast_backpressure  : in STD_LOGIC;
+        
+        -- Message checking signals
         last_message_sent       : out STD_LOGIC_VECTOR ((BUS_WIDTH-1) downto 0);
         message_sent            : out STD_LOGIC;
         
@@ -104,6 +121,8 @@ architecture Behavioral of hoplite_tb is
     
     signal count            : integer;
     
+    constant USE_MULTICAST  : boolean := False;
+    
     type t_Counts is array (0 to (NETWORK_COLS-1), 0 to (NETWORK_ROWS-1)) of integer;
     type t_MessageCounts is array (0 to (NETWORK_COLS-1), 0 to (NETWORK_ROWS-1)) of t_Counts;
     signal row_broadcasts_sent, column_messages_sent            : t_MessageCounts;
@@ -113,10 +132,10 @@ architecture Behavioral of hoplite_tb is
     
     -- Array of message interfaces between nodes
     signal destinations : t_Destination;
-    signal x_messages_out, y_messages_out : t_Message;
-    signal x_messages_out_valid, y_messages_out_valid : t_MessageValid;
-    signal x_messages_in, y_messages_in : t_Message;
-    signal x_messages_in_valid, y_messages_in_valid : t_MessageValid;
+    signal x_messages_out, y_messages_out, multicast_messages_out : t_Message;
+    signal x_messages_out_valid, y_messages_out_valid, multicast_messages_out_valid : t_MessageValid;
+    signal x_messages_in, y_messages_in, multicast_messages_in : t_Message;
+    signal x_messages_in_valid, y_messages_in_valid, multicast_messages_in_valid : t_MessageValid;
     signal trig : t_Trigger;
     signal trig_broadcast : t_Trigger;
     
@@ -179,20 +198,27 @@ begin
     -- Generate the network
     NETWORK_ROW_GEN: for i in 0 to (NETWORK_ROWS-1) generate
         NETWORK_COL_GEN: for j in 0 to (NETWORK_COLS-1) generate
-            constant prev_y : integer := ((i-1) mod NETWORK_ROWS);
-            constant prev_x : integer := ((j-1) mod NETWORK_COLS);
-            constant curr_y : integer := i;
-            constant curr_x : integer := j;
-            constant next_y : integer := ((i+1) mod NETWORK_ROWS);
-            constant next_x : integer := ((j+1) mod NETWORK_COLS);
+            constant prev_y         : integer := ((i-1) mod NETWORK_ROWS);
+            constant prev_x         : integer := ((j-1) mod NETWORK_COLS);
+            constant curr_y         : integer := i;
+            constant curr_x         : integer := j;
+            constant next_y         : integer := ((i+1) mod NETWORK_ROWS);
+            constant next_x         : integer := ((j+1) mod NETWORK_COLS);
+            constant multicast_x    : integer := 1;
+            constant multicast_y    : integer := curr_y + 1;
         begin
             -- Instantiate node
             NODE: hoplite_tb_node
             generic map (
-                BUS_WIDTH   => BUS_WIDTH,
-                X_COORD     => curr_x,
-                Y_COORD     => curr_y,
-                COORD_BITS  => COORD_BITS
+                BUS_WIDTH               => BUS_WIDTH,
+                X_COORD                 => curr_x,
+                Y_COORD                 => curr_y,
+                COORD_BITS              => COORD_BITS,
+                
+                MULTICAST_COORD_BITS    => MULTICAST_COORD_BITS,
+                MULTICAST_X_COORD       => multicast_x,
+                MULTICAST_Y_COORD       => multicast_y,
+                USE_MULTICAST           => USE_MULTICAST
             )
             port map (
                 clk                 => clk,
@@ -207,16 +233,21 @@ begin
                 y_dest              => destinations(curr_x, curr_y)(Y_INDEX),
                 
                 -- Messages incoming to router
-                x_in                => x_messages_in(curr_x, curr_y),
-                x_in_valid          => x_messages_in_valid(curr_x, curr_y),                  
-                y_in                => y_messages_in(curr_x, curr_y),
-                y_in_valid          => y_messages_in_valid(curr_x, curr_y),
+                x_in                    => x_messages_in(curr_x, curr_y),
+                x_in_valid              => x_messages_in_valid(curr_x, curr_y),                  
+                y_in                    => y_messages_in(curr_x, curr_y),
+                y_in_valid              => y_messages_in_valid(curr_x, curr_y),
+                multicast_in            => (others => '0'),
+                multicast_in_valid      => '0',
                 
                 -- Messages outgoing from router
-                x_out               => x_messages_out(curr_x, curr_y),
-                x_out_valid         => x_messages_out_valid(curr_x, curr_y),
-                y_out               => y_messages_out(curr_x, curr_y),
-                y_out_valid         => y_messages_out_valid(curr_x, curr_y),
+                x_out                   => x_messages_out(curr_x, curr_y),
+                x_out_valid             => x_messages_out_valid(curr_x, curr_y),
+                y_out                   => y_messages_out(curr_x, curr_y),
+                y_out_valid             => y_messages_out_valid(curr_x, curr_y),
+                multicast_out           => open,
+                multicast_out_valid     => open,
+                multicast_backpressure  => '0',
                 
                 -- Messages sent by the contained processing element
                 last_message_sent   => last_messages_sent(curr_x, curr_y),
