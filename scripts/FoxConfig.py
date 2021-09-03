@@ -35,6 +35,13 @@ class FoxConfig:
 
         self.useMatrixInitFile = foxConfig['useMatrixInitFile']
 
+        self.useMulticast = foxConfig['useMulticast']
+
+        if self.useMulticast == True:
+            self.multicastClusterNodes = foxConfig['multicastConfig']['multicastClusterNodes']
+        else:
+            self.multicastClusterNodes = 0
+
     # Firmware configuration
     def import_firmware_config(self):
         firmwareStream = open("{scriptDirectory}/{configFolder}/FirmwareConfig.yaml".format(scriptDirectory=self.scriptDirectory, configFolder=self.configFolder), 'r')
