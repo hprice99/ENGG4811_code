@@ -422,29 +422,11 @@ begin
                                     write(my_line, string'(" received message successfully"));
                                     
                                     writeline(output, my_line);
-                                
---                                    write(my_line, string'(HT & HT & "Source X = "));
---                                    write(my_line, to_integer(unsigned(last_messages_received(dest_x, dest_y)((3*COORD_BITS-1) downto 2*COORD_BITS))));
-                                    
---                                    write(my_line, string'(", Source Y = "));
---                                    write(my_line, to_integer(unsigned(last_messages_received(dest_x, dest_y)((4*COORD_BITS-1) downto 3*COORD_BITS))));
-                                    
---                                    write(my_line, string'(", Destination X = "));
---                                    write(my_line, to_integer(unsigned(last_messages_received(dest_x, dest_y)((COORD_BITS-1) downto 0))));
-                                    
---                                    write(my_line, string'(", Destination Y = "));
---                                    write(my_line, to_integer(unsigned(last_messages_received(dest_x, dest_y)((2*COORD_BITS-1) downto COORD_BITS))));
-                                    
---                                    write(my_line, string'(", Count = "));
---                                    write(my_line, to_integer(unsigned(last_messages_received(dest_x, dest_y)((BUS_WIDTH-MESSAGE_TYPE_BITS-1) downto 4*COORD_BITS))));
-                                
---                                    write(my_line, string'(", Type = "));
+
                                     if (last_messages_received(dest_x, dest_y)(BUS_WIDTH-1) = '1') then
                                         row_broadcasts_received(src_x, src_y)(dest_x, dest_y)   <= row_broadcasts_received(src_x, src_y)(dest_x, dest_y) + 1;
---                                        write(my_line, string'("Broadcast"));
                                     else
                                         column_messages_received(src_x, src_y)(dest_x, dest_y)  <= column_messages_received(src_x, src_y)(dest_x, dest_y) + 1;
---                                        write(my_line, string'("Unicast"));
                                     end if;
                                 
                                     my_line := print_packet(string'("last_messages_received"), last_messages_received(dest_x, dest_y));
@@ -471,60 +453,9 @@ begin
                                     
                                     writeline(output, my_line);
                                     
---                                    write(my_line, string'(HT & HT & "last_messages_received:"));
-                                    
---                                    writeline(output, my_line);
-                                    
---                                    write(my_line, string'(HT & HT & HT & "Source X = "));
---                                    write(my_line, to_integer(unsigned(last_messages_received(dest_x, dest_y)((3*COORD_BITS-1) downto 2*COORD_BITS))));
-                                    
---                                    write(my_line, string'(", Source Y = "));
---                                    write(my_line, to_integer(unsigned(last_messages_received(dest_x, dest_y)((4*COORD_BITS-1) downto 3*COORD_BITS))));
-                                    
---                                    write(my_line, string'(", Destination X = "));
---                                    write(my_line, to_integer(unsigned(last_messages_received(dest_x, dest_y)((COORD_BITS-1) downto 0))));
-                                    
---                                    write(my_line, string'(", Destination Y = "));
---                                    write(my_line, to_integer(unsigned(last_messages_received(dest_x, dest_y)((2*COORD_BITS-1) downto COORD_BITS))));
-                                    
---                                    write(my_line, string'(", Count = "));
---                                    write(my_line, to_integer(unsigned(last_messages_received(dest_x, dest_y)((BUS_WIDTH-MESSAGE_TYPE_BITS-1) downto 4*COORD_BITS))));
-                                
---                                    write(my_line, string'(", Type = "));
---                                    if (last_messages_received(dest_x, dest_y)(BUS_WIDTH-1) = '1') then
---                                        write(my_line, string'("Broadcast"));
---                                    else
---                                        write(my_line, string'("Unicast"));
---                                    end if;
-
                                     my_line := print_packet(string'("last_messages_received"), last_messages_received(dest_x, dest_y));
                                     
                                     writeline(output, my_line);
-                                    
---                                    write(my_line, string'(HT & HT & "expected_messages_received:"));
---                                    writeline(output, my_line);
-                                                                        
---                                    write(my_line, string'(HT & HT & HT & "Source X = "));
---                                    write(my_line, to_integer(unsigned(expected_messages_received(src_x, src_y)(dest_x, dest_y)((3*COORD_BITS-1) downto 2*COORD_BITS))));
-                                    
---                                    write(my_line, string'(", Source Y = "));
---                                    write(my_line, to_integer(unsigned(expected_messages_received(src_x, src_y)(dest_x, dest_y)((4*COORD_BITS-1) downto 3*COORD_BITS))));
-                                    
---                                    write(my_line, string'(", Destination X = "));
---                                    write(my_line, to_integer(unsigned(expected_messages_received(src_x, src_y)(dest_x, dest_y)((COORD_BITS-1) downto 0))));
-                                    
---                                    write(my_line, string'(", Destination Y = "));
---                                    write(my_line, to_integer(unsigned(expected_messages_received(src_x, src_y)(dest_x, dest_y)((2*COORD_BITS-1) downto COORD_BITS))));
-                                    
---                                    write(my_line, string'(", Count = "));
---                                    write(my_line, to_integer(unsigned(expected_messages_received(src_x, src_y)(dest_x, dest_y)((BUS_WIDTH-MESSAGE_TYPE_BITS-1) downto 4*COORD_BITS))));
-                                
---                                    write(my_line, string'(", Type = "));
---                                    if (expected_messages_received(src_x, src_y)(dest_x, dest_y)(BUS_WIDTH-1) = '1') then
---                                        write(my_line, string'("Broadcast"));
---                                    else
---                                        write(my_line, string'("Unicast"));
---                                    end if;
 
                                     my_line := print_packet(string'("expected_messages_received"), expected_messages_received(src_x, src_y)(dest_x, dest_y));
                                     

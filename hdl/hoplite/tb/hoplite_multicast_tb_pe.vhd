@@ -76,6 +76,58 @@ architecture Behavioral of hoplite_tb_pe is
     signal received_src, received_dest  : t_Coordinate;
     signal received_message             : std_logic_vector((MESSAGE_BITS-1) downto 0);
     signal received_type                : std_logic;
+    
+    impure function print_trigger (trig_broadcast : in std_logic; dest : in t_Coordinate) return line is
+        variable my_line    : line;
+    begin
+        write(my_line, string'(HT & HT & "Trigger"));
+        
+        write(my_line, string'(", Type = "));
+        if (trig_broadcast = '1') then
+            write(my_line, string'("Broadcast"));
+        else
+            write(my_line, string'("Unicast"));
+        end if;
+        
+        write(my_line, string'(", Destination X = "));
+        write(my_line, to_integer(unsigned(dest(X_INDEX))));
+        
+        write(my_line, string'(", Destination Y = "));
+        write(my_line, to_integer(unsigned(dest(Y_INDEX))));
+        
+        return my_line;
+    end function print_trigger;
+    
+    impure function print_received_message (received_src : in t_Coordinate; received_dest : in t_Coordinate; received_message : in std_logic_vector; packet : in std_logic_vector) return line is
+        variable my_line    : line;
+    begin
+        write(my_line, string'(HT & HT & "Source X = "));
+        write(my_line, to_integer(unsigned(received_src(X_INDEX))));
+        
+        write(my_line, string'(", Source Y = "));
+        write(my_line, to_integer(unsigned(received_src(Y_INDEX))));
+        
+        write(my_line, string'(", Destination X = "));
+        write(my_line, to_integer(unsigned(received_dest(X_INDEX))));
+        
+        write(my_line, string'(", Destination Y = "));
+        write(my_line, to_integer(unsigned(received_dest(Y_INDEX))));
+        
+        write(my_line, string'(", Count = "));
+        write(my_line, to_integer(unsigned(received_message)));
+        
+        write(my_line, string'(", Type = "));
+        if (received_type = '1') then
+            write(my_line, string'("Broadcast"));
+        else
+            write(my_line, string'("Unicast"));
+        end if;
+        
+        write(my_line, string'(", Raw = "));
+        write(my_line, packet);
+        
+        return my_line;
+    end function print_received_message;
 
 begin
 
@@ -121,21 +173,8 @@ begin
             write(my_line, count);
             
             writeline(output, my_line);
-        
-            write(my_line, string'(HT & HT & "Trigger"));
-            
-            write(my_line, string'(", Type = "));
-            if (trig_broadcast = '1') then
-                write(my_line, string'("Broadcast"));
-            else
-                write(my_line, string'("Unicast"));
-            end if;
-            
-            write(my_line, string'(", Destination X = "));
-            write(my_line, to_integer(unsigned(dest(X_INDEX))));
-            
-            write(my_line, string'(", Destination Y = "));
-            write(my_line, to_integer(unsigned(dest(Y_INDEX))));
+
+            my_line := print_trigger(trig_broadcast, dest);
             
             writeline(output, my_line);
         end if;
@@ -179,31 +218,8 @@ begin
             write(my_line, count);
             
             writeline(output, my_line);
-        
-            write(my_line, string'(HT & HT & "Source X = "));
-            write(my_line, to_integer(unsigned(received_src(X_INDEX))));
-            
-            write(my_line, string'(", Source Y = "));
-            write(my_line, to_integer(unsigned(received_src(Y_INDEX))));
-            
-            write(my_line, string'(", Destination X = "));
-            write(my_line, to_integer(unsigned(received_dest(X_INDEX))));
-            
-            write(my_line, string'(", Destination Y = "));
-            write(my_line, to_integer(unsigned(received_dest(Y_INDEX))));
-            
-            write(my_line, string'(", Count = "));
-            write(my_line, to_integer(unsigned(received_message)));
-            
-            write(my_line, string'(", Type = "));
-            if (received_type = '1') then
-                write(my_line, string'("Broadcast"));
-            else
-                write(my_line, string'("Unicast"));
-            end if;
-            
-            write(my_line, string'(", Raw = "));
-            write(my_line, message_in);
+
+            my_line := print_received_message(received_src, received_dest, received_message, message_in);
             
             writeline(output, my_line);
         end if;
