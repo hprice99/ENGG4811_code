@@ -164,6 +164,8 @@ architecture Behavioral of hoplite_tb is
     
 begin
     
+    assert ((USE_MULTICAST = true and MULTICAST_COORD_BITS > 0) or (USE_MULTICAST = False)) report "MULTICAST_COORD_BITS must be set when USE_MULTICAST is enabled" severity failure;
+
     -- Generate clk and reset_n
     reset_n <= '0', '1' after clk_period;
     
@@ -265,7 +267,6 @@ begin
             y_messages_in(curr_x, curr_y)       <= y_messages_out(curr_x, prev_y);
             y_messages_in_valid(curr_x, curr_y) <= y_messages_out_valid(curr_x, prev_y);
             
-            
             -- Set destination
             SET_DESTINATION: process (clk)
             begin
@@ -334,8 +335,7 @@ begin
     FIFO_SRC_ROW_CONTROL: for src_y in 0 to (NETWORK_ROWS-1) generate
         FIFO_SRC_COL_CONTROL: for src_x in 0 to (NETWORK_COLS-1) generate
         begin
-            last_messages_sent_destination(src_x, src_y)(X_INDEX) <= last_messages_sent(src_x, src_y)((COORD_BITS-1) downto 0);
-            last_messages_sent_destination(src_x, src_y)(Y_INDEX) <= last_messages_sent(src_x, src_y)((2*COORD_BITS-1) downto COORD_BITS);
+            last_messages_sent_destination(src_x, src_y)    <= get_dest_coord(last_messages_sent(src_x, src_y));
             
             FIFO_DEST_ROW_CONTROL: for dest_y in 0 to (NETWORK_ROWS-1) generate
                 FIFO_DEST_COL_CONTROL: for dest_x in 0 to (NETWORK_COLS-1) generate
@@ -344,8 +344,7 @@ begin
                     constant dest_y_signal : std_logic_vector((COORD_BITS-1) downto 0) := std_logic_vector(to_unsigned(dest_y, COORD_BITS));
                     constant dest_x_signal : std_logic_vector((COORD_BITS-1) downto 0) := std_logic_vector(to_unsigned(dest_x, COORD_BITS));
                 begin
-                    last_messages_received_src(dest_x, dest_y)(X_INDEX) <= last_messages_received(dest_x, dest_y)((3*COORD_BITS-1) downto 2*COORD_BITS);
-                    last_messages_received_src(dest_x, dest_y)(Y_INDEX) <= last_messages_received(dest_x, dest_y)((4*COORD_BITS-1) downto 3*COORD_BITS);
+                    last_messages_received_src(dest_x, dest_y)  <= get_source_coord(last_messages_received(dest_x, dest_y));
                 
                     -- FIFO for checking messages are correctly routed
                     CHECK_FIFO: fifo_sync

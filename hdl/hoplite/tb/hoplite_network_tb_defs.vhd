@@ -21,7 +21,7 @@ package hoplite_network_tb_defs is
     constant PE_READY_FREQUENCY : integer := 5;
     
     -- Size of message data in packets
-    constant MESSAGE_BITS       : integer := 32;
+    constant MESSAGE_BITS       : integer := 8;
     constant MESSAGE_TYPE_BITS  : integer := 1;
     
     -- Constants
@@ -30,8 +30,8 @@ package hoplite_network_tb_defs is
     constant NETWORK_NODES  : integer := NETWORK_ROWS * NETWORK_COLS;
     constant COORD_BITS     : integer := ceil_log2(max(NETWORK_ROWS, NETWORK_COLS));
     
-    -- constant MULTICAST_COORD_BITS   : integer := ceil_log2(NETWORK_ROWS) + 1;
-    constant MULTICAST_COORD_BITS   : integer := 0;
+    constant MULTICAST_COORD_BITS   : integer := ceil_log2(NETWORK_ROWS) + 1;
+    -- constant MULTICAST_COORD_BITS   : integer := 0;
     
     constant BUS_WIDTH      : integer := 4 * COORD_BITS + MESSAGE_BITS + MESSAGE_TYPE_BITS + 2 * MULTICAST_COORD_BITS;
     
@@ -142,16 +142,18 @@ package body hoplite_network_tb_defs is
     end function get_message_type;
  
     impure function print_packet (port_name : in string; packet : in std_logic_vector) return line is
-        variable destination    : t_Coordinate;
-        variable source         : t_Coordinate;
-        variable message        : std_logic_vector((MESSAGE_BITS-1) downto 0);
-        variable message_type   : std_logic_vector((MESSAGE_TYPE_BITS-1) downto 0);
+        variable destination            : t_Coordinate;
+        variable multicast_destination  : t_MulticastCoordinate;
+        variable source                 : t_Coordinate;
+        variable message                : std_logic_vector((MESSAGE_BITS-1) downto 0);
+        variable message_type           : std_logic_vector((MESSAGE_TYPE_BITS-1) downto 0);
         variable my_line : line;
     begin
-        destination     := get_dest_coord(packet);
-        source          := get_source_coord(packet);
-        message         := get_message(packet);
-        message_type    := get_message_type(packet); 
+        destination             := get_dest_coord(packet);
+        multicast_destination   := get_multicast_coord(packet);
+        source                  := get_source_coord(packet);
+        message                 := get_message(packet);
+        message_type            := get_message_type(packet); 
     
         write(my_line, HT & HT);
         write(my_line, port_name);
@@ -159,6 +161,14 @@ package body hoplite_network_tb_defs is
         write(my_line, to_integer(unsigned(destination(X_INDEX))));
         write(my_line, string'(", "));
         write(my_line, to_integer(unsigned(destination(Y_INDEX))));
+        
+        if (MULTICAST_COORD_BITS > 0) then
+            write(my_line, string'("), multicast destination = ("));
+            write(my_line, to_integer(unsigned(multicast_destination(X_INDEX))));
+            write(my_line, string'(", "));
+            write(my_line, to_integer(unsigned(multicast_destination(Y_INDEX))));
+        end if;
+        
         write(my_line, string'("), source = ("));
         write(my_line, to_integer(unsigned(source(X_INDEX))));
         write(my_line, string'(", "));

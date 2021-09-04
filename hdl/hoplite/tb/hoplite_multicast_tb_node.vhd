@@ -166,12 +166,17 @@ architecture Behavioral of hoplite_multicast_tb_node is
         );
     end component nic_dual;
 
-    component hoplite_tb_pe
+    component hoplite_multicast_tb_pe
         generic (
-            BUS_WIDTH   : integer := 32;
-            X_COORD     : integer := 0;
-            Y_COORD     : integer := 0;
-            COORD_BITS  : integer := 1
+            BUS_WIDTH               : integer := 32;
+            X_COORD                 : integer := 0;
+            Y_COORD                 : integer := 0;
+            COORD_BITS              : integer := 1;
+            
+            MULTICAST_COORD_BITS    : integer := 1;
+            MULTICAST_X_COORD       : integer := 1;
+            MULTICAST_Y_COORD       : integer := 1;
+            USE_MULTICAST           : boolean := False
         );
         port (
             clk                 : in STD_LOGIC;
@@ -196,7 +201,7 @@ architecture Behavioral of hoplite_multicast_tb_node is
             last_message_received   : out STD_LOGIC_VECTOR ((BUS_WIDTH-1) downto 0);
             message_received        : out STD_LOGIC
         );
-    end component hoplite_tb_pe; 
+    end component hoplite_multicast_tb_pe; 
     
     constant FIFO_DEPTH : integer := 100;
     
@@ -377,12 +382,17 @@ begin
         end if;
     end process PRINT;
     
-    PE : hoplite_tb_pe
+    PE : hoplite_multicast_tb_pe
         generic map (
-            BUS_WIDTH   => BUS_WIDTH,
-            X_COORD     => X_COORD,
-            Y_COORD     => Y_COORD,
-            COORD_BITS  => COORD_BITS
+            BUS_WIDTH               => BUS_WIDTH,
+            X_COORD                 => X_COORD,
+            Y_COORD                 => Y_COORD,
+            COORD_BITS              => COORD_BITS,
+            
+            MULTICAST_COORD_BITS    => MULTICAST_COORD_BITS,
+            MULTICAST_X_COORD       => MULTICAST_X_COORD,
+            MULTICAST_Y_COORD       => MULTICAST_Y_COORD,
+            USE_MULTICAST           => USE_MULTICAST
         )
         port map (
             clk                     => clk,
