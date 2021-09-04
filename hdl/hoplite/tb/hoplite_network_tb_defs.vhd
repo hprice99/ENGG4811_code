@@ -1,12 +1,10 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
-
--- Uncomment the following library declaration if using
--- arithmetic functions with Signed or Unsigned values
 use IEEE.NUMERIC_STD.ALL;
+use IEEE.math_real.all;
 
--- Random stimulus
-use ieee.math_real.all;
+use STD.textio.all;
+use IEEE.std_logic_textio.all;
 
 library xil_defaultlib;
 use xil_defaultlib.math_functions.all;
@@ -52,10 +50,40 @@ package hoplite_network_tb_defs is
     -- Message checking FIFOs
     type t_FifoMessage is array (0 to (NETWORK_COLS-1), 0 to (NETWORK_ROWS-1)) of t_Message;
     type t_FifoMessageValid is array (0 to (NETWORK_COLS-1), 0 to (NETWORK_ROWS-1)) of t_MessageValid;
+    
+    impure function print_packet (port_name : in string; packet : in std_logic_vector)
+        return line;
 
 end package hoplite_network_tb_defs;
 
 
 package body hoplite_network_tb_defs is
+ 
+    impure function print_packet (port_name : in string; packet : in std_logic_vector) return line is
+        variable my_line : line;
+    begin
+        write(my_line, HT & HT);
+        write(my_line, port_name);
+        write(my_line, string'(": destination = ("));
+        write(my_line, to_integer(unsigned(packet((COORD_BITS-1) downto 0))));
+        write(my_line, string'(", "));
+        write(my_line, to_integer(unsigned(packet((2*COORD_BITS-1) downto COORD_BITS))));
+        write(my_line, string'("), source = ("));
+        write(my_line, to_integer(unsigned(packet((3*COORD_BITS-1) downto 2*COORD_BITS))));
+        write(my_line, string'(", "));
+        write(my_line, to_integer(unsigned(packet((4*COORD_BITS-1) downto 3*COORD_BITS))));
+        write(my_line, string'("), type = "));
+        if (packet(BUS_WIDTH-1) = '1') then
+            write(my_line, string'("Broadcast"));
+        else
+            write(my_line, string'("Unicast"));
+        end if;
+        write(my_line, string'(", data = "));
+        write(my_line, to_integer(unsigned(packet((BUS_WIDTH-MESSAGE_TYPE_BITS-1) downto 4*COORD_BITS))));
+        write(my_line, string'(", raw = "));
+        write(my_line, packet((BUS_WIDTH-1) downto 0));
+        
+        return my_line;
+    end function print_packet;
  
 end package body hoplite_network_tb_defs;

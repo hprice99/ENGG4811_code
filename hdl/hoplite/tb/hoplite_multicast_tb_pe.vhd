@@ -68,6 +68,8 @@ architecture Behavioral of hoplite_tb_pe is
 
     constant src    : t_Coordinate := (X_INDEX => x_src, Y_INDEX => y_src);
     signal dest     : t_Coordinate;
+    
+    signal multicast_dest   : t_MulticastCoordinate;
 
     signal message  : std_logic_vector((BUS_WIDTH-1) downto 0);
     

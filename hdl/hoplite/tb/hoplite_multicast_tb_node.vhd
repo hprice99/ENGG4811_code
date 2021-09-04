@@ -228,33 +228,6 @@ architecture Behavioral of hoplite_tb_node is
     signal x_out_valid_d, y_out_valid_d : STD_LOGIC;
     
     signal print_valid : STD_LOGIC;
-    
-    impure function print_packet (port_name : in string; packet : in std_logic_vector) return line is
-        variable my_line : line;
-    begin
-        write(my_line, HT & HT);
-        write(my_line, port_name);
-        write(my_line, string'(": destination = ("));
-        write(my_line, to_integer(unsigned(packet((COORD_BITS-1) downto 0))));
-        write(my_line, string'(", "));
-        write(my_line, to_integer(unsigned(packet((2*COORD_BITS-1) downto COORD_BITS))));
-        write(my_line, string'("), source = ("));
-        write(my_line, to_integer(unsigned(packet((3*COORD_BITS-1) downto 2*COORD_BITS))));
-        write(my_line, string'(", "));
-        write(my_line, to_integer(unsigned(packet((4*COORD_BITS-1) downto 3*COORD_BITS))));
-        write(my_line, string'("), type = "));
-        if (packet(BUS_WIDTH-1) = '1') then
-            write(my_line, string'("Broadcast"));
-        else
-            write(my_line, string'("Unicast"));
-        end if;
-        write(my_line, string'(", data = "));
-        write(my_line, to_integer(unsigned(packet((BUS_WIDTH-MESSAGE_TYPE_BITS-1) downto 4*COORD_BITS))));
-        write(my_line, string'(", raw = "));
-        write(my_line, packet((BUS_WIDTH-1) downto 0));
-        
-        return my_line;
-    end function print_packet;
 
 begin
 
