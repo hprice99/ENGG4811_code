@@ -29,7 +29,7 @@ use IEEE.std_logic_textio.all;
 library xil_defaultlib;
 use xil_defaultlib.hoplite_network_tb_defs.all;
 
-entity hoplite_tb_node is
+entity hoplite_multicast_tb_node is
     Generic (
         BUS_WIDTH               : integer := 32;
         X_COORD                 : integer := 0;
@@ -79,9 +79,9 @@ entity hoplite_tb_node is
         last_message_received   : out STD_LOGIC_VECTOR ((BUS_WIDTH-1) downto 0);
         message_received        : out STD_LOGIC
     );
-end hoplite_tb_node;
+end hoplite_multicast_tb_node;
 
-architecture Behavioral of hoplite_tb_node is
+architecture Behavioral of hoplite_multicast_tb_node is
 
     component hoplite_router_multicast is
         Generic (

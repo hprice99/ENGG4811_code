@@ -42,7 +42,7 @@ end hoplite_tb;
 
 architecture Behavioral of hoplite_tb is
 
-    component hoplite_tb_node
+    component hoplite_multicast_tb_node
     Generic (
         BUS_WIDTH               : integer := 32;
         X_COORD                 : integer := 0;
@@ -92,7 +92,7 @@ architecture Behavioral of hoplite_tb is
         last_message_received   : out STD_LOGIC_VECTOR ((BUS_WIDTH-1) downto 0);
         message_received        : out STD_LOGIC
     );
-    end component hoplite_tb_node;
+    end component hoplite_multicast_tb_node;
     
     component fifo_sync
         generic (
@@ -208,7 +208,7 @@ begin
             constant multicast_y    : integer := curr_y + 1;
         begin
             -- Instantiate node
-            NODE: hoplite_tb_node
+            NODE: hoplite_multicast_tb_node
             generic map (
                 BUS_WIDTH               => BUS_WIDTH,
                 X_COORD                 => curr_x,
