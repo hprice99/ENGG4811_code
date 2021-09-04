@@ -228,6 +228,33 @@ architecture Behavioral of hoplite_tb_node is
     signal x_out_valid_d, y_out_valid_d : STD_LOGIC;
     
     signal print_valid : STD_LOGIC;
+    
+    impure function print_packet (port_name : in string; packet : in std_logic_vector) return line is
+        variable my_line : line;
+    begin
+        write(my_line, HT & HT);
+        write(my_line, port_name);
+        write(my_line, string'(": destination = ("));
+        write(my_line, to_integer(unsigned(packet((COORD_BITS-1) downto 0))));
+        write(my_line, string'(", "));
+        write(my_line, to_integer(unsigned(packet((2*COORD_BITS-1) downto COORD_BITS))));
+        write(my_line, string'("), source = ("));
+        write(my_line, to_integer(unsigned(packet((3*COORD_BITS-1) downto 2*COORD_BITS))));
+        write(my_line, string'(", "));
+        write(my_line, to_integer(unsigned(packet((4*COORD_BITS-1) downto 3*COORD_BITS))));
+        write(my_line, string'("), type = "));
+        if (packet(BUS_WIDTH-1) = '1') then
+            write(my_line, string'("Broadcast"));
+        else
+            write(my_line, string'("Unicast"));
+        end if;
+        write(my_line, string'(", data = "));
+        write(my_line, to_integer(unsigned(packet((BUS_WIDTH-MESSAGE_TYPE_BITS-1) downto 4*COORD_BITS))));
+        write(my_line, string'(", raw = "));
+        write(my_line, packet((BUS_WIDTH-1) downto 0));
+        
+        return my_line;
+    end function print_packet;
 
 begin
 
@@ -339,7 +366,7 @@ begin
     begin
         if (rising_edge(clk) and reset_n = '1') then
             if (print_valid = '1') then
-                write(my_line, string'(HT & "hoplite_tb_node: "));
+                write(my_line, string'(HT & "hoplite_multicast_tb_node: "));
                
                 write(my_line, string'("Node ("));
                 write(my_line, X_COORD);
@@ -352,93 +379,25 @@ begin
             end if;
         
             if (x_in_valid = '1') then
-                write(my_line, string'(HT & HT & "x_in: destination = ("));
-                write(my_line, to_integer(unsigned(x_in((COORD_BITS-1) downto 0))));
-                write(my_line, string'(", "));
-                write(my_line, to_integer(unsigned(x_in((2*COORD_BITS-1) downto COORD_BITS))));
-                write(my_line, string'("), source = ("));
-                write(my_line, to_integer(unsigned(x_in((3*COORD_BITS-1) downto 2*COORD_BITS))));
-                write(my_line, string'(", "));
-                write(my_line, to_integer(unsigned(x_in((4*COORD_BITS-1) downto 3*COORD_BITS))));
-                write(my_line, string'("), type = "));
-                if (x_in(BUS_WIDTH-1) = '1') then
-                    write(my_line, string'("Broadcast"));
-                else
-                    write(my_line, string'("Unicast"));
-                end if;
-                write(my_line, string'(", data = "));
-                write(my_line, to_integer(unsigned(x_in((BUS_WIDTH-MESSAGE_TYPE_BITS-1) downto 4*COORD_BITS))));
-                write(my_line, string'(", raw = "));
-                write(my_line, x_in((BUS_WIDTH-1) downto 0));
+                my_line := print_packet(string'("x_in"), x_in);
                 
                 writeline(output, my_line);
             end if;
             
-            if (y_in_valid = '1') then           
-                write(my_line, string'(HT & HT & "y_in: destination = ("));
-                write(my_line, to_integer(unsigned(y_in((COORD_BITS-1) downto 0))));
-                write(my_line, string'(", "));
-                write(my_line, to_integer(unsigned(y_in((2*COORD_BITS-1) downto COORD_BITS))));
-                write(my_line, string'("), source = ("));
-                write(my_line, to_integer(unsigned(y_in((3*COORD_BITS-1) downto 2*COORD_BITS))));
-                write(my_line, string'(", "));
-                write(my_line, to_integer(unsigned(y_in((4*COORD_BITS-1) downto 3*COORD_BITS))));
-                write(my_line, string'("), type = "));
-                if (y_in(BUS_WIDTH-1) = '1') then
-                    write(my_line, string'("Broadcast"));
-                else
-                    write(my_line, string'("Unicast"));
-                end if;
-                write(my_line, string'(", data = "));
-                write(my_line, to_integer(unsigned(y_in((BUS_WIDTH-MESSAGE_TYPE_BITS-1) downto 4*COORD_BITS))));
-                write(my_line, string'(", raw = "));
-                write(my_line, y_in((BUS_WIDTH-1) downto 0));
+            if (y_in_valid = '1') then               
+                my_line := print_packet(string'("y_in"), y_in);
                 
                 writeline(output, my_line);
             end if;
             
             if (x_out_valid_d = '1') then
-                write(my_line, string'(HT & HT & "x_out: destination = ("));
-                write(my_line, to_integer(unsigned(x_out_d((COORD_BITS-1) downto 0))));
-                write(my_line, string'(", "));
-                write(my_line, to_integer(unsigned(x_out_d((2*COORD_BITS-1) downto COORD_BITS))));
-                write(my_line, string'("), source = ("));
-                write(my_line, to_integer(unsigned(x_out_d((3*COORD_BITS-1) downto 2*COORD_BITS))));
-                write(my_line, string'(", "));
-                write(my_line, to_integer(unsigned(x_out_d((4*COORD_BITS-1) downto 3*COORD_BITS))));
-                write(my_line, string'("), type = "));
-                if (x_out_d(BUS_WIDTH-1) = '1') then
-                    write(my_line, string'("Broadcast"));
-                else
-                    write(my_line, string'("Unicast"));
-                end if;
-                write(my_line, string'(", data = "));
-                write(my_line, to_integer(unsigned(x_out_d((BUS_WIDTH-MESSAGE_TYPE_BITS-1) downto 4*COORD_BITS))));
-                write(my_line, string'(", raw = "));
-                write(my_line, x_out_d((BUS_WIDTH-1) downto 0));
+                my_line := print_packet(string'("x_out"), x_out_d);
                 
                 writeline(output, my_line);
             end if;
             
             if (y_out_valid_d = '1') then
-                write(my_line, string'(HT & HT & "y_out: destination = ("));
-                write(my_line, to_integer(unsigned(y_out_d((COORD_BITS-1) downto 0))));
-                write(my_line, string'(", "));
-                write(my_line, to_integer(unsigned(y_out_d((2*COORD_BITS-1) downto COORD_BITS))));
-                write(my_line, string'("), source = ("));
-                write(my_line, to_integer(unsigned(y_out_d((3*COORD_BITS-1) downto 2*COORD_BITS))));
-                write(my_line, string'(", "));
-                write(my_line, to_integer(unsigned(y_out_d((4*COORD_BITS-1) downto 3*COORD_BITS))));
-                write(my_line, string'("), type = "));
-                if (y_out_d(BUS_WIDTH-1) = '1') then
-                    write(my_line, string'("Broadcast"));
-                else
-                    write(my_line, string'("Unicast"));
-                end if;
-                write(my_line, string'(", data = "));
-                write(my_line, to_integer(unsigned(y_out_d((BUS_WIDTH-MESSAGE_TYPE_BITS-1) downto 4*COORD_BITS))));
-                write(my_line, string'(", raw = "));
-                write(my_line, y_out_d((BUS_WIDTH-1) downto 0));
+                my_line := print_packet(string'("y_out"), y_out_d);
                 
                 writeline(output, my_line);
             end if;
