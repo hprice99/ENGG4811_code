@@ -213,6 +213,7 @@ architecture Behavioral of hoplite_tb is
     signal last_messages_received       : t_Message;
     signal last_messages_received_src   : t_Destination;
     signal messages_received            : t_MessageValid;
+    signal last_messages_received_multicast_destination   : t_MulticastDestination;
     
 begin
     
@@ -476,6 +477,7 @@ begin
                     constant multicast_y_signal : std_logic_vector((MULTICAST_COORD_BITS-1) downto 0) := std_logic_vector(to_unsigned(src_y+1, MULTICAST_COORD_BITS));
                 begin
                     last_messages_received_src(dest_x, dest_y)  <= get_source_coord(last_messages_received(dest_x, dest_y));
+                    last_messages_received_multicast_destination(dest_x, dest_y) <= get_multicast_coord(last_messages_received(dest_x, dest_y));
                 
                     -- FIFO for checking messages are correctly routed
                     CHECK_FIFO: fifo_sync
@@ -504,7 +506,7 @@ begin
                             if (messages_sent(src_x, src_y) = '1' 
                                     and ((last_messages_sent_destination(src_x, src_y)(X_INDEX) = dest_x_signal
                                     and last_messages_sent_destination(src_x, src_y)(Y_INDEX) = dest_y_signal)
-                                    or (last_messages_sent_multicast_destination(src_x, src_y)(X_INDEX) = multicast_x_signal
+                                    or (src_y = dest_y and last_messages_sent_multicast_destination(src_x, src_y)(X_INDEX) = multicast_x_signal
                                     and last_messages_sent_multicast_destination(src_x, src_y)(Y_INDEX) = multicast_y_signal))) then
                                 expected_messages_sent_valid(src_x, src_y)(dest_x, dest_y)  <= '1';
                                 expected_messages_sent(src_x, src_y)(dest_x, dest_y)        <= last_messages_sent(src_x, src_y);
@@ -520,8 +522,9 @@ begin
                     begin
                         if (rising_edge(clk) and reset_n = '1') then
                             if (messages_received(dest_x, dest_y) = '1' 
-                                    and last_messages_received_src(dest_x, dest_y)(X_INDEX) = src_x_signal
-                                    and last_messages_received_src(dest_x, dest_y)(Y_INDEX) = src_y_signal) then
+                                    and ((last_messages_received_src(dest_x, dest_y)(X_INDEX) = src_x_signal
+                                    and last_messages_received_src(dest_x, dest_y)(Y_INDEX) = src_y_signal))
+                                    ) then
                                 expected_messages_received_valid(src_x, src_y)(dest_x, dest_y)  <= '1';
                             else
                                 expected_messages_received_valid(src_x, src_y)(dest_x, dest_y)  <= '0';
@@ -535,9 +538,6 @@ begin
                     begin
                         if (rising_edge(clk)) then
                             if (reset_n = '0') then 
---                                row_broadcasts_sent(src_x, src_y)(dest_x, dest_y)   <= 0;
---                                column_messages_sent(src_x, src_y)(dest_x, dest_y)  <= 0;
-                                                          
                                 row_broadcasts_received(src_x, src_y)(dest_x, dest_y)   <= 0;
                                 column_messages_received(src_x, src_y)(dest_x, dest_y)  <= 0;
                             elsif (messages_received(dest_x, dest_y) = '1') then
@@ -601,12 +601,12 @@ begin
                     
                     -- Set the number of messages expected
                     SET_BROADCAST_EXPECTED: if (src_x = src_y) generate
-                        -- Pick all elements on the row
-                        BROADCAST_EXPECTED: if (src_x /= dest_x and src_y = dest_y) generate
+                        -- Broadcast to all nodes in the same row
+                        BROADCAST_EXPECTED: if (src_y = dest_y) generate
                             expected_row_broadcasts_received(src_x, src_y)(dest_x, dest_y)    <= MESSAGE_BURST;
                         end generate BROADCAST_EXPECTED;
                         
-                        BROADCAST_NOT_EXPECTED: if (src_x = dest_x or src_y /= dest_y) generate
+                        BROADCAST_NOT_EXPECTED: if (src_y /= dest_y) generate
                             expected_row_broadcasts_received(src_x, src_y)(dest_x, dest_y)    <= 0;
                         end generate BROADCAST_NOT_EXPECTED;
                     end generate SET_BROADCAST_EXPECTED;
@@ -677,11 +677,13 @@ begin
                             write(my_line, dest_x);
                             write(my_line, string'(", "));
                             write(my_line, dest_y);
-                            write(my_line, string'(") have been received"));
+                            write(my_line, string'(") have been received. "));
+                            write(my_line, string'("Expected: "));
+                            write(my_line, expected_column_messages_received(src_x, src_y)(dest_x, dest_y));
                             
                             writeline(output, my_line);
                             
-                            if (column_messages_received(src_x, src_y)(dest_x, dest_y) = MESSAGE_BURST) then
+                            if (column_messages_received(src_x, src_y)(dest_x, dest_y) = expected_column_messages_received(src_x, src_y)(dest_x, dest_y)) then
                                 write(my_line, string'("All column messages from node ("));
                                 write(my_line, src_x);
                                 write(my_line, string'(", "));
