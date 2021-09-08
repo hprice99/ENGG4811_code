@@ -48,9 +48,9 @@ entity multicast_router_node is
         x_in_valid              : in STD_LOGIC;
         y_in                    : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
         y_in_valid              : in STD_LOGIC;
-        multicast_in            : in t_MulticastClusterPackets;
-        multicast_in_valid      : in t_MulticastClusterPacketsValid;
-        multicast_available     : out t_MulticastClusterPacketsValid;
+        multicast_in            : in t_MulticastGroupPackets;
+        multicast_in_valid      : in t_MulticastGroupPacketsValid;
+        multicast_available     : out t_MulticastGroupPacketsValid;
         
         -- Output
         x_out                   : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
@@ -121,7 +121,7 @@ architecture Behavioral of multicast_router_node is
     end component fifo_sync_wrapper;
 
     -- Select signal for multicast_in source
-    signal source_select    : integer range 1 to MULTICAST_CLUSTER_NODES;
+    signal source_select    : integer range 1 to MULTICAST_GROUP_NODES;
 
     -- multicast_in packet from selected source
     signal active_multicast_in          : std_logic_vector((BUS_WIDTH-1) downto 0);
@@ -132,14 +132,14 @@ architecture Behavioral of multicast_router_node is
     signal multicast_ready          : std_logic;
 
     -- Buffer signals
-    signal buffer_fifo_write_en     : t_MulticastClusterPacketsValid;
-    signal buffer_fifo_write_data   : t_MulticastClusterPackets;
+    signal buffer_fifo_write_en     : t_MulticastGroupPacketsValid;
+    signal buffer_fifo_write_data   : t_MulticastGroupPackets;
     
-    signal buffer_fifo_read_en      : t_MulticastClusterPacketsValid;
-    signal buffer_fifo_read_data    : t_MulticastClusterPackets;
+    signal buffer_fifo_read_en      : t_MulticastGroupPacketsValid;
+    signal buffer_fifo_read_data    : t_MulticastGroupPackets;
 
-    signal buffer_fifo_full         : t_MulticastClusterPacketsValid;
-    signal buffer_fifo_empty        : t_MulticastClusterPacketsValid;
+    signal buffer_fifo_full         : t_MulticastGroupPacketsValid;
+    signal buffer_fifo_empty        : t_MulticastGroupPacketsValid;
     
     function rotate_left (vect : in std_logic_vector) return std_logic_vector is
         variable rotated_vect   : std_logic_vector((vect'length-1) downto 0);
@@ -185,7 +185,7 @@ begin
     multicast_ready <= not multicast_backpressure;
 
     -- Buffer and arbitrate active_multicast_in
-    BUFFER_GEN: for i in 0 to (MULTICAST_CLUSTER_NODES-1) generate
+    BUFFER_GEN: for i in 0 to (MULTICAST_GROUP_NODES-1) generate
     begin
         BUFFER_FIFO: fifo_sync_wrapper
             generic map (
@@ -250,7 +250,7 @@ begin
                 source_select       <= 1;
             else
                 -- Rotate through sources
-                if (source_select = MULTICAST_CLUSTER_NODES) then
+                if (source_select = MULTICAST_GROUP_NODES) then
                     source_select <= 1;
                 else
                     source_select <= source_select + 1;
