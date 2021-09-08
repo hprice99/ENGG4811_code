@@ -8,11 +8,11 @@ use xil_defaultlib.packet_defs.all;
 package multicast_defs is 
 
     -- Constants
-    constant MULTICAST_CLUSTER_NODES    : integer := 2;
+    constant MULTICAST_GROUP_NODES    : integer := 2;
 
     -- Custom types
-    type t_MulticastClusterPackets is array (0 to (MULTICAST_CLUSTER_NODES-1)) of std_logic_vector((BUS_WIDTH-1) downto 0);
-    type t_MulticastClusterPacketsValid is array (0 to (MULTICAST_CLUSTER_NODES-1)) of std_logic;
+    type t_MulticastGroupPackets is array (0 to (MULTICAST_GROUP_NODES-1)) of std_logic_vector((BUS_WIDTH-1) downto 0);
+    type t_MulticastGroupPacketsValid is array (0 to (MULTICAST_GROUP_NODES-1)) of std_logic;
 
 end package multicast_defs;
 

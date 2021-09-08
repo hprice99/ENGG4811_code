@@ -35,6 +35,7 @@ use std.env.stop;
 
 library xil_defaultlib;
 use xil_defaultlib.hoplite_network_tb_defs.all;
+use xil_defaultlib.multicast_defs.all;
 use xil_defaultlib.math_functions.all;
 
 entity hoplite_tb is
@@ -42,40 +43,91 @@ end hoplite_tb;
 
 architecture Behavioral of hoplite_tb is
 
-    component hoplite_tb_node
-    generic (
-        X_COORD     : integer := 0;
-        Y_COORD     : integer := 0;
-        COORD_BITS  : integer := 2;
-        BUS_WIDTH   : integer := 8
+    component hoplite_multicast_tb_node
+    Generic (
+        BUS_WIDTH               : integer := 32;
+        X_COORD                 : integer := 0;
+        Y_COORD                 : integer := 0;
+        COORD_BITS              : integer := 1;
+        
+        MULTICAST_COORD_BITS    : integer := 1;
+        MULTICAST_X_COORD       : integer := 1;
+        MULTICAST_Y_COORD       : integer := 1;
+        USE_MULTICAST           : boolean := False
     );
-    port ( 
-        clk                     : in STD_LOGIC;
-        reset_n                 : in STD_LOGIC;
-        count                   : in integer;
+    Port ( 
+        clk                 : in STD_LOGIC;
+        reset_n             : in STD_LOGIC;
+        count               : in INTEGER;
         
-        x_dest                  : in STD_LOGIC_VECTOR((COORD_BITS-1) downto 0);
-        y_dest                  : in STD_LOGIC_VECTOR((COORD_BITS-1) downto 0);
-        trig                    : in STD_LOGIC;
-        trig_broadcast          : in STD_LOGIC;
+        x_dest              : in STD_LOGIC_VECTOR((COORD_BITS-1) downto 0);
+        y_dest              : in STD_LOGIC_VECTOR((COORD_BITS-1) downto 0);
+        trig                : in STD_LOGIC;
+        trig_broadcast      : in STD_LOGIC;
         
-        x_in                    : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
-        x_in_valid              : in STD_LOGIC;
-        y_in                    : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
-        y_in_valid              : in STD_LOGIC;
+        -- Input (messages received by node)
+        x_in                : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
+        x_in_valid          : in STD_LOGIC;
         
-        x_out                   : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
-        x_out_valid             : out STD_LOGIC;
-        y_out                   : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
-        y_out_valid             : out STD_LOGIC;
+        y_in                : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
+        y_in_valid          : in STD_LOGIC;
         
+        multicast_in        : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
+        multicast_in_valid  : in STD_LOGIC;
+        
+        -- Output (messages sent by node)
+        x_out               : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
+        x_out_valid         : out STD_LOGIC;
+        
+        y_out               : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
+        y_out_valid         : out STD_LOGIC;
+        
+        multicast_out           : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
+        multicast_out_valid     : out STD_LOGIC;
+        multicast_backpressure  : in STD_LOGIC;
+        
+        -- Message checking signals
         last_message_sent       : out STD_LOGIC_VECTOR ((BUS_WIDTH-1) downto 0);
         message_sent            : out STD_LOGIC;
         
         last_message_received   : out STD_LOGIC_VECTOR ((BUS_WIDTH-1) downto 0);
         message_received        : out STD_LOGIC
     );
-    end component hoplite_tb_node;
+    end component hoplite_multicast_tb_node;
+    
+    component multicast_router_node is
+    Generic (
+        BUS_WIDTH               : integer := 32;
+        COORD_BITS              : integer := 1;
+
+        MULTICAST_COORD_BITS    : integer := 1;
+        MULTICAST_X_COORD       : integer := 1;
+        MULTICAST_Y_COORD       : integer := 1;
+
+        FIFO_DEPTH              : integer := 32
+    );
+    Port ( 
+        clk             : in STD_LOGIC;
+        reset_n         : in STD_LOGIC;
+        
+        -- Input
+        x_in                    : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
+        x_in_valid              : in STD_LOGIC;
+        y_in                    : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
+        y_in_valid              : in STD_LOGIC;
+        multicast_in            : in t_MulticastGroupPackets;
+        multicast_in_valid      : in t_MulticastGroupPacketsValid;
+        multicast_available     : out t_MulticastGroupPacketsValid;
+        
+        -- Output
+        x_out                   : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
+        x_out_valid             : out STD_LOGIC;
+        y_out                   : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
+        y_out_valid             : out STD_LOGIC;
+        multicast_out           : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
+        multicast_out_valid     : out STD_LOGIC
+    );
+    end component multicast_router_node;
     
     component fifo_sync
         generic (
@@ -104,6 +156,9 @@ architecture Behavioral of hoplite_tb is
     
     signal count            : integer;
     
+    constant USE_MULTICAST  : boolean := True;
+    constant MULTICAST_FIFO_DEPTH   : integer := MAX_MESSAGE_COUNT;
+    
     type t_Counts is array (0 to (NETWORK_COLS-1), 0 to (NETWORK_ROWS-1)) of integer;
     type t_MessageCounts is array (0 to (NETWORK_COLS-1), 0 to (NETWORK_ROWS-1)) of t_Counts;
     signal row_broadcasts_sent, column_messages_sent            : t_MessageCounts;
@@ -113,12 +168,27 @@ architecture Behavioral of hoplite_tb is
     
     -- Array of message interfaces between nodes
     signal destinations : t_Destination;
-    signal x_messages_out, y_messages_out : t_Message;
-    signal x_messages_out_valid, y_messages_out_valid : t_MessageValid;
-    signal x_messages_in, y_messages_in : t_Message;
-    signal x_messages_in_valid, y_messages_in_valid : t_MessageValid;
+    signal x_messages_out, y_messages_out, multicast_messages_out : t_Message;
+    signal x_messages_out_valid, y_messages_out_valid, multicast_messages_out_valid : t_MessageValid;
+    signal x_messages_in, y_messages_in, multicast_messages_in : t_Message;
+    signal x_messages_in_valid, y_messages_in_valid, multicast_messages_in_valid : t_MessageValid;
     signal trig : t_Trigger;
     signal trig_broadcast : t_Trigger;
+    
+    signal multicast_backpressure   : t_MessageValid;
+    
+    signal multicast_x_messages_out, multicast_y_messages_out   : t_MulticastToMulticastPackets;
+    signal multicast_x_messages_out_valid, multicast_y_messages_out_valid   : t_MulticastNetworkPacketsValid;
+    
+    signal multicast_to_node_messages_out   : t_MulticastToMulticastPackets;
+    signal multicast_to_node_messages_out_valid : t_MulticastNetworkPacketsValid;
+    
+    signal multicast_x_messages_in, multicast_y_messages_in     : t_MulticastToMulticastPackets;
+    signal multicast_x_messages_in_valid, multicast_y_messages_in_valid   : t_MulticastNetworkPacketsValid;
+    
+    signal node_to_multicast_messages_in        : t_CombinedMulticastGroupPackets;
+    signal node_to_multicast_messages_in_valid  : t_CombinedMulticastGroupPacketsValid;
+    signal node_to_multicast_available          : t_CombinedMulticastGroupPacketsValid;
     
     constant TEST_SRC_ROW           : integer := 0;
     constant TEST_BROADCAST_COL     : integer := 0;
@@ -137,14 +207,18 @@ architecture Behavioral of hoplite_tb is
     signal last_messages_sent               : t_Message;
     signal last_messages_sent_destination   : t_Destination;
     signal messages_sent                    : t_MessageValid;
+    signal last_messages_sent_multicast_destination   : t_MulticastDestination;
 
     -- Messages received by processing elements
     signal last_messages_received       : t_Message;
     signal last_messages_received_src   : t_Destination;
     signal messages_received            : t_MessageValid;
-
+    signal last_messages_received_multicast_destination   : t_MulticastDestination;
+    
 begin
     
+    assert ((USE_MULTICAST = true and MULTICAST_COORD_BITS > 0) or (USE_MULTICAST = False)) report "MULTICAST_COORD_BITS must be set when USE_MULTICAST is enabled" severity failure;
+
     -- Generate clk and reset_n
     reset_n <= '0', '1' after clk_period;
     
@@ -178,21 +252,104 @@ begin
 
     -- Generate the network
     NETWORK_ROW_GEN: for i in 0 to (NETWORK_ROWS-1) generate
+        constant prev_multicast_x   : integer := 1;
+        constant prev_multicast_y   : integer := ((i-1) mod NETWORK_ROWS) + 1;
+        constant curr_multicast_x   : integer := 1;
+        constant curr_multicast_y   : integer := i+1;
+        constant next_multicast_x   : integer := 1;
+        constant next_multicast_y   : integer := ((i+1) mod NETWORK_ROWS) + 1;
+    begin
+        MULTICAST_ROUTER_GEN: if (USE_MULTICAST = true) generate
+            MULTICAST_ROUTER: multicast_router_node
+                generic map (
+                    BUS_WIDTH               => BUS_WIDTH,
+                    COORD_BITS              => COORD_BITS,
+            
+                    MULTICAST_COORD_BITS    => MULTICAST_COORD_BITS,
+                    MULTICAST_X_COORD       => curr_multicast_x,
+                    MULTICAST_Y_COORD       => curr_multicast_y,
+            
+                    FIFO_DEPTH              => MULTICAST_FIFO_DEPTH
+                )
+                port map ( 
+                    clk             => clk,
+                    reset_n         => reset_n,
+                    
+                    -- Input
+                    x_in                    => multicast_x_messages_in(curr_multicast_x, curr_multicast_y),
+                    x_in_valid              => multicast_x_messages_in_valid(curr_multicast_x, curr_multicast_y),
+                    y_in                    => multicast_y_messages_in(curr_multicast_x, curr_multicast_y),
+                    y_in_valid              => multicast_y_messages_in_valid(curr_multicast_x, curr_multicast_y),
+                    multicast_in            => node_to_multicast_messages_in(curr_multicast_x, curr_multicast_y),
+                    multicast_in_valid      => node_to_multicast_messages_in_valid(curr_multicast_x, curr_multicast_y),
+                    multicast_available     => node_to_multicast_available(curr_multicast_x, curr_multicast_y),
+                    
+                    -- Output
+                    x_out                   => multicast_x_messages_out(curr_multicast_x, curr_multicast_y),
+                    x_out_valid             => multicast_x_messages_out_valid(curr_multicast_x, curr_multicast_y),
+                    y_out                   => multicast_y_messages_out(curr_multicast_x, curr_multicast_y),
+                    y_out_valid             => multicast_y_messages_out_valid(curr_multicast_x, curr_multicast_y),
+                    multicast_out           => multicast_to_node_messages_out(curr_multicast_x, curr_multicast_y),
+                    multicast_out_valid     => multicast_to_node_messages_out_valid(curr_multicast_x, curr_multicast_y)
+                );
+
+                -- Connect in and out messages
+--                multicast_x_messages_in(curr_multicast_x, curr_multicast_y)       <= multicast_x_messages_out(prev_multicast_x, curr_multicast_y);
+--                multicast_x_messages_in_valid(curr_multicast_x, curr_multicast_y) <= multicast_x_messages_out_valid(prev_multicast_x, curr_multicast_y);
+                
+                multicast_x_messages_in(curr_multicast_x, curr_multicast_y)       <= (others => '0');
+                multicast_x_messages_in_valid(curr_multicast_x, curr_multicast_y) <= '0';
+
+                multicast_y_messages_in(curr_multicast_x, curr_multicast_y)       <= multicast_y_messages_out(curr_multicast_x, prev_multicast_y);
+                multicast_y_messages_in_valid(curr_multicast_x, curr_multicast_y) <= multicast_y_messages_out_valid(curr_multicast_x, prev_multicast_y);
+            end generate MULTICAST_ROUTER_GEN;
+
         NETWORK_COL_GEN: for j in 0 to (NETWORK_COLS-1) generate
-            constant prev_y : integer := ((i-1) mod NETWORK_ROWS);
-            constant prev_x : integer := ((j-1) mod NETWORK_COLS);
-            constant curr_y : integer := i;
-            constant curr_x : integer := j;
-            constant next_y : integer := ((i+1) mod NETWORK_ROWS);
-            constant next_x : integer := ((j+1) mod NETWORK_COLS);
+            constant prev_y         : integer := ((i-1) mod NETWORK_ROWS);
+            constant prev_x         : integer := ((j-1) mod NETWORK_COLS);
+            constant curr_y         : integer := i;
+            constant curr_x         : integer := j;
+            constant next_y         : integer := ((i+1) mod NETWORK_ROWS);
+            constant next_x         : integer := ((j+1) mod NETWORK_COLS);
+            constant multicast_cluster_node_number  : integer := curr_x;
         begin
+            -- Assign multicast packets
+            USE_MULTICAST_PACKET_ASSIGN: if (USE_MULTICAST = True) generate
+            begin
+                -- Messages from multicast layer to node
+                multicast_messages_in(curr_x, curr_y)       <= multicast_to_node_messages_out(curr_multicast_x, curr_multicast_y);
+                multicast_messages_in_valid(curr_x, curr_y) <= multicast_to_node_messages_out_valid(curr_multicast_x, curr_multicast_y);
+                
+                -- Messages from node to multicast layer
+                multicast_backpressure(curr_x, curr_y)  <= not node_to_multicast_available(curr_multicast_x, curr_multicast_y)(multicast_cluster_node_number);
+                node_to_multicast_messages_in(curr_multicast_x, curr_multicast_y)(multicast_cluster_node_number)         <= multicast_messages_out(curr_x, curr_y);
+                node_to_multicast_messages_in_valid(curr_multicast_x, curr_multicast_y)(multicast_cluster_node_number)   <= multicast_messages_out_valid(curr_x, curr_y);
+            end generate USE_MULTICAST_PACKET_ASSIGN;
+            
+            NOT_USE_MULTICAST_PACKET_ASSIGN: if (USE_MULTICAST = False) generate
+            begin
+                -- Messages from multicast layer to node
+                multicast_messages_in(curr_x, curr_y)       <= (others => '0');
+                multicast_messages_in_valid(curr_x, curr_y) <= '0';
+                
+                -- Messages from node to multicast layer
+                multicast_backpressure(curr_x, curr_y)  <= '0';
+                node_to_multicast_messages_in(curr_multicast_x, curr_multicast_y)(multicast_cluster_node_number)         <= (others => '0');
+                node_to_multicast_messages_in_valid(curr_multicast_x, curr_multicast_y)(multicast_cluster_node_number)   <= '0';
+            end generate NOT_USE_MULTICAST_PACKET_ASSIGN;
+        
             -- Instantiate node
-            NODE: hoplite_tb_node
+            NODE: hoplite_multicast_tb_node
             generic map (
-                BUS_WIDTH   => BUS_WIDTH,
-                X_COORD     => curr_x,
-                Y_COORD     => curr_y,
-                COORD_BITS  => COORD_BITS
+                BUS_WIDTH               => BUS_WIDTH,
+                X_COORD                 => curr_x,
+                Y_COORD                 => curr_y,
+                COORD_BITS              => COORD_BITS,
+                
+                MULTICAST_COORD_BITS    => MULTICAST_COORD_BITS,
+                MULTICAST_X_COORD       => curr_multicast_x,
+                MULTICAST_Y_COORD       => curr_multicast_y,
+                USE_MULTICAST           => USE_MULTICAST
             )
             port map (
                 clk                 => clk,
@@ -207,16 +364,21 @@ begin
                 y_dest              => destinations(curr_x, curr_y)(Y_INDEX),
                 
                 -- Messages incoming to router
-                x_in                => x_messages_in(curr_x, curr_y),
-                x_in_valid          => x_messages_in_valid(curr_x, curr_y),                  
-                y_in                => y_messages_in(curr_x, curr_y),
-                y_in_valid          => y_messages_in_valid(curr_x, curr_y),
+                x_in                    => x_messages_in(curr_x, curr_y),
+                x_in_valid              => x_messages_in_valid(curr_x, curr_y),
+                y_in                    => y_messages_in(curr_x, curr_y),
+                y_in_valid              => y_messages_in_valid(curr_x, curr_y),
+                multicast_in            => multicast_messages_in(curr_x, curr_y),
+                multicast_in_valid      => multicast_messages_in_valid(curr_x, curr_y),
                 
                 -- Messages outgoing from router
-                x_out               => x_messages_out(curr_x, curr_y),
-                x_out_valid         => x_messages_out_valid(curr_x, curr_y),
-                y_out               => y_messages_out(curr_x, curr_y),
-                y_out_valid         => y_messages_out_valid(curr_x, curr_y),
+                x_out                   => x_messages_out(curr_x, curr_y),
+                x_out_valid             => x_messages_out_valid(curr_x, curr_y),
+                y_out                   => y_messages_out(curr_x, curr_y),
+                y_out_valid             => y_messages_out_valid(curr_x, curr_y),
+                multicast_out           => multicast_messages_out(curr_x, curr_y),
+                multicast_out_valid     => multicast_messages_out_valid(curr_x, curr_y),
+                multicast_backpressure  => multicast_backpressure(curr_x, curr_y),
                 
                 -- Messages sent by the contained processing element
                 last_message_sent   => last_messages_sent(curr_x, curr_y),
@@ -233,7 +395,6 @@ begin
             
             y_messages_in(curr_x, curr_y)       <= y_messages_out(curr_x, prev_y);
             y_messages_in_valid(curr_x, curr_y) <= y_messages_out_valid(curr_x, prev_y);
-            
             
             -- Set destination
             SET_DESTINATION: process (clk)
@@ -303,8 +464,8 @@ begin
     FIFO_SRC_ROW_CONTROL: for src_y in 0 to (NETWORK_ROWS-1) generate
         FIFO_SRC_COL_CONTROL: for src_x in 0 to (NETWORK_COLS-1) generate
         begin
-            last_messages_sent_destination(src_x, src_y)(X_INDEX) <= last_messages_sent(src_x, src_y)((COORD_BITS-1) downto 0);
-            last_messages_sent_destination(src_x, src_y)(Y_INDEX) <= last_messages_sent(src_x, src_y)((2*COORD_BITS-1) downto COORD_BITS);
+            last_messages_sent_destination(src_x, src_y)    <= get_dest_coord(last_messages_sent(src_x, src_y));
+            last_messages_sent_multicast_destination(src_x, src_y)  <= get_multicast_coord(last_messages_sent(src_x, src_y));
             
             FIFO_DEST_ROW_CONTROL: for dest_y in 0 to (NETWORK_ROWS-1) generate
                 FIFO_DEST_COL_CONTROL: for dest_x in 0 to (NETWORK_COLS-1) generate
@@ -312,9 +473,11 @@ begin
                     constant src_x_signal : std_logic_vector((COORD_BITS-1) downto 0) := std_logic_vector(to_unsigned(src_x, COORD_BITS));
                     constant dest_y_signal : std_logic_vector((COORD_BITS-1) downto 0) := std_logic_vector(to_unsigned(dest_y, COORD_BITS));
                     constant dest_x_signal : std_logic_vector((COORD_BITS-1) downto 0) := std_logic_vector(to_unsigned(dest_x, COORD_BITS));
+                    constant multicast_x_signal : std_logic_vector((MULTICAST_COORD_BITS-1) downto 0) := std_logic_vector(to_unsigned(1, MULTICAST_COORD_BITS));
+                    constant multicast_y_signal : std_logic_vector((MULTICAST_COORD_BITS-1) downto 0) := std_logic_vector(to_unsigned(src_y+1, MULTICAST_COORD_BITS));
                 begin
-                    last_messages_received_src(dest_x, dest_y)(X_INDEX) <= last_messages_received(dest_x, dest_y)((3*COORD_BITS-1) downto 2*COORD_BITS);
-                    last_messages_received_src(dest_x, dest_y)(Y_INDEX) <= last_messages_received(dest_x, dest_y)((4*COORD_BITS-1) downto 3*COORD_BITS);
+                    last_messages_received_src(dest_x, dest_y)  <= get_source_coord(last_messages_received(dest_x, dest_y));
+                    last_messages_received_multicast_destination(dest_x, dest_y) <= get_multicast_coord(last_messages_received(dest_x, dest_y));
                 
                     -- FIFO for checking messages are correctly routed
                     CHECK_FIFO: fifo_sync
@@ -341,8 +504,10 @@ begin
                     begin
                         if (rising_edge(clk) and reset_n = '1') then
                             if (messages_sent(src_x, src_y) = '1' 
-                                    and last_messages_sent_destination(src_x, src_y)(X_INDEX) = dest_x_signal
-                                    and last_messages_sent_destination(src_x, src_y)(Y_INDEX) = dest_y_signal) then
+                                    and ((last_messages_sent_destination(src_x, src_y)(X_INDEX) = dest_x_signal
+                                    and last_messages_sent_destination(src_x, src_y)(Y_INDEX) = dest_y_signal)
+                                    or (src_y = dest_y and last_messages_sent_multicast_destination(src_x, src_y)(X_INDEX) = multicast_x_signal
+                                    and last_messages_sent_multicast_destination(src_x, src_y)(Y_INDEX) = multicast_y_signal))) then
                                 expected_messages_sent_valid(src_x, src_y)(dest_x, dest_y)  <= '1';
                                 expected_messages_sent(src_x, src_y)(dest_x, dest_y)        <= last_messages_sent(src_x, src_y);
                             else
@@ -357,8 +522,9 @@ begin
                     begin
                         if (rising_edge(clk) and reset_n = '1') then
                             if (messages_received(dest_x, dest_y) = '1' 
-                                    and last_messages_received_src(dest_x, dest_y)(X_INDEX) = src_x_signal
-                                    and last_messages_received_src(dest_x, dest_y)(Y_INDEX) = src_y_signal) then
+                                    and ((last_messages_received_src(dest_x, dest_y)(X_INDEX) = src_x_signal
+                                    and last_messages_received_src(dest_x, dest_y)(Y_INDEX) = src_y_signal))
+                                    ) then
                                 expected_messages_received_valid(src_x, src_y)(dest_x, dest_y)  <= '1';
                             else
                                 expected_messages_received_valid(src_x, src_y)(dest_x, dest_y)  <= '0';
@@ -372,9 +538,6 @@ begin
                     begin
                         if (rising_edge(clk)) then
                             if (reset_n = '0') then 
---                                row_broadcasts_sent(src_x, src_y)(dest_x, dest_y)   <= 0;
---                                column_messages_sent(src_x, src_y)(dest_x, dest_y)  <= 0;
-                                                          
                                 row_broadcasts_received(src_x, src_y)(dest_x, dest_y)   <= 0;
                                 column_messages_received(src_x, src_y)(dest_x, dest_y)  <= 0;
                             elsif (messages_received(dest_x, dest_y) = '1') then
@@ -391,30 +554,14 @@ begin
                                     write(my_line, string'(" received message successfully"));
                                     
                                     writeline(output, my_line);
-                                
-                                    write(my_line, string'(HT & HT & "Source X = "));
-                                    write(my_line, to_integer(unsigned(last_messages_received(dest_x, dest_y)((3*COORD_BITS-1) downto 2*COORD_BITS))));
-                                    
-                                    write(my_line, string'(", Source Y = "));
-                                    write(my_line, to_integer(unsigned(last_messages_received(dest_x, dest_y)((4*COORD_BITS-1) downto 3*COORD_BITS))));
-                                    
-                                    write(my_line, string'(", Destination X = "));
-                                    write(my_line, to_integer(unsigned(last_messages_received(dest_x, dest_y)((COORD_BITS-1) downto 0))));
-                                    
-                                    write(my_line, string'(", Destination Y = "));
-                                    write(my_line, to_integer(unsigned(last_messages_received(dest_x, dest_y)((2*COORD_BITS-1) downto COORD_BITS))));
-                                    
-                                    write(my_line, string'(", Count = "));
-                                    write(my_line, to_integer(unsigned(last_messages_received(dest_x, dest_y)((BUS_WIDTH-MESSAGE_TYPE_BITS-1) downto 4*COORD_BITS))));
-                                
-                                    write(my_line, string'(", Type = "));
+
                                     if (last_messages_received(dest_x, dest_y)(BUS_WIDTH-1) = '1') then
                                         row_broadcasts_received(src_x, src_y)(dest_x, dest_y)   <= row_broadcasts_received(src_x, src_y)(dest_x, dest_y) + 1;
-                                        write(my_line, string'("Broadcast"));
                                     else
                                         column_messages_received(src_x, src_y)(dest_x, dest_y)  <= column_messages_received(src_x, src_y)(dest_x, dest_y) + 1;
-                                        write(my_line, string'("Unicast"));
                                     end if;
+                                
+                                    my_line := print_packet(string'("last_messages_received"), last_messages_received(dest_x, dest_y));
                                 
                                     writeline(output, my_line);
                                 elsif (last_messages_received_src(dest_x, dest_y)(X_INDEX) = src_x_signal
@@ -438,58 +585,11 @@ begin
                                     
                                     writeline(output, my_line);
                                     
-                                    write(my_line, string'(HT & HT & "last_messages_received:"));
+                                    my_line := print_packet(string'("last_messages_received"), last_messages_received(dest_x, dest_y));
                                     
                                     writeline(output, my_line);
-                                    
-                                    write(my_line, string'(HT & HT & HT & "Source X = "));
-                                    write(my_line, to_integer(unsigned(last_messages_received(dest_x, dest_y)((3*COORD_BITS-1) downto 2*COORD_BITS))));
-                                    
-                                    write(my_line, string'(", Source Y = "));
-                                    write(my_line, to_integer(unsigned(last_messages_received(dest_x, dest_y)((4*COORD_BITS-1) downto 3*COORD_BITS))));
-                                    
-                                    write(my_line, string'(", Destination X = "));
-                                    write(my_line, to_integer(unsigned(last_messages_received(dest_x, dest_y)((COORD_BITS-1) downto 0))));
-                                    
-                                    write(my_line, string'(", Destination Y = "));
-                                    write(my_line, to_integer(unsigned(last_messages_received(dest_x, dest_y)((2*COORD_BITS-1) downto COORD_BITS))));
-                                    
-                                    write(my_line, string'(", Count = "));
-                                    write(my_line, to_integer(unsigned(last_messages_received(dest_x, dest_y)((BUS_WIDTH-MESSAGE_TYPE_BITS-1) downto 4*COORD_BITS))));
-                                
-                                    write(my_line, string'(", Type = "));
-                                    if (last_messages_received(dest_x, dest_y)(BUS_WIDTH-1) = '1') then
-                                        write(my_line, string'("Broadcast"));
-                                    else
-                                        write(my_line, string'("Unicast"));
-                                    end if;
-                                    
-                                    writeline(output, my_line);
-                                    
-                                    write(my_line, string'(HT & HT & "expected_messages_received:"));
-                                    writeline(output, my_line);
-                                                                        
-                                    write(my_line, string'(HT & HT & HT & "Source X = "));
-                                    write(my_line, to_integer(unsigned(expected_messages_received(src_x, src_y)(dest_x, dest_y)((3*COORD_BITS-1) downto 2*COORD_BITS))));
-                                    
-                                    write(my_line, string'(", Source Y = "));
-                                    write(my_line, to_integer(unsigned(expected_messages_received(src_x, src_y)(dest_x, dest_y)((4*COORD_BITS-1) downto 3*COORD_BITS))));
-                                    
-                                    write(my_line, string'(", Destination X = "));
-                                    write(my_line, to_integer(unsigned(expected_messages_received(src_x, src_y)(dest_x, dest_y)((COORD_BITS-1) downto 0))));
-                                    
-                                    write(my_line, string'(", Destination Y = "));
-                                    write(my_line, to_integer(unsigned(expected_messages_received(src_x, src_y)(dest_x, dest_y)((2*COORD_BITS-1) downto COORD_BITS))));
-                                    
-                                    write(my_line, string'(", Count = "));
-                                    write(my_line, to_integer(unsigned(expected_messages_received(src_x, src_y)(dest_x, dest_y)((BUS_WIDTH-MESSAGE_TYPE_BITS-1) downto 4*COORD_BITS))));
-                                
-                                    write(my_line, string'(", Type = "));
-                                    if (expected_messages_received(src_x, src_y)(dest_x, dest_y)(BUS_WIDTH-1) = '1') then
-                                        write(my_line, string'("Broadcast"));
-                                    else
-                                        write(my_line, string'("Unicast"));
-                                    end if;
+
+                                    my_line := print_packet(string'("expected_messages_received"), expected_messages_received(src_x, src_y)(dest_x, dest_y));
                                     
                                     writeline(output, my_line);
                                     
@@ -501,12 +601,12 @@ begin
                     
                     -- Set the number of messages expected
                     SET_BROADCAST_EXPECTED: if (src_x = src_y) generate
-                        -- Pick all elements on the row
-                        BROADCAST_EXPECTED: if (src_x /= dest_x and src_y = dest_y) generate
+                        -- Broadcast to all nodes in the same row
+                        BROADCAST_EXPECTED: if (src_y = dest_y) generate
                             expected_row_broadcasts_received(src_x, src_y)(dest_x, dest_y)    <= MESSAGE_BURST;
                         end generate BROADCAST_EXPECTED;
                         
-                        BROADCAST_NOT_EXPECTED: if (src_x = dest_x or src_y /= dest_y) generate
+                        BROADCAST_NOT_EXPECTED: if (src_y /= dest_y) generate
                             expected_row_broadcasts_received(src_x, src_y)(dest_x, dest_y)    <= 0;
                         end generate BROADCAST_NOT_EXPECTED;
                     end generate SET_BROADCAST_EXPECTED;
@@ -577,11 +677,13 @@ begin
                             write(my_line, dest_x);
                             write(my_line, string'(", "));
                             write(my_line, dest_y);
-                            write(my_line, string'(") have been received"));
+                            write(my_line, string'(") have been received. "));
+                            write(my_line, string'("Expected: "));
+                            write(my_line, expected_column_messages_received(src_x, src_y)(dest_x, dest_y));
                             
                             writeline(output, my_line);
                             
-                            if (column_messages_received(src_x, src_y)(dest_x, dest_y) = MESSAGE_BURST) then
+                            if (column_messages_received(src_x, src_y)(dest_x, dest_y) = expected_column_messages_received(src_x, src_y)(dest_x, dest_y)) then
                                 write(my_line, string'("All column messages from node ("));
                                 write(my_line, src_x);
                                 write(my_line, string'(", "));

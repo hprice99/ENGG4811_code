@@ -140,7 +140,9 @@ begin
     with sel select
         multicast_backpressure <=   '0' when "00",
                                     '1' when "10",
-                                    '1' when others;
+                                    '1' when "01",
+                                    '1' when "11",
+                                    '0' when others;
     
     OUTPUT_FF: process (clk)
     begin

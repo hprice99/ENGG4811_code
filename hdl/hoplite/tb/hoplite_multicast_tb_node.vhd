@@ -29,12 +29,17 @@ use IEEE.std_logic_textio.all;
 library xil_defaultlib;
 use xil_defaultlib.hoplite_network_tb_defs.all;
 
-entity hoplite_tb_node is
+entity hoplite_multicast_tb_node is
     Generic (
-        X_COORD     : integer := 0;
-        Y_COORD     : integer := 0;
-        COORD_BITS  : integer := 2;
-        BUS_WIDTH   : integer := 8
+        BUS_WIDTH               : integer := 32;
+        X_COORD                 : integer := 0;
+        Y_COORD                 : integer := 0;
+        COORD_BITS              : integer := 1;
+        
+        MULTICAST_COORD_BITS    : integer := 1;
+        MULTICAST_X_COORD       : integer := 1;
+        MULTICAST_Y_COORD       : integer := 1;
+        USE_MULTICAST           : boolean := False
     );
     Port ( 
         clk                 : in STD_LOGIC;
@@ -46,51 +51,81 @@ entity hoplite_tb_node is
         trig                : in STD_LOGIC;
         trig_broadcast      : in STD_LOGIC;
         
+        -- Input (messages received by node)
         x_in                : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
         x_in_valid          : in STD_LOGIC;
+        
         y_in                : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
         y_in_valid          : in STD_LOGIC;
         
+        multicast_in        : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
+        multicast_in_valid  : in STD_LOGIC;
+        
+        -- Output (messages sent by node)
         x_out               : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
         x_out_valid         : out STD_LOGIC;
+        
         y_out               : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
         y_out_valid         : out STD_LOGIC;
         
+        multicast_out           : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
+        multicast_out_valid     : out STD_LOGIC;
+        multicast_backpressure  : in STD_LOGIC;
+        
+        -- Message checking signals
         last_message_sent       : out STD_LOGIC_VECTOR ((BUS_WIDTH-1) downto 0);
         message_sent            : out STD_LOGIC;
         
         last_message_received   : out STD_LOGIC_VECTOR ((BUS_WIDTH-1) downto 0);
         message_received        : out STD_LOGIC
     );
-end hoplite_tb_node;
+end hoplite_multicast_tb_node;
 
-architecture Behavioral of hoplite_tb_node is
+architecture Behavioral of hoplite_multicast_tb_node is
 
-    component hoplite_router_multicast
-        generic (
-            BUS_WIDTH   : integer := 32;
-            X_COORD     : integer := 0;
-            Y_COORD     : integer := 0;
-            COORD_BITS  : integer := 1
+    component hoplite_router_multicast is
+        Generic (
+            BUS_WIDTH               : integer := 32;
+            X_COORD                 : integer := 0;
+            Y_COORD                 : integer := 0;
+            COORD_BITS              : integer := 1;
+            
+            MULTICAST_COORD_BITS    : integer := 1;
+            MULTICAST_X_COORD       : integer := 1;
+            MULTICAST_Y_COORD       : integer := 1;
+            USE_MULTICAST           : boolean := False
         );
-        port (
+        Port ( 
             clk             : in STD_LOGIC;
             reset_n         : in STD_LOGIC;
             
+            -- Input (messages received by router)
             x_in            : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
             x_in_valid      : in STD_LOGIC;
+            
             y_in            : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
             y_in_valid      : in STD_LOGIC;
+            
             pe_in           : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
             pe_in_valid     : in STD_LOGIC;
+            pe_backpressure : out STD_LOGIC;
             
+            multicast_in            : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
+            multicast_in_valid      : in STD_LOGIC;
+            
+            -- Output (messages sent out of router)
             x_out           : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
             x_out_valid     : out STD_LOGIC;
+            
             y_out           : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
             y_out_valid     : out STD_LOGIC;
+            
             pe_out          : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
             pe_out_valid    : out STD_LOGIC;
-            pe_backpressure : out STD_LOGIC
+            
+            multicast_out           : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
+            multicast_out_valid     : out STD_LOGIC;
+            multicast_backpressure  : in STD_LOGIC
         );
     end component hoplite_router_multicast;
     
@@ -131,12 +166,17 @@ architecture Behavioral of hoplite_tb_node is
         );
     end component nic_dual;
 
-    component hoplite_tb_pe
+    component hoplite_multicast_tb_pe
         generic (
-            BUS_WIDTH   : integer := 32;
-            X_COORD     : integer := 0;
-            Y_COORD     : integer := 0;
-            COORD_BITS  : integer := 1
+            BUS_WIDTH               : integer := 32;
+            X_COORD                 : integer := 0;
+            Y_COORD                 : integer := 0;
+            COORD_BITS              : integer := 1;
+            
+            MULTICAST_COORD_BITS    : integer := 1;
+            MULTICAST_X_COORD       : integer := 1;
+            MULTICAST_Y_COORD       : integer := 1;
+            USE_MULTICAST           : boolean := False
         );
         port (
             clk                 : in STD_LOGIC;
@@ -161,7 +201,7 @@ architecture Behavioral of hoplite_tb_node is
             last_message_received   : out STD_LOGIC_VECTOR ((BUS_WIDTH-1) downto 0);
             message_received        : out STD_LOGIC
         );
-    end component hoplite_tb_pe; 
+    end component hoplite_multicast_tb_pe; 
     
     constant FIFO_DEPTH : integer := 100;
     
@@ -198,29 +238,47 @@ begin
 
     ROUTER: hoplite_router_multicast
         generic map (
-            BUS_WIDTH   => BUS_WIDTH,
-            X_COORD     => X_COORD,
-            Y_COORD     => Y_COORD,
-            COORD_BITS  => COORD_BITS
+            BUS_WIDTH               => BUS_WIDTH,
+            X_COORD                 => X_COORD,
+            Y_COORD                 => Y_COORD,
+            COORD_BITS              => COORD_BITS,
+            
+            MULTICAST_COORD_BITS    => MULTICAST_COORD_BITS,
+            MULTICAST_X_COORD       => MULTICAST_X_COORD,
+            MULTICAST_Y_COORD       => MULTICAST_Y_COORD,
+            USE_MULTICAST           => USE_MULTICAST
         )
         port map (
             clk                 => clk,
             reset_n             => reset_n,
             
+            -- Input (messages received by router)
             x_in                => x_in,
             x_in_valid          => x_in_valid,
+            
             y_in                => y_in,
             y_in_valid          => y_in_valid,
+            
             pe_in               => pe_to_network_message,
             pe_in_valid         => pe_to_network_valid,
+            pe_backpressure     => pe_backpressure,
             
+            multicast_in        => multicast_in,
+            multicast_in_valid  => multicast_in_valid,
+            
+            -- Output (messages sent out of router)
             x_out               => x_out_d,
             x_out_valid         => x_out_valid_d,
+            
             y_out               => y_out_d,
             y_out_valid         => y_out_valid_d,
+            
             pe_out              => network_to_pe_message,
             pe_out_valid        => network_to_pe_valid,
-            pe_backpressure     => pe_backpressure
+            
+            multicast_out           => multicast_out,
+            multicast_out_valid     => multicast_out_valid,
+            multicast_backpressure  => multicast_backpressure
         );
     
     -- Connect router ports to node ports
@@ -286,7 +344,7 @@ begin
     begin
         if (rising_edge(clk) and reset_n = '1') then
             if (print_valid = '1') then
-                write(my_line, string'(HT & "hoplite_tb_node: "));
+                write(my_line, string'(HT & "hoplite_multicast_tb_node: "));
                
                 write(my_line, string'("Node ("));
                 write(my_line, X_COORD);
@@ -299,105 +357,42 @@ begin
             end if;
         
             if (x_in_valid = '1') then
-                write(my_line, string'(HT & HT & "x_in: destination = ("));
-                write(my_line, to_integer(unsigned(x_in((COORD_BITS-1) downto 0))));
-                write(my_line, string'(", "));
-                write(my_line, to_integer(unsigned(x_in((2*COORD_BITS-1) downto COORD_BITS))));
-                write(my_line, string'("), source = ("));
-                write(my_line, to_integer(unsigned(x_in((3*COORD_BITS-1) downto 2*COORD_BITS))));
-                write(my_line, string'(", "));
-                write(my_line, to_integer(unsigned(x_in((4*COORD_BITS-1) downto 3*COORD_BITS))));
-                write(my_line, string'("), type = "));
-                if (x_in(BUS_WIDTH-1) = '1') then
-                    write(my_line, string'("Broadcast"));
-                else
-                    write(my_line, string'("Unicast"));
-                end if;
-                write(my_line, string'(", data = "));
-                write(my_line, to_integer(unsigned(x_in((BUS_WIDTH-MESSAGE_TYPE_BITS-1) downto 4*COORD_BITS))));
-                write(my_line, string'(", raw = "));
-                write(my_line, x_in((BUS_WIDTH-1) downto 0));
+                my_line := print_packet(string'("x_in"), x_in);
                 
                 writeline(output, my_line);
             end if;
             
-            if (y_in_valid = '1') then           
-                write(my_line, string'(HT & HT & "y_in: destination = ("));
-                write(my_line, to_integer(unsigned(y_in((COORD_BITS-1) downto 0))));
-                write(my_line, string'(", "));
-                write(my_line, to_integer(unsigned(y_in((2*COORD_BITS-1) downto COORD_BITS))));
-                write(my_line, string'("), source = ("));
-                write(my_line, to_integer(unsigned(y_in((3*COORD_BITS-1) downto 2*COORD_BITS))));
-                write(my_line, string'(", "));
-                write(my_line, to_integer(unsigned(y_in((4*COORD_BITS-1) downto 3*COORD_BITS))));
-                write(my_line, string'("), type = "));
-                if (y_in(BUS_WIDTH-1) = '1') then
-                    write(my_line, string'("Broadcast"));
-                else
-                    write(my_line, string'("Unicast"));
-                end if;
-                write(my_line, string'(", data = "));
-                write(my_line, to_integer(unsigned(y_in((BUS_WIDTH-MESSAGE_TYPE_BITS-1) downto 4*COORD_BITS))));
-                write(my_line, string'(", raw = "));
-                write(my_line, y_in((BUS_WIDTH-1) downto 0));
+            if (y_in_valid = '1') then               
+                my_line := print_packet(string'("y_in"), y_in);
                 
                 writeline(output, my_line);
             end if;
             
             if (x_out_valid_d = '1') then
-                write(my_line, string'(HT & HT & "x_out: destination = ("));
-                write(my_line, to_integer(unsigned(x_out_d((COORD_BITS-1) downto 0))));
-                write(my_line, string'(", "));
-                write(my_line, to_integer(unsigned(x_out_d((2*COORD_BITS-1) downto COORD_BITS))));
-                write(my_line, string'("), source = ("));
-                write(my_line, to_integer(unsigned(x_out_d((3*COORD_BITS-1) downto 2*COORD_BITS))));
-                write(my_line, string'(", "));
-                write(my_line, to_integer(unsigned(x_out_d((4*COORD_BITS-1) downto 3*COORD_BITS))));
-                write(my_line, string'("), type = "));
-                if (x_out_d(BUS_WIDTH-1) = '1') then
-                    write(my_line, string'("Broadcast"));
-                else
-                    write(my_line, string'("Unicast"));
-                end if;
-                write(my_line, string'(", data = "));
-                write(my_line, to_integer(unsigned(x_out_d((BUS_WIDTH-MESSAGE_TYPE_BITS-1) downto 4*COORD_BITS))));
-                write(my_line, string'(", raw = "));
-                write(my_line, x_out_d((BUS_WIDTH-1) downto 0));
+                my_line := print_packet(string'("x_out"), x_out_d);
                 
                 writeline(output, my_line);
             end if;
             
             if (y_out_valid_d = '1') then
-                write(my_line, string'(HT & HT & "y_out: destination = ("));
-                write(my_line, to_integer(unsigned(y_out_d((COORD_BITS-1) downto 0))));
-                write(my_line, string'(", "));
-                write(my_line, to_integer(unsigned(y_out_d((2*COORD_BITS-1) downto COORD_BITS))));
-                write(my_line, string'("), source = ("));
-                write(my_line, to_integer(unsigned(y_out_d((3*COORD_BITS-1) downto 2*COORD_BITS))));
-                write(my_line, string'(", "));
-                write(my_line, to_integer(unsigned(y_out_d((4*COORD_BITS-1) downto 3*COORD_BITS))));
-                write(my_line, string'("), type = "));
-                if (y_out_d(BUS_WIDTH-1) = '1') then
-                    write(my_line, string'("Broadcast"));
-                else
-                    write(my_line, string'("Unicast"));
-                end if;
-                write(my_line, string'(", data = "));
-                write(my_line, to_integer(unsigned(y_out_d((BUS_WIDTH-MESSAGE_TYPE_BITS-1) downto 4*COORD_BITS))));
-                write(my_line, string'(", raw = "));
-                write(my_line, y_out_d((BUS_WIDTH-1) downto 0));
+                my_line := print_packet(string'("y_out"), y_out_d);
                 
                 writeline(output, my_line);
             end if;
         end if;
     end process PRINT;
     
-    PE : hoplite_tb_pe
+    PE : hoplite_multicast_tb_pe
         generic map (
-            BUS_WIDTH   => BUS_WIDTH,
-            X_COORD     => X_COORD,
-            Y_COORD     => Y_COORD,
-            COORD_BITS  => COORD_BITS
+            BUS_WIDTH               => BUS_WIDTH,
+            X_COORD                 => X_COORD,
+            Y_COORD                 => Y_COORD,
+            COORD_BITS              => COORD_BITS,
+            
+            MULTICAST_COORD_BITS    => MULTICAST_COORD_BITS,
+            MULTICAST_X_COORD       => MULTICAST_X_COORD,
+            MULTICAST_Y_COORD       => MULTICAST_Y_COORD,
+            USE_MULTICAST           => USE_MULTICAST
         )
         port map (
             clk                     => clk,

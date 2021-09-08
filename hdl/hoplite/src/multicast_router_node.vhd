@@ -25,6 +25,7 @@ use IEEE.NUMERIC_STD.ALL;
 
 library xil_defaultlib;
 use xil_defaultlib.multicast_defs.all;
+use xil_defaultlib.math_functions.all;
 
 -- TODO Change multicast_in and multicast_out to buffer and network_to_pe
 entity multicast_router_node is
@@ -47,9 +48,9 @@ entity multicast_router_node is
         x_in_valid              : in STD_LOGIC;
         y_in                    : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
         y_in_valid              : in STD_LOGIC;
-        multicast_in            : in t_MulticastClusterPackets;
-        multicast_in_valid      : in t_MulticastClusterPacketsValid;
-        multicast_available     : out t_MulticastClusterPacketsValid;
+        multicast_in            : in t_MulticastGroupPackets;
+        multicast_in_valid      : in t_MulticastGroupPacketsValid;
+        multicast_available     : out t_MulticastGroupPacketsValid;
         
         -- Output
         x_out                   : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
@@ -120,7 +121,7 @@ architecture Behavioral of multicast_router_node is
     end component fifo_sync_wrapper;
 
     -- Select signal for multicast_in source
-    signal source_select    : std_logic_vector((MULTICAST_CLUSTER_NODES-1) downto 0);
+    signal source_select    : integer range 1 to MULTICAST_GROUP_NODES;
 
     -- multicast_in packet from selected source
     signal active_multicast_in          : std_logic_vector((BUS_WIDTH-1) downto 0);
@@ -131,17 +132,17 @@ architecture Behavioral of multicast_router_node is
     signal multicast_ready          : std_logic;
 
     -- Buffer signals
-    signal buffer_fifo_write_en     : t_MulticastClusterPacketsValid;
-    signal buffer_fifo_write_data   : t_MulticastClusterPackets;
+    signal buffer_fifo_write_en     : t_MulticastGroupPacketsValid;
+    signal buffer_fifo_write_data   : t_MulticastGroupPackets;
     
-    signal buffer_fifo_read_en      : t_MulticastClusterPacketsValid;
-    signal buffer_fifo_read_data    : t_MulticastClusterPackets;
+    signal buffer_fifo_read_en      : t_MulticastGroupPacketsValid;
+    signal buffer_fifo_read_data    : t_MulticastGroupPackets;
 
-    signal buffer_fifo_full         : t_MulticastClusterPacketsValid;
-    signal buffer_fifo_empty        : t_MulticastClusterPacketsValid;
+    signal buffer_fifo_full         : t_MulticastGroupPacketsValid;
+    signal buffer_fifo_empty        : t_MulticastGroupPacketsValid;
     
     function rotate_left (vect : in std_logic_vector) return std_logic_vector is
-        variable rotated_vect   : std_logic_vector;
+        variable rotated_vect   : std_logic_vector((vect'length-1) downto 0);
     begin
         rotated_vect    := vect((vect'length - 2) downto 0) & vect(vect'length - 1);
         
@@ -184,7 +185,7 @@ begin
     multicast_ready <= not multicast_backpressure;
 
     -- Buffer and arbitrate active_multicast_in
-    BUFFER_GEN: for i in 0 to (MULTICAST_CLUSTER_NODES-1) generate
+    BUFFER_GEN: for i in 0 to (MULTICAST_GROUP_NODES-1) generate
     begin
         BUFFER_FIFO: fifo_sync_wrapper
             generic map (
@@ -230,7 +231,7 @@ begin
         -- Read from buffer
         BUFFER_READ_ENABLE: process (buffer_fifo_empty(i), multicast_ready, source_select)
         begin
-            if (buffer_fifo_empty(i) = '0' and source_select(i) = '1') then
+            if (buffer_fifo_empty(i) = '0' and source_select = i + 1) then
                 buffer_fifo_read_en(i)   <= multicast_ready;
             else
                 buffer_fifo_read_en(i)   <= '0';
@@ -246,13 +247,29 @@ begin
         if (rising_edge(clk)) then
             if (reset_n = '0') then
                 -- Set first source as active
-                source_select       <= (others => '0');
-                source_select(0)    <= '1';
+                source_select       <= 1;
             else
                 -- Rotate through sources
-                source_select   <= rotate_left(source_select);
+                if (source_select = MULTICAST_GROUP_NODES) then
+                    source_select <= 1;
+                else
+                    source_select <= source_select + 1;
+                end if;
             end if;
         end if;
     end process ARBITRATOR;
+    
+    -- Select active multicast buffer data
+--    ACTIVE_SELECT: process (source_select, multicast_ready, buffer_fifo_empty)
+--    begin
+--        active_multicast_in         <= buffer_fifo_read_data(source_select-1);
+--        active_multicast_in_valid   <= multicast_ready and not buffer_fifo_empty(source_select-1);
+--    end process ACTIVE_SELECT;
+
+    ACTIVE_SELECT: process (source_select, buffer_fifo_read_en)
+    begin
+        active_multicast_in         <= buffer_fifo_read_data(source_select-1);
+        active_multicast_in_valid   <= buffer_fifo_read_en(source_select-1);
+    end process ACTIVE_SELECT;
 
 end Behavioral;
