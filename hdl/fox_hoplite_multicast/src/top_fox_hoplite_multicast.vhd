@@ -36,6 +36,7 @@ library xil_defaultlib;
 use xil_defaultlib.math_functions.all;
 use xil_defaultlib.packet_defs.all;
 use xil_defaultlib.fox_defs.all;
+use xil_defaultlib.multicast_defs.all;
 use xil_defaultlib.matrix_config.all;
 use xil_defaultlib.firmware_config.all;
 
@@ -95,6 +96,7 @@ architecture Behavioral of top is
             NODE_NUMBER     : integer := 0;
             
             -- Multicast parameters
+            USE_MULTICAST           : boolean := False;
             MULTICAST_X_COORD       : integer := 1;
             MULTICAST_Y_COORD       : integer := 1;
 
@@ -142,11 +144,16 @@ architecture Behavioral of top is
             x_in_valid          : in STD_LOGIC;
             y_in                : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
             y_in_valid          : in STD_LOGIC;
+            multicast_in        : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
+            multicast_in_valid  : in STD_LOGIC;
             
             x_out               : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
             x_out_valid         : out STD_LOGIC;
             y_out               : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
             y_out_valid         : out STD_LOGIC;
+            multicast_out       : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
+            multicast_out_valid : out STD_LOGIC;
+            multicast_backpressure  : in STD_LOGIC;
 
             out_matrix          : out std_logic_vector(31 downto 0);
             out_matrix_en       : out std_logic;
@@ -176,6 +183,7 @@ architecture Behavioral of top is
             NODE_NUMBER     : integer := 0;
             
             -- Multicast parameters
+            USE_MULTICAST           : boolean := False;
             MULTICAST_X_COORD       : integer := 1;
             MULTICAST_Y_COORD       : integer := 1;
     
@@ -229,11 +237,16 @@ architecture Behavioral of top is
             x_in_valid          : in STD_LOGIC;
             y_in                : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
             y_in_valid          : in STD_LOGIC;
+            multicast_in        : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
+            multicast_in_valid  : in STD_LOGIC;
             
             x_out               : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
             x_out_valid         : out STD_LOGIC;
             y_out               : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
             y_out_valid         : out STD_LOGIC;
+            multicast_out       : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
+            multicast_out_valid : out STD_LOGIC;
+            multicast_backpressure  : in STD_LOGIC;
     
             out_matrix          : out std_logic_vector(31 downto 0);
             out_matrix_en       : out std_logic;
@@ -242,11 +255,64 @@ architecture Behavioral of top is
         );
     end component result_node;
     
+    component multicast_router_node is
+        Generic (
+            BUS_WIDTH               : integer := 32;
+            COORD_BITS              : integer := 1;
+    
+            MULTICAST_COORD_BITS    : integer := 1;
+            MULTICAST_X_COORD       : integer := 1;
+            MULTICAST_Y_COORD       : integer := 1;
+    
+            FIFO_DEPTH              : integer := 32
+        );
+        Port ( 
+            clk             : in STD_LOGIC;
+            reset_n         : in STD_LOGIC;
+            
+            -- Input
+            x_in                    : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
+            x_in_valid              : in STD_LOGIC;
+            y_in                    : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
+            y_in_valid              : in STD_LOGIC;
+            multicast_in            : in t_NodeToMulticastPackets;
+            multicast_in_valid      : in t_NodeToMulticastPacketsValid;
+            multicast_available     : out t_NodeToMulticastPacketsValid;
+            
+            -- Output
+            x_out                   : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
+            x_out_valid             : out STD_LOGIC;
+            y_out                   : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
+            y_out_valid             : out STD_LOGIC;
+            multicast_out           : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
+            multicast_out_valid     : out STD_LOGIC
+        );
+    end component multicast_router_node;
+    
+    -- TODO Move to fox_defs
+    constant USE_MULTICAST          : boolean := False;
+    constant MULTICAST_FIFO_DEPTH   : integer := FOX_FIFO_DEPTH;
+    
     -- Array of message interfaces between nodes
-    signal x_messages_out, y_messages_out : t_Message;
-    signal x_messages_out_valid, y_messages_out_valid : t_MessageValid;
-    signal x_messages_in, y_messages_in : t_Message;
-    signal x_messages_in_valid, y_messages_in_valid : t_MessageValid;
+    signal x_messages_out, y_messages_out, multicast_messages_out : t_Message;
+    signal x_messages_out_valid, y_messages_out_valid, multicast_messages_out_valid : t_MessageValid;
+    signal x_messages_in, y_messages_in, multicast_messages_in : t_Message;
+    signal x_messages_in_valid, y_messages_in_valid, multicast_messages_in_valid : t_MessageValid;
+    
+    -- Messages to/from multicast router node
+    signal multicast_x_messages_out, multicast_y_messages_out   : t_MulticastToMulticastPackets;
+    signal multicast_x_messages_out_valid, multicast_y_messages_out_valid   : t_MulticastToMulticastPacketsValid;
+    
+    signal multicast_to_node_messages_out       : t_MulticastToNodePackets;
+    signal multicast_to_node_messages_out_valid : t_MulticastToNodePacketsValid;
+    
+    signal multicast_x_messages_in, multicast_y_messages_in               : t_MulticastToMulticastPackets;
+    signal multicast_x_messages_in_valid, multicast_y_messages_in_valid   : t_MulticastToMulticastPacketsValid;
+    
+    signal node_to_multicast_messages_in        : t_CombinedNodeToMulticastPackets;
+    signal node_to_multicast_messages_in_valid  : t_CombinedNodeToMulticastPacketValid;
+    signal node_to_multicast_available          : t_CombinedNodeToMulticastPacketValid;
+    signal multicast_backpressure               : t_MessageValid;
 
     constant FOX_DIVIDE_ENABLED     : std_logic := '0';
     constant RESULT_DIVIDE_ENABLED  : std_logic := '1';
@@ -258,19 +324,70 @@ begin
 
     -- Generate the network
     NETWORK_ROW_GEN: for i in 0 to (NETWORK_ROWS-1) generate
+        constant prev_multicast_x   : integer := 1;
+        constant prev_multicast_y   : integer := ((i-1) mod NETWORK_ROWS) + 1;
+        constant curr_multicast_x   : integer := 1;
+        constant curr_multicast_y   : integer := i+1;
+        constant next_multicast_x   : integer := 1;
+        constant next_multicast_y   : integer := ((i+1) mod NETWORK_ROWS) + 1;
+    begin
+        MULTICAST_ROUTER_GEN: if (USE_MULTICAST = true) generate
+            MULTICAST_ROUTER: multicast_router_node
+                generic map (
+                    BUS_WIDTH               => BUS_WIDTH,
+                    COORD_BITS              => COORD_BITS,
+            
+                    MULTICAST_COORD_BITS    => MULTICAST_COORD_BITS,
+                    MULTICAST_X_COORD       => curr_multicast_x,
+                    MULTICAST_Y_COORD       => curr_multicast_y,
+            
+                    FIFO_DEPTH              => MULTICAST_FIFO_DEPTH
+                )
+                port map ( 
+                    clk             => clk,
+                    reset_n         => reset_n,
+                    
+                    -- Input
+                    x_in                    => multicast_x_messages_in(curr_multicast_x, curr_multicast_y),
+                    x_in_valid              => multicast_x_messages_in_valid(curr_multicast_x, curr_multicast_y),
+                    y_in                    => multicast_y_messages_in(curr_multicast_x, curr_multicast_y),
+                    y_in_valid              => multicast_y_messages_in_valid(curr_multicast_x, curr_multicast_y),
+                    multicast_in            => node_to_multicast_messages_in(curr_multicast_x, curr_multicast_y),
+                    multicast_in_valid      => node_to_multicast_messages_in_valid(curr_multicast_x, curr_multicast_y),
+                    multicast_available     => node_to_multicast_available(curr_multicast_x, curr_multicast_y),
+                    
+                    -- Output
+                    x_out                   => multicast_x_messages_out(curr_multicast_x, curr_multicast_y),
+                    x_out_valid             => multicast_x_messages_out_valid(curr_multicast_x, curr_multicast_y),
+                    y_out                   => multicast_y_messages_out(curr_multicast_x, curr_multicast_y),
+                    y_out_valid             => multicast_y_messages_out_valid(curr_multicast_x, curr_multicast_y),
+                    multicast_out           => multicast_to_node_messages_out(curr_multicast_x, curr_multicast_y),
+                    multicast_out_valid     => multicast_to_node_messages_out_valid(curr_multicast_x, curr_multicast_y)
+                );
+
+                -- Connect in and out messages
+--                multicast_x_messages_in(curr_multicast_x, curr_multicast_y)       <= multicast_x_messages_out(prev_multicast_x, curr_multicast_y);
+--                multicast_x_messages_in_valid(curr_multicast_x, curr_multicast_y) <= multicast_x_messages_out_valid(prev_multicast_x, curr_multicast_y);
+                
+                multicast_x_messages_in(curr_multicast_x, curr_multicast_y)       <= (others => '0');
+                multicast_x_messages_in_valid(curr_multicast_x, curr_multicast_y) <= '0';
+
+                multicast_y_messages_in(curr_multicast_x, curr_multicast_y)       <= multicast_y_messages_out(curr_multicast_x, prev_multicast_y);
+                multicast_y_messages_in_valid(curr_multicast_x, curr_multicast_y) <= multicast_y_messages_out_valid(curr_multicast_x, prev_multicast_y);
+            end generate MULTICAST_ROUTER_GEN;
+    
         NETWORK_COL_GEN: for j in 0 to (NETWORK_COLS-1) generate
-            constant prev_y         : integer := ((i-1) mod NETWORK_ROWS);
-            constant prev_x         : integer := ((j-1) mod NETWORK_COLS);
-            constant curr_y         : integer := i;
-            constant curr_x         : integer := j;
-            constant next_y         : integer := ((i+1) mod NETWORK_ROWS);
-            constant next_x         : integer := ((j+1) mod NETWORK_COLS);
-            constant node_number    : integer := i * NETWORK_ROWS + j;
-            constant y_offset       : integer := i * (FOX_MATRIX_SIZE);
-            constant x_offset       : integer := j * (FOX_MATRIX_SIZE);
-            constant matrix_file    : string  := MATRIX_INIT_FILE_PREFIX & integer'image(node_number) & MATRIX_INIT_FILE_SUFFIX;
-            constant multicast_x    : integer := 1;
-            constant multicast_y    : integer := 1;
+            constant prev_y                         : integer := ((i-1) mod NETWORK_ROWS);
+            constant prev_x                         : integer := ((j-1) mod NETWORK_COLS);
+            constant curr_y                         : integer := i;
+            constant curr_x                         : integer := j;
+            constant next_y                         : integer := ((i+1) mod NETWORK_ROWS);
+            constant next_x                         : integer := ((j+1) mod NETWORK_COLS);
+            constant node_number                    : integer := i * NETWORK_ROWS + j;
+            constant multicast_group_node_number    : integer := curr_x;
+            constant y_offset                       : integer := i * (FOX_MATRIX_SIZE);
+            constant x_offset                       : integer := j * (FOX_MATRIX_SIZE);
+            constant matrix_file                    : string  := MATRIX_INIT_FILE_PREFIX & integer'image(node_number) & MATRIX_INIT_FILE_SUFFIX;
         begin
             -- Connect in and out messages
             x_messages_in(curr_x, curr_y)       <= x_messages_out(prev_x, curr_y);
@@ -278,6 +395,31 @@ begin
 
             y_messages_in(curr_x, curr_y)       <= y_messages_out(curr_x, next_y);
             y_messages_in_valid(curr_x, curr_y) <= y_messages_out_valid(curr_x, next_y);
+            
+            -- Assign multicast packets
+            USE_MULTICAST_PACKET_ASSIGN: if (USE_MULTICAST = True) generate
+            begin
+                -- Messages from multicast layer to node
+                multicast_messages_in(curr_x, curr_y)       <= multicast_to_node_messages_out(curr_multicast_x, curr_multicast_y);
+                multicast_messages_in_valid(curr_x, curr_y) <= multicast_to_node_messages_out_valid(curr_multicast_x, curr_multicast_y);
+                
+                -- Messages from node to multicast layer
+                multicast_backpressure(curr_x, curr_y)  <= not node_to_multicast_available(curr_multicast_x, curr_multicast_y)(multicast_group_node_number);
+                node_to_multicast_messages_in(curr_multicast_x, curr_multicast_y)(multicast_group_node_number)         <= multicast_messages_out(curr_x, curr_y);
+                node_to_multicast_messages_in_valid(curr_multicast_x, curr_multicast_y)(multicast_group_node_number)   <= multicast_messages_out_valid(curr_x, curr_y);
+            end generate USE_MULTICAST_PACKET_ASSIGN;
+            
+            NOT_USE_MULTICAST_PACKET_ASSIGN: if (USE_MULTICAST = False) generate
+            begin
+                -- Messages from multicast layer to node
+                multicast_messages_in(curr_x, curr_y)       <= (others => '0');
+                multicast_messages_in_valid(curr_x, curr_y) <= '0';
+                
+                -- Messages from node to multicast layer
+                multicast_backpressure(curr_x, curr_y)  <= '0';
+                node_to_multicast_messages_in(curr_multicast_x, curr_multicast_y)(multicast_group_node_number)         <= (others => '0');
+                node_to_multicast_messages_in_valid(curr_multicast_x, curr_multicast_y)(multicast_group_node_number)   <= '0';
+            end generate NOT_USE_MULTICAST_PACKET_ASSIGN;
         
             -- Instantiate node
             RESULT_GEN: if (curr_x = RESULT_X_COORD and curr_y = RESULT_Y_COORD) generate
@@ -302,8 +444,9 @@ begin
                     NODE_NUMBER     => node_number,
                     
                     -- Multicast parameters
-                    MULTICAST_X_COORD   => multicast_x,
-                    MULTICAST_Y_COORD   => multicast_y,
+                    USE_MULTICAST       => USE_MULTICAST,
+                    MULTICAST_X_COORD   => curr_multicast_x,
+                    MULTICAST_Y_COORD   => curr_multicast_y,
             
                     -- Packet parameters
                     COORD_BITS              => COORD_BITS,
@@ -352,16 +495,21 @@ begin
                     uart_tx             => uart_tx,
                     
                     -- Messages incoming to router
-                    x_in                => x_messages_in(curr_x, curr_y),
-                    x_in_valid          => x_messages_in_valid(curr_x, curr_y),                  
-                    y_in                => y_messages_in(curr_x, curr_y),
-                    y_in_valid          => y_messages_in_valid(curr_x, curr_y),
+                    x_in                    => x_messages_in(curr_x, curr_y),
+                    x_in_valid              => x_messages_in_valid(curr_x, curr_y),                  
+                    y_in                    => y_messages_in(curr_x, curr_y),
+                    y_in_valid              => y_messages_in_valid(curr_x, curr_y),
+                    multicast_in            => multicast_messages_in(curr_x, curr_y),
+                    multicast_in_valid      => multicast_messages_in_valid(curr_x, curr_y),
                     
                     -- Messages outgoing from router
-                    x_out               => x_messages_out(curr_x, curr_y),
-                    x_out_valid         => x_messages_out_valid(curr_x, curr_y),
-                    y_out               => y_messages_out(curr_x, curr_y),
-                    y_out_valid         => y_messages_out_valid(curr_x, curr_y),
+                    x_out                   => x_messages_out(curr_x, curr_y),
+                    x_out_valid             => x_messages_out_valid(curr_x, curr_y),
+                    y_out                   => y_messages_out(curr_x, curr_y),
+                    y_out_valid             => y_messages_out_valid(curr_x, curr_y),
+                    multicast_out           => multicast_messages_out(curr_x, curr_y),
+                    multicast_out_valid     => multicast_messages_out_valid(curr_x, curr_y),
+                    multicast_backpressure  => multicast_backpressure(curr_x, curr_y),
 
                     out_matrix          => out_matrix(curr_x, curr_y),
                     out_matrix_en       => out_matrix_en(curr_x, curr_y),
@@ -392,8 +540,9 @@ begin
                     NODE_NUMBER     => node_number,
                     
                     -- Multicast parameters
-                    MULTICAST_X_COORD   => multicast_x,
-                    MULTICAST_Y_COORD   => multicast_y,
+                    USE_MULTICAST       => USE_MULTICAST,
+                    MULTICAST_X_COORD   => curr_multicast_x,
+                    MULTICAST_Y_COORD   => curr_multicast_y,
 
                     -- Packet parameters
                     COORD_BITS              => COORD_BITS,
@@ -436,16 +585,21 @@ begin
                     out_char_ready      => '1',
                     
                     -- Messages incoming to router
-                    x_in                => x_messages_in(curr_x, curr_y),
-                    x_in_valid          => x_messages_in_valid(curr_x, curr_y),                  
-                    y_in                => y_messages_in(curr_x, curr_y),
-                    y_in_valid          => y_messages_in_valid(curr_x, curr_y),
+                    x_in                    => x_messages_in(curr_x, curr_y),
+                    x_in_valid              => x_messages_in_valid(curr_x, curr_y),                  
+                    y_in                    => y_messages_in(curr_x, curr_y),
+                    y_in_valid              => y_messages_in_valid(curr_x, curr_y),
+                    multicast_in            => multicast_messages_in(curr_x, curr_y),
+                    multicast_in_valid      => multicast_messages_in_valid(curr_x, curr_y),
                     
                     -- Messages outgoing from router
-                    x_out               => x_messages_out(curr_x, curr_y),
-                    x_out_valid         => x_messages_out_valid(curr_x, curr_y),
-                    y_out               => y_messages_out(curr_x, curr_y),
-                    y_out_valid         => y_messages_out_valid(curr_x, curr_y),
+                    x_out                   => x_messages_out(curr_x, curr_y),
+                    x_out_valid             => x_messages_out_valid(curr_x, curr_y),
+                    y_out                   => y_messages_out(curr_x, curr_y),
+                    y_out_valid             => y_messages_out_valid(curr_x, curr_y),
+                    multicast_out           => multicast_messages_out(curr_x, curr_y),
+                    multicast_out_valid     => multicast_messages_out_valid(curr_x, curr_y),
+                    multicast_backpressure  => multicast_backpressure(curr_x, curr_y),
 
                     out_matrix          => out_matrix(curr_x, curr_y),
                     out_matrix_en       => out_matrix_en(curr_x, curr_y),

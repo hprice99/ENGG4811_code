@@ -52,6 +52,7 @@ entity result_node is
         NODE_NUMBER     : integer := 0;
         
         -- Multicast parameters
+        USE_MULTICAST           : boolean := False;
         MULTICAST_X_COORD       : integer := 1;
         MULTICAST_Y_COORD       : integer := 1;
 
@@ -105,11 +106,16 @@ entity result_node is
         x_in_valid          : in STD_LOGIC;
         y_in                : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
         y_in_valid          : in STD_LOGIC;
+        multicast_in        : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
+        multicast_in_valid  : in STD_LOGIC;
         
         x_out               : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
         x_out_valid         : out STD_LOGIC;
         y_out               : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
         y_out_valid         : out STD_LOGIC;
+        multicast_out       : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
+        multicast_out_valid : out STD_LOGIC;
+        multicast_backpressure  : in STD_LOGIC;
 
         out_matrix          : out std_logic_vector(31 downto 0);
         out_matrix_en       : out std_logic;
@@ -141,6 +147,7 @@ architecture Behavioral of result_node is
             NODE_NUMBER     : integer := 0;
             
             -- Multicast parameters
+            USE_MULTICAST           : boolean := False;
             MULTICAST_X_COORD       : integer := 1;
             MULTICAST_Y_COORD       : integer := 1;
 
@@ -188,11 +195,16 @@ architecture Behavioral of result_node is
             x_in_valid          : in STD_LOGIC;
             y_in                : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
             y_in_valid          : in STD_LOGIC;
+            multicast_in        : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
+            multicast_in_valid  : in STD_LOGIC;
             
             x_out               : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
             x_out_valid         : out STD_LOGIC;
             y_out               : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
             y_out_valid         : out STD_LOGIC;
+            multicast_out       : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
+            multicast_out_valid : out STD_LOGIC;
+            multicast_backpressure  : in STD_LOGIC;
 
             out_matrix          : out std_logic_vector(31 downto 0);
             out_matrix_en       : out std_logic;
@@ -295,6 +307,7 @@ begin
             NODE_NUMBER     => NODE_NUMBER,
             
             -- Multicast parameters
+            USE_MULTICAST       => USE_MULTICAST,
             MULTICAST_X_COORD   => MULTICAST_X_COORD,
             MULTICAST_Y_COORD   => MULTICAST_Y_COORD,
     
@@ -343,12 +356,17 @@ begin
             x_in_valid          => x_in_valid,
             y_in                => y_in,
             y_in_valid          => y_in_valid,
+            multicast_in        => multicast_in,
+            multicast_in_valid  => multicast_in_valid,
             
             -- Messages outgoing from router
             x_out               => x_out,
             x_out_valid         => x_out_valid,
             y_out               => y_out,
             y_out_valid         => y_out_valid,
+            multicast_out       => multicast_out,
+            multicast_out_valid => multicast_out_valid,
+            multicast_backpressure  => multicast_backpressure,
     
             out_matrix          => out_matrix,
             out_matrix_en       => out_matrix_en,
