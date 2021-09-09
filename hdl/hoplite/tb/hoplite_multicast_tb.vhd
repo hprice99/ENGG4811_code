@@ -643,11 +643,13 @@ begin
                             write(my_line, dest_x);
                             write(my_line, string'(", "));
                             write(my_line, dest_y);
-                            write(my_line, string'(") have been received"));
+                            write(my_line, string'(") have been received. "));
+                            write(my_line, string'("Expected: "));
+                            write(my_line, expected_row_broadcasts_received(src_x, src_y)(dest_x, dest_y));
                             
                             writeline(output, my_line);
                         
-                            if (row_broadcasts_received(src_x, src_y)(dest_x, dest_y) = MESSAGE_BURST) then
+                            if (row_broadcasts_received(src_x, src_y)(dest_x, dest_y) = expected_row_broadcasts_received(src_x, src_y)(dest_x, dest_y)) then
                                 write(my_line, string'("All broadcast messages from node ("));
                                 write(my_line, src_x);
                                 write(my_line, string'(", "));
@@ -656,7 +658,7 @@ begin
                                 write(my_line, dest_x);
                                 write(my_line, string'(", "));
                                 write(my_line, dest_y);
-                                write(my_line, string'(") have been received"));
+                                write(my_line, string'(") have been received. "));
                                         
                                 writeline(output, my_line);
                             end if;
