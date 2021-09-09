@@ -21,4 +21,6 @@ useMatrixInitFile: True
 
 useMulticast: True
 multicastConfig:
-  multicastClusterNodes: 2
+  multicastGroupNodes: 2
+  multicastNetworkRows: 2
+  multicastNetworkCols: 1
