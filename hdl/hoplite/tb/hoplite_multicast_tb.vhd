@@ -115,9 +115,9 @@ architecture Behavioral of hoplite_tb is
         x_in_valid              : in STD_LOGIC;
         y_in                    : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
         y_in_valid              : in STD_LOGIC;
-        multicast_in            : in t_MulticastGroupPackets;
-        multicast_in_valid      : in t_MulticastGroupPacketsValid;
-        multicast_available     : out t_MulticastGroupPacketsValid;
+        multicast_in            : in t_NodeToMulticastPackets;
+        multicast_in_valid      : in t_NodeToMulticastPacketsValid;
+        multicast_available     : out t_NodeToMulticastPacketsValid;
         
         -- Output
         x_out                   : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
@@ -178,17 +178,17 @@ architecture Behavioral of hoplite_tb is
     signal multicast_backpressure   : t_MessageValid;
     
     signal multicast_x_messages_out, multicast_y_messages_out   : t_MulticastToMulticastPackets;
-    signal multicast_x_messages_out_valid, multicast_y_messages_out_valid   : t_MulticastNetworkPacketsValid;
+    signal multicast_x_messages_out_valid, multicast_y_messages_out_valid   : t_MulticastToMulticastPacketsValid;
     
-    signal multicast_to_node_messages_out   : t_MulticastToMulticastPackets;
-    signal multicast_to_node_messages_out_valid : t_MulticastNetworkPacketsValid;
+    signal multicast_to_node_messages_out       : t_MulticastToNodePackets;
+    signal multicast_to_node_messages_out_valid : t_MulticastToNodePacketsValid;
     
     signal multicast_x_messages_in, multicast_y_messages_in     : t_MulticastToMulticastPackets;
-    signal multicast_x_messages_in_valid, multicast_y_messages_in_valid   : t_MulticastNetworkPacketsValid;
+    signal multicast_x_messages_in_valid, multicast_y_messages_in_valid   : t_MulticastToMulticastPacketsValid;
     
-    signal node_to_multicast_messages_in        : t_CombinedMulticastGroupPackets;
-    signal node_to_multicast_messages_in_valid  : t_CombinedMulticastGroupPacketsValid;
-    signal node_to_multicast_available          : t_CombinedMulticastGroupPacketsValid;
+    signal node_to_multicast_messages_in        : t_CombinedNodeToMulticastPackets;
+    signal node_to_multicast_messages_in_valid  : t_CombinedNodeToMulticastPacketValid;
+    signal node_to_multicast_available          : t_CombinedNodeToMulticastPacketValid;
     
     constant TEST_SRC_ROW           : integer := 0;
     constant TEST_BROADCAST_COL     : integer := 0;
@@ -643,11 +643,13 @@ begin
                             write(my_line, dest_x);
                             write(my_line, string'(", "));
                             write(my_line, dest_y);
-                            write(my_line, string'(") have been received"));
+                            write(my_line, string'(") have been received. "));
+                            write(my_line, string'("Expected: "));
+                            write(my_line, expected_row_broadcasts_received(src_x, src_y)(dest_x, dest_y));
                             
                             writeline(output, my_line);
                         
-                            if (row_broadcasts_received(src_x, src_y)(dest_x, dest_y) = MESSAGE_BURST) then
+                            if (row_broadcasts_received(src_x, src_y)(dest_x, dest_y) = expected_row_broadcasts_received(src_x, src_y)(dest_x, dest_y)) then
                                 write(my_line, string'("All broadcast messages from node ("));
                                 write(my_line, src_x);
                                 write(my_line, string'(", "));
@@ -656,7 +658,7 @@ begin
                                 write(my_line, dest_x);
                                 write(my_line, string'(", "));
                                 write(my_line, dest_y);
-                                write(my_line, string'(") have been received"));
+                                write(my_line, string'(") have been received. "));
                                         
                                 writeline(output, my_line);
                             end if;

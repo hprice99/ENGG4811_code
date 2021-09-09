@@ -48,9 +48,9 @@ entity multicast_router_node is
         x_in_valid              : in STD_LOGIC;
         y_in                    : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
         y_in_valid              : in STD_LOGIC;
-        multicast_in            : in t_MulticastGroupPackets;
-        multicast_in_valid      : in t_MulticastGroupPacketsValid;
-        multicast_available     : out t_MulticastGroupPacketsValid;
+        multicast_in            : in t_NodeToMulticastPackets;
+        multicast_in_valid      : in t_NodeToMulticastPacketsValid;
+        multicast_available     : out t_NodeToMulticastPacketsValid;
         
         -- Output
         x_out                   : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
@@ -132,14 +132,14 @@ architecture Behavioral of multicast_router_node is
     signal multicast_ready          : std_logic;
 
     -- Buffer signals
-    signal buffer_fifo_write_en     : t_MulticastGroupPacketsValid;
-    signal buffer_fifo_write_data   : t_MulticastGroupPackets;
+    signal buffer_fifo_write_en     : t_NodeToMulticastPacketsValid;
+    signal buffer_fifo_write_data   : t_NodeToMulticastPackets;
     
-    signal buffer_fifo_read_en      : t_MulticastGroupPacketsValid;
-    signal buffer_fifo_read_data    : t_MulticastGroupPackets;
+    signal buffer_fifo_read_en      : t_NodeToMulticastPacketsValid;
+    signal buffer_fifo_read_data    : t_NodeToMulticastPackets;
 
-    signal buffer_fifo_full         : t_MulticastGroupPacketsValid;
-    signal buffer_fifo_empty        : t_MulticastGroupPacketsValid;
+    signal buffer_fifo_full         : t_NodeToMulticastPacketsValid;
+    signal buffer_fifo_empty        : t_NodeToMulticastPacketsValid;
     
     function rotate_left (vect : in std_logic_vector) return std_logic_vector is
         variable rotated_vect   : std_logic_vector((vect'length-1) downto 0);
