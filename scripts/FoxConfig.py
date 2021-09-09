@@ -38,9 +38,13 @@ class FoxConfig:
         self.useMulticast = foxConfig['useMulticast']
 
         if self.useMulticast == True:
-            self.multicastClusterNodes = foxConfig['multicastConfig']['multicastClusterNodes']
+            self.multicastGroupNodes = foxConfig['multicastConfig']['multicastGroupNodes']
+            self.multicastNetworkRows = foxConfig['multicastConfig']['multicastNetworkRows']
+            self.multicastNetworkCols = foxConfig['multicastConfig']['multicastNetworkCols']
         else:
-            self.multicastClusterNodes = 0
+            self.multicastGroupNodes = 0
+            self.multicastNetworkRows = 0
+            self.multicastNetworkCols = 0
 
     # Firmware configuration
     def import_firmware_config(self):

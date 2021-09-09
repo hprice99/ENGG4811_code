@@ -69,7 +69,9 @@ foxNetwork = FoxNetwork(networkRows=config.networkRows, \
                         B=B, \
                         useMatrixInitFile=config.useMatrixInitFile, \
                         useMulticast=config.useMulticast, \
-                        multicastClusterNodes=config.multicastClusterNodes, \
+                        multicastGroupNodes=config.multicastGroupNodes, \
+                        multicastNetworkRows=config.multicastNetworkRows, \
+                        multicastNetworkCols=config.multicastNetworkCols, \
                         hdlFolder=hdlFolder, \
                         firmwareFolder=firmwareFolder)
 

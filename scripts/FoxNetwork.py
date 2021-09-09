@@ -14,7 +14,8 @@ class FoxNetwork:
             multicastCoordBits, \
             doneFlagBits, resultFlagBits, matrixTypeBits, matrixCoordBits, \
             foxFirmware, resultFirmware, A=None, B=None, \
-            useMatrixInitFile=True, useMulticast, multicastClusterNodes, \
+            useMatrixInitFile=True, useMulticast, multicastGroupNodes, \
+            multicastNetworkRows, multicastNetworkCols, \
             hdlFolder=None, firmwareFolder=None):
 
         # Entire network details
@@ -60,7 +61,7 @@ class FoxNetwork:
         self.useMulticast = useMulticast
 
         if self.useMulticast == True:
-            self.multicastConfig = MulticastConfig(multicastClusterNodes=multicastClusterNodes)
+            self.multicastConfig = MulticastConfig(multicastGroupNodes=multicastGroupNodes, multicastNetworkRows=multicastNetworkRows, multicastNetworkCols=multicastNetworkCols)
         else:
             self.multicastConfig = None
 
