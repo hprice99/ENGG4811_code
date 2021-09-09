@@ -156,7 +156,7 @@ architecture Behavioral of hoplite_tb is
     
     signal count            : integer;
     
-    constant USE_MULTICAST  : boolean := True;
+    constant USE_MULTICAST          : boolean := True;
     constant MULTICAST_FIFO_DEPTH   : integer := MAX_MESSAGE_COUNT;
     
     type t_Counts is array (0 to (NETWORK_COLS-1), 0 to (NETWORK_ROWS-1)) of integer;
@@ -506,7 +506,7 @@ begin
                             if (messages_sent(src_x, src_y) = '1' 
                                     and ((last_messages_sent_destination(src_x, src_y)(X_INDEX) = dest_x_signal
                                     and last_messages_sent_destination(src_x, src_y)(Y_INDEX) = dest_y_signal)
-                                    or (src_y = dest_y and last_messages_sent_multicast_destination(src_x, src_y)(X_INDEX) = multicast_x_signal
+                                    or (USE_MULTICAST = true and src_y = dest_y and last_messages_sent_multicast_destination(src_x, src_y)(X_INDEX) = multicast_x_signal
                                     and last_messages_sent_multicast_destination(src_x, src_y)(Y_INDEX) = multicast_y_signal))) then
                                 expected_messages_sent_valid(src_x, src_y)(dest_x, dest_y)  <= '1';
                                 expected_messages_sent(src_x, src_y)(dest_x, dest_y)        <= last_messages_sent(src_x, src_y);
@@ -602,11 +602,13 @@ begin
                     -- Set the number of messages expected
                     SET_BROADCAST_EXPECTED: if (src_x = src_y) generate
                         -- Broadcast to all nodes in the same row
-                        BROADCAST_EXPECTED: if (src_y = dest_y) generate
+                        BROADCAST_EXPECTED: if ((USE_MULTICAST = False and src_x /= dest_x and src_y = dest_y) or
+                                (USE_MULTICAST = True and src_y = dest_y)) generate
                             expected_row_broadcasts_received(src_x, src_y)(dest_x, dest_y)    <= MESSAGE_BURST;
                         end generate BROADCAST_EXPECTED;
                         
-                        BROADCAST_NOT_EXPECTED: if (src_y /= dest_y) generate
+                        BROADCAST_NOT_EXPECTED: if ((USE_MULTICAST = false and (src_x = dest_x or src_y /= dest_y)) or 
+                                (USE_MULTICAST = true and src_y /= dest_y)) generate
                             expected_row_broadcasts_received(src_x, src_y)(dest_x, dest_y)    <= 0;
                         end generate BROADCAST_NOT_EXPECTED;
                     end generate SET_BROADCAST_EXPECTED;
