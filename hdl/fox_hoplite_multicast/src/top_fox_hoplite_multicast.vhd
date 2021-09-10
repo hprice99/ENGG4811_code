@@ -290,7 +290,7 @@ architecture Behavioral of top is
     end component multicast_router_node;
     
     -- TODO Move to fox_defs
-    constant USE_MULTICAST          : boolean := False;
+    constant USE_MULTICAST          : boolean := True;
     constant MULTICAST_FIFO_DEPTH   : integer := FOX_FIFO_DEPTH;
     
     -- Array of message interfaces between nodes
@@ -303,11 +303,11 @@ architecture Behavioral of top is
     signal multicast_x_messages_out, multicast_y_messages_out   : t_MulticastToMulticastPackets;
     signal multicast_x_messages_out_valid, multicast_y_messages_out_valid   : t_MulticastToMulticastPacketsValid;
     
-    signal multicast_to_node_messages_out       : t_MulticastToNodePackets;
-    signal multicast_to_node_messages_out_valid : t_MulticastToNodePacketsValid;
-    
     signal multicast_x_messages_in, multicast_y_messages_in               : t_MulticastToMulticastPackets;
     signal multicast_x_messages_in_valid, multicast_y_messages_in_valid   : t_MulticastToMulticastPacketsValid;
+    
+    signal multicast_to_node_messages_out       : t_MulticastToNodePackets;
+    signal multicast_to_node_messages_out_valid : t_MulticastToNodePacketsValid;
     
     signal node_to_multicast_messages_in        : t_CombinedNodeToMulticastPackets;
     signal node_to_multicast_messages_in_valid  : t_CombinedNodeToMulticastPacketValid;
@@ -372,8 +372,8 @@ begin
                 multicast_x_messages_in(curr_multicast_x, curr_multicast_y)       <= (others => '0');
                 multicast_x_messages_in_valid(curr_multicast_x, curr_multicast_y) <= '0';
 
-                multicast_y_messages_in(curr_multicast_x, curr_multicast_y)       <= multicast_y_messages_out(curr_multicast_x, prev_multicast_y);
-                multicast_y_messages_in_valid(curr_multicast_x, curr_multicast_y) <= multicast_y_messages_out_valid(curr_multicast_x, prev_multicast_y);
+                multicast_y_messages_in(curr_multicast_x, curr_multicast_y)       <= multicast_y_messages_out(curr_multicast_x, next_multicast_y);
+                multicast_y_messages_in_valid(curr_multicast_x, curr_multicast_y) <= multicast_y_messages_out_valid(curr_multicast_x, next_multicast_y);
             end generate MULTICAST_ROUTER_GEN;
     
         NETWORK_COL_GEN: for j in 0 to (NETWORK_COLS-1) generate

@@ -133,7 +133,7 @@ architecture Behavioral of hoplite_router_multicast is
     
     -- Determine if the packet received is a multicast packet destined for this node
     impure function is_valid_multicast_in (packet_in_multicast_coord : in t_MulticastCoords; 
-                                        packet_in_valid : in std_logic) 
+                                           packet_in_valid : in std_logic) 
                                         return boolean is
         variable is_multicast   : boolean;  
     begin
@@ -170,7 +170,7 @@ architecture Behavioral of hoplite_router_multicast is
 begin
 
     -- If multicast is to be used, then MULTICAST_X_COORD and MULTICAST_Y_COORD must be positive
-    assert ((USE_MULTICAST = true and MULTICAST_X_COORD > 0 and MULTICAST_Y_COORD > 0) or USE_MULTICAST = False) report "MULTICAST_COORDS must be set when USE_MULTICAST is enabled" severity failure;
+    assert ((USE_MULTICAST = True and MULTICAST_X_COORD > 0 and MULTICAST_Y_COORD > 0) or USE_MULTICAST = False) report "MULTICAST_COORDS must be set when USE_MULTICAST is enabled" severity failure;
 
     -- Assign destination coordinates   
     x_in_dest_d(X_INDEX) <= x_d(X_INDEX_HEADER_END downto X_INDEX_HEADER_START);

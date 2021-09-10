@@ -71,14 +71,7 @@ enum FoxError send_ready(int my_x_coord, int my_y_coord,
     packet.doneFlag = true;
     packet.resultFlag = false;
     packet.matrixType = matrixType;
-
-    if (matrixType == A_type) {
-
-        packet.multicastGroup = 1;
-    } else {
-
-        packet.multicastGroup = 0;
-    }
+    packet.multicastGroup = 0;
 
     packet.destX = dest_x_coord;
     packet.destY = dest_y_coord;
@@ -133,7 +126,8 @@ enum FoxError send_A(int my_x_coord, int my_y_coord, int fox_rows) {
     packet.doneFlag = false;
     packet.resultFlag = false;
     packet.matrixType = A_type;
-    packet.multicastGroup = 1;
+    // packet.multicastGroup = 1;
+    packet.multicastGroup = 0;
     packet.destY = my_y_coord;
 
     // Loop through matrix elements

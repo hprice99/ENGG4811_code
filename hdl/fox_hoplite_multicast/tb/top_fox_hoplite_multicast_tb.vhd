@@ -106,8 +106,8 @@ architecture Behavioral of top_tb is
 --    constant FOX_FIRMWARE       : string := "firmware_fox_hoplite_multicast_tb.hex";
 --    constant RESULT_FIRMWARE    : string := "firmware_fox_hoplite_multicast_result_tb.hex";
     
---    constant FOX_FIRMWARE       : string := "firmware_hoplite.hex";
---    constant RESULT_FIRMWARE    : string := "firmware_hoplite_result.hex";
+    constant FOX_FIRMWARE       : string := "firmware_fox_hoplite_multicast.hex";
+    constant RESULT_FIRMWARE    : string := "firmware_fox_hoplite_multicast_result.hex";
     
     signal LED      : std_logic_vector((FOX_NETWORK_NODES-1) downto 0);
     
