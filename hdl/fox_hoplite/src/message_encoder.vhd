@@ -21,10 +21,11 @@
 
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.NUMERIC_STD.ALL;
 
 -- Uncomment the following library declaration if using
 -- arithmetic functions with Signed or Unsigned values
---use IEEE.NUMERIC_STD.ALL;
+--
 
 -- Uncomment the following library declaration if instantiating
 -- any Xilinx leaf cells in this code.
@@ -124,7 +125,7 @@ begin
                 if (multicast_group_in_valid = '1') then
                     multicast_group <= multicast_group_in;
                     
-                    if (multicast_group /= "0") then
+                    if (to_integer(unsigned(multicast_group_in)) = 0) then
                         multicast_x_coord   <= (others => '1');
                         multicast_y_coord   <= (others => '1');
                     else

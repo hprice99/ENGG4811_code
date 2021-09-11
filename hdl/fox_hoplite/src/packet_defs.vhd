@@ -8,7 +8,7 @@ package packet_defs is
 
     -- Size of message data in packets
     constant COORD_BITS             : integer := 1;
-    constant MULTICAST_COORD_BITS   : integer := 2;
+    constant MULTICAST_COORD_BITS   : integer := 1;
     constant DONE_FLAG_BITS         : integer := 1;
     constant RESULT_FLAG_BITS       : integer := 1;
     constant MATRIX_TYPE_BITS       : integer := 1;
