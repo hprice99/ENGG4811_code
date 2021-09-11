@@ -360,12 +360,12 @@ begin
             multicast_in_valid  => multicast_in_valid,
             
             -- Messages outgoing from router
-            x_out               => x_out,
-            x_out_valid         => x_out_valid,
-            y_out               => y_out,
-            y_out_valid         => y_out_valid,
-            multicast_out       => multicast_out,
-            multicast_out_valid => multicast_out_valid,
+            x_out                   => x_out,
+            x_out_valid             => x_out_valid,
+            y_out                   => y_out,
+            y_out_valid             => y_out_valid,
+            multicast_out           => multicast_out,
+            multicast_out_valid     => multicast_out_valid,
             multicast_backpressure  => multicast_backpressure,
     
             out_matrix          => out_matrix,

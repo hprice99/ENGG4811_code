@@ -372,8 +372,8 @@ begin
                 multicast_x_messages_in(curr_multicast_x, curr_multicast_y)       <= (others => '0');
                 multicast_x_messages_in_valid(curr_multicast_x, curr_multicast_y) <= '0';
 
-                multicast_y_messages_in(curr_multicast_x, curr_multicast_y)       <= multicast_y_messages_out(curr_multicast_x, next_multicast_y);
-                multicast_y_messages_in_valid(curr_multicast_x, curr_multicast_y) <= multicast_y_messages_out_valid(curr_multicast_x, next_multicast_y);
+                multicast_y_messages_in(curr_multicast_x, curr_multicast_y)       <= multicast_y_messages_out(curr_multicast_x, prev_multicast_y);
+                multicast_y_messages_in_valid(curr_multicast_x, curr_multicast_y) <= multicast_y_messages_out_valid(curr_multicast_x, prev_multicast_y);
             end generate MULTICAST_ROUTER_GEN;
     
         NETWORK_COL_GEN: for j in 0 to (NETWORK_COLS-1) generate
@@ -405,6 +405,7 @@ begin
                 
                 -- Messages from node to multicast layer
                 multicast_backpressure(curr_x, curr_y)  <= not node_to_multicast_available(curr_multicast_x, curr_multicast_y)(multicast_group_node_number);
+                
                 node_to_multicast_messages_in(curr_multicast_x, curr_multicast_y)(multicast_group_node_number)         <= multicast_messages_out(curr_x, curr_y);
                 node_to_multicast_messages_in_valid(curr_multicast_x, curr_multicast_y)(multicast_group_node_number)   <= multicast_messages_out_valid(curr_x, curr_y);
             end generate USE_MULTICAST_PACKET_ASSIGN;

@@ -215,11 +215,13 @@ void main() {
 
     initialise_C();
 
+    #ifdef TB_PRINT
     #ifdef RESULT
     print_string("Result node ");
     print_dec(my_node_number);
     print_char('\n');
     print_char('\n');
+    #endif
     #endif
 
     #ifdef TB_PRINT

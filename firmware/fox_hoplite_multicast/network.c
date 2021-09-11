@@ -45,6 +45,12 @@ void print_matrix_packet(char* caller, struct MatrixPacket packet) {
     print_string(", matrixElement = ");
     print_hex(packet.matrixElement, 2);
 
+    print_string(", destination = (");
+    print_hex(packet.destX, 1);
+    print_string(", ");
+    print_hex(packet.destY, 1);
+    print_string(")");
+
     print_string("\n");
 }
 
