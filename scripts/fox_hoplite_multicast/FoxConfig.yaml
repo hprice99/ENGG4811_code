@@ -10,6 +10,7 @@ resultNodeCoord:
 
 packetFormat:
   multicastGroupBits: 1
+  multicastCoordBits: 2
   doneFlagBits: 1
   resultFlagBits: 1
   matrixTypeBits: 1
@@ -17,3 +18,9 @@ packetFormat:
   matrixElementBits: 32
 
 useMatrixInitFile: True
+
+useMulticast: True
+multicastConfig:
+  multicastGroupNodes: 2
+  multicastNetworkRows: 2
+  multicastNetworkCols: 1

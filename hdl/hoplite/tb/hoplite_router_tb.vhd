@@ -173,10 +173,6 @@ architecture Behavioral of hoplite_router_tb is
     constant FIFO_ADDRESS_WIDTH     : natural := ceil_log2(MAX_CYCLES);
     constant FIFO_DEPTH             : natural := 2 ** FIFO_ADDRESS_WIDTH;
     constant FIFO_DATA_WIDTH        : natural := BUS_WIDTH; 
-    
-    signal pe_fifo_en_w, pe_fifo_en_r               : std_logic;
-    signal pe_fifo_empty, pe_fifo_full              : std_logic;
-    signal pe_fifo_data_w, pe_fifo_data_r           : std_logic_vector((BUS_WIDTH-1) downto 0);
         
     signal check_dest_fifo_en_w, check_dest_fifo_en_r       : std_logic;
     signal check_dest_fifo_empty, check_dest_fifo_full      : std_logic;
@@ -263,12 +259,13 @@ begin
                 if (count <= 10) then
                     pe_message_dest(X_INDEX)    <= "00";
                     pe_message_dest(Y_INDEX)    <= "00";
+                    pe_message_b_valid          <= rand_logic(0.75, count + NETWORK_NODES);
                 else
                     pe_message_dest(X_INDEX)    <= rand_slv(COORD_BITS, count + NETWORK_NODES);
                     pe_message_dest(Y_INDEX)    <= rand_slv(COORD_BITS, 2*count + NETWORK_NODES);
+                    pe_message_b_valid          <= rand_logic(PE_IN_THRESHOLD, count + NETWORK_NODES);
                 end if;
                 pe_message_data             <= rand_slv(DATA_WIDTH, 3*count + NETWORK_NODES);
-                pe_message_b_valid          <= rand_logic(PE_IN_THRESHOLD, count + NETWORK_NODES);
             end if;
         end if;
     end process CONSTRUCT_MESSAGE;

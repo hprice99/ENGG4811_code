@@ -34,6 +34,7 @@ use ieee.std_logic_unsigned.all;
 
 library xil_defaultlib;
 use xil_defaultlib.math_functions.all;
+use xil_defaultlib.packet_defs.all;
 use xil_defaultlib.fox_defs.all;
 use xil_defaultlib.matrix_config.all;
 use xil_defaultlib.firmware_config.all;
@@ -96,6 +97,7 @@ architecture Behavioral of top is
             -- Packet parameters
             COORD_BITS              : integer := 2;
             MULTICAST_GROUP_BITS    : integer := 1;
+            MULTICAST_COORD_BITS    : integer := 1;
             MATRIX_TYPE_BITS        : integer := 1;
             MATRIX_COORD_BITS       : integer := 8;
             MATRIX_ELEMENT_BITS     : integer := 32;
@@ -172,6 +174,7 @@ architecture Behavioral of top is
             -- Packet parameters
             COORD_BITS              : integer := 2;
             MULTICAST_GROUP_BITS    : integer := 1;
+            MULTICAST_COORD_BITS    : integer := 1;
             MATRIX_TYPE_BITS        : integer := 1;
             MATRIX_COORD_BITS       : integer := 8;
             MATRIX_ELEMENT_BITS     : integer := 32;
@@ -291,6 +294,7 @@ begin
                     -- Packet parameters
                     COORD_BITS              => COORD_BITS,
                     MULTICAST_GROUP_BITS    => MULTICAST_GROUP_BITS,
+                    MULTICAST_COORD_BITS    => MULTICAST_COORD_BITS,
                     MATRIX_TYPE_BITS        => MATRIX_TYPE_BITS,
                     MATRIX_COORD_BITS       => MATRIX_COORD_BITS, 
                     MATRIX_ELEMENT_BITS     => MATRIX_ELEMENT_BITS,
@@ -376,6 +380,7 @@ begin
                     -- Packet parameters
                     COORD_BITS              => COORD_BITS,
                     MULTICAST_GROUP_BITS    => MULTICAST_GROUP_BITS,
+                    MULTICAST_COORD_BITS    => MULTICAST_COORD_BITS,
                     MATRIX_TYPE_BITS        => MATRIX_TYPE_BITS,
                     MATRIX_COORD_BITS       => MATRIX_COORD_BITS, 
                     MATRIX_ELEMENT_BITS     => MATRIX_ELEMENT_BITS,
