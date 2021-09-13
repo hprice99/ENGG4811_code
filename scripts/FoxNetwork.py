@@ -121,6 +121,20 @@ class FoxNetwork:
 
         file.close()
 
+        return packets
+
+    '''
+    Write a list of packets to a file
+    '''
+    def write_packets_to_file(self, *, packets, fileName):
+        # Append each packet to a file
+        file = open(fileName, "a")
+
+        for packet in packets:
+            file.write(packet)
+
+        file.close()
+
     '''
     Pad a matrix file with 0 entries
     '''
@@ -157,15 +171,19 @@ class FoxNetwork:
         scriptLocation = os.path.realpath(__file__)
         scriptDirectory = os.path.dirname(scriptLocation)
 
-        initFilePrefix = "{directory}/../{hdlFolder}/memory/node".format(directory=scriptDirectory, hdlFolder=self.hdlFolder)
+        initFilePrefix = "{directory}/../{hdlFolder}/memory/".format(directory=scriptDirectory, hdlFolder=self.hdlFolder)
         initFileSuffix = ".mif"
+
+        packets = []
+
+        combinedFileName = initFilePrefix + "combined" + initFileSuffix 
 
         # Loop through the nodes
         for nodeNumber in range(self.networkNodes):
             elementsWritten = 0
 
             # Delete the file before writing to it
-            matrixFileName = initFilePrefix + str(nodeNumber) + initFileSuffix
+            matrixFileName = initFilePrefix + "node{nodeNumber}".format(nodeNumber=nodeNumber) + initFileSuffix
             if os.path.exists(matrixFileName):
                 os.remove(matrixFileName)
             else:
@@ -186,11 +204,13 @@ class FoxNetwork:
 
             # Write A
             nodeA = self.A[nodeMatrixYStart:nodeMatrixYEnd, nodeMatrixXStart:nodeMatrixXEnd]
-            multicastCoord = {'x' : 1, 'y' : 1}
+            multicastCoord = {'x' : 0, 'y' : 0}
             matrixType = MatrixTypes.A
 
             # Encode the matrix and write to file
-            self.write_matrix_to_file(matrixFile=matrixFileName, nodeCoord=nodeCoord, multicastCoord=multicastCoord, matrixType=matrixType, matrix=nodeA)
+            aPackets = self.write_matrix_to_file(matrixFile=matrixFileName, nodeCoord=nodeCoord, multicastCoord=multicastCoord, matrixType=matrixType, matrix=nodeA)
+
+            packets += aPackets
 
             elementsWritten += np.size(nodeA)
 
@@ -200,7 +220,9 @@ class FoxNetwork:
             matrixType = MatrixTypes.B
 
             # Encode the matrix and write to file
-            self.write_matrix_to_file(matrixFile=matrixFileName, nodeCoord=nodeCoord, multicastCoord=multicastCoord, matrixType=matrixType, matrix=nodeB)
+            bPackets = self.write_matrix_to_file(matrixFile=matrixFileName, nodeCoord=nodeCoord, multicastCoord=multicastCoord, matrixType=matrixType, matrix=nodeB)
+
+            packets += bPackets
 
             elementsWritten += np.size(nodeB)
 
@@ -209,6 +231,8 @@ class FoxNetwork:
                 paddingRequired = self.totalMatrixElements - elementsWritten
 
                 self.pad_matrix_file(matrixFile=matrixFileName, nodeCoord=nodeCoord, paddingRequired=paddingRequired)
+
+        self.write_packets_to_file(packets=packets, fileName=combinedFileName)
 
     '''
     Generate VHDL package containing network parameters
