@@ -203,3 +203,4 @@ ip.xcix
 
 # Memory-initialisation files
 *.mif
+*.npz
