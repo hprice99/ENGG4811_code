@@ -178,6 +178,11 @@ class FoxNetwork:
 
         combinedFileName = initFilePrefix + "combined" + initFileSuffix 
 
+        if os.path.exists(combinedFileName):
+            os.remove(combinedFileName)
+        else:
+            print("The file does not exist")
+
         # Loop through the nodes
         for nodeNumber in range(self.networkNodes):
             elementsWritten = 0
