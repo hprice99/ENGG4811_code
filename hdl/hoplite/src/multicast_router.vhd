@@ -191,7 +191,7 @@ begin
         x_next  <= '0';
         y_next  <= '0';
      
-        if (x_in_valid_d = '1' and is_valid_packet_in(x_in_multicast_dest_d, x_in_valid) = False) then
+        if (x_in_valid_d = '1' and is_valid_packet_in(x_in_multicast_dest_d, x_in_valid_d) = False) then
             x_next <= '1';
         elsif (multicast_in_valid_d = '1' and is_valid_packet_in(multicast_in_multicast_dest_d, multicast_in_valid_d) = True) then
             x_next <= '0';
