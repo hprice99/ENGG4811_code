@@ -25,6 +25,7 @@ use ieee.numeric_std.all;
 library xil_defaultlib;
 use xil_defaultlib.packet_defs.all;
 use xil_defaultlib.matrix_config.all;
+use xil_defaultlib.fox_defs.all;
 use xil_defaultlib.math_functions.all;
 use xil_defaultlib.conv_functions.all;
 
@@ -122,11 +123,19 @@ architecture Behavioral of rom_tb is
     signal decoder_packet_out_valid     : std_logic;
     signal decoder_packet_read          : std_logic;
 
-    type t_State is (START, DECODE, READ, DONE);
+    type t_State is (START, READ, DECODE, DONE);
     signal current_state    : t_State;
     signal next_state       : t_State;
     
     signal entries_read     : integer;
+    
+    type t_Matrix is array (0 to (TOTAL_MATRIX_SIZE-1), 0 to (TOTAL_MATRIX_SIZE-1)) of integer;
+    signal A : t_Matrix;
+    signal B : t_Matrix;
+    
+    type t_Offset is array (0 to (FOX_NETWORK_STAGES-1), 0 to (FOX_NETWORK_STAGES-1)) of integer;
+    constant matrix_x_offsets : t_Offset  := (0 => (0, FOX_MATRIX_SIZE), 1 => (0, FOX_MATRIX_SIZE));
+    constant matrix_y_offsets : t_Offset  := (0 => (0, 0), 1 => (FOX_MATRIX_SIZE, FOX_MATRIX_SIZE));
     
 begin
 
@@ -209,19 +218,25 @@ begin
             when START => 
                 next_state  <= READ;
             when READ =>
+                next_state  <= DECODE;
+            when DECODE =>
                 if (entries_read < matrix_file_length) then
-                    next_state  <= DECODE;
+                    next_state  <= READ;
                 else
                     next_state  <= DONE;
                 end if;
-            when DECODE =>
-                next_state  <= READ;
             when others =>
                 next_state <= current_state;
         end case;
     end process STATE_TRANSITION;
 
     STATE_OUTPUT: process (current_state)
+        variable dest_x_coord   : integer;
+        variable dest_y_coord   : integer;
+        variable matrix_x_coord : integer;
+        variable matrix_y_coord : integer;
+        variable matrix_type    : integer;
+        variable matrix_element : integer;
     begin
         decoder_packet_read     <= '0';
         read_en                 <= '0';
@@ -232,6 +247,20 @@ begin
             when DECODE =>
                 decoder_packet_read <= '1';
                 entries_read        <= entries_read + 1;
+                
+                dest_x_coord    := slv_to_int(decoder_x_coord_out);
+                dest_y_coord    := slv_to_int(decoder_y_coord_out);
+                matrix_x_coord  := slv_to_int(decoder_matrix_x_coord_out) + FOX_MATRIX_SIZE * dest_x_coord;
+                matrix_y_coord  := slv_to_int(decoder_matrix_y_coord_out) + FOX_MATRIX_SIZE * dest_y_coord;
+                matrix_type     := slv_to_int(decoder_matrix_type_out);
+                matrix_element  := slv_to_int(decoder_matrix_element_out);
+                
+                -- Assign packet to matrix
+                if (matrix_type = 0) then
+                    A(matrix_x_coord, matrix_y_coord)   <= matrix_element;
+                elsif (matrix_type = 1) then
+                    B(matrix_x_coord, matrix_y_coord)   <= matrix_element;
+                end if;
             when READ   => 
                 read_en             <= '1';
                 read_address        <= std_logic_vector(to_unsigned(entries_read, ADDRESS_WIDTH));
@@ -295,6 +324,38 @@ begin
         if (rising_edge(clk) and reset_n = '1') then
             if (current_state = DONE) then
                 write(my_output_line, string'("DONE"));
+                writeline(output, my_output_line);
+                
+                write(my_output_line, string'("A = [" & LF));
+                for y in 0 to (TOTAL_MATRIX_SIZE-1) loop
+                
+                    write(my_output_line, string'(HT & HT));
+                    
+                    for x in 0 to (TOTAL_MATRIX_SIZE-1) loop
+                        write(my_output_line, A(x, y));
+                        write(my_output_line, string'(",  "));
+                    end loop;
+                    
+                    writeline(output, my_output_line);
+                end loop;
+                write(my_output_line, string'("]"));
+                writeline(output, my_output_line);
+                
+                write(my_output_line, LF);
+                
+                write(my_output_line, string'("B = [" & LF));
+                for y in 0 to (TOTAL_MATRIX_SIZE-1) loop
+                
+                    write(my_output_line, string'(HT & HT));
+                    
+                    for x in 0 to (TOTAL_MATRIX_SIZE-1) loop
+                        write(my_output_line, B(x, y));
+                        write(my_output_line, string'(",  "));
+                    end loop;
+                    
+                    writeline(output, my_output_line);
+                end loop;
+                write(my_output_line, string'("]"));
                 writeline(output, my_output_line);
                 
                 stop;
