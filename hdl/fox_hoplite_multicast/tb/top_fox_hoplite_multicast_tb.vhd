@@ -64,7 +64,7 @@ architecture Behavioral of top_tb is
             
             uart_tx             : out std_logic;
             
-            out_matrix          : out t_Matrix;
+            out_matrix          : out t_MatrixOut;
             out_matrix_en       : out t_MessageValid;
             out_matrix_end_row  : out t_MessageValid;
             out_matrix_end      : out t_MessageValid
@@ -128,7 +128,7 @@ architecture Behavioral of top_tb is
     signal out_char_en  : t_MessageValid;
     signal line_started : t_MessageValid;
 
-    signal out_matrix           : t_Matrix;
+    signal out_matrix           : t_MatrixOut;
     signal out_matrix_en        : t_MessageValid;
     signal out_matrix_end_row   : t_MessageValid;
     signal out_matrix_end       : t_MessageValid;
