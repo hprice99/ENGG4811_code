@@ -2,11 +2,16 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
+use STD.textio.all;
+use IEEE.std_logic_textio.all;
+
 entity rom is
     generic (
         BUS_WIDTH       : integer := 32;
         ROM_DEPTH       : integer := 64;
-        ADDRESS_WIDTH   : integer := 6
+        ADDRESS_WIDTH   : integer := 6;
+        
+        INITIALISATION_FILE : string    := "none"
     );
     port (
         clk         : in std_logic;
@@ -48,7 +53,7 @@ begin
     begin
         if (rising_edge(clk)) then
             if (read_en = '1') then
-                read_data   <= rom(conv_integer(read_addr));
+                read_data   <= rom(to_integer(unsigned((read_addr))));
             end if;
         end if;
     end process READ_PROC;
