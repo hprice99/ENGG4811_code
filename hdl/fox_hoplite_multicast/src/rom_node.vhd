@@ -198,9 +198,12 @@ architecture Behavioral of rom_node is
     signal x_out_valid_d, y_out_valid_d : STD_LOGIC;
     
     -- ROM control signals
-    signal rom_read_en      : std_logic;
-    signal rom_read_address : std_logic_vector((ROM_ADDRESS_WIDTH-1) downto 0);
-    signal rom_read_data    : std_logic_vector((BUS_WIDTH-1) downto 0);
+    signal rom_read_en          : std_logic;
+    signal rom_read_address     : std_logic_vector((ROM_ADDRESS_WIDTH-1) downto 0);
+    signal rom_read_data        : std_logic_vector((BUS_WIDTH-1) downto 0);
+    signal rom_read_data_valid  : std_logic;
+
+    signal rom_read_started : std_logic;
 
     signal read_address     : integer;
 
@@ -288,7 +291,7 @@ begin
             network_to_pe_empty => open
         );
 
-    pe_message_out_valid    <= rom_read_en;
+    pe_message_out_valid    <= rom_read_data_valid;
     pe_message_out          <= rom_read_data;
 
     ROM_MEMORY: rom 
@@ -313,10 +316,14 @@ begin
     begin
         if (rising_edge(clk)) then
             if (reset_n = '0') then
-                rom_read_en         <= '0';
-                read_address        <= 0;
-                rom_read_complete   <= '0';
+                rom_read_en             <= '0';
+                rom_read_data_valid     <= '0';
+                read_address            <= 0;
+                rom_read_complete       <= '0';
+                rom_read_started        <= '0';
             else
+                rom_read_data_valid   <= rom_read_en;
+            
                 if (rom_read_en = '0' and read_address < ROM_DEPTH and pe_to_network_full = '0') then
                     rom_read_en <= '1';
                 elsif (read_address < ROM_DEPTH and pe_to_network_full = '0') then

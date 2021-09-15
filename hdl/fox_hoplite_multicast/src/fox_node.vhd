@@ -512,9 +512,9 @@ begin
             BUS_WIDTH   => BUS_WIDTH,
             FIFO_DEPTH  => FIFO_DEPTH,
            
-            USE_INITIALISATION_FILE => USE_INITIALISATION_FILE,
-            INITIALISATION_FILE     => MATRIX_FILE,
-            INITIALISATION_LENGTH   => MATRIX_FILE_LENGTH
+            USE_INITIALISATION_FILE => False,
+            INITIALISATION_FILE     => "none",
+            INITIALISATION_LENGTH   => 0
         )
         port map (
             clk                 => clk,

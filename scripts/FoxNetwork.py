@@ -90,8 +90,8 @@ class FoxNetwork:
     '''
     def node_number_to_node_coord(self, nodeNumber):
         nodeCoords = {}
-        nodeCoords['x'] = nodeNumber % self.networkRows
-        nodeCoords['y'] = nodeNumber // self.networkRows
+        nodeCoords['x'] = nodeNumber % self.foxNetworkStages
+        nodeCoords['y'] = nodeNumber // self.foxNetworkStages
 
         return nodeCoords
 
@@ -176,6 +176,8 @@ class FoxNetwork:
         initFilePrefix = "{directory}/../{hdlFolder}/memory/".format(directory=scriptDirectory, hdlFolder=self.hdlFolder)
         initFileSuffix = ".mif"
 
+        aPackets = []
+        bPackets = []
         packets = []
 
         combinedFileName = initFilePrefix + "combined" + initFileSuffix 
@@ -215,9 +217,9 @@ class FoxNetwork:
             matrixType = MatrixTypes.A
 
             # Encode the matrix and write to file
-            aPackets = self.write_matrix_to_file(matrixFile=matrixFileName, nodeCoord=nodeCoord, multicastCoord=multicastCoord, matrixType=matrixType, matrix=nodeA)
+            newAPackets = self.write_matrix_to_file(matrixFile=matrixFileName, nodeCoord=nodeCoord, multicastCoord=multicastCoord, matrixType=matrixType, matrix=nodeA)
 
-            packets += aPackets
+            aPackets += newAPackets
 
             elementsWritten += np.size(nodeA)
 
@@ -227,9 +229,9 @@ class FoxNetwork:
             matrixType = MatrixTypes.B
 
             # Encode the matrix and write to file
-            bPackets = self.write_matrix_to_file(matrixFile=matrixFileName, nodeCoord=nodeCoord, multicastCoord=multicastCoord, matrixType=matrixType, matrix=nodeB)
+            newBPackets = self.write_matrix_to_file(matrixFile=matrixFileName, nodeCoord=nodeCoord, multicastCoord=multicastCoord, matrixType=matrixType, matrix=nodeB)
 
-            packets += bPackets
+            bPackets += newBPackets
 
             elementsWritten += np.size(nodeB)
 
@@ -239,6 +241,7 @@ class FoxNetwork:
 
                 self.pad_matrix_file(matrixFile=matrixFileName, nodeCoord=nodeCoord, paddingRequired=paddingRequired)
 
+        packets = aPackets + bPackets
         self.write_packets_to_file(packets=packets, fileName=combinedFileName)
 
     '''

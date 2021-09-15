@@ -94,7 +94,7 @@ void create_initial_stage_B(void) {
 
             if (packet.matrixType != B_type) {
 
-                print_string("Expected to receive A matrix\n");
+                print_string("Expected to receive B matrix\n");
                 return;
             }
 

@@ -358,7 +358,7 @@ begin
             if (reset_n = '0') then
                 x_packets_received  <= 0;
             elsif (reset_n = '1') then
-                if (x_decoder_packet_read = '1') then
+                if (x_decoder_packet_in_valid = '1') then
                     x_packets_received  <= x_packets_received + 1;
                 
                     write(my_line, string'("X_DECODER: "));
@@ -429,7 +429,7 @@ begin
             if (reset_n = '0') then
                 y_packets_received  <= 0;
             elsif (reset_n = '1') then
-                if (y_decoder_packet_read = '1') then
+                if (y_decoder_packet_in_valid = '1') then
                     y_packets_received  <= y_packets_received + 1;
                 
                     write(my_line, string'("Y_DECODER: "));

@@ -45,7 +45,7 @@ architecture Behavioural of rom is
         return temp_rom;
     end function memory_init;
 
-    signal rom : t_ROM  := memory_init(INITIALISATION_FILE);
+    constant rom : t_ROM  := memory_init(INITIALISATION_FILE);
 
 begin
     
