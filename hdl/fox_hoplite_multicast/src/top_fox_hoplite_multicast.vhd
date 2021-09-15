@@ -331,7 +331,7 @@ begin
         constant next_multicast_x   : integer := 1;
         constant next_multicast_y   : integer := ((i+1) mod NETWORK_ROWS) + 1;
     begin
-        MULTICAST_ROUTER_GEN: if (USE_MULTICAST = true) generate
+        MULTICAST_ROUTER_GEN: if (USE_MULTICAST = true and curr_multicast_x <= MULTICAST_NETWORK_COLS and curr_multicast_y <= MULTICAST_NETWORK_ROWS) generate
             MULTICAST_ROUTER: multicast_router_node
                 generic map (
                     BUS_WIDTH               => BUS_WIDTH,
@@ -395,7 +395,7 @@ begin
 
             y_messages_in(curr_x, curr_y)       <= y_messages_out(curr_x, next_y);
             y_messages_in_valid(curr_x, curr_y) <= y_messages_out_valid(curr_x, next_y);
-            
+                        
             -- Assign multicast packets
             USE_MULTICAST_PACKET_ASSIGN: if (USE_MULTICAST = True) generate
             begin
