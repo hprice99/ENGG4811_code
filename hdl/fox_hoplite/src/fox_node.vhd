@@ -358,17 +358,6 @@ architecture Behavioral of fox_node is
         );
     end component system;
     
-    component pipeline
-        generic (
-            STAGES  : integer := 10
-        );
-        port (
-            clk     : in STD_LOGIC;
-            d_in    : in STD_LOGIC;
-            d_out   : out STD_LOGIC
-        );
-    end component pipeline;
-    
     -- Messages from PE to network
     signal pe_message_out       : STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
     signal pe_message_out_valid : STD_LOGIC;
@@ -476,9 +465,9 @@ begin
             BUS_WIDTH   => BUS_WIDTH,
             FIFO_DEPTH  => FIFO_DEPTH,
            
-            USE_INITIALISATION_FILE => USE_INITIALISATION_FILE,
-            INITIALISATION_FILE     => MATRIX_FILE,
-            INITIALISATION_LENGTH   => MATRIX_FILE_LENGTH
+            USE_INITIALISATION_FILE => False,
+            INITIALISATION_FILE     => "none",
+            INITIALISATION_LENGTH   => 0
         )
         port map (
             clk                 => clk,

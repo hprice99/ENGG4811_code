@@ -7,7 +7,7 @@ package packet_defs is
     constant MULTICAST_GROUP_BITS   : integer := 1;
 
     -- Size of message data in packets
-    constant COORD_BITS             : integer := 1;
+    constant COORD_BITS             : integer := 2;
     constant MULTICAST_COORD_BITS   : integer := 1;
     constant DONE_FLAG_BITS         : integer := 1;
     constant RESULT_FLAG_BITS       : integer := 1;
