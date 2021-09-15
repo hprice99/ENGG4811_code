@@ -55,10 +55,6 @@ entity rom_node is
         BUS_WIDTH               : integer := 56;
 
         FIFO_DEPTH              : integer := 64;
-
-        -- Matrix parameters
-        TOTAL_MATRIX_SIZE       : integer := 32;
-        FOX_MATRIX_SIZE         : integer := 16;
         
         USE_INITIALISATION_FILE : boolean := True;
         MATRIX_FILE             : string  := "none";
@@ -68,6 +64,8 @@ entity rom_node is
     Port (
         clk                 : in std_logic;
         reset_n             : in std_logic;
+        
+        rom_read_complete   : out std_logic;
 
         x_in                : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
         x_in_valid          : in STD_LOGIC;
@@ -201,7 +199,7 @@ architecture Behavioral of rom_node is
     
     -- ROM control signals
     signal rom_read_en      : std_logic;
-    signal rom_read_address : std_logic_vector((ADDRESS_WIDTH-1) downto 0);
+    signal rom_read_address : std_logic_vector((ROM_ADDRESS_WIDTH-1) downto 0);
     signal rom_read_data    : std_logic_vector((BUS_WIDTH-1) downto 0);
 
     signal read_address     : integer;
@@ -237,11 +235,11 @@ begin
             x_out_valid             => x_out_valid_d,
             y_out                   => y_out_d,
             y_out_valid             => y_out_valid_d,
-            pe_out                  => network_to_pe_message,
-            pe_out_valid            => network_to_pe_valid,
+            pe_out                  => open,
+            pe_out_valid            => open,
             multicast_out           => open,
             multicast_out_valid     => open,
-            multicast_backpressure  => (others => '0')
+            multicast_backpressure  => '0'
         );
     
     -- Connect router ports to node ports
@@ -253,7 +251,6 @@ begin
     
     -- Network interface controller (FIFO for messages to and from PE)
     router_ready    <= not pe_backpressure;
-    pe_ready        <= processor_in_message_read;
     
     NIC: nic_dual
         generic map (
@@ -280,8 +277,8 @@ begin
             pe_to_network_empty => pe_to_network_empty,
     
             -- Messages from network to PE
-            from_network_valid  => (others => '0'),
-            from_network_data   => '0',
+            from_network_valid  => '0',
+            from_network_data   => (others => '0'),
     
             pe_ready            => '0',
             to_pe_valid         => open,
@@ -309,8 +306,8 @@ begin
             read_addr   => rom_read_address,
             read_data   => rom_read_data
         );
-
-    rom_read_address    <= std_logic_vector(to_unsigned(read_address, ADDRESS_WIDTH));
+        
+    rom_read_address    <= std_logic_vector(to_unsigned(read_address, ROM_ADDRESS_WIDTH));
 
     ROM_READ: process (clk)
     begin
@@ -318,10 +315,21 @@ begin
             if (reset_n = '0') then
                 rom_read_en         <= '0';
                 read_address        <= 0;
+                rom_read_complete   <= '0';
             else
-                if (read_address < ROM_DEPTH) then
+                if (rom_read_en = '0' and read_address < ROM_DEPTH and pe_to_network_full = '0') then
+                    rom_read_en <= '1';
+                elsif (read_address < ROM_DEPTH and pe_to_network_full = '0') then
                     rom_read_en     <= '1';
                     read_address    <= read_address + 1;
+                else
+                    rom_read_en     <= '0';
+                end if;
+                
+                if (read_address = ROM_DEPTH) then
+                    rom_read_complete   <= '1';
+                else
+                    rom_read_complete   <= '0';
                 end if;
             end if;
         end if;
