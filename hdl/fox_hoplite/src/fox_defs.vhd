@@ -22,6 +22,10 @@ package fox_defs is
     constant RESULT_X_COORD  : integer := 0;
     constant RESULT_Y_COORD  : integer := 0;
 
+    -- ROM node parameters
+    constant ROM_X_COORD  : integer := 0;
+    constant ROM_Y_COORD  : integer := 2;
+
     -- NIC parameters
     constant FOX_FIFO_DEPTH     : integer := 2 * FOX_MATRIX_ELEMENTS;
     constant RESULT_FIFO_DEPTH  : integer := TOTAL_MATRIX_ELEMENTS;

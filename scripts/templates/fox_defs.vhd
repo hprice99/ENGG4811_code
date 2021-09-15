@@ -22,6 +22,10 @@ package fox_defs is
     constant RESULT_X_COORD  : integer := {{ foxNetwork.resultNodeCoord['x'] }};
     constant RESULT_Y_COORD  : integer := {{ foxNetwork.resultNodeCoord['y'] }};
 
+    -- ROM node parameters
+    constant ROM_X_COORD  : integer := {{ foxNetwork.romNodeCoord['x'] }};
+    constant ROM_Y_COORD  : integer := {{ foxNetwork.romNodeCoord['y'] }};
+
     -- NIC parameters
     constant FOX_FIFO_DEPTH     : integer := 2 * FOX_MATRIX_ELEMENTS;
     constant RESULT_FIFO_DEPTH  : integer := TOTAL_MATRIX_ELEMENTS;

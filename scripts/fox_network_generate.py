@@ -55,6 +55,7 @@ resultFirmware.write_makefile_variables(firmwareFolder)
 foxNetwork = FoxNetwork(networkRows=config.networkRows, \
                         networkCols=config.networkCols, \
                         resultNodeCoord=config.resultNodeCoord, \
+                        romNodeCoord=config.romNodeCoord, \
                         totalMatrixSize=config.totalMatrixSize, \
                         foxNetworkStages=config.foxNetworkStages, \
                         multicastGroupBits=config.multicastGroupBits,\

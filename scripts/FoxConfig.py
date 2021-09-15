@@ -19,6 +19,7 @@ class FoxConfig:
         self.networkCols = foxConfig['networkCols']
 
         self.resultNodeCoord = foxConfig['resultNodeCoord']
+        self.romNodeCoord = foxConfig['romNodeCoord']
 
         self.totalMatrixSize = matrixSize
 

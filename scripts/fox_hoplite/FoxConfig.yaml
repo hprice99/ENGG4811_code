@@ -8,6 +8,10 @@ resultNodeCoord:
   x: 0
   y: 0
 
+romNodeCoord:
+  x: 0
+  y: 2
+
 packetFormat:
   multicastGroupBits: 1
   multicastCoordBits: 1

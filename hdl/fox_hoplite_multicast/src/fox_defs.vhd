@@ -10,7 +10,7 @@ use xil_defaultlib.math_functions.all;
 package fox_defs is 
 
     -- Constants
-    constant NETWORK_ROWS   : integer := 2;
+    constant NETWORK_ROWS   : integer := 3;
     constant NETWORK_COLS   : integer := 2;
     constant NETWORK_NODES  : integer := NETWORK_ROWS * NETWORK_COLS;
 
@@ -21,6 +21,10 @@ package fox_defs is
     -- Result node parameters
     constant RESULT_X_COORD  : integer := 0;
     constant RESULT_Y_COORD  : integer := 0;
+
+    -- ROM node parameters
+    constant ROM_X_COORD  : integer := 0;
+    constant ROM_Y_COORD  : integer := 2;
 
     -- NIC parameters
     constant FOX_FIFO_DEPTH     : integer := 2 * FOX_MATRIX_ELEMENTS;

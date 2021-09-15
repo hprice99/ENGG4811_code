@@ -10,6 +10,7 @@ from Firmware import *
 
 class FoxNetwork:
     def __init__(self, *, networkRows, networkCols, resultNodeCoord, \
+            romNodeCoord, \
             totalMatrixSize, foxNetworkStages, multicastGroupBits, \
             multicastCoordBits, \
             doneFlagBits, resultFlagBits, matrixTypeBits, matrixCoordBits, \
@@ -23,6 +24,7 @@ class FoxNetwork:
         self.networkCols = networkCols
         self.networkNodes = self.networkRows * self.networkCols
         self.resultNodeCoord = resultNodeCoord
+        self.romNodeCoord = romNodeCoord
 
         # Fox algorithm network details
         self.foxNetworkStages = foxNetworkStages
@@ -184,7 +186,7 @@ class FoxNetwork:
             print("The file does not exist")
 
         # Loop through the nodes
-        for nodeNumber in range(self.networkNodes):
+        for nodeNumber in range(self.foxNetworkNodes):
             elementsWritten = 0
 
             # Delete the file before writing to it
