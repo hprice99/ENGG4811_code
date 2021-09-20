@@ -11,7 +11,7 @@ scripts:
 sw:
 	cd $(FIRMWARE_DIR) && $(MAKE) all
 
-debug:
+debug: scripts
 	cd $(FIRMWARE_DIR) && $(MAKE) debug
 
 clean: script_clean firmware_clean

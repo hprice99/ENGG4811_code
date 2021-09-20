@@ -34,6 +34,7 @@ use ieee.std_logic_unsigned.all;
 
 library xil_defaultlib;
 use xil_defaultlib.math_functions.all;
+use xil_defaultlib.packet_defs.all;
 use xil_defaultlib.fox_defs.all;
 use xil_defaultlib.matrix_config.all;
 use xil_defaultlib.firmware_config.all;
@@ -64,7 +65,7 @@ entity top is
            
            uart_tx              : out std_logic;
            
-           out_matrix           : out t_Matrix;
+           out_matrix           : out t_MatrixOut;
            out_matrix_en        : out t_MessageValid;
            out_matrix_end_row   : out t_MessageValid;
            out_matrix_end       : out t_MessageValid
@@ -150,7 +151,7 @@ architecture Behavioral of top is
         );
     end component fox_node;
 
-    component result_node is
+    component result_node
         Generic (
             -- Entire network parameters
             NETWORK_ROWS    : integer := 2;
@@ -232,6 +233,74 @@ architecture Behavioral of top is
             out_matrix_end      : out std_logic
         );
     end component result_node;
+
+    component rom_node
+        Generic (   
+            -- Node parameters
+            X_COORD         : integer := 0;
+            Y_COORD         : integer := 0;
+    
+            -- Packet parameters
+            COORD_BITS              : integer := 2;
+            MULTICAST_GROUP_BITS    : integer := 1;
+            MULTICAST_COORD_BITS    : integer := 1;
+            MATRIX_TYPE_BITS        : integer := 1;
+            MATRIX_COORD_BITS       : integer := 8;
+            MATRIX_ELEMENT_BITS     : integer := 32;
+            BUS_WIDTH               : integer := 56;
+    
+            FIFO_DEPTH              : integer := 64;
+            
+            USE_INITIALISATION_FILE : boolean := True;
+            MATRIX_FILE             : string  := "none";
+            ROM_DEPTH               : integer := 64;
+            ROM_ADDRESS_WIDTH       : integer := 6
+        );
+        Port (
+            clk                 : in std_logic;
+            reset_n             : in std_logic;
+            
+            rom_read_complete   : out std_logic;
+    
+            x_in                : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
+            x_in_valid          : in STD_LOGIC;
+            y_in                : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
+            y_in_valid          : in STD_LOGIC;
+            
+            x_out               : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
+            x_out_valid         : out STD_LOGIC;
+            y_out               : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
+            y_out_valid         : out STD_LOGIC
+        );
+    end component rom_node;
+
+    component hoplite_router
+        generic (
+            BUS_WIDTH   : integer := 32;
+            X_COORD     : integer := 0;
+            Y_COORD     : integer := 0;
+            COORD_BITS  : integer := 1
+        );
+        port (
+            clk             : in STD_LOGIC;
+            reset_n         : in STD_LOGIC;
+            
+            x_in            : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
+            x_in_valid      : in STD_LOGIC;
+            y_in            : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
+            y_in_valid      : in STD_LOGIC;
+            pe_in           : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
+            pe_in_valid     : in STD_LOGIC;
+            
+            x_out           : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
+            x_out_valid     : out STD_LOGIC;
+            y_out           : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
+            y_out_valid     : out STD_LOGIC;
+            pe_out          : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
+            pe_out_valid    : out STD_LOGIC;
+            pe_backpressure : out STD_LOGIC
+        );
+    end component hoplite_router;
     
     -- Array of message interfaces between nodes
     signal x_messages_out, y_messages_out : t_Message;
@@ -245,6 +314,10 @@ architecture Behavioral of top is
 
     constant UART_FIFO_DEPTH    : integer := 1024;
 
+    constant combined_matrix_file   : string := "combined.mif";
+    constant matrix_file_length     : integer := 2 * TOTAL_MATRIX_ELEMENTS;
+    constant ROM_ADDRESS_WIDTH      : integer := ceil_log2(matrix_file_length);
+
 begin
 
     -- Generate the network
@@ -256,10 +329,6 @@ begin
             constant curr_x         : integer := j;
             constant next_y         : integer := ((i+1) mod NETWORK_ROWS);
             constant next_x         : integer := ((j+1) mod NETWORK_COLS);
-            constant node_number    : integer := i * NETWORK_ROWS + j;
-            constant y_offset       : integer := i * (FOX_MATRIX_SIZE);
-            constant x_offset       : integer := j * (FOX_MATRIX_SIZE);
-            constant matrix_file    : string  := MATRIX_INIT_FILE_PREFIX & integer'image(node_number) & MATRIX_INIT_FILE_SUFFIX;
         begin
             -- Connect in and out messages
             x_messages_in(curr_x, curr_y)       <= x_messages_out(prev_x, curr_y);
@@ -268,172 +337,251 @@ begin
             y_messages_in(curr_x, curr_y)       <= y_messages_out(curr_x, next_y);
             y_messages_in_valid(curr_x, curr_y) <= y_messages_out_valid(curr_x, next_y);
         
-            -- Instantiate node
-            RESULT_GEN: if (curr_x = RESULT_X_COORD and curr_y = RESULT_Y_COORD) generate
-                RESULT_NODE_INITIALISE: result_node
-                generic map (
-                    -- Entire network parameters
-                    NETWORK_ROWS    => NETWORK_ROWS,
-                    NETWORK_COLS    => NETWORK_COLS,
-                    NETWORK_NODES   => NETWORK_NODES,
+            FOX_NETWORK_GEN: if (curr_x < FOX_NETWORK_STAGES and curr_y < FOX_NETWORK_STAGES) generate
+                constant node_number    : integer := i * FOX_NETWORK_STAGES + j;
+                constant y_offset       : integer := i * (FOX_MATRIX_SIZE);
+                constant x_offset       : integer := j * (FOX_MATRIX_SIZE);
+                constant matrix_file    : string  := MATRIX_INIT_FILE_PREFIX & integer'image(node_number) & MATRIX_INIT_FILE_SUFFIX;
+            begin
+                -- Instantiate result node
+                RESULT_GEN: if (curr_x = RESULT_X_COORD and curr_y = RESULT_Y_COORD) generate
+                    RESULT_NODE_INITIALISE: result_node
+                    generic map (
+                        -- Entire network parameters
+                        NETWORK_ROWS    => NETWORK_ROWS,
+                        NETWORK_COLS    => NETWORK_COLS,
+                        NETWORK_NODES   => NETWORK_NODES,
 
-                    -- Fox's algorithm network paramters
-                    FOX_NETWORK_STAGES  => FOX_NETWORK_STAGES,
-                    FOX_NETWORK_NODES   => FOX_NETWORK_NODES,
+                        -- Fox's algorithm network paramters
+                        FOX_NETWORK_STAGES  => FOX_NETWORK_STAGES,
+                        FOX_NETWORK_NODES   => FOX_NETWORK_NODES,
 
-                    -- Result node parameters
-                    RESULT_X_COORD  => RESULT_X_COORD,
-                    RESULT_Y_COORD  => RESULT_Y_COORD,
+                        -- Result node parameters
+                        RESULT_X_COORD  => RESULT_X_COORD,
+                        RESULT_Y_COORD  => RESULT_Y_COORD,
+                    
+                        -- Node parameters
+                        X_COORD         => curr_x,
+                        Y_COORD         => curr_y,
+                        NODE_NUMBER     => node_number,
+
+                        -- Packet parameters
+                        COORD_BITS              => COORD_BITS,
+                        MULTICAST_GROUP_BITS    => MULTICAST_GROUP_BITS,
+                        MULTICAST_COORD_BITS    => MULTICAST_COORD_BITS,
+                        MATRIX_TYPE_BITS        => MATRIX_TYPE_BITS,
+                        MATRIX_COORD_BITS       => MATRIX_COORD_BITS, 
+                        MATRIX_ELEMENT_BITS     => MATRIX_ELEMENT_BITS,
+                        BUS_WIDTH               => BUS_WIDTH,
+
+                        -- Matrix parameters
+                        TOTAL_MATRIX_SIZE       => TOTAL_MATRIX_SIZE,
+                        FOX_MATRIX_SIZE         => FOX_MATRIX_SIZE,
+                        
+                        USE_INITIALISATION_FILE => USE_MATRIX_INIT_FILE,
+                        MATRIX_FILE             => matrix_file,
+                        MATRIX_FILE_LENGTH      => MATRIX_INIT_FILE_LENGTH,
+                        
+                        -- Matrix offset for node
+                        MATRIX_X_OFFSET => x_offset,
+                        MATRIX_Y_OFFSET => y_offset,
+
+                        -- NIC parameters
+                        NIC_FIFO_DEPTH  => RESULT_FIFO_DEPTH,
+
+                        -- UART parameters
+                        CLK_FREQ        => CLK_FREQ,
+                        ENABLE_UART     => ENABLE_UART,
+                        UART_FIFO_DEPTH => UART_FIFO_DEPTH,
+                        
+                        -- PicoRV32 core parameters
+                        DIVIDE_ENABLED     => RESULT_DIVIDE_ENABLED,
+                        MULTIPLY_ENABLED   => MULTIPLY_ENABLED,
+                        FIRMWARE           => RESULT_FIRMWARE,
+                        MEM_SIZE           => RESULT_FIRMWARE_MEM_SIZE
+                    )
+                    port map (
+                        clk                 => clk,
+                        reset_n             => reset_n,
+                        
+                        LED                 => LED(node_number),
+
+                        out_char            => out_char(curr_x, curr_y),
+                        out_char_en         => out_char_en(curr_x, curr_y),
+                        
+                        uart_tx             => uart_tx,
+                        
+                        -- Messages incoming to router
+                        x_in                => x_messages_in(curr_x, curr_y),
+                        x_in_valid          => x_messages_in_valid(curr_x, curr_y),                  
+                        y_in                => y_messages_in(curr_x, curr_y),
+                        y_in_valid          => y_messages_in_valid(curr_x, curr_y),
+                        
+                        -- Messages outgoing from router
+                        x_out               => x_messages_out(curr_x, curr_y),
+                        x_out_valid         => x_messages_out_valid(curr_x, curr_y),
+                        y_out               => y_messages_out(curr_x, curr_y),
+                        y_out_valid         => y_messages_out_valid(curr_x, curr_y),
+
+                        out_matrix          => out_matrix(curr_x, curr_y),
+                        out_matrix_en       => out_matrix_en(curr_x, curr_y),
+                        out_matrix_end_row  => out_matrix_end_row(curr_x, curr_y),
+                        out_matrix_end      => out_matrix_end(curr_x, curr_y)
+                    );
+                end generate RESULT_GEN;
                 
-                    -- Node parameters
-                    X_COORD         => curr_x,
-                    Y_COORD         => curr_y,
-                    NODE_NUMBER     => node_number,
+                FOX_GEN: if (curr_x /= RESULT_X_COORD or curr_y /= RESULT_Y_COORD) generate
+                    FOX_NODE_INITIALISE: fox_node
+                    generic map (
+                        -- Entire network parameters
+                        NETWORK_ROWS    => NETWORK_ROWS,
+                        NETWORK_COLS    => NETWORK_COLS,
+                        NETWORK_NODES   => NETWORK_NODES,
 
-                    -- Packet parameters
-                    COORD_BITS              => COORD_BITS,
-                    MULTICAST_GROUP_BITS    => MULTICAST_GROUP_BITS,
-                    MULTICAST_COORD_BITS    => MULTICAST_COORD_BITS,
-                    MATRIX_TYPE_BITS        => MATRIX_TYPE_BITS,
-                    MATRIX_COORD_BITS       => MATRIX_COORD_BITS, 
-                    MATRIX_ELEMENT_BITS     => MATRIX_ELEMENT_BITS,
-                    BUS_WIDTH               => BUS_WIDTH,
+                        -- Fox's algorithm network paramters
+                        FOX_NETWORK_STAGES  => FOX_NETWORK_STAGES,
+                        FOX_NETWORK_NODES   => FOX_NETWORK_NODES,
 
-                    -- Matrix parameters
-                    TOTAL_MATRIX_SIZE       => TOTAL_MATRIX_SIZE,
-                    FOX_MATRIX_SIZE         => FOX_MATRIX_SIZE,
+                        -- Result node parameters
+                        RESULT_X_COORD  => RESULT_X_COORD,
+                        RESULT_Y_COORD  => RESULT_Y_COORD,
                     
-                    USE_INITIALISATION_FILE => USE_MATRIX_INIT_FILE,
-                    MATRIX_FILE             => matrix_file,
-                    MATRIX_FILE_LENGTH      => MATRIX_INIT_FILE_LENGTH,
-                    
-                    -- Matrix offset for node
-                    MATRIX_X_OFFSET => x_offset,
-                    MATRIX_Y_OFFSET => y_offset,
+                        -- Node parameters
+                        X_COORD         => curr_x,
+                        Y_COORD         => curr_y,
+                        NODE_NUMBER     => node_number,
 
-                    -- NIC parameters
-                    NIC_FIFO_DEPTH  => RESULT_FIFO_DEPTH,
+                        -- Packet parameters
+                        COORD_BITS              => COORD_BITS,
+                        MULTICAST_GROUP_BITS    => MULTICAST_GROUP_BITS,
+                        MULTICAST_COORD_BITS    => MULTICAST_COORD_BITS,
+                        MATRIX_TYPE_BITS        => MATRIX_TYPE_BITS,
+                        MATRIX_COORD_BITS       => MATRIX_COORD_BITS, 
+                        MATRIX_ELEMENT_BITS     => MATRIX_ELEMENT_BITS,
+                        BUS_WIDTH               => BUS_WIDTH,
 
-                    -- UART parameters
-                    CLK_FREQ        => CLK_FREQ,
-                    ENABLE_UART     => ENABLE_UART,
-                    UART_FIFO_DEPTH => UART_FIFO_DEPTH,
-                    
-                    -- PicoRV32 core parameters
-                    DIVIDE_ENABLED     => RESULT_DIVIDE_ENABLED,
-                    MULTIPLY_ENABLED   => MULTIPLY_ENABLED,
-                    FIRMWARE           => RESULT_FIRMWARE,
-                    MEM_SIZE           => RESULT_FIRMWARE_MEM_SIZE
-                )
-                port map (
-                    clk                 => clk,
-                    reset_n             => reset_n,
-                    
-                    LED                 => LED(node_number),
+                        -- Matrix parameters
+                        TOTAL_MATRIX_SIZE       => TOTAL_MATRIX_SIZE,
+                        FOX_MATRIX_SIZE         => FOX_MATRIX_SIZE,
+                        
+                        USE_INITIALISATION_FILE => USE_MATRIX_INIT_FILE,
+                        MATRIX_FILE             => matrix_file,
+                        MATRIX_FILE_LENGTH      => MATRIX_INIT_FILE_LENGTH,
+                        
+                        -- Matrix offset for node
+                        MATRIX_X_OFFSET => x_offset,
+                        MATRIX_Y_OFFSET => y_offset,
 
-                    out_char            => out_char(curr_x, curr_y),
-                    out_char_en         => out_char_en(curr_x, curr_y),
-                    
-                    uart_tx             => uart_tx,
-                    
-                    -- Messages incoming to router
-                    x_in                => x_messages_in(curr_x, curr_y),
-                    x_in_valid          => x_messages_in_valid(curr_x, curr_y),                  
-                    y_in                => y_messages_in(curr_x, curr_y),
-                    y_in_valid          => y_messages_in_valid(curr_x, curr_y),
-                    
-                    -- Messages outgoing from router
-                    x_out               => x_messages_out(curr_x, curr_y),
-                    x_out_valid         => x_messages_out_valid(curr_x, curr_y),
-                    y_out               => y_messages_out(curr_x, curr_y),
-                    y_out_valid         => y_messages_out_valid(curr_x, curr_y),
+                        -- NIC parameters
+                        FIFO_DEPTH      => FOX_FIFO_DEPTH,
+                        
+                        -- PicoRV32 core parameters
+                        DIVIDE_ENABLED     => FOX_DIVIDE_ENABLED,
+                        MULTIPLY_ENABLED   => MULTIPLY_ENABLED,
+                        FIRMWARE           => FOX_FIRMWARE,
+                        MEM_SIZE           => FOX_FIRMWARE_MEM_SIZE
+                    )
+                    port map (
+                        clk                 => clk,
+                        reset_n             => reset_n,
+                        
+                        LED                 => LED(node_number),
 
-                    out_matrix          => out_matrix(curr_x, curr_y),
-                    out_matrix_en       => out_matrix_en(curr_x, curr_y),
-                    out_matrix_end_row  => out_matrix_end_row(curr_x, curr_y),
-                    out_matrix_end      => out_matrix_end(curr_x, curr_y)
-                );
-            end generate RESULT_GEN;
-            
-            FOX_GEN: if (curr_x /= RESULT_X_COORD or curr_y /= RESULT_Y_COORD) generate
-                FOX_NODE_INITIALISE: fox_node
-                generic map (
-                    -- Entire network parameters
-                    NETWORK_ROWS    => NETWORK_ROWS,
-                    NETWORK_COLS    => NETWORK_COLS,
-                    NETWORK_NODES   => NETWORK_NODES,
+                        out_char            => out_char(curr_x, curr_y),
+                        out_char_en         => out_char_en(curr_x, curr_y),
+                        out_char_ready      => '1',
+                        
+                        -- Messages incoming to router
+                        x_in                => x_messages_in(curr_x, curr_y),
+                        x_in_valid          => x_messages_in_valid(curr_x, curr_y),                  
+                        y_in                => y_messages_in(curr_x, curr_y),
+                        y_in_valid          => y_messages_in_valid(curr_x, curr_y),
+                        
+                        -- Messages outgoing from router
+                        x_out               => x_messages_out(curr_x, curr_y),
+                        x_out_valid         => x_messages_out_valid(curr_x, curr_y),
+                        y_out               => y_messages_out(curr_x, curr_y),
+                        y_out_valid         => y_messages_out_valid(curr_x, curr_y),
 
-                    -- Fox's algorithm network paramters
-                    FOX_NETWORK_STAGES  => FOX_NETWORK_STAGES,
-                    FOX_NETWORK_NODES   => FOX_NETWORK_NODES,
+                        out_matrix          => out_matrix(curr_x, curr_y),
+                        out_matrix_en       => out_matrix_en(curr_x, curr_y),
+                        out_matrix_end_row  => out_matrix_end_row(curr_x, curr_y),
+                        out_matrix_end      => out_matrix_end(curr_x, curr_y)
+                    );
+                end generate FOX_GEN;
+            end generate FOX_NETWORK_GEN;
 
-                    -- Result node parameters
-                    RESULT_X_COORD  => RESULT_X_COORD,
-                    RESULT_Y_COORD  => RESULT_Y_COORD,
+            PERIPHERAL_NODE_GEN: if (curr_x >= FOX_NETWORK_STAGES or curr_y >= FOX_NETWORK_STAGES) generate
+                ROM_GEN: if (curr_x = ROM_X_COORD and curr_y = ROM_Y_COORD) generate
+                    ROM: rom_node
+                    generic map (
+                        -- Node parameters
+                        X_COORD => curr_x,
+                        Y_COORD => curr_y,
+
+                        -- Packet parameters
+                        COORD_BITS              => COORD_BITS,
+                        MULTICAST_GROUP_BITS    => MULTICAST_GROUP_BITS,
+                        MULTICAST_COORD_BITS    => MULTICAST_COORD_BITS,
+                        MATRIX_TYPE_BITS        => MATRIX_TYPE_BITS,
+                        MATRIX_COORD_BITS       => MATRIX_COORD_BITS,
+                        MATRIX_ELEMENT_BITS     => MATRIX_ELEMENT_BITS,
+                        BUS_WIDTH               => BUS_WIDTH,
                 
-                    -- Node parameters
-                    X_COORD         => curr_x,
-                    Y_COORD         => curr_y,
-                    NODE_NUMBER     => node_number,
-
-                    -- Packet parameters
-                    COORD_BITS              => COORD_BITS,
-                    MULTICAST_GROUP_BITS    => MULTICAST_GROUP_BITS,
-                    MULTICAST_COORD_BITS    => MULTICAST_COORD_BITS,
-                    MATRIX_TYPE_BITS        => MATRIX_TYPE_BITS,
-                    MATRIX_COORD_BITS       => MATRIX_COORD_BITS, 
-                    MATRIX_ELEMENT_BITS     => MATRIX_ELEMENT_BITS,
-                    BUS_WIDTH               => BUS_WIDTH,
-
-                    -- Matrix parameters
-                    TOTAL_MATRIX_SIZE       => TOTAL_MATRIX_SIZE,
-                    FOX_MATRIX_SIZE         => FOX_MATRIX_SIZE,
-                    
-                    USE_INITIALISATION_FILE => USE_MATRIX_INIT_FILE,
-                    MATRIX_FILE             => matrix_file,
-                    MATRIX_FILE_LENGTH      => MATRIX_INIT_FILE_LENGTH,
-                    
-                    -- Matrix offset for node
-                    MATRIX_X_OFFSET => x_offset,
-                    MATRIX_Y_OFFSET => y_offset,
-
-                    -- NIC parameters
-                    FIFO_DEPTH      => FOX_FIFO_DEPTH,
-                    
-                    -- PicoRV32 core parameters
-                    DIVIDE_ENABLED     => FOX_DIVIDE_ENABLED,
-                    MULTIPLY_ENABLED   => MULTIPLY_ENABLED,
-                    FIRMWARE           => FOX_FIRMWARE,
-                    MEM_SIZE           => FOX_FIRMWARE_MEM_SIZE
-                )
-                port map (
-                    clk                 => clk,
-                    reset_n             => reset_n,
-                    
-                    LED                 => LED(node_number),
-
-                    out_char            => out_char(curr_x, curr_y),
-                    out_char_en         => out_char_en(curr_x, curr_y),
-                    out_char_ready      => '1',
-                    
-                    -- Messages incoming to router
-                    x_in                => x_messages_in(curr_x, curr_y),
-                    x_in_valid          => x_messages_in_valid(curr_x, curr_y),                  
-                    y_in                => y_messages_in(curr_x, curr_y),
-                    y_in_valid          => y_messages_in_valid(curr_x, curr_y),
-                    
-                    -- Messages outgoing from router
-                    x_out               => x_messages_out(curr_x, curr_y),
-                    x_out_valid         => x_messages_out_valid(curr_x, curr_y),
-                    y_out               => y_messages_out(curr_x, curr_y),
-                    y_out_valid         => y_messages_out_valid(curr_x, curr_y),
-
-                    out_matrix          => out_matrix(curr_x, curr_y),
-                    out_matrix_en       => out_matrix_en(curr_x, curr_y),
-                    out_matrix_end_row  => out_matrix_end_row(curr_x, curr_y),
-                    out_matrix_end      => out_matrix_end(curr_x, curr_y)
-                );
-            end generate FOX_GEN;
+                        FIFO_DEPTH              => 8,
+                        
+                        USE_INITIALISATION_FILE => True,
+                        MATRIX_FILE             => combined_matrix_file,
+                        ROM_DEPTH               => matrix_file_length,
+                        ROM_ADDRESS_WIDTH       => ROM_ADDRESS_WIDTH
+                    )
+                    port map (
+                        clk                 => clk,
+                        reset_n             => reset_n,
+                        
+                        rom_read_complete   => open,
+                
+                        x_in                    => x_messages_in(curr_x, curr_y),
+                        x_in_valid              => x_messages_in_valid(curr_x, curr_y),
+                        y_in                    => y_messages_in(curr_x, curr_y),
+                        y_in_valid              => y_messages_in_valid(curr_x, curr_y),
+                        
+                        x_out                   => x_messages_out(curr_x, curr_y),
+                        x_out_valid             => x_messages_out_valid(curr_x, curr_y),
+                        y_out                   => y_messages_out(curr_x, curr_y),
+                        y_out_valid             => y_messages_out_valid(curr_x, curr_y)
+                    );
+                end generate ROM_GEN;
+                
+                ROUTER_GEN: if (curr_x /= ROM_X_COORD or curr_y /= ROM_Y_COORD) generate
+                    ROUTER: hoplite_router
+                        generic map (
+                            BUS_WIDTH   => BUS_WIDTH,
+                            X_COORD     => curr_x,
+                            Y_COORD     => curr_y,
+                            COORD_BITS  => COORD_BITS
+                        )
+                        port map (
+                            clk                 => clk,
+                            reset_n             => reset_n,
+                            
+                            x_in                => x_messages_in(curr_x, curr_y),
+                            x_in_valid          => x_messages_in_valid(curr_x, curr_y),
+                            y_in                => y_messages_in(curr_x, curr_y),
+                            y_in_valid          => y_messages_in_valid(curr_x, curr_y),
+                            pe_in               => (others => '0'),
+                            pe_in_valid         => '0',
+                            pe_backpressure     => open,
+                            
+                            x_out                   => x_messages_out(curr_x, curr_y),
+                            x_out_valid             => x_messages_out_valid(curr_x, curr_y),
+                            y_out                   => y_messages_out(curr_x, curr_y),
+                            y_out_valid             => y_messages_out_valid(curr_x, curr_y),
+                            pe_out              => open,
+                            pe_out_valid        => open
+                        );
+                end generate ROUTER_GEN;
+            end generate PERIPHERAL_NODE_GEN;
         end generate NETWORK_COL_GEN;
     end generate NETWORK_ROW_GEN;
 

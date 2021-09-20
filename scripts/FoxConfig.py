@@ -19,6 +19,7 @@ class FoxConfig:
         self.networkCols = foxConfig['networkCols']
 
         self.resultNodeCoord = foxConfig['resultNodeCoord']
+        self.romNodeCoord = foxConfig['romNodeCoord']
 
         self.totalMatrixSize = matrixSize
 
@@ -34,6 +35,17 @@ class FoxConfig:
         self.matrixElementBits = foxConfig['packetFormat']['matrixElementBits']
 
         self.useMatrixInitFile = foxConfig['useMatrixInitFile']
+
+        self.useMulticast = foxConfig['useMulticast']
+
+        if self.useMulticast == True:
+            self.multicastGroupNodes = foxConfig['multicastConfig']['multicastGroupNodes']
+            self.multicastNetworkRows = foxConfig['multicastConfig']['multicastNetworkRows']
+            self.multicastNetworkCols = foxConfig['multicastConfig']['multicastNetworkCols']
+        else:
+            self.multicastGroupNodes = 0
+            self.multicastNetworkRows = 0
+            self.multicastNetworkCols = 0
 
     # Firmware configuration
     def import_firmware_config(self):

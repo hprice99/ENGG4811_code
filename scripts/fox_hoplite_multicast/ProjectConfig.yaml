@@ -1,0 +1,4 @@
+---
+# Firmware folder relative to repository root
+firmwareFolder: firmware/fox_hoplite_multicast
+hdlFolder: hdl/fox_hoplite_multicast
