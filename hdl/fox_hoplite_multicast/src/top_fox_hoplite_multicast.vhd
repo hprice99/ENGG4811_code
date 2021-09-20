@@ -382,7 +382,7 @@ architecture Behavioral of top is
     
     -- TODO Move to fox_defs
     constant USE_MULTICAST          : boolean := True;
-    constant MULTICAST_FIFO_DEPTH   : integer := FOX_FIFO_DEPTH;
+    constant MULTICAST_FIFO_DEPTH   : integer := FOX_MATRIX_ELEMENTS;
     
     -- Array of message interfaces between nodes
     signal x_messages_out, y_messages_out, multicast_messages_out : t_Message;
@@ -467,8 +467,11 @@ begin
                 multicast_x_messages_in(curr_multicast_x, curr_multicast_y)       <= (others => '0');
                 multicast_x_messages_in_valid(curr_multicast_x, curr_multicast_y) <= '0';
 
-                multicast_y_messages_in(curr_multicast_x, curr_multicast_y)       <= multicast_y_messages_out(curr_multicast_x, prev_multicast_y);
-                multicast_y_messages_in_valid(curr_multicast_x, curr_multicast_y) <= multicast_y_messages_out_valid(curr_multicast_x, prev_multicast_y);
+--                multicast_y_messages_in(curr_multicast_x, curr_multicast_y)       <= multicast_y_messages_out(curr_multicast_x, prev_multicast_y);
+--                multicast_y_messages_in_valid(curr_multicast_x, curr_multicast_y) <= multicast_y_messages_out_valid(curr_multicast_x, prev_multicast_y);
+
+                multicast_y_messages_in(curr_multicast_x, curr_multicast_y)       <= (others => '0');
+                multicast_y_messages_in_valid(curr_multicast_x, curr_multicast_y) <= '0';
             end generate MULTICAST_ROUTER_GEN;
     
         NETWORK_COL_GEN: for j in 0 to (NETWORK_COLS-1) generate
