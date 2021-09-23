@@ -81,7 +81,9 @@ enum FoxError send_ready(int my_x_coord, int my_y_coord,
 
     packet.matrixElement = 0;
 
-    networkError = send_message(packet);
+    do {
+        networkError = send_message(packet);
+    } while (networkError != NETWORK_SUCCESS);
 
     #ifdef DEBUG_PRINT
     print_matrix_packet("Sent ready", packet);
@@ -151,7 +153,9 @@ enum FoxError send_A(int my_x_coord, int my_y_coord) {
             #endif
 
             // Send message over multicast
-            networkError = send_message(packet);
+            do {
+                networkError = send_message(packet);
+            } while (networkError != NETWORK_SUCCESS);
 
             if (networkError == NETWORK_ERROR) {
 
@@ -229,7 +233,9 @@ enum FoxError send_B(int my_x_coord, int my_y_coord, int fox_rows) {
                 packet.destY = my_y_coord - 1;
             }
 
-            networkError = send_message(packet);
+            do {
+                networkError = send_message(packet);
+            } while (networkError != NETWORK_SUCCESS);
 
             #ifdef DEBUG_PRINT
             print_matrix_packet("end_B", packet);
@@ -274,7 +280,9 @@ enum FoxError send_C(int my_x_coord, int my_y_coord) {
             print_char('s');
             #endif
 
-            networkError = send_message(packet);
+            do {
+                networkError = send_message(packet);
+            } while (networkError != NETWORK_SUCCESS);
 
             #ifdef DEBUG_PRINT
             print_matrix_packet("end_C", packet);

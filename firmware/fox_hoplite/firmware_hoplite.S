@@ -2,8 +2,8 @@
 .global main
 
 /* set stack pointer */
-lui sp, %hi(4*4096)
-addi sp, sp, %lo(4*4096)
+lui sp, %hi(4*3072)
+addi sp, sp, %lo(4*3072)
 
 /* call main */
 jal ra, main

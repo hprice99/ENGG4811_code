@@ -4,9 +4,15 @@ networkCols: 2
 
 foxNetworkStages: 2
 
+foxNodeFifos:
+  peToNetwork: 8
+
 resultNodeCoord:
   x: 0
   y: 0
+
+resultNodeFifos:
+  peToNetwork: 8
 
 romNodeCoord:
   x: 0

@@ -66,8 +66,8 @@ class FoxConfig:
             self.multicastFifoDepth = 0
             
         # FIFO configuration
-        self.foxNodeFifos = {'peToNetwork': 2 * foxMatrixElements,
-                                'networkToPe' : 2 * foxMatrixElements}
+        self.foxNodeFifos = {'peToNetwork'  : 2 * foxMatrixElements,
+                             'networkToPe'  : 2 * foxMatrixElements}
 
         if 'foxNodeFifos' in foxConfig:
             if 'peToNetwork' in foxConfig['foxNodeFifos']:
@@ -76,7 +76,7 @@ class FoxConfig:
             if 'networkToPe' in foxConfig['foxNodeFifos']:
                 self.foxNodeFifos['networkToPe'] = foxConfig['foxNodeFifos']['networkToPe']
 
-        self.resultNodeFifos = {'peToNetwork': 2 * totalMatrixElements,
+        self.resultNodeFifos = {'peToNetwork' : 2 * totalMatrixElements,
                                 'networkToPe' : 2 * totalMatrixElements}
 
         if 'resultNodeFifos' in foxConfig:

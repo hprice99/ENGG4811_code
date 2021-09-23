@@ -27,10 +27,10 @@ package fox_defs is
     constant ROM_Y_COORD  : integer := 2;
 
     -- NIC parameters
-    constant FOX_PE_TO_NETWORK_FIFO_DEPTH   : integer := 512;
+    constant FOX_PE_TO_NETWORK_FIFO_DEPTH   : integer := 8;
     constant FOX_NETWORK_TO_PE_FIFO_DEPTH   : integer := 512;
 
-    constant RESULT_PE_TO_NETWORK_FIFO_DEPTH    : integer := 2048;
+    constant RESULT_PE_TO_NETWORK_FIFO_DEPTH    : integer := 8;
     constant RESULT_NETWORK_TO_PE_FIFO_DEPTH    : integer := 2048;
 
     constant RESULT_UART_FIFO_DEPTH : integer := 512;
