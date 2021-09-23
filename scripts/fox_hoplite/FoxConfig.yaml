@@ -12,6 +12,8 @@ romNodeCoord:
   x: 0
   y: 2
 
+resultUartFifoDepth: 512
+
 packetFormat:
   multicastGroupBits: 1
   multicastCoordBits: 1
@@ -23,4 +25,4 @@ packetFormat:
 
 useMatrixInitFile: True
 
-useMulticast: False
+multicastAvailable: False

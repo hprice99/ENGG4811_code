@@ -116,7 +116,8 @@ architecture Behavioral of top is
             MATRIX_Y_OFFSET : integer := 0;
 
             -- NIC parameters
-            FIFO_DEPTH      : integer := 32;
+            PE_TO_NETWORK_FIFO_DEPTH    : integer := 32;
+            NETWORK_TO_PE_FIFO_DEPTH    : integer := 32;
             
             -- PicoRV32 core parameters
             DIVIDE_ENABLED     : std_logic := '0';
@@ -193,7 +194,8 @@ architecture Behavioral of top is
             MATRIX_Y_OFFSET : integer := 0;
     
             -- NIC parameters
-            NIC_FIFO_DEPTH     : integer := 32;
+            PE_TO_NETWORK_FIFO_DEPTH    : integer := 32;
+            NETWORK_TO_PE_FIFO_DEPTH    : integer := 32;
     
             -- UART parameters
             CLK_FREQ           : integer := 50e6;
@@ -312,8 +314,6 @@ architecture Behavioral of top is
     constant RESULT_DIVIDE_ENABLED  : std_logic := '1';
     constant MULTIPLY_ENABLED       : std_logic := '1';
 
-    constant UART_FIFO_DEPTH    : integer := 1024;
-
     constant combined_matrix_file   : string := "combined.mif";
     constant matrix_file_length     : integer := 2 * TOTAL_MATRIX_ELEMENTS;
     constant ROM_ADDRESS_WIDTH      : integer := ceil_log2(matrix_file_length);
@@ -387,12 +387,13 @@ begin
                         MATRIX_Y_OFFSET => y_offset,
 
                         -- NIC parameters
-                        NIC_FIFO_DEPTH  => RESULT_FIFO_DEPTH,
-
+                        PE_TO_NETWORK_FIFO_DEPTH    => RESULT_PE_TO_NETWORK_FIFO_DEPTH,
+                        NETWORK_TO_PE_FIFO_DEPTH    => RESULT_NETWORK_TO_PE_FIFO_DEPTH,
+    
                         -- UART parameters
                         CLK_FREQ        => CLK_FREQ,
                         ENABLE_UART     => ENABLE_UART,
-                        UART_FIFO_DEPTH => UART_FIFO_DEPTH,
+                        UART_FIFO_DEPTH => RESULT_UART_FIFO_DEPTH,
                         
                         -- PicoRV32 core parameters
                         DIVIDE_ENABLED     => RESULT_DIVIDE_ENABLED,
@@ -473,7 +474,8 @@ begin
                         MATRIX_Y_OFFSET => y_offset,
 
                         -- NIC parameters
-                        FIFO_DEPTH      => FOX_FIFO_DEPTH,
+                        PE_TO_NETWORK_FIFO_DEPTH    => FOX_PE_TO_NETWORK_FIFO_DEPTH,
+                        NETWORK_TO_PE_FIFO_DEPTH    => FOX_NETWORK_TO_PE_FIFO_DEPTH,
                         
                         -- PicoRV32 core parameters
                         DIVIDE_ENABLED     => FOX_DIVIDE_ENABLED,

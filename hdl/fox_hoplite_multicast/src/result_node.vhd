@@ -78,7 +78,8 @@ entity result_node is
         MATRIX_Y_OFFSET : integer := 0;
 
         -- NIC parameters
-        NIC_FIFO_DEPTH     : integer := 32;
+        PE_TO_NETWORK_FIFO_DEPTH    : integer := 32;
+        NETWORK_TO_PE_FIFO_DEPTH    : integer := 32;
 
         -- UART parameters
         CLK_FREQ           : integer := 50e6;
@@ -173,7 +174,8 @@ architecture Behavioral of result_node is
             MATRIX_Y_OFFSET : integer := 0;
 
             -- NIC parameters
-            FIFO_DEPTH      : integer := 32;
+            PE_TO_NETWORK_FIFO_DEPTH    : integer := 32;
+            NETWORK_TO_PE_FIFO_DEPTH    : integer := 32;
             
             -- PicoRV32 core parameters
             DIVIDE_ENABLED     : std_logic := '0';
@@ -333,7 +335,8 @@ begin
             MATRIX_Y_OFFSET => MATRIX_X_OFFSET,
     
             -- NIC parameters
-            FIFO_DEPTH      => RESULT_FIFO_DEPTH,
+            PE_TO_NETWORK_FIFO_DEPTH      => PE_TO_NETWORK_FIFO_DEPTH,
+            NETWORK_TO_PE_FIFO_DEPTH      => NETWORK_TO_PE_FIFO_DEPTH,
             
             -- PicoRV32 core parameters
             DIVIDE_ENABLED     => DIVIDE_ENABLED,

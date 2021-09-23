@@ -15,8 +15,11 @@ class FoxNetwork:
             multicastCoordBits, \
             doneFlagBits, resultFlagBits, matrixTypeBits, matrixCoordBits, \
             foxFirmware, resultFirmware, A=None, B=None, \
-            useMatrixInitFile=True, useMulticast, multicastGroupNodes, \
+            useMatrixInitFile=True, multicastAvailable, useMulticast, multicastGroupNodes, \
             multicastNetworkRows, multicastNetworkCols, \
+            multicastFifoDepth, \
+            foxNodeFifos, resultNodeFifos, \
+            resultUartFifoDepth, \
             hdlFolder=None, firmwareFolder=None):
 
         # Entire network details
@@ -45,6 +48,11 @@ class FoxNetwork:
         self.foxFifoDepth = 2 * self.foxMatrixElements
         self.resultFifoDepth = self.totalMatrixElements
 
+        self.foxNodeFifos = foxNodeFifos
+        self.resultNodeFifos = resultNodeFifos
+
+        self.resultUartFifoDepth = resultUartFifoDepth
+
         # Do not set A or B by default
         self.A = A
         self.B = B
@@ -62,8 +70,19 @@ class FoxNetwork:
 
         self.useMulticast = useMulticast
 
-        if self.useMulticast == True:
-            self.multicastConfig = MulticastConfig(multicastGroupNodes=multicastGroupNodes, multicastNetworkRows=multicastNetworkRows, multicastNetworkCols=multicastNetworkCols)
+        if multicastAvailable == True:
+            if self.useMulticast == True:
+                self.multicastConfig = MulticastConfig(useMulticast=useMulticast, \
+                                                        multicastGroupNodes=multicastGroupNodes, \
+                                                        multicastNetworkRows=multicastNetworkRows, \
+                                                        multicastNetworkCols=multicastNetworkCols, \
+                                                        multicastFifoDepth=multicastFifoDepth)
+            else:
+                self.multicastConfig = MulticastConfig(useMulticast=useMulticast, \
+                                                        multicastGroupNodes=0, \
+                                                        multicastNetworkRows=0, \
+                                                        multicastNetworkCols=0, \
+                                                        multicastFifoDepth=0)
         else:
             self.multicastConfig = None
 

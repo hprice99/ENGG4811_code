@@ -130,7 +130,9 @@ architecture Behavioral of rom_node is
     component nic_dual
         generic (
             BUS_WIDTH   : integer := 32;
-            FIFO_DEPTH  : integer := 64;
+            
+            PE_TO_NETWORK_FIFO_DEPTH    : integer := 32;
+            NETWORK_TO_PE_FIFO_DEPTH    : integer := 32;
             
             USE_INITIALISATION_FILE : boolean := True;
             INITIALISATION_FILE     : string := "none";
@@ -258,7 +260,9 @@ begin
     NIC: nic_dual
         generic map (
             BUS_WIDTH   => BUS_WIDTH,
-            FIFO_DEPTH  => FIFO_DEPTH,
+            
+            PE_TO_NETWORK_FIFO_DEPTH    => FIFO_DEPTH,
+            NETWORK_TO_PE_FIFO_DEPTH    => 4,
            
             USE_INITIALISATION_FILE => False,
             INITIALISATION_FILE     => "none",
