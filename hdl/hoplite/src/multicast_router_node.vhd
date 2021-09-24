@@ -140,14 +140,6 @@ architecture Behavioral of multicast_router_node is
 
     signal buffer_fifo_full         : t_NodeToMulticastPacketsValid;
     signal buffer_fifo_empty        : t_NodeToMulticastPacketsValid;
-    
-    function rotate_left (vect : in std_logic_vector) return std_logic_vector is
-        variable rotated_vect   : std_logic_vector((vect'length-1) downto 0);
-    begin
-        rotated_vect    := vect((vect'length - 2) downto 0) & vect(vect'length - 1);
-        
-        return rotated_vect;
-    end function rotate_left;
 
 begin
 
