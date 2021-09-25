@@ -6,6 +6,7 @@ foxNetworkStages: 2
 
 foxNodeFifos:
   peToNetwork: 8
+  networkToPe: 1024
 
 resultNodeCoord:
   x: 0
@@ -13,12 +14,13 @@ resultNodeCoord:
 
 resultNodeFifos:
   peToNetwork: 8
+  networkToPe: 1024
 
 romNodeCoord:
   x: 0
   y: 2
 
-resultUartFifoDepth: 512
+resultUartFifoDepth: 1024
 
 packetFormat:
   multicastGroupBits: 1

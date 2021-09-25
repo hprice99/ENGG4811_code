@@ -67,6 +67,9 @@ entity result_node is
         USE_INITIALISATION_FILE : boolean := True;
         MATRIX_FILE             : string  := "none";
         MATRIX_FILE_LENGTH      : integer := 0;
+
+        ROM_X_COORD             : integer := 0;
+        ROM_Y_COORD             : integer := 0;
         
         -- Matrix offset for node
         MATRIX_X_OFFSET : integer := 0;
@@ -153,6 +156,9 @@ architecture Behavioral of result_node is
             USE_INITIALISATION_FILE : boolean := True;
             MATRIX_FILE             : string  := "none";
             MATRIX_FILE_LENGTH      : integer := 0;
+
+            ROM_X_COORD             : integer := 0;
+            ROM_Y_COORD             : integer := 0;
             
             -- Matrix offset for node
             MATRIX_X_OFFSET : integer := 0;
@@ -304,6 +310,9 @@ begin
             USE_INITIALISATION_FILE => USE_INITIALISATION_FILE,
             MATRIX_FILE             => MATRIX_FILE,
             MATRIX_FILE_LENGTH      => MATRIX_FILE_LENGTH,
+
+            ROM_X_COORD             => ROM_X_COORD,
+            ROM_Y_COORD             => ROM_Y_COORD,
             
             -- Matrix offset for node
             MATRIX_X_OFFSET => MATRIX_X_OFFSET,

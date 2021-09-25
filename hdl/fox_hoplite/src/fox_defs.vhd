@@ -28,12 +28,12 @@ package fox_defs is
 
     -- NIC parameters
     constant FOX_PE_TO_NETWORK_FIFO_DEPTH   : integer := 8;
-    constant FOX_NETWORK_TO_PE_FIFO_DEPTH   : integer := 512;
+    constant FOX_NETWORK_TO_PE_FIFO_DEPTH   : integer := 1024;
 
     constant RESULT_PE_TO_NETWORK_FIFO_DEPTH    : integer := 8;
-    constant RESULT_NETWORK_TO_PE_FIFO_DEPTH    : integer := 2048;
+    constant RESULT_NETWORK_TO_PE_FIFO_DEPTH    : integer := 1024;
 
-    constant RESULT_UART_FIFO_DEPTH : integer := 512;
+    constant RESULT_UART_FIFO_DEPTH : integer := 1024;
 
     -- Custom types
     type t_Destination is array(0 to (NETWORK_COLS-1), 0 to (NETWORK_ROWS-1)) of t_Coordinate;

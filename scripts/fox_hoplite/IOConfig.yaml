@@ -123,3 +123,9 @@ networkIo:
   - name: result_y_coord
     direction: input
     width: 8
+  - name: rom_x_coord
+    direction: input
+    width: 8
+  - name: rom_y_coord
+    direction: input
+    width: 8
