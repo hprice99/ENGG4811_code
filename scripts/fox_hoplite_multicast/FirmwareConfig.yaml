@@ -1,8 +1,8 @@
 ---
 foxFirmware:
   name: firmware_fox_hoplite_multicast
-  memory_size: 4096
+  memory_size: 3072
 
 resultFirmware:
   name: firmware_fox_hoplite_multicast_result
-  memory_size: 8192
+  memory_size: 4096

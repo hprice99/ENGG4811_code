@@ -23,6 +23,9 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
 
+library xil_defaultlib;
+use xil_defaultlib.math_functions.all;
+
 -- TODO Change multicast_in and multicast_out to pe_to_network and network_to_pe
 entity multicast_router is
     Generic (
@@ -102,6 +105,8 @@ architecture Behavioral of multicast_router is
     end function is_valid_packet_in;
 
 begin
+
+    assert ((ceil_log2(MULTICAST_X_COORD) <= MULTICAST_COORD_BITS) and (ceil_log2(MULTICAST_Y_COORD) <= MULTICAST_COORD_BITS)) report "MULTICAST_COORD_BITS must be large enough for coordinates" severity failure;
 
     -- Assign multicast coordinates
     x_in_multicast_dest_d(X_INDEX)  <= x_in_d(MULTICAST_X_INDEX_HEADER_END downto MULTICAST_X_INDEX_HEADER_START);
@@ -186,7 +191,7 @@ begin
         x_next  <= '0';
         y_next  <= '0';
      
-        if (x_in_valid_d = '1' and is_valid_packet_in(x_in_multicast_dest_d, x_in_valid) = False) then
+        if (x_in_valid_d = '1' and is_valid_packet_in(x_in_multicast_dest_d, x_in_valid_d) = False) then
             x_next <= '1';
         elsif (multicast_in_valid_d = '1' and is_valid_packet_in(multicast_in_multicast_dest_d, multicast_in_valid_d) = True) then
             x_next <= '0';

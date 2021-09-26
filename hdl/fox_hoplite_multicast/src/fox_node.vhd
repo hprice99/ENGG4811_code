@@ -55,6 +55,7 @@ entity fox_node is
         NODE_NUMBER     : integer := 0;
         
         -- Multicast parameters
+        USE_MULTICAST           : boolean := False;
         MULTICAST_X_COORD       : integer := 1;
         MULTICAST_Y_COORD       : integer := 1;
 
@@ -74,13 +75,17 @@ entity fox_node is
         USE_INITIALISATION_FILE : boolean := True;
         MATRIX_FILE             : string  := "none";
         MATRIX_FILE_LENGTH      : integer := 0;
+        
+        ROM_X_COORD             : integer := 0;
+        ROM_Y_COORD             : integer := 0;
 
         -- Matrix offset for node
         MATRIX_X_OFFSET : integer := 0;
         MATRIX_Y_OFFSET : integer := 0;
 
         -- NIC parameters
-        FIFO_DEPTH      : integer := 32;
+        PE_TO_NETWORK_FIFO_DEPTH    : integer := 32;
+        NETWORK_TO_PE_FIFO_DEPTH    : integer := 32;
         
         -- PicoRV32 core parameters
         DIVIDE_ENABLED     : std_logic := '0';
@@ -102,11 +107,16 @@ entity fox_node is
         x_in_valid          : in STD_LOGIC;
         y_in                : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
         y_in_valid          : in STD_LOGIC;
+        multicast_in        : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
+        multicast_in_valid  : in STD_LOGIC;
         
         x_out               : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
         x_out_valid         : out STD_LOGIC;
         y_out               : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
         y_out_valid         : out STD_LOGIC;
+        multicast_out       : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
+        multicast_out_valid : out STD_LOGIC;
+        multicast_backpressure  : in STD_LOGIC;
 
         out_matrix          : out std_logic_vector(31 downto 0);
         out_matrix_en       : out std_logic;
@@ -166,7 +176,9 @@ architecture Behavioral of fox_node is
     component nic_dual
         generic (
             BUS_WIDTH   : integer := 32;
-            FIFO_DEPTH  : integer := 64;
+            
+            PE_TO_NETWORK_FIFO_DEPTH    : integer := 32;
+            NETWORK_TO_PE_FIFO_DEPTH    : integer := 32;
             
             USE_INITIALISATION_FILE : boolean := True;
             INITIALISATION_FILE     : string := "none";
@@ -310,6 +322,8 @@ architecture Behavioral of fox_node is
             FOX_MATRIX_SIZE : integer := 16;
             
             USE_MATRIX_INIT_FILE    : boolean  := True;
+            ROM_X_COORD             : integer := 0;
+            ROM_Y_COORD             : integer := 0;
             
             -- Matrix offset for node
             MATRIX_X_OFFSET : integer := 0;
@@ -395,8 +409,8 @@ architecture Behavioral of fox_node is
     signal pe_to_network_message    : STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
     signal pe_to_network_valid      : STD_LOGIC;
     
-    signal pe_backpressure      : STD_LOGIC;
-    signal router_ready         : STD_LOGIC;
+    signal pe_backpressure          : STD_LOGIC;   
+    signal router_ready             : STD_LOGIC;
     
     signal pe_to_network_full, pe_to_network_empty   : STD_LOGIC;
     
@@ -462,7 +476,7 @@ begin
             MULTICAST_COORD_BITS    => MULTICAST_COORD_BITS,
             MULTICAST_X_COORD       => MULTICAST_X_COORD,
             MULTICAST_Y_COORD       => MULTICAST_Y_COORD,
-            USE_MULTICAST           => False
+            USE_MULTICAST           => USE_MULTICAST
         )
         port map (
             clk                 => clk,
@@ -475,8 +489,8 @@ begin
             pe_in                   => pe_to_network_message,
             pe_in_valid             => pe_to_network_valid,
             pe_backpressure         => pe_backpressure,
-            multicast_in            => (others => '0'),
-            multicast_in_valid      => '0',
+            multicast_in            => multicast_in,
+            multicast_in_valid      => multicast_in_valid,
             
             
             x_out                   => x_out_d,
@@ -485,9 +499,9 @@ begin
             y_out_valid             => y_out_valid_d,
             pe_out                  => network_to_pe_message,
             pe_out_valid            => network_to_pe_valid,
-            multicast_out           => open,
-            multicast_out_valid     => open,
-            multicast_backpressure  => '0'
+            multicast_out           => multicast_out,
+            multicast_out_valid     => multicast_out_valid,
+            multicast_backpressure  => multicast_backpressure
         );
     
     -- Connect router ports to node ports
@@ -504,11 +518,13 @@ begin
     NIC: nic_dual
         generic map (
             BUS_WIDTH   => BUS_WIDTH,
-            FIFO_DEPTH  => FIFO_DEPTH,
+            
+            PE_TO_NETWORK_FIFO_DEPTH    => PE_TO_NETWORK_FIFO_DEPTH,
+            NETWORK_TO_PE_FIFO_DEPTH    => NETWORK_TO_PE_FIFO_DEPTH,
            
-            USE_INITIALISATION_FILE => USE_INITIALISATION_FILE,
-            INITIALISATION_FILE     => MATRIX_FILE,
-            INITIALISATION_LENGTH   => MATRIX_FILE_LENGTH
+            USE_INITIALISATION_FILE => False,
+            INITIALISATION_FILE     => "none",
+            INITIALISATION_LENGTH   => 0
         )
         port map (
             clk                 => clk,
@@ -646,6 +662,9 @@ begin
             FOX_MATRIX_SIZE => FOX_MATRIX_SIZE,
             
             USE_MATRIX_INIT_FILE    => USE_INITIALISATION_FILE,
+            
+            ROM_X_COORD     => ROM_X_COORD,
+            ROM_Y_COORD     => ROM_Y_COORD,
             
             MATRIX_X_OFFSET => MATRIX_X_OFFSET,
             MATRIX_Y_OFFSET => MATRIX_Y_OFFSET,

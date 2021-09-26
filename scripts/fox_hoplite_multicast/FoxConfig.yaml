@@ -1,16 +1,30 @@
 ---
-networkRows: 2
+networkRows: 3
 networkCols: 2
 
 foxNetworkStages: 2
+
+foxNodeFifos:
+  peToNetwork: 8
+  networkToPe: 1024
 
 resultNodeCoord:
   x: 0
   y: 0
 
+resultNodeFifos:
+  peToNetwork: 8
+  networkToPe: 1024
+
+resultUartFifoDepth: 1024
+
+romNodeCoord:
+  x: 0
+  y: 2
+
 packetFormat:
   multicastGroupBits: 1
-  multicastCoordBits: 1
+  multicastCoordBits: 2
   doneFlagBits: 1
   resultFlagBits: 1
   matrixTypeBits: 1
@@ -19,6 +33,7 @@ packetFormat:
 
 useMatrixInitFile: True
 
+multicastAvailable: True
 useMulticast: True
 multicastConfig:
   multicastGroupNodes: 2

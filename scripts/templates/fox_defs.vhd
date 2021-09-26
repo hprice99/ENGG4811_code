@@ -22,16 +22,25 @@ package fox_defs is
     constant RESULT_X_COORD  : integer := {{ foxNetwork.resultNodeCoord['x'] }};
     constant RESULT_Y_COORD  : integer := {{ foxNetwork.resultNodeCoord['y'] }};
 
+    -- ROM node parameters
+    constant ROM_X_COORD  : integer := {{ foxNetwork.romNodeCoord['x'] }};
+    constant ROM_Y_COORD  : integer := {{ foxNetwork.romNodeCoord['y'] }};
+
     -- NIC parameters
-    constant FOX_FIFO_DEPTH     : integer := 2 * FOX_MATRIX_ELEMENTS;
-    constant RESULT_FIFO_DEPTH  : integer := TOTAL_MATRIX_ELEMENTS;
+    constant FOX_PE_TO_NETWORK_FIFO_DEPTH   : integer := {{ foxNetwork.foxNodeFifos['peToNetwork'] }};
+    constant FOX_NETWORK_TO_PE_FIFO_DEPTH   : integer := {{ foxNetwork.foxNodeFifos['networkToPe'] }};
+
+    constant RESULT_PE_TO_NETWORK_FIFO_DEPTH    : integer := {{ foxNetwork.resultNodeFifos['peToNetwork'] }};
+    constant RESULT_NETWORK_TO_PE_FIFO_DEPTH    : integer := {{ foxNetwork.resultNodeFifos['networkToPe'] }};
+
+    constant RESULT_UART_FIFO_DEPTH : integer := {{ foxNetwork.resultUartFifoDepth }};
 
     -- Custom types
     type t_Destination is array(0 to (NETWORK_COLS-1), 0 to (NETWORK_ROWS-1)) of t_Coordinate;
     type t_Message is array (0 to (NETWORK_COLS-1), 0 to (NETWORK_ROWS-1)) of std_logic_vector((BUS_WIDTH-1) downto 0);
     type t_MessageValid is array (0 to (NETWORK_COLS-1), 0 to (NETWORK_ROWS-1)) of std_logic;
     type t_Char is array (0 to (FOX_NETWORK_STAGES-1), 0 to (FOX_NETWORK_STAGES-1)) of std_logic_vector(7 downto 0);
-    type t_Matrix is array (0 to (FOX_NETWORK_STAGES-1), 0 to (FOX_NETWORK_STAGES-1)) of std_logic_vector((MATRIX_ELEMENT_BITS-1) downto 0);
+    type t_MatrixOut is array (0 to (FOX_NETWORK_STAGES-1), 0 to (FOX_NETWORK_STAGES-1)) of std_logic_vector((MATRIX_ELEMENT_BITS-1) downto 0);
 
 end package fox_defs;
 

@@ -23,6 +23,8 @@ module system #(
     parameter FOX_MATRIX_SIZE   = 32,
     
     parameter USE_MATRIX_INIT_FILE = 1,
+    parameter ROM_X_COORD          = 0,
+    parameter ROM_Y_COORD          = 0,
     
     // Matrix coordinate offset
     parameter MATRIX_X_OFFSET   = 0,
@@ -325,6 +327,12 @@ module system #(
                 end
                 `RESULT_Y_COORD_INPUT: begin
                     mem_rdata   <= RESULT_Y_COORD;
+                end
+                `ROM_X_COORD_INPUT: begin
+                    mem_rdata   <= ROM_X_COORD;
+                end
+                `ROM_Y_COORD_INPUT: begin
+                    mem_rdata   <= ROM_Y_COORD;
                 end
                 `MATRIX_INIT_FROM_FILE_INPUT: begin
                     if (USE_MATRIX_INIT_FILE == 0) begin

@@ -71,12 +71,16 @@ entity fox_node is
         MATRIX_FILE             : string  := "none";
         MATRIX_FILE_LENGTH      : integer := 0;
 
+        ROM_X_COORD             : integer := 0;
+        ROM_Y_COORD             : integer := 0;
+
         -- Matrix offset for node
         MATRIX_X_OFFSET : integer := 0;
         MATRIX_Y_OFFSET : integer := 0;
 
         -- NIC parameters
-        FIFO_DEPTH      : integer := 32;
+        PE_TO_NETWORK_FIFO_DEPTH    : integer := 32;
+        NETWORK_TO_PE_FIFO_DEPTH    : integer := 32;
         
         -- PicoRV32 core parameters
         DIVIDE_ENABLED     : std_logic := '0';
@@ -144,7 +148,9 @@ architecture Behavioral of fox_node is
     component nic_dual
         generic (
             BUS_WIDTH   : integer := 32;
-            FIFO_DEPTH  : integer := 64;
+            
+            PE_TO_NETWORK_FIFO_DEPTH    : integer := 32;
+            NETWORK_TO_PE_FIFO_DEPTH    : integer := 32;
             
             USE_INITIALISATION_FILE : boolean := True;
             INITIALISATION_FILE     : string := "none";
@@ -279,7 +285,9 @@ architecture Behavioral of fox_node is
 
             FOX_MATRIX_SIZE : integer := 16;
             
-            USE_MATRIX_INIT_FILE    : boolean  := True;
+            USE_MATRIX_INIT_FILE    : boolean := True;
+            ROM_X_COORD             : integer := 0;
+            ROM_Y_COORD             : integer := 0;
             
             -- Matrix offset for node
             MATRIX_X_OFFSET : integer := 0;
@@ -357,17 +365,6 @@ architecture Behavioral of fox_node is
             trap                    : out std_logic
         );
     end component system;
-    
-    component pipeline
-        generic (
-            STAGES  : integer := 10
-        );
-        port (
-            clk     : in STD_LOGIC;
-            d_in    : in STD_LOGIC;
-            d_out   : out STD_LOGIC
-        );
-    end component pipeline;
     
     -- Messages from PE to network
     signal pe_message_out       : STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
@@ -474,11 +471,13 @@ begin
     NIC: nic_dual
         generic map (
             BUS_WIDTH   => BUS_WIDTH,
-            FIFO_DEPTH  => FIFO_DEPTH,
+            
+            PE_TO_NETWORK_FIFO_DEPTH    => PE_TO_NETWORK_FIFO_DEPTH,
+            NETWORK_TO_PE_FIFO_DEPTH    => NETWORK_TO_PE_FIFO_DEPTH,
            
-            USE_INITIALISATION_FILE => USE_INITIALISATION_FILE,
-            INITIALISATION_FILE     => MATRIX_FILE,
-            INITIALISATION_LENGTH   => MATRIX_FILE_LENGTH
+            USE_INITIALISATION_FILE => False,
+            INITIALISATION_FILE     => "none",
+            INITIALISATION_LENGTH   => 0
         )
         port map (
             clk                 => clk,
@@ -608,6 +607,9 @@ begin
             FOX_MATRIX_SIZE => FOX_MATRIX_SIZE,
             
             USE_MATRIX_INIT_FILE    => USE_INITIALISATION_FILE,
+            
+            ROM_X_COORD     => ROM_X_COORD,
+            ROM_Y_COORD     => ROM_Y_COORD,
             
             MATRIX_X_OFFSET => MATRIX_X_OFFSET,
             MATRIX_Y_OFFSET => MATRIX_Y_OFFSET,

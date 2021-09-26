@@ -55,6 +55,7 @@ resultFirmware.write_makefile_variables(firmwareFolder)
 foxNetwork = FoxNetwork(networkRows=config.networkRows, \
                         networkCols=config.networkCols, \
                         resultNodeCoord=config.resultNodeCoord, \
+                        romNodeCoord=config.romNodeCoord, \
                         totalMatrixSize=config.totalMatrixSize, \
                         foxNetworkStages=config.foxNetworkStages, \
                         multicastGroupBits=config.multicastGroupBits,\
@@ -68,10 +69,15 @@ foxNetwork = FoxNetwork(networkRows=config.networkRows, \
                         A=A, \
                         B=B, \
                         useMatrixInitFile=config.useMatrixInitFile, \
+                        multicastAvailable=config.multicastAvailable, \
                         useMulticast=config.useMulticast, \
                         multicastGroupNodes=config.multicastGroupNodes, \
                         multicastNetworkRows=config.multicastNetworkRows, \
                         multicastNetworkCols=config.multicastNetworkCols, \
+                        multicastFifoDepth=config.multicastFifoDepth, \
+                        foxNodeFifos=config.foxNodeFifos, \
+                        resultNodeFifos=config.resultNodeFifos, \
+                        resultUartFifoDepth=config.resultUartFifoDepth, \
                         hdlFolder=hdlFolder, \
                         firmwareFolder=firmwareFolder)
 

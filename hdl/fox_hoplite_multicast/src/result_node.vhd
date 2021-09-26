@@ -1,29 +1,5 @@
-----------------------------------------------------------------------------------
--- Company: 
--- Engineer: 
--- 
--- Create Date: 08/05/2021 07:24:23 PM
--- Design Name: 
--- Module Name: top - Behavioral
--- Project Name: 
--- Target Devices: 
--- Tool Versions: 
--- Description: 
--- 
--- Dependencies: 
--- 
--- Revision:
--- Revision 0.01 - File Created
--- Additional Comments:
--- 
-----------------------------------------------------------------------------------
-
-
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
-
--- Uncomment the following library declaration if using
--- arithmetic functions with Signed or Unsigned values
 use IEEE.NUMERIC_STD.ALL;
 use ieee.std_logic_unsigned.all;
 
@@ -52,6 +28,7 @@ entity result_node is
         NODE_NUMBER     : integer := 0;
         
         -- Multicast parameters
+        USE_MULTICAST           : boolean := False;
         MULTICAST_X_COORD       : integer := 1;
         MULTICAST_Y_COORD       : integer := 1;
 
@@ -72,12 +49,16 @@ entity result_node is
         MATRIX_FILE             : string  := "none";
         MATRIX_FILE_LENGTH      : integer := 0;
         
+        ROM_X_COORD             : integer := 0;
+        ROM_Y_COORD             : integer := 0;
+        
         -- Matrix offset for node
         MATRIX_X_OFFSET : integer := 0;
         MATRIX_Y_OFFSET : integer := 0;
 
         -- NIC parameters
-        NIC_FIFO_DEPTH     : integer := 32;
+        PE_TO_NETWORK_FIFO_DEPTH    : integer := 32;
+        NETWORK_TO_PE_FIFO_DEPTH    : integer := 32;
 
         -- UART parameters
         CLK_FREQ           : integer := 50e6;
@@ -105,11 +86,16 @@ entity result_node is
         x_in_valid          : in STD_LOGIC;
         y_in                : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
         y_in_valid          : in STD_LOGIC;
+        multicast_in        : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
+        multicast_in_valid  : in STD_LOGIC;
         
         x_out               : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
         x_out_valid         : out STD_LOGIC;
         y_out               : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
         y_out_valid         : out STD_LOGIC;
+        multicast_out       : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
+        multicast_out_valid : out STD_LOGIC;
+        multicast_backpressure  : in STD_LOGIC;
 
         out_matrix          : out std_logic_vector(31 downto 0);
         out_matrix_en       : out std_logic;
@@ -141,6 +127,7 @@ architecture Behavioral of result_node is
             NODE_NUMBER     : integer := 0;
             
             -- Multicast parameters
+            USE_MULTICAST           : boolean := False;
             MULTICAST_X_COORD       : integer := 1;
             MULTICAST_Y_COORD       : integer := 1;
 
@@ -161,12 +148,16 @@ architecture Behavioral of result_node is
             MATRIX_FILE             : string  := "none";
             MATRIX_FILE_LENGTH      : integer := 0;
             
+            ROM_X_COORD             : integer := 0;
+            ROM_Y_COORD             : integer := 0;
+            
             -- Matrix offset for node
             MATRIX_X_OFFSET : integer := 0;
             MATRIX_Y_OFFSET : integer := 0;
 
             -- NIC parameters
-            FIFO_DEPTH      : integer := 32;
+            PE_TO_NETWORK_FIFO_DEPTH    : integer := 32;
+            NETWORK_TO_PE_FIFO_DEPTH    : integer := 32;
             
             -- PicoRV32 core parameters
             DIVIDE_ENABLED     : std_logic := '0';
@@ -188,11 +179,16 @@ architecture Behavioral of result_node is
             x_in_valid          : in STD_LOGIC;
             y_in                : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
             y_in_valid          : in STD_LOGIC;
+            multicast_in        : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
+            multicast_in_valid  : in STD_LOGIC;
             
             x_out               : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
             x_out_valid         : out STD_LOGIC;
             y_out               : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
             y_out_valid         : out STD_LOGIC;
+            multicast_out       : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
+            multicast_out_valid : out STD_LOGIC;
+            multicast_backpressure  : in STD_LOGIC;
 
             out_matrix          : out std_logic_vector(31 downto 0);
             out_matrix_en       : out std_logic;
@@ -201,53 +197,27 @@ architecture Behavioral of result_node is
         );
     end component fox_node;
     
-    component fifo_sync
-        generic (
-            BUS_WIDTH   : integer := 32;
-            FIFO_DEPTH  : integer := 64
-        );
-        port (
-            clk         : in std_logic;
-            reset_n     : in std_logic;
-
-            write_en    : in std_logic;
-            write_data  : in std_logic_vector((BUS_WIDTH-1) downto 0);
-
-            read_en     : in std_logic;
-            read_data   : out std_logic_vector((BUS_WIDTH-1) downto 0);
-
-            full        : out std_logic;
-            empty       : out std_logic
-        );
-    end component fifo_sync;
-    
-    component UART is
+    component UART_tx_buffered
         Generic (
-            CLK_FREQ      : integer := 50e6;   -- system clock frequency in Hz
-            BAUD_RATE     : integer := 115200; -- baud rate value
-            PARITY_BIT    : string  := "none"; -- type of parity: "none", "even", "odd", "mark", "space"
-            USE_DEBOUNCER : boolean := True    -- enable/disable debouncer
-        );
+            CLK_FREQ        : integer := 50e6;
+            BAUD_RATE     : integer := 115200;
+            PARITY_BIT    : string  := "none";
+            USE_DEBOUNCER : boolean := True;
+    
+            BUFFER_DEPTH    : integer := 50
+        ); 
         Port (
-            -- CLOCK AND RESET
-            CLK          : in  std_logic; -- system clock
-            RST          : in  std_logic; -- high active synchronous reset
-            -- UART INTERFACE
-            UART_TXD     : out std_logic; -- serial transmit data
-            UART_RXD     : in  std_logic; -- serial receive data
-            -- USER DATA INPUT INTERFACE
-            DIN          : in  std_logic_vector(7 downto 0); -- input data to be transmitted over UART
-            DIN_VLD      : in  std_logic; -- when DIN_VLD = 1, input data (DIN) are valid
-            DIN_RDY      : out std_logic; -- when DIN_RDY = 1, transmitter is ready and valid input data will be accepted for transmiting
-            -- USER DATA OUTPUT INTERFACE
-            DOUT         : out std_logic_vector(7 downto 0); -- output data received via UART
-            DOUT_VLD     : out std_logic; -- when DOUT_VLD = 1, output data (DOUT) are valid (is assert only for one clock cycle)
-            FRAME_ERROR  : out std_logic; -- when FRAME_ERROR = 1, stop bit was invalid (is assert only for one clock cycle)
-            PARITY_ERROR : out std_logic  -- when PARITY_ERROR = 1, parity bit was invalid (is assert only for one clock cycle)
+            clk     : in std_logic;
+            reset_n : in std_logic;
+    
+            data_in         : in std_logic_vector(7 downto 0);
+            data_in_valid   : in std_logic;
+    
+            uart_tx         : out std_logic;
+    
+            buffer_full     : out std_logic
         );
-    end component UART;
-
-    signal reset    : std_logic;
+    end component UART_tx_buffered;
     
     constant BAUD_RATE      : integer := 115200;
     constant PARITY_BIT     : string := "none";
@@ -258,17 +228,10 @@ architecture Behavioral of result_node is
     signal pe_to_uart           : std_logic_vector(7 downto 0);
     signal pe_to_uart_valid     : std_logic;
     signal pe_to_uart_ready     : std_logic;
-    
-    signal uart_tx_ready        : std_logic;
-    signal uart_tx_data         : std_logic_vector(7 downto 0);
-    signal uart_tx_data_valid   : std_logic;
-    
-    signal uart_tx_buffer_read_valid    : std_logic;
-    signal uart_tx_buffer_full, uart_tx_buffer_empty    : std_logic;
+
+    signal buffer_full  : std_logic;
 
 begin
-
-    reset   <= not reset_n;
 
     -- Instantiate node
     out_char    <= pe_to_uart;
@@ -295,6 +258,7 @@ begin
             NODE_NUMBER     => NODE_NUMBER,
             
             -- Multicast parameters
+            USE_MULTICAST       => USE_MULTICAST,
             MULTICAST_X_COORD   => MULTICAST_X_COORD,
             MULTICAST_Y_COORD   => MULTICAST_Y_COORD,
     
@@ -315,12 +279,16 @@ begin
             MATRIX_FILE             => MATRIX_FILE,
             MATRIX_FILE_LENGTH      => MATRIX_FILE_LENGTH,
             
+            ROM_X_COORD             => ROM_X_COORD,
+            ROM_Y_COORD             => ROM_Y_COORD,
+            
             -- Matrix offset for node
             MATRIX_X_OFFSET => MATRIX_X_OFFSET,
             MATRIX_Y_OFFSET => MATRIX_X_OFFSET,
     
             -- NIC parameters
-            FIFO_DEPTH      => RESULT_FIFO_DEPTH,
+            PE_TO_NETWORK_FIFO_DEPTH      => PE_TO_NETWORK_FIFO_DEPTH,
+            NETWORK_TO_PE_FIFO_DEPTH      => NETWORK_TO_PE_FIFO_DEPTH,
             
             -- PicoRV32 core parameters
             DIVIDE_ENABLED     => DIVIDE_ENABLED,
@@ -343,12 +311,17 @@ begin
             x_in_valid          => x_in_valid,
             y_in                => y_in,
             y_in_valid          => y_in_valid,
+            multicast_in        => multicast_in,
+            multicast_in_valid  => multicast_in_valid,
             
             -- Messages outgoing from router
-            x_out               => x_out,
-            x_out_valid         => x_out_valid,
-            y_out               => y_out,
-            y_out_valid         => y_out_valid,
+            x_out                   => x_out,
+            x_out_valid             => x_out_valid,
+            y_out                   => y_out,
+            y_out_valid             => y_out_valid,
+            multicast_out           => multicast_out,
+            multicast_out_valid     => multicast_out_valid,
+            multicast_backpressure  => multicast_backpressure,
     
             out_matrix          => out_matrix,
             out_matrix_en       => out_matrix_en,
@@ -356,61 +329,34 @@ begin
             out_matrix_end      => out_matrix_end
         );
         
-    pe_to_uart_ready    <= not uart_tx_buffer_full;
-        
-    UART_BUFFER: fifo_sync
-        generic map (
-            BUS_WIDTH   => UART_BUS_WIDTH,
-            FIFO_DEPTH  => UART_FIFO_DEPTH
-        )
-        port map (
-            clk         => clk,
-            reset_n     => reset_n,
 
-            write_en    => pe_to_uart_valid,
-            write_data  => pe_to_uart,
+    ENABLE_UART_GEN: if (ENABLE_UART = True) generate
+        pe_to_uart_ready    <= not buffer_full;
 
-            read_en     => uart_tx_buffer_read_valid,
-            read_data   => uart_tx_data,
-
-            full        => uart_tx_buffer_full,
-            empty       => uart_tx_buffer_empty
-        );
-
-    TX_BUFFER_READ_VALID: process (uart_tx_ready, uart_tx_buffer_empty)
-    begin
-        if (uart_tx_buffer_empty = '0') then
-            uart_tx_buffer_read_valid   <= uart_tx_ready;
-        else
-            uart_tx_buffer_read_valid   <= '0';
-        end if;
-    end process TX_BUFFER_READ_VALID;
-
-    UART_GEN: if (ENABLE_UART = True) generate
-        UART_INITIALISE: UART
+        BUFFERED_UART: uart_tx_buffered
             generic map (
-                CLK_FREQ      => CLK_FREQ,
-                BAUD_RATE     => BAUD_RATE,
-                PARITY_BIT    => PARITY_BIT,
-                USE_DEBOUNCER => USE_DEBOUNCER
+                CLK_FREQ        => CLK_FREQ,
+                BAUD_RATE       => BAUD_RATE,
+                PARITY_BIT      => PARITY_BIT,
+                USE_DEBOUNCER   => USE_DEBOUNCER,
+        
+                BUFFER_DEPTH    => UART_FIFO_DEPTH
             )
             port map (
-                -- CLOCK AND RESET
-                CLK          => clk,
-                RST          => reset,
-
-                UART_TXD     => uart_tx,
-                UART_RXD     => '1',
-                
-                DIN          => uart_tx_data, 
-                DIN_VLD      => uart_tx_buffer_read_valid, 
-                DIN_RDY      => uart_tx_ready,
-
-                DOUT         => open,
-                DOUT_VLD     => open, 
-                FRAME_ERROR  => open, 
-                PARITY_ERROR => open
+                clk     => clk,
+                reset_n => reset_n,
+        
+                data_in         => pe_to_uart,
+                data_in_valid   => pe_to_uart_valid,
+        
+                uart_tx         => uart_tx,
+        
+                buffer_full     => buffer_full
             );
-    end generate UART_GEN;
+    end generate ENABLE_UART_GEN;
+
+    DISABLE_UART_GEN: if (ENABLE_UART = False) generate
+        pe_to_uart_ready    <= '1';
+    end generate DISABLE_UART_GEN;
 
 end Behavioral;

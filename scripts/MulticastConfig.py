@@ -1,9 +1,11 @@
 class MulticastConfig:
-    def __init__(self, *, multicastGroupNodes, multicastNetworkRows, multicastNetworkCols):
+    def __init__(self, *, useMulticast, multicastGroupNodes, multicastNetworkRows, multicastNetworkCols, multicastFifoDepth):
 
+        self.useMulticast = useMulticast
         self.multicastGroupNodes = multicastGroupNodes
         self.multicastNetworkRows = multicastNetworkRows
         self.multicastNetworkCols = multicastNetworkCols
+        self.multicastFifoDepth = multicastFifoDepth
 
     '''
     Generate VHDL package containing multicast configuration

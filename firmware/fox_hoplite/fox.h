@@ -54,8 +54,6 @@ enum FoxError send_C(int my_x_coord, int my_y_coord);
 
 enum FoxError assign_element(struct MatrixPacket packet);
 
-enum FoxError assign_my_A(void);
-
 enum FoxError receive_matrix(enum MatrixType matrixType);
 
 #ifdef RESULT

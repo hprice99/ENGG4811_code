@@ -31,6 +31,9 @@ use IEEE.NUMERIC_STD.ALL;
 --library UNISIM;
 --use UNISIM.VComponents.all;
 
+library xil_defaultlib;
+use xil_defaultlib.packet_defs.all;
+
 entity message_decoder is
     Generic (
         COORD_BITS              : integer := 2;
@@ -66,59 +69,39 @@ end message_decoder;
 architecture Behavioral of message_decoder is
 
     signal latest_packet    : std_logic_vector((BUS_WIDTH-1) downto 0);
-
-    constant X_COORD_START  : integer := 0;
-    constant X_COORD_END    : integer := X_COORD_START + COORD_BITS - 1;
-
-    constant Y_COORD_START  : integer := X_COORD_END + 1;
-    constant Y_COORD_END    : integer := Y_COORD_START + COORD_BITS - 1;
-
-    constant MULTICAST_X_COORD_START  : integer := Y_COORD_END + 1;
-    constant MULTICAST_X_COORD_END    : integer := MULTICAST_X_COORD_START + MULTICAST_COORD_BITS - 1;
-
-    constant MULTICAST_Y_COORD_START  : integer := MULTICAST_X_COORD_END + 1;
-    constant MULTICAST_Y_COORD_END    : integer := MULTICAST_Y_COORD_START + MULTICAST_COORD_BITS - 1;
     
     signal multicast_x_coord, multicast_y_coord : std_logic_vector((MULTICAST_COORD_BITS-1) downto 0);
     signal multicast_coord_combined : std_logic_vector((2*MULTICAST_COORD_BITS-1) downto 0);
 
-    constant DONE_FLAG_BIT          : integer := MULTICAST_Y_COORD_END + 1;
-
-    constant RESULT_FLAG_BIT        : integer := DONE_FLAG_BIT + 1;
-
-    constant MATRIX_TYPE_START      : integer := RESULT_FLAG_BIT + 1;
-    constant MATRIX_TYPE_END        : integer := MATRIX_TYPE_START + MATRIX_TYPE_BITS - 1;
-
-    constant MATRIX_X_COORD_START   : integer := MATRIX_TYPE_END + 1;
-    constant MATRIX_X_COORD_END     : integer := MATRIX_X_COORD_START + MATRIX_COORD_BITS - 1;
-
-    constant MATRIX_Y_COORD_START   : integer := MATRIX_X_COORD_END + 1;
-    constant MATRIX_Y_COORD_END     : integer := MATRIX_Y_COORD_START + MATRIX_COORD_BITS - 1;
-
-    constant MATRIX_ELEMENT_START   : integer := MATRIX_Y_COORD_END + 1;
-    constant MATRIX_ELEMENT_END     : integer := MATRIX_ELEMENT_START + MATRIX_ELEMENT_BITS - 1;
+    signal dest_coord   : t_Coordinate;
+    signal multicast_coord  : t_MulticastCoordinate;
+    signal matrix_coord : t_MatrixCoordinate;
 
 begin
     latest_packet       <= packet_in;
 
     -- Message format 0 -- x_dest | y_dest | multicast_x_coord | multicast_y_coord | done | result | matrix | matrix_x_coord | matrix_y_coord | matrix_element -- (BUS_WIDTH-1)
-    x_coord_out         <= latest_packet(X_COORD_END downto X_COORD_START);
-    y_coord_out         <= latest_packet(Y_COORD_END downto Y_COORD_START);
+    dest_coord          <= get_dest_coord(latest_packet);
+    x_coord_out         <= dest_coord(X_INDEX);
+    y_coord_out         <= dest_coord(Y_INDEX);
     
-    multicast_x_coord   <= latest_packet(MULTICAST_X_COORD_END downto MULTICAST_X_COORD_START);
-    multicast_y_coord   <= latest_packet(MULTICAST_Y_COORD_END downto MULTICAST_Y_COORD_START);
+    multicast_coord             <= get_multicast_coord(latest_packet);
+    multicast_x_coord           <= multicast_coord(X_INDEX);
+    multicast_y_coord           <= multicast_coord(Y_INDEX);
     multicast_coord_combined    <= multicast_y_coord & multicast_x_coord;
     
     with multicast_coord_combined select
         multicast_group_out <= "0" when "00",
                                "1" when others;
     
-    done_flag_out       <= latest_packet(DONE_FLAG_BIT);
-    result_flag_out     <= latest_packet(RESULT_FLAG_BIT);
-    matrix_type_out     <= latest_packet(MATRIX_TYPE_END downto MATRIX_TYPE_START);
-    matrix_x_coord_out  <= latest_packet(MATRIX_X_COORD_END downto MATRIX_X_COORD_START);
-    matrix_y_coord_out  <= latest_packet(MATRIX_Y_COORD_END downto MATRIX_Y_COORD_START);
-    matrix_element_out  <= latest_packet(MATRIX_ELEMENT_END downto MATRIX_ELEMENT_START);
+    done_flag_out       <= get_done_flag(latest_packet);
+    result_flag_out     <= get_result_flag(latest_packet);
+    matrix_type_out     <= get_matrix_type(latest_packet);
+    
+    matrix_coord        <= get_matrix_coord(latest_packet);
+    matrix_x_coord_out  <= matrix_coord(X_INDEX);
+    matrix_y_coord_out  <= matrix_coord(Y_INDEX);
+    matrix_element_out  <= get_matrix_element(latest_packet);
     
     -- Hold packet_out_valid high from when packet_in_valid is high to when the message is read, then reset
     VALID_FF: process (clk)

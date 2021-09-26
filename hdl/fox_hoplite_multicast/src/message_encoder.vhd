@@ -128,7 +128,7 @@ begin
                 if (multicast_group_in_valid = '1') then
                     multicast_group <= multicast_group_in;
                     
-                    if (multicast_group /= "0") then
+                    if (to_integer(unsigned(multicast_group_in)) /= 0) then
                         dest_multicast_x_coord   <= std_logic_vector(to_unsigned(MULTICAST_X_COORD, MULTICAST_COORD_BITS));
                         dest_multicast_y_coord   <= std_logic_vector(to_unsigned(MULTICAST_Y_COORD, MULTICAST_COORD_BITS));
                     else
