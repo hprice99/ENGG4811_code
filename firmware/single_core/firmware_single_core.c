@@ -3,7 +3,7 @@
 #include "print.h"
 #include "matrix.h"
 
-#define LOOP_COUNTER 1000000000
+#define LOOP_DELAY      40000000
 
 #define MAX_ENTRY 10
 
@@ -60,13 +60,10 @@ void createC(void) {
 }
 
 void main(void) {
-    int ledValue = 0;
-
     int switchValue = 0;
 
-    int i = 0;
-
-    LED = ledValue;
+    int ledValue = 1;
+    LED_OUTPUT = ledValue;
 
     createA();
     createB();
@@ -77,10 +74,48 @@ void main(void) {
     output_matrix("C = A*B", (long*)C, MATRIX_SIZE, MATRIX_SIZE);
     print_string("Matrix multiplication completed\n");
 
+    int loopCount = 0;
+    int ledToggles = 0;
+
+    print_string("\nLED ");
+
+    if (ledValue == 0) {
+        
+        print_string("off, ");
+    } else if (ledValue == 1) {
+
+        print_string("on,  ");
+    }
+
+    print_string("ledToggles = ");
+    print_dec(ledToggles);
+    print_char('\n');
+
     while (1) {
 
-        LED = ledValue;
-        switchValue = SWITCH;
-        ledValue = switchValue;
+        if (loopCount > LOOP_DELAY) {
+
+            loopCount = 0;
+            ledValue = 1 - ledValue;
+            ledToggles++;
+
+            LED_OUTPUT = ledValue;
+
+            print_string("LED ");
+
+            if (ledValue == 0) {
+                
+                print_string("off, ");
+            } else if (ledValue == 1) {
+
+                print_string("on,  ");
+            }
+
+            print_string("ledToggles = ");
+            print_dec(ledToggles);
+            print_char('\n');
+        }
+
+        loopCount++;
     }
 }

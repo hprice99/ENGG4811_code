@@ -1,7 +1,7 @@
 TOOLCHAIN_PREFIX = /opt/riscv32i/bin/riscv32-unknown-elf-
 CFLAGS = -march=rv32im
 
-include firmware_fox_hoplite_multicast_config.mk
+include firmware_single_core_config.mk
 
 LIB = ../lib
 LIB_SRCS = $(LIB)/print.c $(LIB)/matrix.c
