@@ -48,18 +48,40 @@ env = Environment(loader=fileLoader, trim_blocks=True, lstrip_blocks=True)
 stream = open("{scriptDirectory}/{projectName}/IOConfig.yaml".format(scriptDirectory=scriptDirectory, projectName=projectName), 'r')
 dictionary = yaml.safe_load(stream)
 
-charIo = [Port(name=element["name"], direction=element["direction"], width=element["width"]) for element in dictionary["charIo"]]
-peToNetworkIo = [Port(name=element["name"], direction=element["direction"], width=element["width"]) for element in dictionary["peToNetworkIo"]]
+if 'charIo' in dictionary and dictionary["charIo"] is not None:
+    charIo = [Port(name=element["name"], direction=element["direction"], width=element["width"]) for element in dictionary["charIo"]]
+else:
+    charIo = None
 
-ledIo = [Port(name=element["name"], direction=element["direction"], width=element["width"]) for element in dictionary["ledIo"]]
+if 'peToNetworkIo' in dictionary and dictionary["peToNetworkIo"] is not None:
+    peToNetworkIo = [Port(name=element["name"], direction=element["direction"], width=element["width"]) for element in dictionary["peToNetworkIo"]]
+else:
+    peToNetworkIo = None
 
-networkToPeIo = [Port(name=element["name"], direction=element["direction"], width=element["width"]) for element in dictionary["networkToPeIo"]]
+if 'ledIo' in dictionary and dictionary["ledIo"] is not None:
+    ledIo = [Port(name=element["name"], direction=element["direction"], width=element["width"]) for element in dictionary["ledIo"]]
+else:
+    ledIo = None
 
-nodeIo = [Port(name=element["name"], direction=element["direction"], width=element["width"]) for element in dictionary["nodeIo"]]
+if 'networkToPeIo' in dictionary and dictionary["networkToPeIo"] is not None:
+    networkToPeIo = [Port(name=element["name"], direction=element["direction"], width=element["width"]) for element in dictionary["networkToPeIo"]]
+else:
+    networkToPeIo = None
 
-matrixIo = [Port(name=element["name"], direction=element["direction"], width=element["width"]) for element in dictionary["matrixIo"]]
+if 'nodeIo' in dictionary and dictionary["nodeIo"] is not None:
+    nodeIo = [Port(name=element["name"], direction=element["direction"], width=element["width"]) for element in dictionary["nodeIo"]]
+else:
+    nodeIo = None
 
-networkIo = [Port(name=element["name"], direction=element["direction"], width=element["width"]) for element in dictionary["networkIo"]]
+if 'matrixIo' in dictionary and dictionary["matrixIo"] is not None:
+    matrixIo = [Port(name=element["name"], direction=element["direction"], width=element["width"]) for element in dictionary["matrixIo"]]
+else:
+    matrixIo = None
+
+if 'networkIo' in dictionary and dictionary["networkIo"] is not None:
+    networkIo = [Port(name=element["name"], direction=element["direction"], width=element["width"]) for element in dictionary["networkIo"]]
+else:
+    networkIo = None
 
 # %%
 verilogTemplate = env.get_template('io.vh')

@@ -1,0 +1,35 @@
+---
+charIo:
+  - name: char
+    direction: output
+    width: 8
+  - name: char_output_ready
+    direction: input
+    width: 8
+
+peToNetworkIo:
+
+ledIo:
+  - name: led
+    direction: output
+    width: 8
+
+networkToPeIo:
+
+nodeIo:
+  - name: matrix_init_from_file
+    direction: input
+    width: 8
+
+matrixIo:
+  - name: matrix
+    direction: output
+    width: 32
+  - name: matrix_end_row
+    direction: output
+    width: 8
+  - name: matrix_end
+    direction: output
+    width: 8
+
+networkIo:

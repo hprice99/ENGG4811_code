@@ -1,0 +1,36 @@
+---
+networkRows: 1
+networkCols: 1
+
+foxNetworkStages: 1
+
+foxNodeFifos:
+  peToNetwork: 0
+  networkToPe: 0
+
+resultNodeCoord:
+  x: 0
+  y: 0
+
+resultNodeFifos:
+  peToNetwork: 0
+  networkToPe: 0
+
+resultUartFifoDepth: 0
+
+romNodeCoord:
+  x: 0
+  y: 0
+
+packetFormat:
+  multicastGroupBits: 1
+  multicastCoordBits: 2
+  doneFlagBits: 1
+  resultFlagBits: 1
+  matrixTypeBits: 1
+  matrixCoordBits: 8
+  matrixElementBits: 32
+
+useMatrixInitFile: True
+
+multicastAvailable: False

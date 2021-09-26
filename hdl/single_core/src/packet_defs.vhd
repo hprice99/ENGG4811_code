@@ -4,16 +4,16 @@ use IEEE.NUMERIC_STD.ALL;
 
 package packet_defs is 
 
-    constant MULTICAST_GROUP_BITS   : integer := {{ packetFormat.multicastGroupBits }};
+    constant MULTICAST_GROUP_BITS   : integer := 1;
 
     -- Size of message data in packets
-    constant COORD_BITS             : integer := {{ packetFormat.coordBits }};
-    constant MULTICAST_COORD_BITS   : integer := {{ packetFormat.multicastCoordBits }};
-    constant DONE_FLAG_BITS         : integer := {{ packetFormat.doneFlagBits }};
-    constant RESULT_FLAG_BITS       : integer := {{ packetFormat.resultFlagBits }};
-    constant MATRIX_TYPE_BITS       : integer := {{ packetFormat.matrixTypeBits }};
-    constant MATRIX_COORD_BITS      : integer := {{ packetFormat.matrixCoordBits }};
-    constant MATRIX_ELEMENT_BITS    : integer := {{ packetFormat.matrixElementBits }};
+    constant COORD_BITS             : integer := 0;
+    constant MULTICAST_COORD_BITS   : integer := 2;
+    constant DONE_FLAG_BITS         : integer := 1;
+    constant RESULT_FLAG_BITS       : integer := 1;
+    constant MATRIX_TYPE_BITS       : integer := 1;
+    constant MATRIX_COORD_BITS      : integer := 8;
+    constant MATRIX_ELEMENT_BITS    : integer := 32;
     constant BUS_WIDTH              : integer := 
             2*COORD_BITS + 2*MULTICAST_COORD_BITS + DONE_FLAG_BITS + 
             RESULT_FLAG_BITS + MATRIX_TYPE_BITS + 2*MATRIX_COORD_BITS + 
