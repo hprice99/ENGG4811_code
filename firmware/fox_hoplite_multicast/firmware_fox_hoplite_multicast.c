@@ -38,11 +38,52 @@ void tb_output_matrix(char* label, long* matrix, int rows, int cols) {
 }
 #endif
 
+enum FoxError send_burst_ready(int my_x_coord, int my_y_coord, 
+        enum MatrixType matrixType, int dest_x_coord, int dest_y_coord) {
+    
+    enum NetworkError networkError = NETWORK_ERROR;
+
+    struct MatrixPacket packet;
+
+    packet.doneFlag = true;
+    packet.resultFlag = false;
+    packet.matrixType = matrixType;
+    packet.multicastGroup = 0;
+
+    packet.destX = dest_x_coord;
+    packet.destY = dest_y_coord;
+
+    packet.matrixX = my_x_coord;
+    packet.matrixY = my_y_coord;
+
+    packet.matrixElement = 0;
+
+    do {
+        networkError = send_message(packet);
+    } while (networkError != NETWORK_SUCCESS);
+
+    #ifdef DEBUG_PRINT
+    print_matrix_packet("Sent burst ready", packet);
+    #endif
+
+    if (networkError == NETWORK_ERROR) {
+
+        print_string("send_burst_ready network error\n");
+
+        return FOX_NETWORK_ERROR;
+    }
+
+    return FOX_SUCCESS;
+}
+
 void create_my_A(void) {
 
     if (MATRIX_INIT_FROM_FILE_INPUT) {
 
         print_string("Loading A from file\n");
+
+        send_burst_ready(my_x_coord, my_y_coord, A_type, ROM_X_COORD_INPUT, 
+                ROM_Y_COORD_INPUT);
 
         int aElementsReceived = 0;
         struct MatrixPacket packet;
@@ -83,6 +124,9 @@ void create_initial_stage_B(void) {
     if (MATRIX_INIT_FROM_FILE_INPUT) {
 
         print_string("Loading B from file\n");
+
+        send_burst_ready(my_x_coord, my_y_coord, B_type, ROM_X_COORD_INPUT, 
+                ROM_Y_COORD_INPUT);
 
         int bElementsReceived = 0;
         struct MatrixPacket packet;

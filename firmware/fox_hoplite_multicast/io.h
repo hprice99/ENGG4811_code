@@ -51,5 +51,7 @@
 #define FOX_NETWORK_STAGES_INPUT      (*(volatile char*)0x70000000)
 #define RESULT_X_COORD_INPUT      (*(volatile char*)0x70000010)
 #define RESULT_Y_COORD_INPUT      (*(volatile char*)0x70000020)
+#define ROM_X_COORD_INPUT      (*(volatile char*)0x70000030)
+#define ROM_Y_COORD_INPUT      (*(volatile char*)0x70000040)
 
 #endif

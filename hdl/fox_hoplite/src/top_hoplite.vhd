@@ -110,6 +110,9 @@ architecture Behavioral of top is
             USE_INITIALISATION_FILE : boolean := True;
             MATRIX_FILE             : string  := "none";
             MATRIX_FILE_LENGTH      : integer := 0;
+
+            ROM_X_COORD             : integer := 0;
+            ROM_Y_COORD             : integer := 0;
             
             -- Matrix offset for node
             MATRIX_X_OFFSET : integer := 0;
@@ -188,6 +191,9 @@ architecture Behavioral of top is
             USE_INITIALISATION_FILE : boolean := True;
             MATRIX_FILE             : string  := "none";
             MATRIX_FILE_LENGTH      : integer := 0;
+
+            ROM_X_COORD             : integer := 0;
+            ROM_Y_COORD             : integer := 0;
     
             -- Matrix offset for node
             MATRIX_X_OFFSET : integer := 0;
@@ -256,7 +262,10 @@ architecture Behavioral of top is
             USE_INITIALISATION_FILE : boolean := True;
             MATRIX_FILE             : string  := "none";
             ROM_DEPTH               : integer := 64;
-            ROM_ADDRESS_WIDTH       : integer := 6
+            ROM_ADDRESS_WIDTH       : integer := 6;
+
+            USE_BURST               : boolean := False;
+            BURST_LENGTH            : integer := 0
         );
         Port (
             clk                 : in std_logic;
@@ -317,6 +326,9 @@ architecture Behavioral of top is
     constant combined_matrix_file   : string := "combined.mif";
     constant matrix_file_length     : integer := 2 * TOTAL_MATRIX_ELEMENTS;
     constant ROM_ADDRESS_WIDTH      : integer := ceil_log2(matrix_file_length);
+    
+    constant USE_BURST              : boolean := True;
+    constant BURST_LENGTH           : integer := matrix_file_length / 2;
 
 begin
 
@@ -381,6 +393,9 @@ begin
                         USE_INITIALISATION_FILE => USE_MATRIX_INIT_FILE,
                         MATRIX_FILE             => matrix_file,
                         MATRIX_FILE_LENGTH      => MATRIX_INIT_FILE_LENGTH,
+
+                        ROM_X_COORD             => ROM_X_COORD,
+                        ROM_Y_COORD             => ROM_Y_COORD,
                         
                         -- Matrix offset for node
                         MATRIX_X_OFFSET => x_offset,
@@ -468,6 +483,9 @@ begin
                         USE_INITIALISATION_FILE => USE_MATRIX_INIT_FILE,
                         MATRIX_FILE             => matrix_file,
                         MATRIX_FILE_LENGTH      => MATRIX_INIT_FILE_LENGTH,
+
+                        ROM_X_COORD             => ROM_X_COORD,
+                        ROM_Y_COORD             => ROM_Y_COORD,
                         
                         -- Matrix offset for node
                         MATRIX_X_OFFSET => x_offset,
@@ -495,7 +513,7 @@ begin
                         
                         -- Messages incoming to router
                         x_in                => x_messages_in(curr_x, curr_y),
-                        x_in_valid          => x_messages_in_valid(curr_x, curr_y),                  
+                        x_in_valid          => x_messages_in_valid(curr_x, curr_y),
                         y_in                => y_messages_in(curr_x, curr_y),
                         y_in_valid          => y_messages_in_valid(curr_x, curr_y),
                         
@@ -535,7 +553,10 @@ begin
                         USE_INITIALISATION_FILE => True,
                         MATRIX_FILE             => combined_matrix_file,
                         ROM_DEPTH               => matrix_file_length,
-                        ROM_ADDRESS_WIDTH       => ROM_ADDRESS_WIDTH
+                        ROM_ADDRESS_WIDTH       => ROM_ADDRESS_WIDTH,
+
+                        USE_BURST               => USE_BURST,
+                        BURST_LENGTH            => BURST_LENGTH
                     )
                     port map (
                         clk                 => clk,

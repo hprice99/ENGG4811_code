@@ -75,6 +75,9 @@ entity fox_node is
         USE_INITIALISATION_FILE : boolean := True;
         MATRIX_FILE             : string  := "none";
         MATRIX_FILE_LENGTH      : integer := 0;
+        
+        ROM_X_COORD             : integer := 0;
+        ROM_Y_COORD             : integer := 0;
 
         -- Matrix offset for node
         MATRIX_X_OFFSET : integer := 0;
@@ -319,6 +322,8 @@ architecture Behavioral of fox_node is
             FOX_MATRIX_SIZE : integer := 16;
             
             USE_MATRIX_INIT_FILE    : boolean  := True;
+            ROM_X_COORD             : integer := 0;
+            ROM_Y_COORD             : integer := 0;
             
             -- Matrix offset for node
             MATRIX_X_OFFSET : integer := 0;
@@ -657,6 +662,9 @@ begin
             FOX_MATRIX_SIZE => FOX_MATRIX_SIZE,
             
             USE_MATRIX_INIT_FILE    => USE_INITIALISATION_FILE,
+            
+            ROM_X_COORD     => ROM_X_COORD,
+            ROM_Y_COORD     => ROM_Y_COORD,
             
             MATRIX_X_OFFSET => MATRIX_X_OFFSET,
             MATRIX_Y_OFFSET => MATRIX_Y_OFFSET,

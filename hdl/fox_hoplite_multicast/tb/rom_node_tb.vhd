@@ -75,7 +75,10 @@ architecture Behavioral of rom_node_tb is
             USE_INITIALISATION_FILE : boolean := True;
             MATRIX_FILE             : string  := "none";
             ROM_DEPTH               : integer := 64;
-            ROM_ADDRESS_WIDTH       : integer := 6
+            ROM_ADDRESS_WIDTH       : integer := 6;
+        
+            USE_BURST               : boolean := False;
+            BURST_LENGTH            : integer := 0
         );
         Port (
             clk                 : in std_logic;
@@ -144,6 +147,8 @@ architecture Behavioral of rom_node_tb is
     
     constant NIC_FIFO_DEPTH : integer := 16;
     
+    constant BURST_LENGTH   : integer := matrix_file_length / 2;
+    
     signal rom_read_complete    : std_logic;
     
     signal x_in, y_in   : std_logic_vector((BUS_WIDTH-1) downto 0);
@@ -185,7 +190,24 @@ architecture Behavioral of rom_node_tb is
     signal y_decoder_packet_out_valid     : std_logic;
     signal y_decoder_packet_read          : std_logic;
 
-    impure function print_decoded_message (packet           : in std_logic_vector;
+    signal ready_decoder_packet_in        : std_logic_vector((BUS_WIDTH-1) downto 0);
+    signal ready_decoder_packet_in_valid  : std_logic;
+    
+    signal ready_decoder_x_coord_out          : std_logic_vector((COORD_BITS-1) downto 0);
+    signal ready_decoder_y_coord_out          : std_logic_vector((COORD_BITS-1) downto 0);
+    signal ready_decoder_multicast_group_out  : std_logic_vector((MULTICAST_GROUP_BITS-1) downto 0);
+    signal ready_decoder_done_flag_out        : std_logic;
+    signal ready_decoder_result_flag_out      : std_logic;
+    signal ready_decoder_matrix_type_out      : std_logic_vector((MATRIX_TYPE_BITS-1) downto 0);
+    signal ready_decoder_matrix_x_coord_out   : std_logic_vector((MATRIX_COORD_BITS-1) downto 0);
+    signal ready_decoder_matrix_y_coord_out   : std_logic_vector((MATRIX_COORD_BITS-1) downto 0);
+    signal ready_decoder_matrix_element_out   : std_logic_vector((MATRIX_ELEMENT_BITS-1) downto 0);
+    
+    signal ready_decoder_packet_out_valid     : std_logic;
+    signal ready_decoder_packet_read          : std_logic;
+
+    impure function print_decoded_message (count            : in integer;
+                                           packet           : in std_logic_vector;
                                            x_coord          : in std_logic_vector;
                                            y_coord          : in std_logic_vector;
                                            multicast_group  : in std_logic_vector;
@@ -198,7 +220,10 @@ architecture Behavioral of rom_node_tb is
             return line is
         variable my_line    : line;
     begin
-        write(my_line, string'(HT & HT & "Encoded packet: "));
+        write(my_line, string'(HT & HT & "Cycle: "));
+        write(my_line, count);
+    
+        write(my_line, string'(", Encoded packet: "));
         hwrite(my_line, packet);
         
         write(my_line, string'(", decoded packet: "));
@@ -239,6 +264,11 @@ architecture Behavioral of rom_node_tb is
     end function print_decoded_message;
     
     signal x_packets_received, y_packets_received, total_packets_received   : integer;
+        
+    signal node_ready_x, node_ready_y   : integer;
+    signal ready_packets_sent   : integer;
+    
+    signal count    : integer;
 
 begin
 
@@ -252,12 +282,153 @@ begin
         clk <= '1';
         wait for clk_period/2;  --for next 0.5 ns signal is '1'.
     end process CLK_PROCESS;
-
-    x_in        <= (others => '0');
-    x_in_valid  <= '0';
     
     y_in        <= (others => '0');
     y_in_valid  <= '0';
+
+    COUNTER: process (clk)
+    begin
+        if (rising_edge(clk)) then
+            if (reset_n = '0') then
+                count   <= 0;
+            end if;
+        else
+            count   <= count + 1;
+        end if;
+    end process COUNTER;
+
+    -- Generate ready packets to send to the rom_node
+    READY_PACKET_PROC: process (clk)
+    begin
+        if (rising_edge(clk)) then
+            if (reset_n = '0') then
+                x_in        <= (others => '0');
+                x_in_valid  <= '0';
+                
+                node_ready_x        <= 0;
+                node_ready_y        <= 0;
+                ready_packets_sent  <= 0;
+            
+            else 
+                if (total_packets_received = 0 and ready_packets_sent < FOX_NETWORK_NODES) then
+                    x_in(X_COORD_END downto X_COORD_START)  <= std_logic_vector(to_unsigned(X_COORD, COORD_BITS));
+                    x_in(Y_COORD_END downto Y_COORD_START)  <= std_logic_vector(to_unsigned(Y_COORD, COORD_BITS));
+                
+                    x_in(MATRIX_X_COORD_END downto MATRIX_X_COORD_START)  <= std_logic_vector(to_unsigned(node_ready_x, MATRIX_COORD_BITS));
+                    x_in(MATRIX_Y_COORD_END downto MATRIX_Y_COORD_START)  <= std_logic_vector(to_unsigned(node_ready_y, MATRIX_COORD_BITS));
+                    x_in(DONE_FLAG_BIT) <= '1';
+                    
+                    x_in_valid  <= '1';
+                    
+                    if (node_ready_x < FOX_NETWORK_STAGES-1) then
+                        node_ready_x    <= node_ready_x + 1;
+                    elsif (node_ready_x = FOX_NETWORK_STAGES-1) then
+                        node_ready_x    <= 0;
+                    end if;
+
+                    if (node_ready_x = FOX_NETWORK_STAGES-1 and node_ready_y < FOX_NETWORK_STAGES-1) then
+                        node_ready_y    <= node_ready_y + 1;
+                    end if;
+                    
+                    ready_packets_sent  <= ready_packets_sent + 1;
+                
+                elsif (total_packets_received = BURST_LENGTH and ready_packets_sent < 2*FOX_NETWORK_NODES) then
+                    x_in(X_COORD_END downto X_COORD_START)  <= std_logic_vector(to_unsigned(X_COORD, COORD_BITS));
+                    x_in(Y_COORD_END downto Y_COORD_START)  <= std_logic_vector(to_unsigned(Y_COORD, COORD_BITS));
+                
+                    x_in(MATRIX_X_COORD_END downto MATRIX_X_COORD_START)  <= std_logic_vector(to_unsigned(node_ready_x, MATRIX_COORD_BITS));
+                    x_in(MATRIX_Y_COORD_END downto MATRIX_Y_COORD_START)  <= std_logic_vector(to_unsigned(node_ready_y, MATRIX_COORD_BITS));
+                    x_in(DONE_FLAG_BIT) <= '1';
+                    
+                    x_in_valid  <= '1';
+                    
+                    if (node_ready_x < FOX_NETWORK_STAGES-1) then
+                        node_ready_x    <= node_ready_x + 1;
+                    elsif (node_ready_x = FOX_NETWORK_STAGES-1) then
+                        node_ready_x    <= 0;
+                    end if;
+
+                    if (node_ready_x = FOX_NETWORK_STAGES-1 and node_ready_y < FOX_NETWORK_STAGES-1) then
+                        node_ready_y    <= node_ready_y + 1;
+                    end if;
+                    
+                    ready_packets_sent  <= ready_packets_sent + 1;
+                    
+                else
+                    x_in        <= (others => '0');
+                    x_in_valid  <= '0';
+                
+                    node_ready_x    <= 0;
+                    node_ready_y    <= 0;    
+                    
+                end if;
+            end if;
+        end if;
+    end process READY_PACKET_PROC;
+    
+    READY_DECODER: message_decoder
+        generic map (
+            COORD_BITS              => COORD_BITS,
+            MULTICAST_GROUP_BITS    => MULTICAST_GROUP_BITS,
+            MULTICAST_COORD_BITS    => MULTICAST_COORD_BITS,
+            
+            MATRIX_TYPE_BITS        => MATRIX_TYPE_BITS,
+            MATRIX_COORD_BITS       => MATRIX_COORD_BITS,
+            MATRIX_ELEMENT_BITS     => MATRIX_ELEMENT_BITS,
+            BUS_WIDTH               => BUS_WIDTH
+        )
+        port map (
+            clk                 => clk,
+            reset_n             => reset_n,
+            
+            packet_in           => ready_decoder_packet_in,
+            packet_in_valid     => ready_decoder_packet_in_valid,
+            
+            x_coord_out         => ready_decoder_x_coord_out,
+            y_coord_out         => ready_decoder_y_coord_out,
+            multicast_group_out => ready_decoder_multicast_group_out,
+            done_flag_out       => ready_decoder_done_flag_out,
+            result_flag_out     => ready_decoder_result_flag_out,
+            matrix_type_out     => ready_decoder_matrix_type_out,
+            matrix_x_coord_out  => ready_decoder_matrix_x_coord_out,
+            matrix_y_coord_out  => ready_decoder_matrix_y_coord_out,
+            matrix_element_out  => ready_decoder_matrix_element_out,
+    
+            packet_out_valid    => ready_decoder_packet_out_valid,
+            packet_read         => ready_decoder_packet_read
+        );
+        
+    ready_decoder_packet_in         <= x_in;
+    ready_decoder_packet_in_valid   <= x_in_valid;
+    
+    READY_DECODER_PRINT: process (clk)
+        variable my_line         : line;
+        variable my_decoder_line : line;
+    begin
+        if (rising_edge(clk)) then
+            if (reset_n = '1') then
+                if (ready_decoder_packet_in_valid = '1') then
+                    write(my_line, string'("READY_DECODER: "));
+                    write(my_line, string'(" ready_packets_sent = "));
+                    write(my_line, ready_packets_sent);
+                    
+                    write(my_line, string'(", total_packets_received = "));
+                    write(my_line, total_packets_received);
+                
+                    my_decoder_line := print_decoded_message(count, ready_decoder_packet_in, 
+                                          ready_decoder_x_coord_out, ready_decoder_y_coord_out,
+                                          ready_decoder_multicast_group_out,
+                                          ready_decoder_done_flag_out, ready_decoder_result_flag_out,
+                                          ready_decoder_matrix_type_out,
+                                          ready_decoder_matrix_x_coord_out, ready_decoder_matrix_y_coord_out,
+                                          ready_decoder_matrix_element_out);
+                                          
+                   writeline(output, my_line);
+                   writeline(output, my_decoder_line);
+                end if;
+            end if;
+        end if;
+    end process READY_DECODER_PRINT;
 
     ROM: rom_node
         generic map (   
@@ -284,7 +455,10 @@ begin
             USE_INITIALISATION_FILE => True,
             MATRIX_FILE             => matrix_file,
             ROM_DEPTH               => matrix_file_length,
-            ROM_ADDRESS_WIDTH       => ADDRESS_WIDTH
+            ROM_ADDRESS_WIDTH       => ADDRESS_WIDTH,
+            
+            USE_BURST               => True,
+            BURST_LENGTH            => BURST_LENGTH
         )
         port map (
             clk                 => clk,
@@ -365,7 +539,7 @@ begin
                     write(my_line, string'(" total_packets_received = "));
                     write(my_line, total_packets_received);
                 
-                    my_decoder_line := print_decoded_message(x_decoder_packet_in, 
+                    my_decoder_line := print_decoded_message(count, x_decoder_packet_in, 
                                           x_decoder_x_coord_out, x_decoder_y_coord_out,
                                           x_decoder_multicast_group_out,
                                           x_decoder_done_flag_out, x_decoder_result_flag_out,
@@ -436,7 +610,7 @@ begin
                     write(my_line, string'(" total_packets_received = "));
                     write(my_line, total_packets_received);
                 
-                    my_decoder_line := print_decoded_message(y_decoder_packet_in, 
+                    my_decoder_line := print_decoded_message(count, y_decoder_packet_in, 
                                           y_decoder_x_coord_out, y_decoder_y_coord_out,
                                           y_decoder_multicast_group_out,
                                           y_decoder_done_flag_out, y_decoder_result_flag_out,
@@ -457,7 +631,7 @@ begin
     begin
         if (rising_edge(clk)) then
             if (reset_n = '1') then
-                if (total_packets_received = matrix_file_length - 1) then
+                if (total_packets_received = matrix_file_length) then
                     stop;
                 end if;
             end if;
