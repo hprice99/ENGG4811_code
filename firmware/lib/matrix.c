@@ -39,10 +39,5 @@ void multiply_matrices(long* A, long* B, long* C) {
                 C[cIndex] = C[cIndex] + A[aIndex] * B[bIndex];
             }
         }
-
-        #ifdef MATRIX_POSITION_OUT_ENABLED
-        print_dec(i);
-        print_string(" Row done\n");
-        #endif
     }
 }

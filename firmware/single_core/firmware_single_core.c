@@ -51,7 +51,9 @@ void createA(void) {
         }
     }
 
+    #ifdef DEBUG_PRINT
     print_matrix("A", A, MATRIX_SIZE, MATRIX_SIZE);
+    #endif
 }
 
 void createB(void) {
@@ -69,7 +71,9 @@ void createB(void) {
         }
     }
 
+    #ifdef DEBUG_PRINT
     print_matrix("B", B, MATRIX_SIZE, MATRIX_SIZE);
+    #endif
 }
 
 void createC(void) {
@@ -100,7 +104,6 @@ void main(void) {
     multiply_matrices(A, B, C);
 
     print_matrix("C", C, MATRIX_SIZE, MATRIX_SIZE);
-    print_string("Matrix multiplication completed\n");
 
     int loopCount = 0;
     int ledToggles = 0;

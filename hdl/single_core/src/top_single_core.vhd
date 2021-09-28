@@ -111,7 +111,37 @@ architecture Behavioral of top_single_core is
         );
     end component pipeline;
     
-    signal uart_tx_ready   : std_logic;
+    component UART_tx_buffered is
+        Generic (
+            CLK_FREQ        : integer := 50e6;
+            BAUD_RATE       : integer := 115200;
+            PARITY_BIT      : string  := "none";
+            USE_DEBOUNCER   : boolean := True;
+    
+            BUFFER_DEPTH    : integer := 50
+        ); 
+        Port (
+            clk     : in std_logic;
+            reset_n : in std_logic;
+    
+            data_in         : in std_logic_vector(7 downto 0);
+            data_in_valid   : in std_logic;
+    
+            uart_tx         : out std_logic;
+    
+            buffer_full     : out std_logic
+        );
+    end component UART_tx_buffered;
+    
+    signal out_char_buf     : std_logic_vector(7 downto 0);
+    signal out_char_en_buf  : std_logic;
+    
+    signal uart_tx_ready    : std_logic;
+    signal uart_buffer_full : std_logic;
+    
+    constant BAUD_RATE      : integer := 115200;
+    constant PARITY_BIT     : string := "none";
+    constant USE_DEBOUNCER  : boolean := True;
     
     signal matrix_type_in          : std_logic_vector((MATRIX_TYPE_BITS-1) downto 0);
     signal matrix_x_coord_in       : std_logic_vector((MATRIX_COORD_BITS-1) downto 0);
@@ -123,11 +153,8 @@ architecture Behavioral of top_single_core is
 
 begin
 
-    -- TODO Connect to UART
-    uart_tx_ready  <= '1';
-
-    CORE : system_single_core
-        generic map(
+    CORE: system_single_core
+        generic map (
            DIVIDE_ENABLED   => divide_parameter,
            MULTIPLY_ENABLED => multiply_parameter,
            FIRMWARE         => FOX_FIRMWARE,
@@ -139,8 +166,8 @@ begin
 
             LED                         => LED,
             
-            out_char                    => out_char,
-            out_char_en                 => out_char_en,
+            out_char                    => out_char_buf,
+            out_char_en                 => out_char_en_buf,
             out_char_ready              => uart_tx_ready,
             
             matrix_type_in          => matrix_type_in,
@@ -156,5 +183,37 @@ begin
             out_matrix_end_row          => open,
             out_matrix_end              => open
         );
+        
+    out_char    <= out_char_buf;
+    out_char_en <= out_char_en_buf;
+        
+    UART_GEN: if (ENABLE_UART = True) generate
+        UART_TX_NODE: uart_tx_buffered
+            generic map (
+                CLK_FREQ        => CLK_FREQ,
+                BAUD_RATE       => BAUD_RATE,
+                PARITY_BIT      => PARITY_BIT,
+                USE_DEBOUNCER   => USE_DEBOUNCER,
+        
+                BUFFER_DEPTH    => RESULT_UART_FIFO_DEPTH
+            )
+            port map (
+                clk             => clk,
+                reset_n         => reset_n,
+        
+                data_in         => out_char_buf,
+                data_in_valid   => out_char_en_buf,
+        
+                uart_tx         => uart_tx,
+        
+                buffer_full     => uart_buffer_full
+            );
+            
+        uart_tx_ready <= not uart_buffer_full;
+    end generate UART_GEN;
+
+    NOT_UART_GEN: if (ENABLE_UART = False) generate
+        uart_tx_ready   <= '1';
+    end generate NOT_UART_GEN;
 
 end Behavioral;

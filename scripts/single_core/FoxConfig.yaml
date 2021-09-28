@@ -16,7 +16,7 @@ resultNodeFifos:
   peToNetwork: 0
   networkToPe: 0
 
-resultUartFifoDepth: 0
+resultUartFifoDepth: 1024
 
 romNodeCoord:
   x: 0

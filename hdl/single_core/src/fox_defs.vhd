@@ -33,7 +33,7 @@ package fox_defs is
     constant RESULT_PE_TO_NETWORK_FIFO_DEPTH    : integer := 0;
     constant RESULT_NETWORK_TO_PE_FIFO_DEPTH    : integer := 0;
 
-    constant RESULT_UART_FIFO_DEPTH : integer := 0;
+    constant RESULT_UART_FIFO_DEPTH : integer := 1024;
 
     -- Custom types
     type t_Destination is array(0 to (NETWORK_COLS-1), 0 to (NETWORK_ROWS-1)) of t_Coordinate;
