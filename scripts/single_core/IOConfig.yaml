@@ -31,5 +31,20 @@ matrixIo:
   - name: matrix_end
     direction: output
     width: 8
+  - name: matrix_init_type
+    direction: input
+    width: 8
+  - name: matrix_init_x_coord
+    direction: input
+    width: 8
+  - name: matrix_init_y_coord
+    direction: input
+    width: 8
+  - name: matrix_init_element
+    direction: input
+    width: 32
+  - name: matrix_init_read
+    direction: output
+    width: 8
 
 networkIo:

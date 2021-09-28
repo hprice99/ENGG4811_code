@@ -18,38 +18,55 @@
 -- 
 ----------------------------------------------------------------------------------
 
-
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 
 -- Uncomment the following library declaration if using
 -- arithmetic functions with Signed or Unsigned values
--- use IEEE.NUMERIC_STD.ALL;
--- use ieee.std_logic_unsigned.all;
+use IEEE.NUMERIC_STD.ALL;
+use ieee.std_logic_unsigned.all;
 
 -- Uncomment the following library declaration if instantiating
 -- any Xilinx leaf cells in this code.
 --library UNISIM;
 --use UNISIM.VComponents.all;
 
-entity top is
-    Port ( 
-           CPU_RESETN   : in STD_LOGIC;
-           CLK_100MHZ   : in STD_LOGIC;
-           SW           : in STD_LOGIC_VECTOR(3 downto 0);
-           LED          : out STD_LOGIC_VECTOR(15 downto 0);
-           LED16_B      : out STD_LOGIC;
-           LED16_G      : out STD_LOGIC;
-           LED17_R      : out STD_LOGIC;
-           LED17_B      : out STD_LOGIC
+library xil_defaultlib;
+use xil_defaultlib.packet_defs.all;
+use xil_defaultlib.fox_defs.all;
+use xil_defaultlib.matrix_config.all;
+use xil_defaultlib.firmware_config.all;
+
+entity top_single_core is
+    generic (            
+        FIRMWARE            : string := "firmware_single_core.hex";
+        FIRMWARE_MEM_SIZE   : integer := 4096; 
+        
+        CLK_FREQ            : integer := 50e6;
+        ENABLE_UART         : boolean := False
     );
-end top;
+    port (
+        clk                 : in std_logic;
+        reset_n             : in std_logic;
+        
+        LED                 : out STD_LOGIC;
+        
+        out_char            : out std_logic_vector(7 downto 0);
+        out_char_en         : out std_logic;
+        
+        uart_tx             : out std_logic;
+        
+        out_matrix          : out std_logic_vector(31 downto 0);
+        out_matrix_en       : out std_logic;
+        out_matrix_end_row  : out std_logic;
+        out_matrix_end      : out std_logic
+    );
+end top_single_core;
 
-architecture Behavioral of top is
+architecture Behavioral of top_single_core is
 
-    component system
+    component system_single_core
         generic (
-             USE_ILA            : std_logic := '1';
              DIVIDE_ENABLED     : std_logic := '0';
              MULTIPLY_ENABLED   : std_logic := '1';
              FIRMWARE           : string    := "firmware.hex";
@@ -57,24 +74,30 @@ architecture Behavioral of top is
         );
         port (
             clk                     : in std_logic;
-            resetn                  : in std_logic;
-            sw                      : in std_logic;
-            led                     : out std_logic_vector(15 downto 0);
-            RGB_LED                 : out std_logic;
-            out_byte_en             : out std_logic;
-            out_byte                : out std_logic_vector(7 downto 0);
-            out_matrix_en           : out std_logic;
+            reset_n                 : in std_logic;
+            
+            LED                     : out std_logic;
+            
+            out_char                : out std_logic_vector(7 downto 0);
+            out_char_en             : out std_logic;
+            out_char_ready          : in std_logic;
+            
+            matrix_type_in          : in std_logic_vector((MATRIX_TYPE_BITS-1) downto 0);
+            matrix_x_coord_in       : in std_logic_vector((MATRIX_COORD_BITS-1) downto 0);
+            matrix_y_coord_in       : in std_logic_vector((MATRIX_COORD_BITS-1) downto 0);
+            matrix_element_in       : in std_logic_vector((MATRIX_ELEMENT_BITS-1) downto 0);
+            message_in_valid        : in std_logic;
+            message_in_available    : in std_logic;
+            message_in_read         : out std_logic;
+            
             out_matrix              : out std_logic_vector(31 downto 0);
+            out_matrix_en           : out std_logic;
             out_matrix_end_row      : out std_logic;
-            out_matrix_end          : out std_logic;
-            out_matrix_position_en  : out std_logic;
-            out_matrix_position     : out std_logic_vector(7 downto 0);
-            trap                    : out std_logic
+            out_matrix_end          : out std_logic
         );
-    end component system;
+    end component system_single_core;
     
-    constant ila_parameter      : std_logic := '0';
-    constant divide_parameter   : std_logic := '0';
+    constant divide_parameter   : std_logic := '1';
     constant multiply_parameter : std_logic := '1';
     
     component pipeline
@@ -88,176 +111,50 @@ architecture Behavioral of top is
         );
     end component pipeline;
     
-    signal sw0_pipelined, sw1_pipelined, sw2_pipelined, sw3_pipelined : std_logic;
-    constant switch_pipeline_stages : integer := 30;
-    constant mem_size : integer := 16384;
+    signal uart_tx_ready   : std_logic;
     
-    signal clkdiv2 : std_logic;
+    signal matrix_type_in          : std_logic_vector((MATRIX_TYPE_BITS-1) downto 0);
+    signal matrix_x_coord_in       : std_logic_vector((MATRIX_COORD_BITS-1) downto 0);
+    signal matrix_y_coord_in       : std_logic_vector((MATRIX_COORD_BITS-1) downto 0);
+    signal matrix_element_in       : std_logic_vector((MATRIX_ELEMENT_BITS-1) downto 0);
+    signal message_in_valid        : std_logic;
+    signal message_in_available    : std_logic;
+    signal message_in_read         : std_logic;
 
 begin
 
-    -- Clock divider
-    CLOCK_DIVIDER: process (CLK_100MHZ)
-    begin
-        if (rising_edge(CLK_100MHZ)) then       
-            clkdiv2 <= not clkdiv2;
-        end if;
-    end process CLOCK_DIVIDER;
-    
-    -- RESET LED
-    RESET_LED: process (clkdiv2)
-    begin
-        if (rising_edge(clkdiv2)) then
-            if (CPU_RESETN = '1') then
-                LED17_R <= '1';
-            else
-                LED17_R <= '0';
-            end if;
-        end if;
-    end process RESET_LED;
+    -- TODO Connect to UART
+    uart_tx_ready  <= '1';
 
-    SW0_PIPELINE : pipeline
-        generic map (
-            STAGES  => switch_pipeline_stages
-        )
-        port map (
-            clk         => clkdiv2,
-            d_in        => SW(0),
-            d_out       => sw0_pipelined
-        );
-
-    CORE_0 : system
+    CORE : system_single_core
         generic map(
-           USE_ILA          => ila_parameter, 
            DIVIDE_ENABLED   => divide_parameter,
            MULTIPLY_ENABLED => multiply_parameter,
-           FIRMWARE         => "firmware_single_core.hex",
-           MEM_SIZE         => mem_size
+           FIRMWARE         => FOX_FIRMWARE,
+           MEM_SIZE         => FOX_MEM_SIZE
         )
         port map (
-            clk                         => clkdiv2,
-            resetn                      => CPU_RESETN,
-            -- sw                 => sw(0),
-            sw                          => sw0_pipelined,
-            led                         => led,
-            RGB_LED                     => LED16_B,
-            out_byte_en                 => open,
-            out_byte                    => open,
+            clk                         => clk,
+            reset_n                     => reset_n,
+
+            LED                         => LED,
+            
+            out_char                    => out_char,
+            out_char_en                 => out_char_en,
+            out_char_ready              => uart_tx_ready,
+            
+            matrix_type_in          => matrix_type_in,
+            matrix_x_coord_in       => matrix_x_coord_in,
+            matrix_y_coord_in       => matrix_y_coord_in,
+            matrix_element_in       => matrix_element_in,
+            message_in_valid        => message_in_valid,
+            message_in_available    => message_in_available,
+            message_in_read         => message_in_read,
+            
             out_matrix_en               => open,
             out_matrix                  => open,
             out_matrix_end_row          => open,
-            out_matrix_end              => open,
-            out_matrix_position_en      => open,
-            out_matrix_position         => open,
-            trap                        => open
+            out_matrix_end              => open
         );
-        
---    SW1_PIPELINE : pipeline
---        generic map (
---            STAGES  => switch_pipeline_stages
---        )
---        port map (
---            clk         => CLK_100MHZ,
---            d_in        => SW(1),
---            d_out       => sw1_pipelined
---        );
-        
---    CORE_1 : system
---        generic map(
---           USE_ILA          => ila_parameter, 
---           DIVIDE_ENABLED   => divide_parameter,
---           MULTIPLY_ENABLED => multiply_parameter,
---           FIRMWARE         => "firmware.hex",
---           MEM_SIZE         => mem_size
---        )
---        port map (
---            clk                         => CLK_100MHZ,
---            resetn                      => CPU_RESETN,
---            -- sw                 => sw(1),
---            sw                          => sw1_pipelined,
---            led                         => open,
---            RGB_LED                     => LED16_G,
---            out_byte_en                 => open,
---            out_byte                    => open,
---            out_matrix_en               => open,
---            out_matrix                  => open,
---            out_matrix_end_row          => open,
---            out_matrix_end              => open,
---            out_matrix_position_en      => open,
---            out_matrix_position         => open,
---            trap                        => open
---        );
-        
---    SW2_PIPELINE : pipeline
---        generic map (
---            STAGES  => switch_pipeline_stages
---        )
---        port map (
---            clk         => CLK_100MHZ,
---            d_in        => SW(2),
---            d_out       => sw2_pipelined
---        );
-        
---    CORE_2 : system
---        generic map(
---           USE_ILA          => ila_parameter, 
---           DIVIDE_ENABLED   => divide_parameter,
---           MULTIPLY_ENABLED => multiply_parameter,
---           FIRMWARE         => "firmware.hex",
---           MEM_SIZE         => mem_size
---        )
---        port map (
---            clk                         => CLK_100MHZ,
---            resetn                      => CPU_RESETN,
---            -- sw                 => sw(2),
---            sw                          => sw2_pipelined,
---            led                         => open,
---            RGB_LED                     => LED17_R,
---            out_byte_en                 => open,
---            out_byte                    => open,
---            out_matrix_en               => open,
---            out_matrix                  => open,
---            out_matrix_end_row          => open,
---            out_matrix_end              => open,
---            out_matrix_position_en      => open,
---            out_matrix_position         => open,
---            trap                        => open
---        );
-        
---    SW3_PIPELINE : pipeline
---        generic map (
---            STAGES  => switch_pipeline_stages
---        )
---        port map (
---            clk         => CLK_100MHZ,
---            d_in        => SW(3),
---            d_out       => sw3_pipelined
---        );
-        
---    CORE_3 : system
---        generic map(
---           USE_ILA          => ila_parameter, 
---           DIVIDE_ENABLED   => divide_parameter,
---           MULTIPLY_ENABLED => multiply_parameter,
---           FIRMWARE         => "firmware.hex",
---           MEM_SIZE         => mem_size
---        )
---        port map (
---            clk                         => CLK_100MHZ,
---            resetn                      => CPU_RESETN,
---            -- sw                 => sw(3),
---            sw                          => sw3_pipelined,
---            led                         => open,
---            RGB_LED                     => LED17_B,
---            out_byte_en                 => open,
---            out_byte                    => open,
---            out_matrix_en               => open,
---            out_matrix                  => open,
---            out_matrix_end_row          => open,
---            out_matrix_end              => open,
---            out_matrix_position_en      => open,
---            out_matrix_position         => open,
---            trap                        => open
---        );
 
 end Behavioral;

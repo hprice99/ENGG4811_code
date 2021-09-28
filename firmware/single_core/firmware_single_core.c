@@ -11,6 +11,31 @@ long A[MATRIX_SIZE * MATRIX_SIZE];
 long B[MATRIX_SIZE * MATRIX_SIZE];
 long C[MATRIX_SIZE * MATRIX_SIZE];
 
+void print_matrix(char* matrixName, long* matrix, int rows, int cols) {
+
+    print_string(matrixName);
+    print_string(" = [");
+    for (long y = 0; y < rows; y++) {
+        for (long x = 0; x < cols; x++) {
+
+            int index = COORDINATE_TO_INDEX(x, y);
+
+            print_dec(matrix[index]);
+
+            if (x < TOTAL_MATRIX_SIZE - 1) {
+                print_string(", ");
+            }
+        }
+
+        if (y < TOTAL_MATRIX_SIZE - 1) {
+
+            print_string(";\n \t");
+        }
+    }
+
+    print_string("]\n");
+}
+
 void createA(void) {
 
     for (long row = 0; row < MATRIX_SIZE; row++) {
@@ -26,7 +51,7 @@ void createA(void) {
         }
     }
 
-    output_matrix("A", (long*)A, MATRIX_SIZE, MATRIX_SIZE);
+    print_matrix("A", A, MATRIX_SIZE, MATRIX_SIZE);
 }
 
 void createB(void) {
@@ -44,7 +69,7 @@ void createB(void) {
         }
     }
 
-    output_matrix("B", (long*)B, MATRIX_SIZE, MATRIX_SIZE);
+    print_matrix("B", B, MATRIX_SIZE, MATRIX_SIZE);
 }
 
 void createC(void) {
@@ -60,7 +85,10 @@ void createC(void) {
 }
 
 void main(void) {
-    int switchValue = 0;
+    
+    print_string("Single core ");
+    print_dec(1);
+    print_char('\n');
 
     int ledValue = 1;
     LED_OUTPUT = ledValue;
@@ -71,7 +99,7 @@ void main(void) {
 
     multiply_matrices(A, B, C);
 
-    output_matrix("C = A*B", (long*)C, MATRIX_SIZE, MATRIX_SIZE);
+    print_matrix("C", C, MATRIX_SIZE, MATRIX_SIZE);
     print_string("Matrix multiplication completed\n");
 
     int loopCount = 0;
