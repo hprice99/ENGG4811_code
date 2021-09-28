@@ -1,15 +1,27 @@
 #ifndef IO_H
 #define IO_H
 
-#define CHAR_OUTPUT                 (*(volatile char*)0x10000000)
-#define CHAR_OUTPUT_READY_INPUT     1
+// Character output
+#define CHAR_OUTPUT      (*(volatile char*)0x10000000)
+#define CHAR_OUTPUT_READY_INPUT      (*(volatile char*)0x10000010)
 
-#define LED (*(volatile char*)0x20000000)
-#define SWITCH (*(volatile char*)0x30000000)
 
-#define MATRIX_ROW_END (*(volatile char*)0x50000000)
-#define MATRIX_END (*(volatile char*)0x60000000)
-#define MATRIX_POSITION (*(volatile char*)0x70000000)
-#define MATRIX_OUTPUT (*(volatile long*)0x80000000)
+// LEDs
+#define LED_OUTPUT      (*(volatile char*)0x30000000)
+
+
+// Node details
+#define MATRIX_INIT_FROM_FILE_INPUT      (*(volatile char*)0x50000000)
+
+// Matrix
+#define MATRIX_OUTPUT      (*(volatile long*)0x60000000)
+#define MATRIX_END_ROW_OUTPUT      (*(volatile char*)0x60000010)
+#define MATRIX_END_OUTPUT      (*(volatile char*)0x60000020)
+#define MATRIX_INIT_TYPE_INPUT      (*(volatile char*)0x60000030)
+#define MATRIX_INIT_X_COORD_INPUT      (*(volatile char*)0x60000040)
+#define MATRIX_INIT_Y_COORD_INPUT      (*(volatile char*)0x60000050)
+#define MATRIX_INIT_ELEMENT_INPUT      (*(volatile long*)0x60000060)
+#define MATRIX_INIT_READ_OUTPUT      (*(volatile char*)0x60000070)
+
 
 #endif

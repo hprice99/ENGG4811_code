@@ -1,0 +1,4 @@
+---
+# Firmware folder relative to repository root
+firmwareFolder: firmware/single_core
+hdlFolder: hdl/single_core

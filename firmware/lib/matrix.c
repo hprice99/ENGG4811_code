@@ -1,19 +1,6 @@
 #include "matrix.h"
 #include "print.h"
 
-void print_matrix(long* matrix, int rows, int cols) {
-
-    char digit[7];
-
-    for (int row = 0; row < rows; row++) {
-        for (int col = 0; col < cols; col++) {
-            // TODO Determine number of digits
-            // print_hex(*((matrix + row * rows) + col), 4);
-        }
-        print_string(" ; \n");
-    }
-}
-
 void output_digit(long digit) {
 
     MATRIX_OUTPUT = digit;
@@ -52,11 +39,5 @@ void multiply_matrices(long* A, long* B, long* C) {
                 C[cIndex] = C[cIndex] + A[aIndex] * B[bIndex];
             }
         }
-
-        #ifdef MATRIX_POSITION_OUT_ENABLED
-        MATRIX_POSITION = i;
-
-        print_string(" Row done\n");
-        #endif
     }
 }

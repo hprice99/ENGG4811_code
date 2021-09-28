@@ -10,30 +10,30 @@ use xil_defaultlib.math_functions.all;
 package fox_defs is 
 
     -- Constants
-    constant NETWORK_ROWS   : integer := {{ foxNetwork.networkRows }};
-    constant NETWORK_COLS   : integer := {{ foxNetwork.networkCols }};
+    constant NETWORK_ROWS   : integer := 1;
+    constant NETWORK_COLS   : integer := 1;
     constant NETWORK_NODES  : integer := NETWORK_ROWS * NETWORK_COLS;
 
     -- Fox's algorithm network paramters
-    constant FOX_NETWORK_STAGES  : integer := {{ foxNetwork.foxNetworkStages }};
+    constant FOX_NETWORK_STAGES  : integer := 1;
     constant FOX_NETWORK_NODES   : integer := FOX_NETWORK_STAGES ** 2;
 
     -- Result node parameters
-    constant RESULT_X_COORD  : integer := {{ foxNetwork.resultNodeCoord['x'] }};
-    constant RESULT_Y_COORD  : integer := {{ foxNetwork.resultNodeCoord['y'] }};
+    constant RESULT_X_COORD  : integer := 0;
+    constant RESULT_Y_COORD  : integer := 0;
 
     -- ROM node parameters
-    constant ROM_X_COORD  : integer := {{ foxNetwork.romNodeCoord['x'] }};
-    constant ROM_Y_COORD  : integer := {{ foxNetwork.romNodeCoord['y'] }};
+    constant ROM_X_COORD  : integer := 0;
+    constant ROM_Y_COORD  : integer := 0;
 
     -- NIC parameters
-    constant FOX_PE_TO_NETWORK_FIFO_DEPTH   : integer := {{ foxNetwork.foxNodeFifos['peToNetwork'] }};
-    constant FOX_NETWORK_TO_PE_FIFO_DEPTH   : integer := {{ foxNetwork.foxNodeFifos['networkToPe'] }};
+    constant FOX_PE_TO_NETWORK_FIFO_DEPTH   : integer := 0;
+    constant FOX_NETWORK_TO_PE_FIFO_DEPTH   : integer := 0;
 
-    constant RESULT_PE_TO_NETWORK_FIFO_DEPTH    : integer := {{ foxNetwork.resultNodeFifos['peToNetwork'] }};
-    constant RESULT_NETWORK_TO_PE_FIFO_DEPTH    : integer := {{ foxNetwork.resultNodeFifos['networkToPe'] }};
+    constant RESULT_PE_TO_NETWORK_FIFO_DEPTH    : integer := 0;
+    constant RESULT_NETWORK_TO_PE_FIFO_DEPTH    : integer := 0;
 
-    constant RESULT_UART_FIFO_DEPTH : integer := {{ foxNetwork.resultUartFifoDepth }};
+    constant RESULT_UART_FIFO_DEPTH : integer := 1024;
 
     -- Custom types
     type t_Destination is array(0 to (NETWORK_COLS-1), 0 to (NETWORK_ROWS-1)) of t_Coordinate;

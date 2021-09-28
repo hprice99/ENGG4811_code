@@ -18,63 +18,90 @@
 -- 
 ----------------------------------------------------------------------------------
 
-
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 
 -- Uncomment the following library declaration if using
 -- arithmetic functions with Signed or Unsigned values
--- use IEEE.NUMERIC_STD.ALL;
--- use ieee.std_logic_unsigned.all;
+use IEEE.NUMERIC_STD.ALL;
+use ieee.std_logic_unsigned.all;
 
 -- Uncomment the following library declaration if instantiating
 -- any Xilinx leaf cells in this code.
 --library UNISIM;
 --use UNISIM.VComponents.all;
 
-entity top is
-    Port ( 
-           CPU_RESETN   : in STD_LOGIC;
-           CLK_100MHZ   : in STD_LOGIC;
-           SW           : in STD_LOGIC_VECTOR(3 downto 0);
-           LED          : out STD_LOGIC_VECTOR(15 downto 0);
-           LED16_B      : out STD_LOGIC;
-           LED16_G      : out STD_LOGIC;
-           LED17_R      : out STD_LOGIC;
-           LED17_B      : out STD_LOGIC
+library xil_defaultlib;
+use xil_defaultlib.packet_defs.all;
+use xil_defaultlib.fox_defs.all;
+use xil_defaultlib.matrix_config.all;
+use xil_defaultlib.firmware_config.all;
+use xil_defaultlib.math_functions.all;
+
+entity top_single_core is
+    generic (            
+        FIRMWARE            : string := "firmware_single_core.hex";
+        FIRMWARE_MEM_SIZE   : integer := 4096; 
+        
+        CLK_FREQ            : integer := 50e6;
+        ENABLE_UART         : boolean := False
     );
-end top;
+    port (
+        clk                 : in std_logic;
+        reset_n             : in std_logic;
+        
+        LED                 : out STD_LOGIC;
+        
+        out_char            : out std_logic_vector(7 downto 0);
+        out_char_en         : out std_logic;
+        
+        uart_tx             : out std_logic;
+        
+        out_matrix          : out std_logic_vector(31 downto 0);
+        out_matrix_en       : out std_logic;
+        out_matrix_end_row  : out std_logic;
+        out_matrix_end      : out std_logic
+    );
+end top_single_core;
 
-architecture Behavioral of top is
+architecture Behavioral of top_single_core is
 
-    component system
+    component system_single_core
         generic (
-             USE_ILA            : std_logic := '1';
              DIVIDE_ENABLED     : std_logic := '0';
              MULTIPLY_ENABLED   : std_logic := '1';
+             
+             USE_MATRIX_INIT_FILE : boolean := True;
+             
              FIRMWARE           : string    := "firmware.hex";
              MEM_SIZE           : integer   := 4096
         );
         port (
             clk                     : in std_logic;
-            resetn                  : in std_logic;
-            sw                      : in std_logic;
-            led                     : out std_logic_vector(15 downto 0);
-            RGB_LED                 : out std_logic;
-            out_byte_en             : out std_logic;
-            out_byte                : out std_logic_vector(7 downto 0);
-            out_matrix_en           : out std_logic;
+            reset_n                 : in std_logic;
+            
+            LED                     : out std_logic;
+            
+            out_char                : out std_logic_vector(7 downto 0);
+            out_char_en             : out std_logic;
+            out_char_ready          : in std_logic;
+            
+            matrix_type_in          : in std_logic_vector((MATRIX_TYPE_BITS-1) downto 0);
+            matrix_x_coord_in       : in std_logic_vector((MATRIX_COORD_BITS-1) downto 0);
+            matrix_y_coord_in       : in std_logic_vector((MATRIX_COORD_BITS-1) downto 0);
+            matrix_element_in       : in std_logic_vector((MATRIX_ELEMENT_BITS-1) downto 0);
+            message_in_valid        : in std_logic;
+            message_in_available    : in std_logic;
+            message_in_read         : out std_logic;
+            
             out_matrix              : out std_logic_vector(31 downto 0);
+            out_matrix_en           : out std_logic;
             out_matrix_end_row      : out std_logic;
-            out_matrix_end          : out std_logic;
-            out_matrix_position_en  : out std_logic;
-            out_matrix_position     : out std_logic_vector(7 downto 0);
-            trap                    : out std_logic
+            out_matrix_end          : out std_logic
         );
-    end component system;
+    end component system_single_core;
     
-    constant ila_parameter      : std_logic := '0';
-    constant divide_parameter   : std_logic := '0';
+    constant divide_parameter   : std_logic := '1';
     constant multiply_parameter : std_logic := '1';
     
     component pipeline
@@ -88,176 +115,235 @@ architecture Behavioral of top is
         );
     end component pipeline;
     
-    signal sw0_pipelined, sw1_pipelined, sw2_pipelined, sw3_pipelined : std_logic;
-    constant switch_pipeline_stages : integer := 30;
-    constant mem_size : integer := 16384;
+    component UART_tx_buffered is
+        Generic (
+            CLK_FREQ        : integer := 50e6;
+            BAUD_RATE       : integer := 115200;
+            PARITY_BIT      : string  := "none";
+            USE_DEBOUNCER   : boolean := True;
     
-    signal clkdiv2 : std_logic;
+            BUFFER_DEPTH    : integer := 50
+        ); 
+        Port (
+            clk     : in std_logic;
+            reset_n : in std_logic;
+    
+            data_in         : in std_logic_vector(7 downto 0);
+            data_in_valid   : in std_logic;
+    
+            uart_tx         : out std_logic;
+    
+            buffer_full     : out std_logic
+        );
+    end component UART_tx_buffered;
+    
+    signal out_char_buf     : std_logic_vector(7 downto 0);
+    signal out_char_en_buf  : std_logic;
+    
+    signal uart_tx_ready    : std_logic;
+    signal uart_buffer_full : std_logic;
+    
+    constant BAUD_RATE      : integer := 115200;
+    constant PARITY_BIT     : string := "none";
+    constant USE_DEBOUNCER  : boolean := True;
+    
+    component rom is
+        generic (
+            BUS_WIDTH       : integer := 32;
+            ROM_DEPTH       : integer := 64;
+            ADDRESS_WIDTH   : integer := 6;
+            
+            INITIALISATION_FILE : string    := "none"
+        );
+        port (
+            clk         : in std_logic;
+    
+            read_en     : in std_logic;
+            read_addr   : in std_logic_vector((ADDRESS_WIDTH-1) downto 0);
+            read_data   : out std_logic_vector((BUS_WIDTH-1) downto 0)
+        );
+    end component rom;
+    
+    constant COMBINED_MATRIX_FILE   : string := "combined.mif";
+    constant MATRIX_FILE_LENGTH     : integer := 2 * TOTAL_MATRIX_ELEMENTS;
+    constant ROM_ADDRESS_WIDTH      : integer := ceil_log2(matrix_file_length);
+    
+    signal rom_read_en      : std_logic;
+    signal rom_read_addr    : integer range 0 to MATRIX_FILE_LENGTH;
+    signal rom_addr_vect    : std_logic_vector((ROM_ADDRESS_WIDTH-1) downto 0);
+    signal rom_read_data    : std_logic_vector((BUS_WIDTH-1) downto 0);
+    signal rom_read_valid   : std_logic;
+    
+    component message_decoder is
+        Generic (
+            COORD_BITS              : integer := 2;
+            MULTICAST_GROUP_BITS    : integer := 1;
+            MULTICAST_COORD_BITS    : integer := 1;
+            MATRIX_TYPE_BITS        : integer := 1;
+            MATRIX_COORD_BITS       : integer := 8;
+            MATRIX_ELEMENT_BITS     : integer := 32;
+            BUS_WIDTH               : integer := 56
+        );
+        Port (
+            clk                 : in std_logic;
+            reset_n             : in std_logic;
+            
+            packet_in           : in std_logic_vector((BUS_WIDTH-1) downto 0);
+            packet_in_valid     : in std_logic;
+            
+            matrix_type_out     : out std_logic_vector((MATRIX_TYPE_BITS-1) downto 0);
+            matrix_x_coord_out  : out std_logic_vector((MATRIX_COORD_BITS-1) downto 0);
+            matrix_y_coord_out  : out std_logic_vector((MATRIX_COORD_BITS-1) downto 0);
+            matrix_element_out  : out std_logic_vector((MATRIX_ELEMENT_BITS-1) downto 0);
+    
+            packet_out_valid    : out std_logic;
+            packet_read         : in std_logic
+        );
+    end component message_decoder;
+    
+    signal matrix_type_in          : std_logic_vector((MATRIX_TYPE_BITS-1) downto 0);
+    signal matrix_x_coord_in       : std_logic_vector((MATRIX_COORD_BITS-1) downto 0);
+    signal matrix_y_coord_in       : std_logic_vector((MATRIX_COORD_BITS-1) downto 0);
+    signal matrix_element_in       : std_logic_vector((MATRIX_ELEMENT_BITS-1) downto 0);
+    signal message_in_valid        : std_logic;
+    signal message_in_available    : std_logic;
+    signal message_in_read         : std_logic;
 
 begin
 
-    -- Clock divider
-    CLOCK_DIVIDER: process (CLK_100MHZ)
-    begin
-        if (rising_edge(CLK_100MHZ)) then       
-            clkdiv2 <= not clkdiv2;
-        end if;
-    end process CLOCK_DIVIDER;
-    
-    -- RESET LED
-    RESET_LED: process (clkdiv2)
-    begin
-        if (rising_edge(clkdiv2)) then
-            if (CPU_RESETN = '1') then
-                LED17_R <= '1';
-            else
-                LED17_R <= '0';
-            end if;
-        end if;
-    end process RESET_LED;
-
-    SW0_PIPELINE : pipeline
+    CORE: system_single_core
         generic map (
-            STAGES  => switch_pipeline_stages
-        )
-        port map (
-            clk         => clkdiv2,
-            d_in        => SW(0),
-            d_out       => sw0_pipelined
-        );
-
-    CORE_0 : system
-        generic map(
-           USE_ILA          => ila_parameter, 
            DIVIDE_ENABLED   => divide_parameter,
            MULTIPLY_ENABLED => multiply_parameter,
-           FIRMWARE         => "firmware_single_core.hex",
-           MEM_SIZE         => mem_size
+           
+           USE_MATRIX_INIT_FILE => USE_MATRIX_INIT_FILE, 
+            
+           FIRMWARE         => FOX_FIRMWARE,
+           MEM_SIZE         => FOX_MEM_SIZE
         )
         port map (
-            clk                         => clkdiv2,
-            resetn                      => CPU_RESETN,
-            -- sw                 => sw(0),
-            sw                          => sw0_pipelined,
-            led                         => led,
-            RGB_LED                     => LED16_B,
-            out_byte_en                 => open,
-            out_byte                    => open,
+            clk                         => clk,
+            reset_n                     => reset_n,
+
+            LED                         => LED,
+            
+            out_char                    => out_char_buf,
+            out_char_en                 => out_char_en_buf,
+            out_char_ready              => uart_tx_ready,
+            
+            matrix_type_in          => matrix_type_in,
+            matrix_x_coord_in       => matrix_x_coord_in,
+            matrix_y_coord_in       => matrix_y_coord_in,
+            matrix_element_in       => matrix_element_in,
+            
+            message_in_valid        => message_in_valid,
+            message_in_available    => message_in_available,
+            message_in_read         => message_in_read,
+            
             out_matrix_en               => open,
             out_matrix                  => open,
             out_matrix_end_row          => open,
-            out_matrix_end              => open,
-            out_matrix_position_en      => open,
-            out_matrix_position         => open,
-            trap                        => open
+            out_matrix_end              => open
         );
         
---    SW1_PIPELINE : pipeline
---        generic map (
---            STAGES  => switch_pipeline_stages
---        )
---        port map (
---            clk         => CLK_100MHZ,
---            d_in        => SW(1),
---            d_out       => sw1_pipelined
---        );
+    out_char    <= out_char_buf;
+    out_char_en <= out_char_en_buf;
         
---    CORE_1 : system
---        generic map(
---           USE_ILA          => ila_parameter, 
---           DIVIDE_ENABLED   => divide_parameter,
---           MULTIPLY_ENABLED => multiply_parameter,
---           FIRMWARE         => "firmware.hex",
---           MEM_SIZE         => mem_size
---        )
---        port map (
---            clk                         => CLK_100MHZ,
---            resetn                      => CPU_RESETN,
---            -- sw                 => sw(1),
---            sw                          => sw1_pipelined,
---            led                         => open,
---            RGB_LED                     => LED16_G,
---            out_byte_en                 => open,
---            out_byte                    => open,
---            out_matrix_en               => open,
---            out_matrix                  => open,
---            out_matrix_end_row          => open,
---            out_matrix_end              => open,
---            out_matrix_position_en      => open,
---            out_matrix_position         => open,
---            trap                        => open
---        );
+    UART_GEN: if (ENABLE_UART = True) generate
+        UART_TX_NODE: uart_tx_buffered
+            generic map (
+                CLK_FREQ        => CLK_FREQ,
+                BAUD_RATE       => BAUD_RATE,
+                PARITY_BIT      => PARITY_BIT,
+                USE_DEBOUNCER   => USE_DEBOUNCER,
         
---    SW2_PIPELINE : pipeline
---        generic map (
---            STAGES  => switch_pipeline_stages
---        )
---        port map (
---            clk         => CLK_100MHZ,
---            d_in        => SW(2),
---            d_out       => sw2_pipelined
---        );
+                BUFFER_DEPTH    => RESULT_UART_FIFO_DEPTH
+            )
+            port map (
+                clk             => clk,
+                reset_n         => reset_n,
         
---    CORE_2 : system
---        generic map(
---           USE_ILA          => ila_parameter, 
---           DIVIDE_ENABLED   => divide_parameter,
---           MULTIPLY_ENABLED => multiply_parameter,
---           FIRMWARE         => "firmware.hex",
---           MEM_SIZE         => mem_size
---        )
---        port map (
---            clk                         => CLK_100MHZ,
---            resetn                      => CPU_RESETN,
---            -- sw                 => sw(2),
---            sw                          => sw2_pipelined,
---            led                         => open,
---            RGB_LED                     => LED17_R,
---            out_byte_en                 => open,
---            out_byte                    => open,
---            out_matrix_en               => open,
---            out_matrix                  => open,
---            out_matrix_end_row          => open,
---            out_matrix_end              => open,
---            out_matrix_position_en      => open,
---            out_matrix_position         => open,
---            trap                        => open
---        );
+                data_in         => out_char_buf,
+                data_in_valid   => out_char_en_buf,
         
---    SW3_PIPELINE : pipeline
---        generic map (
---            STAGES  => switch_pipeline_stages
---        )
---        port map (
---            clk         => CLK_100MHZ,
---            d_in        => SW(3),
---            d_out       => sw3_pipelined
---        );
+                uart_tx         => uart_tx,
         
---    CORE_3 : system
---        generic map(
---           USE_ILA          => ila_parameter, 
---           DIVIDE_ENABLED   => divide_parameter,
---           MULTIPLY_ENABLED => multiply_parameter,
---           FIRMWARE         => "firmware.hex",
---           MEM_SIZE         => mem_size
---        )
---        port map (
---            clk                         => CLK_100MHZ,
---            resetn                      => CPU_RESETN,
---            -- sw                 => sw(3),
---            sw                          => sw3_pipelined,
---            led                         => open,
---            RGB_LED                     => LED17_B,
---            out_byte_en                 => open,
---            out_byte                    => open,
---            out_matrix_en               => open,
---            out_matrix                  => open,
---            out_matrix_end_row          => open,
---            out_matrix_end              => open,
---            out_matrix_position_en      => open,
---            out_matrix_position         => open,
---            trap                        => open
---        );
+                buffer_full     => uart_buffer_full
+            );
+            
+        uart_tx_ready <= not uart_buffer_full;
+    end generate UART_GEN;
+
+    NOT_UART_GEN: if (ENABLE_UART = False) generate
+        uart_tx_ready   <= '1';
+    end generate NOT_UART_GEN;
+
+    ROM_GEN: if (USE_MATRIX_INIT_FILE = True) generate
+        MATRIX_ROM: rom
+            generic map (
+                BUS_WIDTH       => BUS_WIDTH,
+                ROM_DEPTH       => MATRIX_FILE_LENGTH,
+                ADDRESS_WIDTH   => ROM_ADDRESS_WIDTH,
+                
+                INITIALISATION_FILE => COMBINED_MATRIX_FILE
+            )
+            port map (
+                clk         => clk,
+        
+                read_en     => rom_read_en,
+                read_addr   => rom_addr_vect,
+                read_data   => rom_read_data
+            );
+            
+        rom_read_en     <= '1';
+        rom_addr_vect   <= std_logic_vector(to_unsigned(rom_read_addr, ROM_ADDRESS_WIDTH));
+        
+        -- Loop through the addresses of ROM
+        ROM_ADDRESS_COUNTER: process (clk)
+        begin
+            if (rising_edge(clk)) then
+                if (reset_n = '0') then
+                    rom_read_addr   <= 0;
+                else
+                    if (message_in_read = '1' and rom_read_addr < MATRIX_FILE_LENGTH) then
+                        rom_read_addr   <= rom_read_addr + 1;
+                    end if;
+                end if;
+            end if;
+        end process ROM_ADDRESS_COUNTER;
+    
+        DECODER: message_decoder
+            generic map (
+                COORD_BITS              => COORD_BITS,
+                MULTICAST_GROUP_BITS    => MULTICAST_GROUP_BITS,
+                MULTICAST_COORD_BITS    => MULTICAST_COORD_BITS,
+                MATRIX_TYPE_BITS        => MATRIX_TYPE_BITS,
+                MATRIX_COORD_BITS       => MATRIX_COORD_BITS,
+                MATRIX_ELEMENT_BITS     => MATRIX_ELEMENT_BITS,
+                BUS_WIDTH               => BUS_WIDTH
+            )
+            port map (
+                clk                 => clk,
+                reset_n             => reset_n,
+                
+                packet_in           => rom_read_data,
+                packet_in_valid     => rom_read_valid,
+                
+                matrix_type_out     => matrix_type_in,
+                matrix_x_coord_out  => matrix_x_coord_in,
+                matrix_y_coord_out  => matrix_y_coord_in,
+                matrix_element_out  => matrix_element_in,
+        
+                packet_out_valid    => open,
+                packet_read         => message_in_read
+            );
+    end generate ROM_GEN;
+    
+    NO_ROM_GEN: if (USE_MATRIX_INIT_FILE = False) generate
+        matrix_type_in      <= (others => '0');
+        matrix_x_coord_in   <= (others => '0');
+        matrix_y_coord_in   <= (others => '0');
+        matrix_element_in   <= (others => '0');
+    end generate NO_ROM_GEN;
 
 end Behavioral;

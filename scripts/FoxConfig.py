@@ -93,8 +93,16 @@ class FoxConfig:
         firmwareStream = open("{scriptDirectory}/{configFolder}/FirmwareConfig.yaml".format(scriptDirectory=self.scriptDirectory, configFolder=self.configFolder), 'r')
         firmwareConfig = yaml.safe_load(firmwareStream)
 
-        self.foxFirmware = firmwareConfig['foxFirmware']['name']
-        self.foxFirmwareMemSize = firmwareConfig['foxFirmware']['memory_size']
+        if 'foxFirmware' in firmwareConfig:
+            self.foxFirmware = firmwareConfig['foxFirmware']['name']
+            self.foxFirmwareMemSize = firmwareConfig['foxFirmware']['memory_size']
+        else:
+            self.foxFirmware = None
+            self.foxFirmwareMemSize = 0
 
-        self.resultFirmware = firmwareConfig['resultFirmware']['name']
-        self.resultFirmwareMemSize = firmwareConfig['resultFirmware']['memory_size']
+        if 'resultFirmware' in firmwareConfig:
+            self.resultFirmware = firmwareConfig['resultFirmware']['name']
+            self.resultFirmwareMemSize = firmwareConfig['resultFirmware']['memory_size']
+        else:
+            self.resultFirmware = None
+            self.resultFirmwareMemSize = 0

@@ -1,11 +1,9 @@
 .section .init
-
-/* Main firmware */
 .global main
 
 /* set stack pointer */
-lui sp, %hi(16*4096)
-addi sp, sp, %lo(16*4096)
+lui sp, %hi(4*16384)
+addi sp, sp, %lo(4*16384)
 
 /* call main */
 jal ra, main

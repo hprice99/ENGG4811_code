@@ -42,14 +42,19 @@ config.import_network_config()
 config.import_firmware_config()
 
 # %%
-foxFirmware = Firmware(name=config.foxFirmware, memSize=config.foxFirmwareMemSize)
-resultFirmware = Firmware(name=config.resultFirmware, memSize=config.resultFirmwareMemSize)
+if config.foxFirmware is not None:
+    foxFirmware = Firmware(name=config.foxFirmware, memSize=config.foxFirmwareMemSize)
+    foxFirmware.write_assembly_file(firmwareFolder)
+    foxFirmware.write_makefile_variables(firmwareFolder)
+else:
+    foxFirmware = None
 
-foxFirmware.write_assembly_file(firmwareFolder)
-resultFirmware.write_assembly_file(firmwareFolder)
-
-foxFirmware.write_makefile_variables(firmwareFolder)
-resultFirmware.write_makefile_variables(firmwareFolder)
+if config.resultFirmware is not None:
+    resultFirmware = Firmware(name=config.resultFirmware, memSize=config.resultFirmwareMemSize)
+    resultFirmware.write_assembly_file(firmwareFolder)
+    resultFirmware.write_makefile_variables(firmwareFolder)
+else:
+    resultFirmware = None
 
 # %%
 foxNetwork = FoxNetwork(networkRows=config.networkRows, \
