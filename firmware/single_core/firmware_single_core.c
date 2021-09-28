@@ -11,6 +11,18 @@ long A[MATRIX_SIZE * MATRIX_SIZE];
 long B[MATRIX_SIZE * MATRIX_SIZE];
 long C[MATRIX_SIZE * MATRIX_SIZE];
 
+enum MatrixType {
+    A_type = 0, 
+    B_type = 1
+};
+
+struct MatrixPacket {
+    enum MatrixType matrixType;
+    int matrixX;
+    int matrixY;
+    long matrixElement;
+};
+
 void print_matrix(char* matrixName, long* matrix, int rows, int cols) {
 
     print_string(matrixName);
@@ -36,44 +48,124 @@ void print_matrix(char* matrixName, long* matrix, int rows, int cols) {
     print_string("]\n");
 }
 
+struct MatrixPacket readMatrixPacket(void) {
+
+    struct MatrixPacket packet;
+
+    packet.matrixType = MATRIX_INIT_TYPE_INPUT;
+    packet.matrixX = MATRIX_INIT_X_COORD_INPUT;
+    packet.matrixY = MATRIX_INIT_Y_COORD_INPUT;
+    packet.matrixElement = MATRIX_INIT_ELEMENT_INPUT;
+
+    MATRIX_INIT_READ_OUTPUT = 1;
+
+    return packet;
+}
+
 void createA(void) {
 
-    for (long row = 0; row < MATRIX_SIZE; row++) {
-        for (long col = 0; col < MATRIX_SIZE; col++) {
+    if (MATRIX_INIT_FROM_FILE_INPUT) {
 
-            int index = row * MATRIX_SIZE + col;
+        print_string("Loading A from file\n");
 
-            if (row < 50) {
-                A[index] = row + 1;
-            } else {
-                A[index] = row - 50;
+        int aElementsReceived = 0;
+        struct MatrixPacket packet;
+
+        while (aElementsReceived < MATRIX_ELEMENTS) {
+
+            packet = readMatrixPacket();
+
+            if (packet.matrixType != A_type) {
+
+                print_string("Expected to receive A matrix\n");
+                return;
+            }
+
+            int index = COORDINATE_TO_INDEX(packet.matrixX, packet.matrixY);
+
+            A[index] = packet.matrixElement;
+            
+            aElementsReceived++;
+
+            #ifdef DEBUG_PRINT
+            print_string("A[");
+            print_dec(packet.matrixX);
+            print_string(", ");
+            print_dec(packet.matrixY);
+            print_string("] = ");
+            print_dec(packet.matrixElement);
+            print_char('\n');
+
+            print_dec(aElementsReceived);
+            print_string(" elements of A received\n");
+            #endif
+        }
+    } else {
+
+        for (long x = 0; x < MATRIX_SIZE; x++) {
+            for (long y = 0; y < MATRIX_SIZE; y++) {
+
+                int index = COORDINATE_TO_INDEX(x, y);
+
+                A[index] = 1;
             }
         }
     }
 
-    #ifdef DEBUG_PRINT
-    print_matrix("A", A, MATRIX_SIZE, MATRIX_SIZE);
-    #endif
+    print_string("A matrix loaded\n");
 }
 
 void createB(void) {
 
-    for (long row = 0; row < MATRIX_SIZE; row++) {
-        for (long col = 0; col < MATRIX_SIZE; col++) {
+    if (MATRIX_INIT_FROM_FILE_INPUT) {
 
-            int index = row * MATRIX_SIZE + col;
+        print_string("Loading B from file\n");
 
-            if (col < 50) {
-                B[index] = col + 1;
-            } else {
-                B[index] = col - 50;
+        int bElementsReceived = 0;
+        struct MatrixPacket packet;
+
+        while (bElementsReceived < MATRIX_ELEMENTS) {
+
+            packet = readMatrixPacket();
+
+            if (packet.matrixType != B_type) {
+
+                print_string("Expected to receive B matrix\n");
+                return;
+            }
+
+            int index = COORDINATE_TO_INDEX(packet.matrixX, packet.matrixY);
+
+            B[index] = packet.matrixElement;
+            
+            bElementsReceived++;
+
+            #ifdef DEBUG_PRINT
+            print_string("B[");
+            print_dec(packet.matrixX);
+            print_string(", ");
+            print_dec(packet.matrixY);
+            print_string("] = ");
+            print_dec(packet.matrixElement);
+            print_char('\n');
+
+            print_dec(bElementsReceived);
+            print_string(" elements of B received\n");
+            #endif
+        }
+    } else {
+
+        for (long x = 0; x < MATRIX_SIZE; x++) {
+            for (long y = 0; y < MATRIX_SIZE; y++) {
+
+                int index = COORDINATE_TO_INDEX(x, y);
+
+                B[index] = 1;
             }
         }
     }
 
-    #ifdef DEBUG_PRINT
-    print_matrix("B", B, MATRIX_SIZE, MATRIX_SIZE);
-    #endif
+    print_string("B matrix loaded\n");
 }
 
 void createC(void) {

@@ -7,6 +7,8 @@ module system_single_core #(
     parameter MATRIX_TYPE_BITS      = 1,
     parameter MATRIX_COORD_BITS     = 8,
     parameter MATRIX_ELEMENT_BITS   = 32,
+    
+    parameter USE_MATRIX_INIT_FILE = 1,
 
     parameter FIRMWARE         = "firmware.hex",
     parameter MEM_SIZE         = 4096,
@@ -168,6 +170,13 @@ module system_single_core #(
                 end
                 `MATRIX_INIT_ELEMENT_INPUT: begin
                     mem_rdata   <= matrix_element_in;
+                end
+                `MATRIX_INIT_FROM_FILE_INPUT: begin
+                    if (USE_MATRIX_INIT_FILE == 0) begin
+                        mem_rdata   <= 0;
+                    end else begin
+                        mem_rdata   <= 1;
+                    end
                 end
               endcase
             end
