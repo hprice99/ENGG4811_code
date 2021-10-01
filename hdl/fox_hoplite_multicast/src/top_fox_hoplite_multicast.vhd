@@ -71,8 +71,8 @@ entity top is
            out_matrix_end_row   : out t_MessageValid;
            out_matrix_end       : out t_MessageValid;
            
-           ila_multicast_out        : out std_logic_vector((BUS_WIDTH-1) downto 0);
-           ila_multicast_out_valid  : out std_logic;
+           ila_multicast_out                : out std_logic_vector((BUS_WIDTH-1) downto 0);
+           ila_multicast_out_valid          : out std_logic;
            
            ila_x_out            : out std_logic_vector((BUS_WIDTH-1) downto 0);
            ila_x_out_valid      : out std_logic;
