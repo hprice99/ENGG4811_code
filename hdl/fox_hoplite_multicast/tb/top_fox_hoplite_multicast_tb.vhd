@@ -31,6 +31,7 @@ use IEEE.std_logic_textio.all;
 
 library xil_defaultlib;
 use xil_defaultlib.fox_defs.all;
+use xil_defaultlib.packet_defs.all;
 use xil_defaultlib.firmware_config.all;
 
 entity top_tb is
@@ -67,7 +68,10 @@ architecture Behavioral of top_tb is
             out_matrix          : out t_MatrixOut;
             out_matrix_en       : out t_MessageValid;
             out_matrix_end_row  : out t_MessageValid;
-            out_matrix_end      : out t_MessageValid
+            out_matrix_end      : out t_MessageValid;
+            
+            ila_multicast_out        : out std_logic_vector((BUS_WIDTH-1) downto 0);
+            ila_multicast_out_valid  : out std_logic
         );
     end component top;
     
@@ -187,40 +191,11 @@ begin
             out_matrix          => out_matrix,
             out_matrix_en       => out_matrix_en,
             out_matrix_end_row  => out_matrix_end_row,
-            out_matrix_end      => out_matrix_end
+            out_matrix_end      => out_matrix_end,
+            
+            ila_multicast_out       => open,
+            ila_multicast_out_valid => open
         );
-        
---    RX_BUFFER: process (clk)
---    begin
---        if (rising_edge(clk)) then
---            uart_rx <= uart_tx;
---        end if;
---    end process RX_BUFFER;
-    
---    UART_RECEIVER: UART
---            generic map (
---                CLK_FREQ      => CLK_FREQ,
---                BAUD_RATE     => BAUD_RATE,
---                PARITY_BIT    => PARITY_BIT,
---                USE_DEBOUNCER => USE_DEBOUNCER
---            )
---            port map (
---                -- CLOCK AND RESET
---                CLK          => clk,
---                RST          => reset,
-
---                UART_TXD     => uart_tx,
---                UART_RXD     => uart_rx,
-                
---                DIN          => (others => '1'), 
---                DIN_VLD      => '0', 
---                DIN_RDY      => open,
-
---                DOUT         => uart_rx_char,
---                DOUT_VLD     => uart_rx_char_valid, 
---                FRAME_ERROR  => open, 
---                PARITY_ERROR => open
---            );
 
     -- Generate prints for Fox's algorithm processing elements
     PRINT_OUTPUT_ROW_GEN: for i in 0 to (FOX_NETWORK_STAGES-1) generate

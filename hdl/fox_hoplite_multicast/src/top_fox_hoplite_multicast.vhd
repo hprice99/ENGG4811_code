@@ -69,7 +69,10 @@ entity top is
            out_matrix           : out t_MatrixOut;
            out_matrix_en        : out t_MessageValid;
            out_matrix_end_row   : out t_MessageValid;
-           out_matrix_end       : out t_MessageValid
+           out_matrix_end       : out t_MessageValid;
+           
+           ila_multicast_out        : out std_logic_vector((BUS_WIDTH-1) downto 0);
+           ila_multicast_out_valid  : out std_logic
     );
 end top;
 
@@ -423,6 +426,9 @@ architecture Behavioral of top is
     constant BURST_LENGTH           : integer := matrix_file_length / 2;
 
 begin
+
+    ila_multicast_out       <= multicast_messages_in(0, 0);
+    ila_multicast_out_valid <= multicast_messages_in_valid(0, 0);
 
     -- Generate the network
     NETWORK_ROW_GEN: for i in 0 to (NETWORK_ROWS-1) generate

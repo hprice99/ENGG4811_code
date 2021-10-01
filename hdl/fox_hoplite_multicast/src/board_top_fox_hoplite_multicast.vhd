@@ -36,6 +36,7 @@ use IEEE.math_real.all;
 library xil_defaultlib;
 use xil_defaultlib.math_functions.all;
 use xil_defaultlib.firmware_config.all;
+use xil_defaultlib.packet_defs.all;
 use xil_defaultlib.fox_defs.all;
 
 entity board_top is
@@ -78,7 +79,10 @@ architecture Behavioral of board_top is
             out_matrix          : out t_MatrixOut;
             out_matrix_en       : out t_MessageValid;
             out_matrix_end_row  : out t_MessageValid;
-            out_matrix_end      : out t_MessageValid
+            out_matrix_end      : out t_MessageValid;
+            
+            ila_multicast_out        : out std_logic_vector((BUS_WIDTH-1) downto 0);
+            ila_multicast_out_valid  : out std_logic
         );
     end component top;
     
@@ -100,6 +104,20 @@ architecture Behavioral of board_top is
     constant ENABLE_UART    : boolean := True;
     
     signal reset_n  : std_logic;
+
+    component multicast_ila
+        Port (
+            clk : in std_logic;
+           
+            probe0  : in std_logic_vector(58 downto 0);
+            probe1  : in std_logic_vector(0 downto 0)
+        );
+    end component multicast_ila;
+    
+    signal ila_multicast_out        : std_logic_vector((BUS_WIDTH-1) downto 0);
+    signal ila_multicast_out_valid  : std_logic;
+    
+    constant ENABLE_ILA : boolean := True;
 
 begin
 
@@ -144,7 +162,20 @@ begin
             out_matrix          => open,
             out_matrix_en       => open,
             out_matrix_end_row  => open,
-            out_matrix_end      => open
+            out_matrix_end      => open,
+            
+            ila_multicast_out       => ila_multicast_out,
+            ila_multicast_out_valid => ila_multicast_out_valid
         );
+      
+    ILA_GEN: if (ENABLE_ILA = True) generate  
+        ILA: multicast_ila
+            port map (
+                clk         => clkdiv2,
+               
+                probe0      => ila_multicast_out,
+                probe1(0)   => ila_multicast_out_valid
+            );
+    end generate ILA_GEN;
 
 end Behavioral;
