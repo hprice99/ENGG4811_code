@@ -117,7 +117,7 @@ architecture Behavioral of board_top is
     signal ila_multicast_out        : std_logic_vector((BUS_WIDTH-1) downto 0);
     signal ila_multicast_out_valid  : std_logic;
     
-    constant ENABLE_ILA : boolean := True;
+    constant ENABLE_MULTICAST_ROUTER_0_ILA : boolean := True;
 
 begin
 
@@ -168,7 +168,7 @@ begin
             ila_multicast_out_valid => ila_multicast_out_valid
         );
       
-    ILA_GEN: if (ENABLE_ILA = True) generate  
+    ILA_GEN: if (ENABLE_MULTICAST_ROUTER_0_ILA = True) generate  
         ILA: multicast_ila
             port map (
                 clk         => clkdiv2,
