@@ -82,7 +82,13 @@ architecture Behavioral of board_top is
             out_matrix_end      : out t_MessageValid;
             
             ila_multicast_out        : out std_logic_vector((BUS_WIDTH-1) downto 0);
-            ila_multicast_out_valid  : out std_logic
+            ila_multicast_out_valid  : out std_logic;
+            
+            ila_x_out            : out std_logic_vector((BUS_WIDTH-1) downto 0);
+            ila_x_out_valid      : out std_logic;
+           
+            ila_y_out            : out std_logic_vector((BUS_WIDTH-1) downto 0);
+            ila_y_out_valid      : out std_logic
         );
     end component top;
     
@@ -114,10 +120,30 @@ architecture Behavioral of board_top is
         );
     end component multicast_ila;
     
+    constant ENABLE_MULTICAST_ROUTER_0_ILA : boolean := True;
+    
     signal ila_multicast_out        : std_logic_vector((BUS_WIDTH-1) downto 0);
     signal ila_multicast_out_valid  : std_logic;
     
-    constant ENABLE_MULTICAST_ROUTER_0_ILA : boolean := True;
+    component hoplite_router_ila
+        Port (
+            clk : in std_logic;
+           
+            probe0  : in std_logic_vector(58 downto 0);
+            probe1  : in std_logic_vector(0 downto 0);
+            
+            probe2  : in std_logic_vector(58 downto 0);
+            probe3  : in std_logic_vector(0 downto 0)
+        );
+    end component hoplite_router_ila;
+    
+    constant ENABLE_HOPLITE_ROUTER_0_ILA : boolean := True;
+    
+    signal ila_x_out        : std_logic_vector((BUS_WIDTH-1) downto 0);
+    signal ila_x_out_valid  : std_logic;
+    
+    signal ila_y_out        : std_logic_vector((BUS_WIDTH-1) downto 0);
+    signal ila_y_out_valid  : std_logic;
 
 begin
 
@@ -165,17 +191,36 @@ begin
             out_matrix_end      => open,
             
             ila_multicast_out       => ila_multicast_out,
-            ila_multicast_out_valid => ila_multicast_out_valid
+            ila_multicast_out_valid => ila_multicast_out_valid,
+            
+            ila_x_out           => ila_x_out,
+            ila_x_out_valid     => ila_x_out_valid,
+            
+            ila_y_out           => ila_y_out,
+            ila_y_out_valid     => ila_y_out_valid
         );
       
-    ILA_GEN: if (ENABLE_MULTICAST_ROUTER_0_ILA = True) generate  
-        ILA: multicast_ila
+    MULTICAST_ROUTER_0_ILA_GEN: if (ENABLE_MULTICAST_ROUTER_0_ILA = True) generate  
+        MULTICAST_ROUTER_0_ILA: multicast_ila
             port map (
                 clk         => clkdiv2,
                
                 probe0      => ila_multicast_out,
                 probe1(0)   => ila_multicast_out_valid
             );
-    end generate ILA_GEN;
+    end generate MULTICAST_ROUTER_0_ILA_GEN;
+    
+    HOPLITE_ROUTER_0_ILA_GEN: if (ENABLE_HOPLITE_ROUTER_0_ILA = True) generate  
+        HOPLITE_ROUTER_0_ILA: hoplite_router_ila
+            port map (
+                clk         => clkdiv2,
+               
+                probe0      => ila_x_out,
+                probe1(0)   => ila_x_out_valid,
+                
+                probe2      => ila_y_out,
+                probe3(0)   => ila_y_out_valid
+            );
+    end generate HOPLITE_ROUTER_0_ILA_GEN;
 
 end Behavioral;

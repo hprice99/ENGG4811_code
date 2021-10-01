@@ -72,7 +72,13 @@ entity top is
            out_matrix_end       : out t_MessageValid;
            
            ila_multicast_out        : out std_logic_vector((BUS_WIDTH-1) downto 0);
-           ila_multicast_out_valid  : out std_logic
+           ila_multicast_out_valid  : out std_logic;
+           
+           ila_x_out            : out std_logic_vector((BUS_WIDTH-1) downto 0);
+           ila_x_out_valid      : out std_logic;
+           
+           ila_y_out            : out std_logic_vector((BUS_WIDTH-1) downto 0);
+           ila_y_out_valid      : out std_logic
     );
 end top;
 
@@ -429,6 +435,12 @@ begin
 
     ila_multicast_out       <= multicast_messages_in(0, 0);
     ila_multicast_out_valid <= multicast_messages_in_valid(0, 0);
+    
+    ila_x_out       <= x_messages_in(1, 0);
+    ila_x_out_valid <= x_messages_in_valid(1, 0);
+    
+    ila_y_out       <= y_messages_in(1, 0);
+    ila_y_out_valid <= y_messages_in_valid(1, 0);
 
     -- Generate the network
     NETWORK_ROW_GEN: for i in 0 to (NETWORK_ROWS-1) generate
