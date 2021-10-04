@@ -34,12 +34,12 @@ It is available under the ISC license [here](https://github.com/cliffordwolf/pic
 
 ### Fox's algorithm
 In order to test the performance of the network-on-chip in a system of RISC-V softcore processors, Fox's algorithm was implemented.
-Fox's algorithm is a single program, multiple data method for distributing the computation of the product of two square matrices $\boldsymbol{A}$ and $\boldsymbol{B}$ across a square grid of $p$ processors [3].
-Each processor is responsible for computing an $\frac{n}{\sqrt{p}} \times \frac{n}{\sqrt{p}}$ submatrix in the final matrix product.
-This algorithm computes the matrix product $\boldsymbol{A} \boldsymbol{B}$ in $\sqrt{p}$ stages.
-In each stage one processor in each row broadcasts its $\boldsymbol{A}$ submatrix to all processors in the same row.
-The product $\boldsymbol{A} \boldsymbol{B}$ of the submatrices in each processor is then calculated and added to the existing result.
-At the end of the stage, each processor sends its $\boldsymbol{B}$ submatrix up its column.
+Fox's algorithm is a single program, multiple data method for distributing the computation of the product of two square matrices **A** and **B** across a square grid of p processors [3].
+Each processor is responsible for computing an square submatrix of size n/sqrt(p) in the final matrix product.
+This algorithm computes the matrix product **AB** in sqrt(p) stages.
+In each stage one processor in each row broadcasts its **A** submatrix to all processors in the same row.
+The product **AB** of the submatrices in each processor is then calculated and added to the existing result.
+At the end of the stage, each processor sends its **B** submatrix up its column.
 
 This project implemented Fox's algorithm on a network of PicoRV32 RISC-V softcore processors, which communicate through the network-on-chip designed.
 This was tested with networks-on-chip with and without multicast commuincation functionality, and the performance of each system was analysed both in terms of computation time and FPGA resource utilisation. 
@@ -59,7 +59,7 @@ This directory contains all hardware components developed in this project.
 ### `scripts`
 This directory contains Python scripts used to generate the memory initialisation files and configuration headers used by the project.
 It also includes Jinja2 templates for these configuration headers, as well as YAML configuration files to define the parameters used by each project.
-These scripts are used to create a memory initialisation file containing the $\boldsymbol{A}$ and $\boldsymbol{B}$ matrices that are multiplied in the firmware, and create firmware and hardware configuration headers that remain synchronised.
+These scripts are used to create a memory initialisation file containing the **A** and **B** matrices that are multiplied in the firmware, and create firmware and hardware configuration headers that remain synchronised.
 
 ### `vivado`
 This directory contains the `.tcl` scripts that may be used to generate the Vivado projects required to synthesise and implement each design.
