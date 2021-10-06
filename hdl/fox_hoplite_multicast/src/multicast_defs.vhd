@@ -14,7 +14,7 @@ package multicast_defs is
     constant MULTICAST_NETWORK_COLS     : integer := 1;
 
     constant USE_MULTICAST          : boolean := True;
-    constant MULTICAST_FIFO_DEPTH   : integer := 16;
+    constant MULTICAST_FIFO_DEPTH   : integer := 2;
 
     -- Custom types
     type t_NodeToMulticastPackets is array (0 to (MULTICAST_GROUP_NODES-1)) of std_logic_vector((BUS_WIDTH-1) downto 0);

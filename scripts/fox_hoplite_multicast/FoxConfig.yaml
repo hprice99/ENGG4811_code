@@ -39,3 +39,4 @@ multicastConfig:
   multicastGroupNodes: 2
   multicastNetworkRows: 2
   multicastNetworkCols: 1
+  multicastFifoDepth: 2
