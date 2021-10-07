@@ -74,9 +74,7 @@ entity result_node is
     Port (
         clk                 : in std_logic;
         reset_n             : in std_logic;
-
-        LED                 : out std_logic;
-
+        
         out_char            : out std_logic_vector(7 downto 0);
         out_char_en         : out std_logic;
 
@@ -168,8 +166,6 @@ architecture Behavioral of result_node is
         port (
             clk                 : in std_logic;
             reset_n             : in std_logic;
-
-            LED                 : out std_logic;
 
             out_char            : out std_logic_vector(7 downto 0);
             out_char_en         : out std_logic;
@@ -299,9 +295,7 @@ begin
         port map (
             clk                 => clk,
             reset_n             => reset_n,
-            
-            LED                 => LED,
-    
+
             out_char            => pe_to_uart,
             out_char_en         => pe_to_uart_valid,
             out_char_ready      => pe_to_uart_ready,

@@ -97,8 +97,6 @@ entity fox_node is
         clk                 : in std_logic;
         reset_n             : in std_logic;
 
-        LED                 : out std_logic;
-
         out_char            : out std_logic_vector(7 downto 0);
         out_char_en         : out std_logic;
         out_char_ready      : in std_logic;
@@ -344,8 +342,6 @@ architecture Behavioral of fox_node is
         port (
             clk                     : in std_logic;
             reset_n                 : in std_logic;
-            
-            LED                     : out std_logic;
             
             out_char                : out std_logic_vector(7 downto 0);
             out_char_en             : out std_logic;
@@ -677,8 +673,6 @@ begin
         port map (
             clk                     => clk,
             reset_n                 => reset_n,
-
-            LED                     => LED,
 
             out_char                => out_char,
             out_char_en             => out_char_en,

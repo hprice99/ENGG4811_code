@@ -59,8 +59,6 @@ entity top is
            reset_n              : in STD_LOGIC;
            clk                  : in STD_LOGIC;
            
-           LED                  : out STD_LOGIC_VECTOR((FOX_NETWORK_NODES-1) downto 0);
-           
            out_char             : out t_Char;
            out_char_en          : out t_MessageValid;
            
@@ -69,16 +67,7 @@ entity top is
            out_matrix           : out t_MatrixOut;
            out_matrix_en        : out t_MessageValid;
            out_matrix_end_row   : out t_MessageValid;
-           out_matrix_end       : out t_MessageValid;
-           
-           ila_multicast_out                : out std_logic_vector((BUS_WIDTH-1) downto 0);
-           ila_multicast_out_valid          : out std_logic;
-           
-           ila_x_out            : out std_logic_vector((BUS_WIDTH-1) downto 0);
-           ila_x_out_valid      : out std_logic;
-           
-           ila_y_out            : out std_logic_vector((BUS_WIDTH-1) downto 0);
-           ila_y_out_valid      : out std_logic
+           out_matrix_end       : out t_MessageValid
     );
 end top;
 
@@ -146,8 +135,6 @@ architecture Behavioral of top is
         port (
             clk                 : in std_logic;
             reset_n             : in std_logic;
-
-            LED                 : out std_logic;
 
             out_char            : out std_logic_vector(7 downto 0);
             out_char_en         : out std_logic;
@@ -242,8 +229,6 @@ architecture Behavioral of top is
         Port (
             clk                 : in std_logic;
             reset_n             : in std_logic;
-    
-            LED                 : out std_logic;
     
             out_char            : out std_logic_vector(7 downto 0);
             out_char_en         : out std_logic;
@@ -433,15 +418,6 @@ architecture Behavioral of top is
 
 begin
 
-    ila_multicast_out       <= multicast_messages_in(0, 0);
-    ila_multicast_out_valid <= multicast_messages_in_valid(0, 0);
-    
-    ila_x_out       <= x_messages_in(1, 0);
-    ila_x_out_valid <= x_messages_in_valid(1, 0);
-    
-    ila_y_out       <= y_messages_in(1, 0);
-    ila_y_out_valid <= y_messages_in_valid(1, 0);
-
     -- Generate the network
     NETWORK_ROW_GEN: for i in 0 to (NETWORK_ROWS-1) generate
         constant prev_multicast_x   : integer := 1;
@@ -486,14 +462,8 @@ begin
                 );
 
                 -- Connect in and out messages
---                multicast_x_messages_in(curr_multicast_x, curr_multicast_y)       <= multicast_x_messages_out(prev_multicast_x, curr_multicast_y);
---                multicast_x_messages_in_valid(curr_multicast_x, curr_multicast_y) <= multicast_x_messages_out_valid(prev_multicast_x, curr_multicast_y);
-                
                 multicast_x_messages_in(curr_multicast_x, curr_multicast_y)       <= (others => '0');
                 multicast_x_messages_in_valid(curr_multicast_x, curr_multicast_y) <= '0';
-
---                multicast_y_messages_in(curr_multicast_x, curr_multicast_y)       <= multicast_y_messages_out(curr_multicast_x, prev_multicast_y);
---                multicast_y_messages_in_valid(curr_multicast_x, curr_multicast_y) <= multicast_y_messages_out_valid(curr_multicast_x, prev_multicast_y);
 
                 multicast_y_messages_in(curr_multicast_x, curr_multicast_y)       <= (others => '0');
                 multicast_y_messages_in_valid(curr_multicast_x, curr_multicast_y) <= '0';
@@ -616,8 +586,6 @@ begin
                     port map (
                         clk                 => clk,
                         reset_n             => reset_n,
-                        
-                        LED                 => LED(node_number),
     
                         out_char            => out_char(curr_x, curr_y),
                         out_char_en         => out_char_en(curr_x, curr_y),
@@ -711,8 +679,6 @@ begin
                     port map (
                         clk                 => clk,
                         reset_n             => reset_n,
-                        
-                        LED                 => LED(node_number),
     
                         out_char            => out_char(curr_x, curr_y),
                         out_char_en         => out_char_en(curr_x, curr_y),

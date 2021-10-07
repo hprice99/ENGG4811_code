@@ -80,8 +80,6 @@ void create_my_A(void) {
 
     if (MATRIX_INIT_FROM_FILE_INPUT) {
 
-        print_string("Loading A from file\n");
-
         send_burst_ready(my_x_coord, my_y_coord, A_type, ROM_X_COORD_INPUT, 
                 ROM_Y_COORD_INPUT);
 
@@ -122,8 +120,6 @@ void create_my_A(void) {
 void create_initial_stage_B(void) {
 
     if (MATRIX_INIT_FROM_FILE_INPUT) {
-
-        print_string("Loading B from file\n");
 
         send_burst_ready(my_x_coord, my_y_coord, B_type, ROM_X_COORD_INPUT, 
                 ROM_Y_COORD_INPUT);
@@ -215,36 +211,6 @@ void main() {
 
     foxStages = FOX_NETWORK_STAGES_INPUT;
 
-    #ifdef TB_PRINT
-    print_string("Node coordinates (");
-    print_hex(my_x_coord, 1);
-    print_string(", ");
-    print_hex(my_y_coord, 1);
-    print_string("), node number = ");
-    print_hex(my_node_number, 1);
-
-    print_string(", Fox stages = ");
-    print_hex(foxStages, 1);
-    print_string(", xOffset = ");
-    print_hex(xOffset, 3);
-    print_string(", yOffset = ");
-    print_hex(yOffset, 3);
-
-    print_string(", matrix size = ");
-    print_hex(MATRIX_SIZE, 1);
-    print_string(", matrix elements = ");
-    print_hex(MATRIX_ELEMENTS, 1);
-    print_string(", resultXCoord = ");
-    print_hex(resultXCoord, 1);
-    print_string(", resultYCoord = ");
-    print_hex(resultYCoord, 1);
-    print_char('\n');
-    print_char('\n');
-    #endif
-
-    int ledValue = 1;
-    long loopCount = 0;
-
     create_my_A();
     #ifdef TB_PRINT
     tb_output_matrix("A", my_A, MATRIX_SIZE, MATRIX_SIZE);
@@ -289,54 +255,4 @@ void main() {
     // Send the results to the result node
     send_C(my_x_coord, my_y_coord);
     #endif
-
-    LED_OUTPUT = ledValue;
-    int ledToggles = 0;
-
-    #ifdef RESULT
-    print_string("\nLED ");
-
-    if (ledValue == 0) {
-        
-        print_string("off, ");
-    } else if (ledValue == 1) {
-
-        print_string("on,  ");
-    }
-
-    print_string("ledToggles = ");
-    print_dec(ledToggles);
-    print_char('\n');
-    #endif
-
-    while (1) {
-
-        if (loopCount > LOOP_DELAY) {
-
-            loopCount = 0;
-            ledValue = 1 - ledValue;
-            ledToggles++;
-
-            LED_OUTPUT = ledValue;
-
-            #ifdef RESULT
-            print_string("LED ");
-
-            if (ledValue == 0) {
-                
-                print_string("off, ");
-            } else if (ledValue == 1) {
-
-                print_string("on,  ");
-            }
-
-            print_string("ledToggles = ");
-            print_dec(ledToggles);
-            print_char('\n');
-            #endif
-
-        }
-
-        loopCount++;
-    }
 }

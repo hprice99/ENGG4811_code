@@ -45,9 +45,6 @@ module system #(
     input              clk,
     input              reset_n,
 
-    // LED to indicate when all stages are complete
-    output reg         LED,
-
     // UART
     output reg[7:0]     out_char,
     output reg          out_char_en,
@@ -159,10 +156,6 @@ module system #(
         always @(posedge clk) begin
             mem_ready <= 1;
             
-            if (reset_n == 0) begin
-                LED <= 0;
-            end
-            
             x_coord_out_valid           <= 0;
             y_coord_out_valid           <= 0;
             multicast_group_out_valid   <= 0;
@@ -237,10 +230,6 @@ module system #(
                 end
                 `PACKET_COMPLETE_OUTPUT: begin
                     packet_complete_out <= 1;
-                end
-
-                `LED_OUTPUT: begin
-                    LED  <= mem_la_wdata[0];
                 end
 
                 `MESSAGE_READ_OUTPUT: begin

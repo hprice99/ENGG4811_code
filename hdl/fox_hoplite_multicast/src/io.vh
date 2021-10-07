@@ -18,8 +18,6 @@
 `define MATRIX_ELEMENT_OUTPUT      32'h2000_0090
 `define PACKET_COMPLETE_OUTPUT      32'h2000_0100
 
-// LEDs
-`define LED_OUTPUT      32'h3000_0000
 
 // Network to PE
 `define MESSAGE_VALID_INPUT      32'h4000_0000

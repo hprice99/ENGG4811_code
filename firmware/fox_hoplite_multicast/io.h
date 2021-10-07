@@ -18,8 +18,6 @@
 #define MATRIX_ELEMENT_OUTPUT      (*(volatile long*)0x20000090)
 #define PACKET_COMPLETE_OUTPUT      (*(volatile char*)0x20000100)
 
-// LEDs
-#define LED_OUTPUT      (*(volatile char*)0x30000000)
 
 // Network to PE
 #define MESSAGE_VALID_INPUT      (*(volatile char*)0x40000000)

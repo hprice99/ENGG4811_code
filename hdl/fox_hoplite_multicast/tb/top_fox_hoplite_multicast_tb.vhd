@@ -58,8 +58,6 @@ architecture Behavioral of top_tb is
             clk                 : in std_logic;
             reset_n             : in std_logic;
             
-            LED                 : out STD_LOGIC_VECTOR((FOX_NETWORK_NODES-1) downto 0);
-            
             out_char            : out t_Char;
             out_char_en         : out t_MessageValid;
             
@@ -68,16 +66,7 @@ architecture Behavioral of top_tb is
             out_matrix          : out t_MatrixOut;
             out_matrix_en       : out t_MessageValid;
             out_matrix_end_row  : out t_MessageValid;
-            out_matrix_end      : out t_MessageValid;
-            
-            ila_multicast_out                : out std_logic_vector((BUS_WIDTH-1) downto 0);
-            ila_multicast_out_valid          : out std_logic;
-            
-            ila_x_out            : out std_logic_vector((BUS_WIDTH-1) downto 0);
-            ila_x_out_valid      : out std_logic;
-           
-            ila_y_out            : out std_logic_vector((BUS_WIDTH-1) downto 0);
-            ila_y_out_valid      : out std_logic
+            out_matrix_end      : out t_MessageValid
         );
     end component top;
     
@@ -119,8 +108,6 @@ architecture Behavioral of top_tb is
     constant FOX_FIRMWARE       : string := "firmware_fox_hoplite_multicast.hex";
     constant RESULT_FIRMWARE    : string := "firmware_fox_hoplite_multicast_result.hex";
     
-    signal LED      : std_logic_vector((FOX_NETWORK_NODES-1) downto 0);
-    
     signal count    : integer;
     
     signal uart_tx  : std_logic;
@@ -142,15 +129,6 @@ architecture Behavioral of top_tb is
     signal out_matrix_en        : t_MessageValid;
     signal out_matrix_end_row   : t_MessageValid;
     signal out_matrix_end       : t_MessageValid;
-    
-    signal ila_multicast_out                : std_logic_vector((BUS_WIDTH-1) downto 0);
-    signal ila_multicast_out_valid          : std_logic;
-    
-    signal ila_x_out        : std_logic_vector((BUS_WIDTH-1) downto 0);
-    signal ila_x_out_valid  : std_logic;
-    
-    signal ila_y_out        : std_logic_vector((BUS_WIDTH-1) downto 0);
-    signal ila_y_out_valid  : std_logic;
 
 begin
 
@@ -196,8 +174,6 @@ begin
             clk                 => clk,
             reset_n             => reset_n,
             
-            LED                 => LED,
-            
             out_char            => out_char,
             out_char_en         => out_char_en,
             
@@ -206,16 +182,7 @@ begin
             out_matrix          => out_matrix,
             out_matrix_en       => out_matrix_en,
             out_matrix_end_row  => out_matrix_end_row,
-            out_matrix_end      => out_matrix_end,
-            
-            ila_multicast_out                => ila_multicast_out,
-            ila_multicast_out_valid          => ila_multicast_out_valid,
-            
-            ila_x_out           => ila_x_out,
-            ila_x_out_valid     => ila_x_out_valid,
-            
-            ila_y_out           => ila_y_out,
-            ila_y_out_valid     => ila_y_out_valid
+            out_matrix_end      => out_matrix_end
         );
 
     -- Generate prints for Fox's algorithm processing elements

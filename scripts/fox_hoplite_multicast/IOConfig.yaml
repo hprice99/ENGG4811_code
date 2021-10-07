@@ -42,11 +42,6 @@ peToNetworkIo:
     direction: output
     width: 8
 
-ledIo:
-  - name: led
-    direction: output
-    width: 8
-
 networkToPeIo:
   - name: message_valid
     direction: input
