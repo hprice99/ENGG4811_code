@@ -18,9 +18,7 @@ module system_single_core #(
 ) (
     input               clk,
     input               reset_n,
-
-    output reg          LED,
-
+    
     // UART
     output reg[7:0]     out_char,
     output reg          out_char_en,
@@ -38,7 +36,9 @@ module system_single_core #(
     output reg[31:0]    out_matrix,
     output reg          out_matrix_en,
     output reg          out_matrix_end_row,
-    output reg          out_matrix_end
+    output reg          out_matrix_end,
+    
+    output reg          matrix_multiply_done
 );
     // set this to 0 for better timing but less performance/MHz
     parameter FAST_MEMORY = 1;
@@ -78,16 +78,6 @@ module system_single_core #(
         .mem_la_wstrb(mem_la_wstrb)
     );
 
-
-   reg [15:0] led_cnt = {16{1'b0}};
-
-   always @(posedge clk)
-   begin
-      led_cnt <= led_cnt - 1'b1;
-    end
-    
-    assign led = led_cnt;
-
     wire [0:0]  trap_ila;
     
     assign trap_ila[0] = trap;
@@ -102,10 +92,6 @@ module system_single_core #(
     generate if (FAST_MEMORY) begin
         always @(posedge clk) begin
             mem_ready <= 1;
-            
-            if (reset_n == 0) begin
-                LED <= 0;
-            end
 
             message_in_read     <= 0;
 
@@ -113,6 +99,8 @@ module system_single_core #(
             out_matrix_en           <= 0;
             out_matrix_end_row      <= 0;
             out_matrix_end          <= 0;
+            
+            matrix_multiply_done    <= 0;
 
             mem_rdata <= memory[mem_la_addr >> 2];
             
@@ -131,10 +119,6 @@ module system_single_core #(
                     out_char        <= mem_la_wdata;
                 end
 
-                `LED_OUTPUT: begin
-                    LED  <= mem_la_wdata[0];
-                end
-
                 `MATRIX_INIT_READ_OUTPUT: begin
                     message_in_read <= 1;
                 end
@@ -149,6 +133,10 @@ module system_single_core #(
                 `MATRIX_OUTPUT: begin
                     out_matrix_en   <= 1;
                     out_matrix      <= mem_la_wdata;
+                end
+                
+                `MATRIX_MULTIPLY_DONE_OUTPUT: begin
+                    matrix_multiply_done    <= 1;
                 end
               endcase
             end

@@ -6,8 +6,6 @@
 `define CHAR_OUTPUT_READY_INPUT      32'h1000_0010
 
 
-// LEDs
-`define LED_OUTPUT      32'h3000_0000
 
 
 // Node details
@@ -22,6 +20,7 @@
 `define MATRIX_INIT_Y_COORD_INPUT      32'h6000_0050
 `define MATRIX_INIT_ELEMENT_INPUT      32'h6000_0060
 `define MATRIX_INIT_READ_OUTPUT      32'h6000_0070
+`define MATRIX_MULTIPLY_DONE_OUTPUT      32'h6000_0080
 
 
 `endif

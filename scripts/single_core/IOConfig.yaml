@@ -9,11 +9,6 @@ charIo:
 
 peToNetworkIo:
 
-ledIo:
-  - name: led
-    direction: output
-    width: 8
-
 networkToPeIo:
 
 nodeIo:
@@ -44,6 +39,9 @@ matrixIo:
     direction: input
     width: 32
   - name: matrix_init_read
+    direction: output
+    width: 8
+  - name: matrix_multiply_done
     direction: output
     width: 8
 

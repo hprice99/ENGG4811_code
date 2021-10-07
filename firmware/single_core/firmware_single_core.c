@@ -111,8 +111,6 @@ void createA(void) {
             }
         }
     }
-
-    print_string("A matrix loaded\n");
 }
 
 void createB(void) {
@@ -164,8 +162,6 @@ void createB(void) {
             }
         }
     }
-
-    print_string("B matrix loaded\n");
 }
 
 void createC(void) {
@@ -181,13 +177,6 @@ void createC(void) {
 }
 
 void main(void) {
-    
-    print_string("Single core ");
-    print_dec(1);
-    print_char('\n');
-
-    int ledValue = 1;
-    LED_OUTPUT = ledValue;
 
     createA();
     createB();
@@ -195,50 +184,6 @@ void main(void) {
 
     multiply_matrices(A, B, C);
 
+    MATRIX_MULTIPLY_DONE_OUTPUT = 1;
     print_matrix("C", C, MATRIX_SIZE, MATRIX_SIZE);
-
-    int loopCount = 0;
-    int ledToggles = 0;
-
-    print_string("\nLED ");
-
-    if (ledValue == 0) {
-        
-        print_string("off, ");
-    } else if (ledValue == 1) {
-
-        print_string("on,  ");
-    }
-
-    print_string("ledToggles = ");
-    print_dec(ledToggles);
-    print_char('\n');
-
-    while (1) {
-
-        if (loopCount > LOOP_DELAY) {
-
-            loopCount = 0;
-            ledValue = 1 - ledValue;
-            ledToggles++;
-
-            LED_OUTPUT = ledValue;
-
-            print_string("LED ");
-
-            if (ledValue == 0) {
-                
-                print_string("off, ");
-            } else if (ledValue == 1) {
-
-                print_string("on,  ");
-            }
-
-            print_string("ledToggles = ");
-            print_dec(ledToggles);
-            print_char('\n');
-        }
-
-        loopCount++;
-    }
 }

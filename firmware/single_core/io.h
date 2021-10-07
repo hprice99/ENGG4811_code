@@ -6,8 +6,6 @@
 #define CHAR_OUTPUT_READY_INPUT      (*(volatile char*)0x10000010)
 
 
-// LEDs
-#define LED_OUTPUT      (*(volatile char*)0x30000000)
 
 
 // Node details
@@ -22,6 +20,7 @@
 #define MATRIX_INIT_Y_COORD_INPUT      (*(volatile char*)0x60000050)
 #define MATRIX_INIT_ELEMENT_INPUT      (*(volatile long*)0x60000060)
 #define MATRIX_INIT_READ_OUTPUT      (*(volatile char*)0x60000070)
+#define MATRIX_MULTIPLY_DONE_OUTPUT      (*(volatile char*)0x60000080)
 
 
 #endif

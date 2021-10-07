@@ -50,8 +50,6 @@ architecture Behavioral of top_tb is
             clk                 : in std_logic;
             reset_n             : in std_logic;
             
-            LED                 : out STD_LOGIC;
-            
             out_char            : out std_logic_vector(7 downto 0);
             out_char_en         : out std_logic;
             
@@ -60,7 +58,9 @@ architecture Behavioral of top_tb is
             out_matrix          : out std_logic_vector(31 downto 0);
             out_matrix_en       : out std_logic;
             out_matrix_end_row  : out std_logic;
-            out_matrix_end      : out std_logic
+            out_matrix_end      : out std_logic;
+            
+            matrix_multiply_done : out std_logic
         );
     end component top_single_core;
     
@@ -95,8 +95,6 @@ architecture Behavioral of top_tb is
     
     signal reset_n      : std_logic;
     signal reset        : std_logic;
-
-    signal LED      : std_logic;
     
     signal count    : integer;
     
@@ -119,6 +117,8 @@ architecture Behavioral of top_tb is
     signal out_matrix_en        : std_logic;
     signal out_matrix_end_row   : std_logic;
     signal out_matrix_end       : std_logic;
+    
+    signal matrix_multiply_done : std_logic;
 
 begin
 
@@ -145,6 +145,19 @@ begin
             end if;
         end if;
     end process COUNTER;
+    
+    MATRIX_DONE: process (clk)
+        variable my_output_line : line;
+    begin
+        if (rising_edge(clk) and reset_n = '1') then
+            if (matrix_multiply_done = '1') then
+                write(my_output_line, string'("DONE - Cycle count = "));
+                write(my_output_line, count);
+                
+                writeline(output, my_output_line);
+            end if;
+        end if;
+    end process MATRIX_DONE;
 
     SINGLE_CORE_TOP: top_single_core
         generic map (            
@@ -158,8 +171,6 @@ begin
             clk                 => clk,
             reset_n             => reset_n,
             
-            LED                 => LED,
-            
             out_char            => out_char,
             out_char_en         => out_char_en,
             
@@ -168,7 +179,9 @@ begin
             out_matrix          => open,
             out_matrix_en       => open,
             out_matrix_end_row  => open,
-            out_matrix_end      => open
+            out_matrix_end      => open,
+            
+            matrix_multiply_done    => matrix_multiply_done
         );
  
     -- Generate prints
