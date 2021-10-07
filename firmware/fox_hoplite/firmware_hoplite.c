@@ -113,7 +113,6 @@ void create_my_A(void) {
                 int index = COORDINATE_TO_INDEX(x, y);
 
                 my_A[index] = my_node_number + 1;
-                // my_A[index] = my_node_number + x + y + 1;
             }
         }
     }
@@ -156,8 +155,6 @@ void create_initial_stage_B(void) {
                 int index = COORDINATE_TO_INDEX(x, y);
 
                 stage_B[index] = my_node_number + 1;
-                // stage_B[index] = 2 * my_node_number + 4;
-                // stage_B[index] = 2 * my_node_number + x + y + 4;
             }
         }
     }
@@ -242,9 +239,6 @@ void main() {
     print_char('\n');
     #endif
 
-    int ledValue = 1;
-    long loopCount = 0;
-
     create_my_A();
     #ifdef TB_PRINT
     tb_output_matrix("A", my_A, MATRIX_SIZE, MATRIX_SIZE);
@@ -258,13 +252,6 @@ void main() {
     #endif
 
     initialise_C();
-
-    #ifdef RESULT
-    print_string("Result node ");
-    print_dec(my_node_number);
-    print_char('\n');
-    print_char('\n');
-    #endif
 
     #ifdef TB_PRINT
     print_string("TB_PRINT defined\n");
@@ -282,59 +269,10 @@ void main() {
     // Receive results and print to UART
     assign_my_C();
     receive_result();
+    MATRIX_MULTIPLY_DONE_OUTPUT = 1;
     print_C();
     #else
     // Send the results to the result node
     send_C(my_x_coord, my_y_coord);
     #endif
-
-    LED_OUTPUT = ledValue;
-    int ledToggles = 0;
-
-    #ifdef RESULT
-    print_string("\nLED ");
-
-    if (ledValue == 0) {
-        
-        print_string("off, ");
-    } else if (ledValue == 1) {
-
-        print_string("on,  ");
-    }
-
-    print_string("ledToggles = ");
-    print_dec(ledToggles);
-    print_char('\n');
-    #endif
-
-    while (1) {
-
-        if (loopCount > LOOP_DELAY) {
-
-            loopCount = 0;
-            ledValue = 1 - ledValue;
-            ledToggles++;
-
-            LED_OUTPUT = ledValue;
-
-            #ifdef RESULT
-            print_string("LED ");
-
-            if (ledValue == 0) {
-                
-                print_string("off, ");
-            } else if (ledValue == 1) {
-
-                print_string("on,  ");
-            }
-
-            print_string("ledToggles = ");
-            print_dec(ledToggles);
-            print_char('\n');
-            #endif
-
-        }
-
-        loopCount++;
-    }
 }

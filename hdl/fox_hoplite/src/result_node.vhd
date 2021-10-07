@@ -70,8 +70,6 @@ entity result_node is
         clk                 : in std_logic;
         reset_n             : in std_logic;
 
-        LED                 : out std_logic;
-
         out_char            : out std_logic_vector(7 downto 0);
         out_char_en         : out std_logic;
 
@@ -90,7 +88,9 @@ entity result_node is
         out_matrix          : out std_logic_vector(31 downto 0);
         out_matrix_en       : out std_logic;
         out_matrix_end_row  : out std_logic;
-        out_matrix_end      : out std_logic
+        out_matrix_end      : out std_logic;
+        
+        matrix_multiply_done    : out std_logic
     );
 end result_node;
 
@@ -154,8 +154,6 @@ architecture Behavioral of result_node is
             clk                 : in std_logic;
             reset_n             : in std_logic;
 
-            LED                 : out std_logic;
-
             out_char            : out std_logic_vector(7 downto 0);
             out_char_en         : out std_logic;
             out_char_ready      : in std_logic;
@@ -173,7 +171,9 @@ architecture Behavioral of result_node is
             out_matrix          : out std_logic_vector(31 downto 0);
             out_matrix_en       : out std_logic;
             out_matrix_end_row  : out std_logic;
-            out_matrix_end      : out std_logic
+            out_matrix_end      : out std_logic;
+            
+            matrix_multiply_done    : out std_logic
         );
     end component fox_node;
     
@@ -276,9 +276,7 @@ begin
         port map (
             clk                 => clk,
             reset_n             => reset_n,
-            
-            LED                 => LED,
-    
+                
             out_char            => pe_to_uart,
             out_char_en         => pe_to_uart_valid,
             out_char_ready      => pe_to_uart_ready,
@@ -298,7 +296,9 @@ begin
             out_matrix          => out_matrix,
             out_matrix_en       => out_matrix_en,
             out_matrix_end_row  => out_matrix_end_row,
-            out_matrix_end      => out_matrix_end
+            out_matrix_end      => out_matrix_end,
+            
+            matrix_multiply_done    => matrix_multiply_done
         );
         
     ENABLE_UART_GEN: if (ENABLE_UART = True) generate

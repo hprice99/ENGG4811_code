@@ -45,9 +45,6 @@ module system #(
     input              clk,
     input              reset_n,
 
-    // LED to indicate when all stages are complete
-    output reg         LED,
-
     // UART
     output reg[7:0]     out_char,
     output reg          out_char_en,
@@ -101,6 +98,8 @@ module system #(
     output reg          out_matrix_en,
     output reg          out_matrix_end_row,
     output reg          out_matrix_end,
+    
+    output reg          matrix_multiply_done,
 
     output wire         trap
 );
@@ -159,10 +158,6 @@ module system #(
         always @(posedge clk) begin
             mem_ready <= 1;
             
-            if (reset_n == 0) begin
-                LED <= 0;
-            end
-            
             x_coord_out_valid           <= 0;
             y_coord_out_valid           <= 0;
             multicast_group_out_valid   <= 0;
@@ -180,6 +175,8 @@ module system #(
             out_matrix_en           <= 0;
             out_matrix_end_row      <= 0;
             out_matrix_end          <= 0;
+            
+            matrix_multiply_done    <= 0;
             
             mem_rdata <= memory[mem_la_addr >> 2];
             
@@ -239,10 +236,6 @@ module system #(
                     packet_complete_out <= 1;
                 end
 
-                `LED_OUTPUT: begin
-                    LED  <= mem_la_wdata[0];
-                end
-
                 `MESSAGE_READ_OUTPUT: begin
                     message_in_read <= 1;
                 end
@@ -257,6 +250,10 @@ module system #(
                 `MATRIX_OUTPUT: begin
                     out_matrix_en   <= 1;
                     out_matrix      <= mem_la_wdata;
+                end
+                
+                `MATRIX_MULTIPLY_DONE_OUTPUT: begin
+                    matrix_multiply_done    <= 1;
                 end
               endcase
             end

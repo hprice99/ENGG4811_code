@@ -57,9 +57,7 @@ entity top is
     Port ( 
            reset_n              : in STD_LOGIC;
            clk                  : in STD_LOGIC;
-           
-           LED                  : out STD_LOGIC_VECTOR((FOX_NETWORK_NODES-1) downto 0);
-           
+                      
            out_char             : out t_Char;
            out_char_en          : out t_MessageValid;
            
@@ -68,7 +66,9 @@ entity top is
            out_matrix           : out t_MatrixOut;
            out_matrix_en        : out t_MessageValid;
            out_matrix_end_row   : out t_MessageValid;
-           out_matrix_end       : out t_MessageValid
+           out_matrix_end       : out t_MessageValid;
+           
+           matrix_multiply_done : out std_logic
     );
 end top;
 
@@ -132,8 +132,6 @@ architecture Behavioral of top is
             clk                 : in std_logic;
             reset_n             : in std_logic;
 
-            LED                 : out std_logic;
-
             out_char            : out std_logic_vector(7 downto 0);
             out_char_en         : out std_logic;
             out_char_ready      : in std_logic;
@@ -151,7 +149,9 @@ architecture Behavioral of top is
             out_matrix          : out std_logic_vector(31 downto 0);
             out_matrix_en       : out std_logic;
             out_matrix_end_row  : out std_logic;
-            out_matrix_end      : out std_logic
+            out_matrix_end      : out std_logic;
+            
+            matrix_multiply_done    : out std_logic
         );
     end component fox_node;
 
@@ -217,9 +217,7 @@ architecture Behavioral of top is
         Port (
             clk                 : in std_logic;
             reset_n             : in std_logic;
-    
-            LED                 : out std_logic;
-    
+        
             out_char            : out std_logic_vector(7 downto 0);
             out_char_en         : out std_logic;
 
@@ -238,7 +236,9 @@ architecture Behavioral of top is
             out_matrix          : out std_logic_vector(31 downto 0);
             out_matrix_en       : out std_logic;
             out_matrix_end_row  : out std_logic;
-            out_matrix_end      : out std_logic
+            out_matrix_end      : out std_logic;
+            
+            matrix_multiply_done    : out std_logic
         );
     end component result_node;
 
@@ -420,8 +420,6 @@ begin
                         clk                 => clk,
                         reset_n             => reset_n,
                         
-                        LED                 => LED(node_number),
-
                         out_char            => out_char(curr_x, curr_y),
                         out_char_en         => out_char_en(curr_x, curr_y),
                         
@@ -442,7 +440,9 @@ begin
                         out_matrix          => out_matrix(curr_x, curr_y),
                         out_matrix_en       => out_matrix_en(curr_x, curr_y),
                         out_matrix_end_row  => out_matrix_end_row(curr_x, curr_y),
-                        out_matrix_end      => out_matrix_end(curr_x, curr_y)
+                        out_matrix_end      => out_matrix_end(curr_x, curr_y),
+                        
+                        matrix_multiply_done    => matrix_multiply_done
                     );
                 end generate RESULT_GEN;
                 
@@ -505,8 +505,6 @@ begin
                         clk                 => clk,
                         reset_n             => reset_n,
                         
-                        LED                 => LED(node_number),
-
                         out_char            => out_char(curr_x, curr_y),
                         out_char_en         => out_char_en(curr_x, curr_y),
                         out_char_ready      => '1',
@@ -526,7 +524,9 @@ begin
                         out_matrix          => out_matrix(curr_x, curr_y),
                         out_matrix_en       => out_matrix_en(curr_x, curr_y),
                         out_matrix_end_row  => out_matrix_end_row(curr_x, curr_y),
-                        out_matrix_end      => out_matrix_end(curr_x, curr_y)
+                        out_matrix_end      => out_matrix_end(curr_x, curr_y),
+                        
+                        matrix_multiply_done    => open
                     );
                 end generate FOX_GEN;
             end generate FOX_NETWORK_GEN;

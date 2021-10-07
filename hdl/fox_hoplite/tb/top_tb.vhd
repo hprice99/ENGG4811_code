@@ -57,8 +57,6 @@ architecture Behavioral of top_tb is
             clk                 : in std_logic;
             reset_n             : in std_logic;
             
-            LED                 : out STD_LOGIC_VECTOR((FOX_NETWORK_NODES-1) downto 0);
-            
             out_char            : out t_Char;
             out_char_en         : out t_MessageValid;
             
@@ -67,7 +65,9 @@ architecture Behavioral of top_tb is
             out_matrix          : out t_MatrixOut;
             out_matrix_en       : out t_MessageValid;
             out_matrix_end_row  : out t_MessageValid;
-            out_matrix_end      : out t_MessageValid
+            out_matrix_end      : out t_MessageValid;
+            
+            matrix_multiply_done    : out std_logic
         );
     end component top;
     
@@ -108,9 +108,7 @@ architecture Behavioral of top_tb is
     
 --    constant FOX_FIRMWARE       : string := "firmware_hoplite.hex";
 --    constant RESULT_FIRMWARE    : string := "firmware_hoplite_result.hex";
-    
-    signal LED      : std_logic_vector((FOX_NETWORK_NODES-1) downto 0);
-    
+        
     signal count    : integer;
     
     signal uart_tx  : std_logic;
@@ -132,6 +130,8 @@ architecture Behavioral of top_tb is
     signal out_matrix_en        : t_MessageValid;
     signal out_matrix_end_row   : t_MessageValid;
     signal out_matrix_end       : t_MessageValid;
+    
+    signal matrix_multiply_done : std_logic;
 
 begin
 
@@ -159,6 +159,19 @@ begin
         end if;
     end process COUNTER;
 
+    MATRIX_DONE: process (clk)
+        variable my_output_line : line;
+    begin
+        if (rising_edge(clk) and reset_n = '1') then
+            if (matrix_multiply_done = '1') then
+                write(my_output_line, string'("DONE - Cycle count = "));
+                write(my_output_line, count);
+                
+                writeline(output, my_output_line);
+            end if;
+        end if;
+    end process MATRIX_DONE;
+
     FOX_TOP: top
         generic map (
             FOX_NETWORK_STAGES  => FOX_NETWORK_STAGES,
@@ -176,9 +189,7 @@ begin
         port map (
             clk                 => clk,
             reset_n             => reset_n,
-            
-            LED                 => LED,
-            
+
             out_char            => out_char,
             out_char_en         => out_char_en,
             
@@ -187,40 +198,11 @@ begin
             out_matrix          => out_matrix,
             out_matrix_en       => out_matrix_en,
             out_matrix_end_row  => out_matrix_end_row,
-            out_matrix_end      => out_matrix_end
+            out_matrix_end      => out_matrix_end,
+            
+            matrix_multiply_done    => matrix_multiply_done
         );
         
---    RX_BUFFER: process (clk)
---    begin
---        if (rising_edge(clk)) then
---            uart_rx <= uart_tx;
---        end if;
---    end process RX_BUFFER;
-    
---    UART_RECEIVER: UART
---            generic map (
---                CLK_FREQ      => CLK_FREQ,
---                BAUD_RATE     => BAUD_RATE,
---                PARITY_BIT    => PARITY_BIT,
---                USE_DEBOUNCER => USE_DEBOUNCER
---            )
---            port map (
---                -- CLOCK AND RESET
---                CLK          => clk,
---                RST          => reset,
-
---                UART_TXD     => uart_tx,
---                UART_RXD     => uart_rx,
-                
---                DIN          => (others => '1'), 
---                DIN_VLD      => '0', 
---                DIN_RDY      => open,
-
---                DOUT         => uart_rx_char,
---                DOUT_VLD     => uart_rx_char_valid, 
---                FRAME_ERROR  => open, 
---                PARITY_ERROR => open
---            );
 
     -- Generate prints for Fox's algorithm processing elements
     PRINT_OUTPUT_ROW_GEN: for i in 0 to (FOX_NETWORK_STAGES-1) generate

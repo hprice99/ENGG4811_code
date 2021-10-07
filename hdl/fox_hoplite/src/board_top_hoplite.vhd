@@ -42,7 +42,6 @@ entity board_top is
     Port ( 
            CPU_RESETN   : in STD_LOGIC;
            clk          : in STD_LOGIC;
-           LED          : out STD_LOGIC_VECTOR(3 downto 0);
            UART_RXD_OUT : out std_logic
     );
 end board_top;
@@ -67,9 +66,7 @@ architecture Behavioral of board_top is
         port (
             clk                 : in std_logic;
             reset_n             : in std_logic;
-            
-            LED                 : out STD_LOGIC_VECTOR((FOX_NETWORK_NODES-1) downto 0);
-            
+                        
             out_char            : out t_Char;
             out_char_en         : out t_MessageValid;
             
@@ -78,7 +75,9 @@ architecture Behavioral of board_top is
             out_matrix          : out t_MatrixOut;
             out_matrix_en       : out t_MessageValid;
             out_matrix_end_row  : out t_MessageValid;
-            out_matrix_end      : out t_MessageValid
+            out_matrix_end      : out t_MessageValid;
+            
+            matrix_multiply_done    : out std_logic
         );
     end component top;
     
@@ -133,9 +132,7 @@ begin
         port map (
             clk                 => clkdiv2,
             reset_n             => reset_n,
-            
-            LED                 => LED,
-            
+                        
             out_char            => open,
             out_char_en         => open,
             
@@ -144,7 +141,9 @@ begin
             out_matrix          => open,
             out_matrix_en       => open,
             out_matrix_end_row  => open,
-            out_matrix_end      => open
+            out_matrix_end      => open,
+            
+            matrix_multiply_done    => open
         );
 
 end Behavioral;

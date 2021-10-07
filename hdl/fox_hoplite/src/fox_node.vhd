@@ -92,8 +92,6 @@ entity fox_node is
         clk                 : in std_logic;
         reset_n             : in std_logic;
 
-        LED                 : out std_logic;
-
         out_char            : out std_logic_vector(7 downto 0);
         out_char_en         : out std_logic;
         out_char_ready      : in std_logic;
@@ -111,7 +109,9 @@ entity fox_node is
         out_matrix          : out std_logic_vector(31 downto 0);
         out_matrix_en       : out std_logic;
         out_matrix_end_row  : out std_logic;
-        out_matrix_end      : out std_logic
+        out_matrix_end      : out std_logic;
+        
+        matrix_multiply_done    : out std_logic
     );
 end fox_node;
 
@@ -308,9 +308,7 @@ architecture Behavioral of fox_node is
         port (
             clk                     : in std_logic;
             reset_n                 : in std_logic;
-            
-            LED                     : out std_logic;
-            
+                        
             out_char                : out std_logic_vector(7 downto 0);
             out_char_en             : out std_logic;
             out_char_ready          : in std_logic;
@@ -361,6 +359,8 @@ architecture Behavioral of fox_node is
             out_matrix_en       : out std_logic;
             out_matrix_end_row  : out std_logic;
             out_matrix_end      : out std_logic;
+            
+            matrix_multiply_done    : out std_logic;
             
             trap                    : out std_logic
         );
@@ -623,8 +623,6 @@ begin
             clk                     => clk,
             reset_n                 => reset_n,
 
-            LED                     => LED,
-
             out_char                => out_char,
             out_char_en             => out_char_en,
             out_char_ready          => out_char_ready,
@@ -676,6 +674,8 @@ begin
             out_matrix_en           => out_matrix_en,
             out_matrix_end_row      => out_matrix_end_row,
             out_matrix_end          => out_matrix_end,
+            
+            matrix_multiply_done    => matrix_multiply_done,
             
             trap                    => open
         );

@@ -42,11 +42,6 @@ peToNetworkIo:
     direction: output
     width: 8
 
-ledIo:
-  - name: led
-    direction: output
-    width: 8
-
 networkToPeIo:
   - name: message_valid
     direction: input
@@ -112,6 +107,9 @@ matrixIo:
   - name: fox_matrix_size
     direction: input
     width: 32
+  - name: matrix_multiply_done
+    direction: output
+    width: 8
 
 networkIo:
   - name: fox_network_stages
