@@ -99,6 +99,8 @@ module system #(
     output reg          out_matrix_end_row,
     output reg          out_matrix_end,
 
+    output reg          matrix_multiply_done,
+
     output wire         trap
 );
     // Import memory-mapped IO addresses
@@ -173,6 +175,8 @@ module system #(
             out_matrix_en           <= 0;
             out_matrix_end_row      <= 0;
             out_matrix_end          <= 0;
+
+            matrix_multiply_done    <= 0;
             
             mem_rdata <= memory[mem_la_addr >> 2];
             
@@ -246,6 +250,9 @@ module system #(
                 `MATRIX_OUTPUT: begin
                     out_matrix_en   <= 1;
                     out_matrix      <= mem_la_wdata;
+                end
+                `MATRIX_MULTIPLY_DONE_OUTPUT: begin
+                    matrix_multiply_done <= 1;
                 end
               endcase
             end

@@ -76,7 +76,9 @@ architecture Behavioral of board_top is
             out_matrix          : out t_MatrixOut;
             out_matrix_en       : out t_MessageValid;
             out_matrix_end_row  : out t_MessageValid;
-            out_matrix_end      : out t_MessageValid
+            out_matrix_end      : out t_MessageValid;
+
+            matrix_multiply_done    : out std_logic
         );
     end component top;
     
@@ -140,7 +142,9 @@ begin
             out_matrix          => open,
             out_matrix_en       => open,
             out_matrix_end_row  => open,
-            out_matrix_end      => open
+            out_matrix_end      => open,
+
+            matrix_multiply_done    => open
         );
     
 end Behavioral;

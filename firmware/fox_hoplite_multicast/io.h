@@ -44,6 +44,7 @@
 #define MATRIX_END_ROW_OUTPUT      (*(volatile char*)0x60000010)
 #define MATRIX_END_OUTPUT      (*(volatile char*)0x60000020)
 #define FOX_MATRIX_SIZE_INPUT      (*(volatile long*)0x60000030)
+#define MATRIX_MULTIPLY_DONE_OUTPUT      (*(volatile char*)0x60000040)
 
 // Network details
 #define FOX_NETWORK_STAGES_INPUT      (*(volatile char*)0x70000000)

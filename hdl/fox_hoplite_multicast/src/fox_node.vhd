@@ -119,7 +119,9 @@ entity fox_node is
         out_matrix          : out std_logic_vector(31 downto 0);
         out_matrix_en       : out std_logic;
         out_matrix_end_row  : out std_logic;
-        out_matrix_end      : out std_logic
+        out_matrix_end      : out std_logic;
+
+        matrix_multiply_done    : out std_logic
     );
 end fox_node;
 
@@ -393,6 +395,8 @@ architecture Behavioral of fox_node is
             out_matrix_en       : out std_logic;
             out_matrix_end_row  : out std_logic;
             out_matrix_end      : out std_logic;
+
+            matrix_multiply_done    : out std_logic;
             
             trap                    : out std_logic
         );
@@ -725,6 +729,8 @@ begin
             out_matrix_en           => out_matrix_en,
             out_matrix_end_row      => out_matrix_end_row,
             out_matrix_end          => out_matrix_end,
+
+            matrix_multiply_done    => matrix_multiply_done,
             
             trap                    => open
         );

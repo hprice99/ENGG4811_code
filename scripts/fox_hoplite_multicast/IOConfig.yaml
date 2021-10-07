@@ -107,6 +107,9 @@ matrixIo:
   - name: fox_matrix_size
     direction: input
     width: 32
+  - name: matrix_multiply_done
+    direction: output
+    width: 8
 
 networkIo:
   - name: fox_network_stages

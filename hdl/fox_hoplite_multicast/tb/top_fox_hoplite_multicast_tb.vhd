@@ -66,7 +66,9 @@ architecture Behavioral of top_tb is
             out_matrix          : out t_MatrixOut;
             out_matrix_en       : out t_MessageValid;
             out_matrix_end_row  : out t_MessageValid;
-            out_matrix_end      : out t_MessageValid
+            out_matrix_end      : out t_MessageValid;
+            
+            matrix_multiply_done    : out std_logic
         );
     end component top;
     
@@ -130,6 +132,8 @@ architecture Behavioral of top_tb is
     signal out_matrix_end_row   : t_MessageValid;
     signal out_matrix_end       : t_MessageValid;
 
+    signal matrix_multiply_done : std_logic;
+
 begin
 
     -- Generate clk and reset_n
@@ -155,6 +159,19 @@ begin
             end if;
         end if;
     end process COUNTER;
+    
+    MATRIX_DONE: process (clk)
+        variable my_output_line : line;
+    begin
+        if (rising_edge(clk) and reset_n = '1') then
+            if (matrix_multiply_done = '1') then
+                write(my_output_line, string'("DONE - Cycle count = "));
+                write(my_output_line, count);
+                
+                writeline(output, my_output_line);
+            end if;
+        end if;
+    end process MATRIX_DONE;
 
     FOX_TOP: top
         generic map (
@@ -182,7 +199,9 @@ begin
             out_matrix          => out_matrix,
             out_matrix_en       => out_matrix_en,
             out_matrix_end_row  => out_matrix_end_row,
-            out_matrix_end      => out_matrix_end
+            out_matrix_end      => out_matrix_end,
+            
+            matrix_multiply_done    => matrix_multiply_done
         );
 
     -- Generate prints for Fox's algorithm processing elements
