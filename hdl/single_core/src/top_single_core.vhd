@@ -305,7 +305,7 @@ begin
                 if (reset_n = '0') then
                     rom_read_addr   <= 0;
                 else
-                    if (message_in_read = '1' and rom_read_addr < MATRIX_FILE_LENGTH) then
+                    if (message_in_read = '1' and rom_read_addr < MATRIX_FILE_LENGTH-1) then
                         rom_read_addr   <= rom_read_addr + 1;
                     end if;
                 end if;
