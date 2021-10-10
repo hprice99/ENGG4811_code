@@ -34,6 +34,10 @@ use xil_defaultlib.fox_defs.all;
 use xil_defaultlib.packet_defs.all;
 use xil_defaultlib.firmware_config.all;
 
+use std.env.finish;
+use std.env.stop;
+
+
 entity top_tb is
 end top_tb;
 
@@ -169,6 +173,7 @@ begin
                 write(my_output_line, count);
                 
                 writeline(output, my_output_line);
+                stop;
             end if;
         end if;
     end process MATRIX_DONE;
