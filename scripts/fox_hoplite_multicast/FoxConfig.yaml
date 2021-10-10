@@ -6,7 +6,7 @@ foxNetworkStages: 2
 
 foxNodeFifos:
   peToNetwork: 8
-  networkToPe: 1024
+#  networkToPe: 1024
 
 resultNodeCoord:
   x: 0
@@ -14,7 +14,7 @@ resultNodeCoord:
 
 resultNodeFifos:
   peToNetwork: 8
-  networkToPe: 1024
+#  networkToPe: 1024
 
 resultUartFifoDepth: 1024
 
