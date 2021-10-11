@@ -5,10 +5,10 @@ use IEEE.NUMERIC_STD.ALL;
 package firmware_config is 
 
     constant FOX_FIRMWARE       : string := "firmware_fox_hoplite_multicast.hex";
-    constant FOX_MEM_SIZE       : integer := 2048;
+    constant FOX_MEM_SIZE       : integer := 32678;
 
     constant RESULT_FIRMWARE    : string := "firmware_fox_hoplite_multicast_result.hex";
-    constant RESULT_MEM_SIZE    : integer := 2048;
+    constant RESULT_MEM_SIZE    : integer := 32678;
 
 end package firmware_config;
 
