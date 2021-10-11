@@ -83,6 +83,8 @@ void create_my_A(void) {
         send_burst_ready(my_x_coord, my_y_coord, A_type, ROM_X_COORD_INPUT, 
                 ROM_Y_COORD_INPUT);
 
+        print_string("Loading A from file\n");
+
         int aElementsReceived = 0;
         struct MatrixPacket packet;
         enum FoxError foxError = FOX_NETWORK_ERROR;
@@ -122,6 +124,8 @@ void create_initial_stage_B(void) {
 
         send_burst_ready(my_x_coord, my_y_coord, B_type, ROM_X_COORD_INPUT, 
                 ROM_Y_COORD_INPUT);
+
+        print_string("Loading B from file\n");
 
         int bElementsReceived = 0;
         struct MatrixPacket packet;

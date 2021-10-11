@@ -1,8 +1,8 @@
 ---
 foxFirmware:
   name: firmware_hoplite
-  memory_size: 8192
+  memory_size: 2048
 
 resultFirmware:
   name: firmware_hoplite_result
-  memory_size: 16384
+  memory_size: 3072

@@ -76,8 +76,8 @@ class FoxConfig:
             if 'networkToPe' in foxConfig['foxNodeFifos']:
                 self.foxNodeFifos['networkToPe'] = foxConfig['foxNodeFifos']['networkToPe']
 
-        self.resultNodeFifos = {'peToNetwork' : 2 * totalMatrixElements,
-                                'networkToPe' : 2 * totalMatrixElements}
+        self.resultNodeFifos = {'peToNetwork' : totalMatrixElements,
+                                'networkToPe' : totalMatrixElements}
 
         if 'resultNodeFifos' in foxConfig:
             if 'peToNetwork' in foxConfig['resultNodeFifos']:
