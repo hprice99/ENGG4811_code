@@ -1,4 +1,4 @@
 ---
 foxFirmware:
   name: firmware_single_core
-  memory_size: 4096
+  memory_size: 2048

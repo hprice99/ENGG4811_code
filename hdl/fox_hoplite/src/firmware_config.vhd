@@ -8,7 +8,7 @@ package firmware_config is
     constant FOX_MEM_SIZE       : integer := 2048;
 
     constant RESULT_FIRMWARE    : string := "firmware_hoplite_result.hex";
-    constant RESULT_MEM_SIZE    : integer := 3072;
+    constant RESULT_MEM_SIZE    : integer := 2048;
 
 end package firmware_config;
 

@@ -5,7 +5,7 @@ networkCols: 2
 foxNetworkStages: 2
 
 foxNodeFifos:
-  peToNetwork: 8
+  peToNetwork: 4
 #  networkToPe: 1024
 
 resultNodeCoord:
@@ -13,7 +13,7 @@ resultNodeCoord:
   y: 0
 
 resultNodeFifos:
-  peToNetwork: 8
+  peToNetwork: 4
 #  networkToPe: 1024
 
 romNodeCoord:

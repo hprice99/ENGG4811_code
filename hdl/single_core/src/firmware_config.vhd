@@ -5,7 +5,7 @@ use IEEE.NUMERIC_STD.ALL;
 package firmware_config is 
 
     constant FOX_FIRMWARE       : string := "firmware_single_core.hex";
-    constant FOX_MEM_SIZE       : integer := 4096;
+    constant FOX_MEM_SIZE       : integer := 2048;
 
 
 end package firmware_config;
