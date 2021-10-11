@@ -28,10 +28,10 @@ package fox_defs is
 
     -- NIC parameters
     constant FOX_PE_TO_NETWORK_FIFO_DEPTH   : integer := 8;
-    constant FOX_NETWORK_TO_PE_FIFO_DEPTH   : integer := 2592;
+    constant FOX_NETWORK_TO_PE_FIFO_DEPTH   : integer := 3200;
 
     constant RESULT_PE_TO_NETWORK_FIFO_DEPTH    : integer := 8;
-    constant RESULT_NETWORK_TO_PE_FIFO_DEPTH    : integer := 10368;
+    constant RESULT_NETWORK_TO_PE_FIFO_DEPTH    : integer := 12800;
 
     constant RESULT_UART_FIFO_DEPTH : integer := 1024;
 

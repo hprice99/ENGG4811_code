@@ -8,7 +8,7 @@ scriptLocation = os.path.realpath(__file__)
 scriptDirectory = os.path.dirname(scriptLocation)
 
 # Matrix configuration
-matrixSize = 72
+matrixSize = 80
 matrixFileName = "matrices.npz"
 
 def generate_matrices():
