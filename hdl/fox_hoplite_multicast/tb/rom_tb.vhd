@@ -1,23 +1,3 @@
-----------------------------------------------------------------------------------
--- Company: 
--- Engineer: 
--- 
--- Create Date: 09/14/2021 02:12:57 PM
--- Design Name: 
--- Module Name: rom_tb - Behavioral
--- Project Name: 
--- Target Devices: 
--- Tool Versions: 
--- Description: 
--- 
--- Dependencies: 
--- 
--- Revision:
--- Revision 0.01 - File Created
--- Additional Comments:
--- 
-----------------------------------------------------------------------------------
-
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use ieee.numeric_std.all;
@@ -36,7 +16,6 @@ use std.env.finish;
 use std.env.stop;
 
 entity rom_tb is
---  Port ( );
 end rom_tb;
 
 architecture Behavioral of rom_tb is
@@ -145,9 +124,9 @@ begin
     CLK_PROCESS: process
     begin
         clk <= '0';
-        wait for clk_period/2;  --for 0.5 ns signal is '0'.
+        wait for clk_period/2;
         clk <= '1';
-        wait for clk_period/2;  --for next 0.5 ns signal is '1'.
+        wait for clk_period/2;
     end process CLK_PROCESS;
 
     decoder_packet_in       <= read_data;
