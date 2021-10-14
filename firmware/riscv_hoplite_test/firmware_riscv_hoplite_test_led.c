@@ -7,7 +7,6 @@
 
 #define LOOP_DELAY 1000000000
 #define NUM_DELAYS 50000
-// #define LOOP_DELAY 2
 #define LED_COUNT 4
 
 int ledValues[LED_COUNT] = {0, 0, 0, 0};

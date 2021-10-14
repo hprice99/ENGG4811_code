@@ -1,24 +1,3 @@
-----------------------------------------------------------------------------------
--- Company: 
--- Engineer: 
--- 
--- Create Date: 08/11/2021 06:40:24 PM
--- Design Name: 
--- Module Name: fifo_sync_memory_initialise_tb - Behavioral
--- Project Name: 
--- Target Devices: 
--- Tool Versions: 
--- Description: 
--- 
--- Dependencies: 
--- 
--- Revision:
--- Revision 0.01 - File Created
--- Additional Comments:
--- 
-----------------------------------------------------------------------------------
-
-
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 
@@ -34,7 +13,7 @@ use std.env.finish;
 use std.env.stop;
 
 entity fifo_sync_memory_initialise_tb is
---  Port ( );
+
 end fifo_sync_memory_initialise_tb;
 
 architecture Behavioral of fifo_sync_memory_initialise_tb is
@@ -148,9 +127,9 @@ begin
     CLK_PROCESS: process
     begin
         clk <= '0';
-        wait for clk_period/2;  --for 0.5 ns signal is '0'.
+        wait for clk_period/2;
         clk <= '1';
-        wait for clk_period/2;  --for next 0.5 ns signal is '1'.
+        wait for clk_period/2;
     end process CLK_PROCESS;
 
     write_en    <= '0';
