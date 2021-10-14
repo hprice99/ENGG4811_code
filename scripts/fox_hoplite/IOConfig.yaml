@@ -1,0 +1,131 @@
+---
+charIo:
+  - name: char
+    direction: output
+    width: 8
+  - name: char_output_ready
+    direction: input
+    width: 8
+
+peToNetworkIo:
+  - name: message_out_ready
+    direction: input
+    width: 8
+  - name: x_coord
+    direction: output
+    width: 8
+  - name: y_coord
+    direction: output
+    width: 8
+  - name: multicast_group
+    direction: output
+    width: 8
+  - name: done_flag
+    direction: output
+    width: 8
+  - name: result_flag
+    direction: output
+    width: 8
+  - name: matrix_type
+    direction: output
+    width: 8
+  - name: matrix_x_coord
+    direction: output
+    width: 8
+  - name: matrix_y_coord
+    direction: output
+    width: 8
+  - name: matrix_element
+    direction: output
+    width: 32
+  - name: packet_complete
+    direction: output
+    width: 8
+
+ledIo:
+  - name: led
+    direction: output
+    width: 8
+
+networkToPeIo:
+  - name: message_valid
+    direction: input
+    width: 8
+  - name: message_in_available
+    direction: input
+    width: 8
+  - name: multicast_group
+    direction: input
+    width: 8
+  - name: done_flag
+    direction: input
+    width: 8
+  - name: result_flag
+    direction: input
+    width: 8
+  - name: matrix_type
+    direction: input
+    width: 8
+  - name: matrix_x_coord
+    direction: input
+    width: 8
+  - name: matrix_y_coord
+    direction: input
+    width: 8
+  - name: matrix_element
+    direction: input
+    width: 32
+  - name: message_read
+    direction: output
+    width: 8
+
+nodeIo:
+  - name: x_coord
+    direction: input
+    width: 8
+  - name: y_coord
+    direction: input
+    width: 8
+  - name: node_number
+    direction: input
+    width: 8
+  - name: matrix_x_offset
+    direction: input
+    width: 8
+  - name: matrix_y_offset
+    direction: input
+    width: 8
+  - name: matrix_init_from_file
+    direction: input
+    width: 8
+
+matrixIo:
+  - name: matrix
+    direction: output
+    width: 32
+  - name: matrix_end_row
+    direction: output
+    width: 8
+  - name: matrix_end
+    direction: output
+    width: 8
+  - name: fox_matrix_size
+    direction: input
+    width: 32
+
+networkIo:
+  - name: fox_network_stages
+    direction: input
+    width: 8
+  - name: result_x_coord
+    direction: input
+    width: 8
+  - name: result_y_coord
+    direction: input
+    width: 8
+  - name: rom_x_coord
+    direction: input
+    width: 8
+  - name: rom_y_coord
+    direction: input
+    width: 8
