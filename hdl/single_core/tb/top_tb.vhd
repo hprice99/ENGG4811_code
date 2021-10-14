@@ -1,29 +1,5 @@
-----------------------------------------------------------------------------------
--- Company: 
--- Engineer: 
--- 
--- Create Date: 07/05/2021 09:08:38 PM
--- Design Name: 
--- Module Name: top_tb - Behavioral
--- Project Name: 
--- Target Devices: 
--- Tool Versions: 
--- Description: 
--- 
--- Dependencies: 
--- 
--- Revision:
--- Revision 0.01 - File Created
--- Additional Comments:
--- 
-----------------------------------------------------------------------------------
-
-
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
-
--- Uncomment the following library declaration if using
--- arithmetic functions with Signed or Unsigned values
 use IEEE.NUMERIC_STD.ALL;
 
 use STD.textio.all;
@@ -66,27 +42,24 @@ architecture Behavioral of top_tb is
     
     component UART is
         Generic (
-            CLK_FREQ      : integer := 50e6;   -- system clock frequency in Hz
-            BAUD_RATE     : integer := 115200; -- baud rate value
-            PARITY_BIT    : string  := "none"; -- type of parity: "none", "even", "odd", "mark", "space"
-            USE_DEBOUNCER : boolean := True    -- enable/disable debouncer
+            CLK_FREQ      : integer := 50e6; 
+            BAUD_RATE     : integer := 115200;
+            PARITY_BIT    : string  := "none";
+            USE_DEBOUNCER : boolean := True
         );
         Port (
             -- CLOCK AND RESET
-            CLK          : in  std_logic; -- system clock
-            RST          : in  std_logic; -- high active synchronous reset
-            -- UART INTERFACE
-            UART_TXD     : out std_logic; -- serial transmit data
-            UART_RXD     : in  std_logic; -- serial receive data
-            -- USER DATA INPUT INTERFACE
-            DIN          : in  std_logic_vector(7 downto 0); -- input data to be transmitted over UART
-            DIN_VLD      : in  std_logic; -- when DIN_VLD = 1, input data (DIN) are valid
-            DIN_RDY      : out std_logic; -- when DIN_RDY = 1, transmitter is ready and valid input data will be accepted for transmiting
-            -- USER DATA OUTPUT INTERFACE
-            DOUT         : out std_logic_vector(7 downto 0); -- output data received via UART
-            DOUT_VLD     : out std_logic; -- when DOUT_VLD = 1, output data (DOUT) are valid (is assert only for one clock cycle)
-            FRAME_ERROR  : out std_logic; -- when FRAME_ERROR = 1, stop bit was invalid (is assert only for one clock cycle)
-            PARITY_ERROR : out std_logic  -- when PARITY_ERROR = 1, parity bit was invalid (is assert only for one clock cycle)
+            CLK          : in  std_logic;
+            RST          : in  std_logic;
+            UART_TXD     : out std_logic;
+            UART_RXD     : in  std_logic;
+            DIN          : in  std_logic_vector(7 downto 0);
+            DIN_VLD      : in  std_logic;
+            DIN_RDY      : out std_logic;
+            DOUT         : out std_logic_vector(7 downto 0);
+            DOUT_VLD     : out std_logic;
+            FRAME_ERROR  : out std_logic;
+            PARITY_ERROR : out std_logic
         );
     end component UART;
     
