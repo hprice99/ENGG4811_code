@@ -1,14 +1,8 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
-
--- Uncomment the following library declaration if using
--- arithmetic functions with Signed or Unsigned values
 use IEEE.NUMERIC_STD.ALL;
-
--- Random stimulus
 use ieee.math_real.all;
 
--- Package Declaration Section
 package random is 
 
     function rand_slv (len, seed : in integer)
@@ -21,8 +15,7 @@ package random is
         return std_logic;
        
 end package random;
- 
--- Package Body Section
+
 package body random is
  
     function rand_slv (len, seed : integer) return std_logic_vector is
@@ -31,12 +24,12 @@ package body random is
       variable seed1 : integer;
       variable seed2 : integer;
     begin
-        seed1 := seed;      
+        seed1 := seed;
         seed2 := 2*seed;
 
         for i in 0 to seed2 loop
             uniform(seed1, seed2, r);
-        end loop;   
+        end loop;
 
         for i in slv'range loop
             uniform(seed1, seed2, r);
@@ -57,12 +50,12 @@ package body random is
       variable seed1 : integer;
       variable seed2 : integer;
     begin
-        seed1 := seed;      
+        seed1 := seed;
         seed2 := 2*seed;
 
         for i in 0 to seed2 loop
             uniform(seed1, seed2, r);
-        end loop;   
+        end loop;
 
         for i in slv'range loop
             uniform(seed1, seed2, r);
@@ -84,7 +77,7 @@ package body random is
       variable seed1 : integer;
       variable seed2 : integer;
     begin
-        seed1 := seed;      
+        seed1 := seed;
         seed2 := 2*seed;
 
         for i in 0 to seed2 loop

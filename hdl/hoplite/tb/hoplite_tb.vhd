@@ -1,29 +1,5 @@
-----------------------------------------------------------------------------------
--- Company: 
--- Engineer: 
--- 
--- Create Date: 05/01/2021 07:39:41 PM
--- Design Name: 
--- Module Name: hoplite_tb - Behavioral
--- Project Name: 
--- Target Devices: 
--- Tool Versions: 
--- Description: 
--- 
--- Dependencies: 
--- 
--- Revision:
--- Revision 0.01 - File Created
--- Additional Comments:
--- 
-----------------------------------------------------------------------------------
-
-
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
-
--- Uncomment the following library declaration if using
--- arithmetic functions with Signed or Unsigned values
 use IEEE.NUMERIC_STD.ALL;
 use IEEE.math_real.all;
 
@@ -151,9 +127,9 @@ begin
     CLK_PROCESS: process
     begin
         clk <= '0';
-        wait for clk_period/2;  --for 0.5 ns signal is '0'.
+        wait for clk_period/2;
         clk <= '1';
-        wait for clk_period/2;  --for next 0.5 ns signal is '1'.
+        wait for clk_period/2;
     end process CLK_PROCESS;
     
     COUNTER: process(clk)
@@ -166,7 +142,7 @@ begin
                 count   <= count + 1;
                 
                 write(my_line, string'(CR & LF & "Cycle "));
-                write(my_line, count);           
+                write(my_line, count);
                 writeline(output, my_line);
                 
                 if (count = MAX_COUNT) then
@@ -282,7 +258,6 @@ begin
                         row_broadcasts_sent(curr_x, curr_y)(next_x, curr_y) <= row_broadcasts_sent(curr_x, curr_y)(next_x, curr_y) + 1;
                     
                     -- Send messages down each column
-                    -- TODO Update method for checking if all broadcast messages have been sent
                     elsif (row_broadcasts_received(0, 0)(1, 0) = MESSAGE_BURST
                             and column_messages_sent(curr_x, curr_y)(curr_x, next_y) < MESSAGE_BURST
                             and curr_y = TEST_SRC_ROW) then
@@ -372,9 +347,6 @@ begin
                     begin
                         if (rising_edge(clk)) then
                             if (reset_n = '0') then 
---                                row_broadcasts_sent(src_x, src_y)(dest_x, dest_y)   <= 0;
---                                column_messages_sent(src_x, src_y)(dest_x, dest_y)  <= 0;
-                                                          
                                 row_broadcasts_received(src_x, src_y)(dest_x, dest_y)   <= 0;
                                 column_messages_received(src_x, src_y)(dest_x, dest_y)  <= 0;
                             elsif (messages_received(dest_x, dest_y) = '1') then

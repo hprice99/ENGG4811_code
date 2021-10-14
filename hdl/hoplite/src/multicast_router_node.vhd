@@ -1,24 +1,3 @@
-----------------------------------------------------------------------------------
--- Company: 
--- Engineer: 
--- 
--- Create Date: 09/03/2021 04:02:02 PM
--- Design Name: 
--- Module Name: multicast_router_node - Behavioral
--- Project Name: 
--- Target Devices: 
--- Tool Versions: 
--- Description: 
--- 
--- Dependencies: 
--- 
--- Revision:
--- Revision 0.01 - File Created
--- Additional Comments:
--- 
-----------------------------------------------------------------------------------
-
-
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
@@ -27,7 +6,6 @@ library xil_defaultlib;
 use xil_defaultlib.multicast_defs.all;
 use xil_defaultlib.math_functions.all;
 
--- TODO Change multicast_in and multicast_out to buffer and network_to_pe
 entity multicast_router_node is
     Generic (
         BUS_WIDTH               : integer := 32;
@@ -250,13 +228,6 @@ begin
             end if;
         end if;
     end process ARBITRATOR;
-    
-    -- Select active multicast buffer data
---    ACTIVE_SELECT: process (source_select, multicast_ready, buffer_fifo_empty)
---    begin
---        active_multicast_in         <= buffer_fifo_read_data(source_select-1);
---        active_multicast_in_valid   <= multicast_ready and not buffer_fifo_empty(source_select-1);
---    end process ACTIVE_SELECT;
 
     ACTIVE_SELECT: process (source_select, buffer_fifo_read_en)
     begin

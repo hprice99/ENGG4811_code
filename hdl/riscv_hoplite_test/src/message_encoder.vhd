@@ -1,35 +1,5 @@
-----------------------------------------------------------------------------------
--- Company: 
--- Engineer: 
--- 
--- Create Date: 07/04/2021 09:50:10 PM
--- Design Name: 
--- Module Name: message_encoder - Behavioral
--- Project Name: 
--- Target Devices: 
--- Tool Versions: 
--- Description: 
--- 
--- Dependencies: 
--- 
--- Revision:
--- Revision 0.01 - File Created
--- Additional Comments:
--- 
-----------------------------------------------------------------------------------
-
-
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
-
--- Uncomment the following library declaration if using
--- arithmetic functions with Signed or Unsigned values
---use IEEE.NUMERIC_STD.ALL;
-
--- Uncomment the following library declaration if instantiating
--- any Xilinx leaf cells in this code.
---library UNISIM;
---use UNISIM.VComponents.all;
 
 entity message_encoder is
     Generic (
@@ -66,7 +36,7 @@ begin
 
     -- Message format 0 -- x_dest | y_dest | messsage -- (BUS_WIDTH-1)
     packet_out          <= message & y_coord & x_coord;
-    packet_out_valid    <= packet_in_complete; -- TODO May need to ensure that this only lasts one clock cycle (already done by system)
+    packet_out_valid    <= packet_in_complete;
     
     FIELD_FF: process (clk)
     begin

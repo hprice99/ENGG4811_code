@@ -1,24 +1,3 @@
-----------------------------------------------------------------------------------
--- Company: 
--- Engineer: 
--- 
--- Create Date: 09/03/2021 04:02:02 PM
--- Design Name: 
--- Module Name: multicast_router - Behavioral
--- Project Name: 
--- Target Devices: 
--- Tool Versions: 
--- Description: 
--- 
--- Dependencies: 
--- 
--- Revision:
--- Revision 0.01 - File Created
--- Additional Comments:
--- 
-----------------------------------------------------------------------------------
-
-
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
@@ -26,7 +5,6 @@ use IEEE.NUMERIC_STD.ALL;
 library xil_defaultlib;
 use xil_defaultlib.math_functions.all;
 
--- TODO Change multicast_in and multicast_out to pe_to_network and network_to_pe
 entity multicast_router is
     Generic (
         BUS_WIDTH               : integer := 32;

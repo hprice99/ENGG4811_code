@@ -1,6 +1,5 @@
 `timescale 1 ns / 1 ps
 
-// MEM_SIZE = Number of 32 bit words (multiply by 4 to get byte count)
 module system #(
     // Entire network parameters
     parameter NETWORK_ROWS      = 2,

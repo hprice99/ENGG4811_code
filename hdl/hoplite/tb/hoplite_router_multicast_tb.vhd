@@ -1,39 +1,10 @@
-----------------------------------------------------------------------------------
--- Company: 
--- Engineer: 
--- 
--- Create Date: 05/01/2021 04:29:30 PM
--- Design Name: 
--- Module Name: hoplite_tb - Behavioral
--- Project Name: 
--- Target Devices: 
--- Tool Versions: 
--- Description: 
--- 
--- Dependencies: 
--- 
--- Revision:
--- Revision 0.01 - File Created
--- Additional Comments:
--- 
-----------------------------------------------------------------------------------
-
-
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
-
--- Uncomment the following library declaration if using
--- arithmetic functions with Signed or Unsigned values
 use IEEE.NUMERIC_STD.ALL;
 use IEEE.math_real.all;
 
 use STD.textio.all;
 use IEEE.std_logic_textio.all;
-
--- Uncomment the following library declaration if instantiating
--- any Xilinx leaf cells in this code.
---library UNISIM;
---use UNISIM.VComponents.all;
 
 library xil_defaultlib;
 use xil_defaultlib.random.all;
@@ -276,9 +247,9 @@ begin
     CLK_PROCESS: process
     begin
         clk <= '0';
-        wait for clk_period/2;  --for 0.5 ns signal is '0'.
+        wait for clk_period/2;
         clk <= '1';
-        wait for clk_period/2;  --for next 0.5 ns signal is '1'.
+        wait for clk_period/2;
     end process CLK_PROCESS;
     
     -- Counter
