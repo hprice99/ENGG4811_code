@@ -1,35 +1,6 @@
-----------------------------------------------------------------------------------
--- Company: 
--- Engineer: 
--- 
--- Create Date: 07/04/2021 07:50:00 PM
--- Design Name: 
--- Module Name: node_switch - Behavioral
--- Project Name: 
--- Target Devices: 
--- Tool Versions: 
--- Description: 
--- 
--- Dependencies: 
--- 
--- Revision:
--- Revision 0.01 - File Created
--- Additional Comments:
--- 
-----------------------------------------------------------------------------------
-
-
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
-
--- Uncomment the following library declaration if using
--- arithmetic functions with Signed or Unsigned values
 use IEEE.NUMERIC_STD.ALL;
-
--- Uncomment the following library declaration if instantiating
--- any Xilinx leaf cells in this code.
---library UNISIM;
---use UNISIM.VComponents.all;
 
 library xil_defaultlib;
 use xil_defaultlib.math_functions.all;
@@ -412,7 +383,7 @@ begin
             message_out         => processor_in_message,
             packet_out_valid    => processor_in_message_valid,
             
-            packet_read         => processor_in_message_read         
+            packet_read         => processor_in_message_read
         );
         
     message_out_ready       <= not pe_to_network_full;
@@ -425,7 +396,7 @@ begin
             NETWORK_NODES   => NETWORK_NODES,
             COORD_BITS      => COORD_BITS,
         
-            X_COORD         => X_COORD,     
+            X_COORD         => X_COORD,
             Y_COORD         => Y_COORD,
             NODE_NUMBER     => NODE_NUMBER,
             
@@ -435,7 +406,7 @@ begin
             MEM_SIZE            => MEM_SIZE
         )
         port map (
-            clk                     => clk,           
+            clk                     => clk,
             reset_n                 => reset_n,
             
             switch                  => switch_pipelined,
