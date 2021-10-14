@@ -36,7 +36,6 @@ entity nic_dual is
         to_pe_valid         : out std_logic;
         to_pe_data          : out std_logic_vector((BUS_WIDTH-1) downto 0);
 
-        -- TODO May need to trigger the router so that the packet can be deflected if it cannot be stored in the FIFO
         network_to_pe_full  : out std_logic;
         network_to_pe_empty : out std_logic
     );

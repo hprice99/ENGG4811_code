@@ -1,29 +1,7 @@
-----------------------------------------------------------------------------------
--- Company: 
--- Engineer: 
--- 
--- Create Date: 04/28/2021 04:02:02 PM
--- Design Name: 
--- Module Name: hoplite_router_multicast - Behavioral
--- Project Name: 
--- Target Devices: 
--- Tool Versions: 
--- Description: 
--- 
--- Dependencies: 
--- 
--- Revision:
--- Revision 0.01 - File Created
--- Additional Comments:
--- 
-----------------------------------------------------------------------------------
-
-
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
 
--- TODO Change pe_in and pe_out to pe_to_network and network_to_pe
 entity hoplite_router_multicast is
     Generic (
         BUS_WIDTH               : integer := 32;
@@ -205,14 +183,14 @@ begin
        
     -- Select X output 
     with sel select
-        x_d <= pe_in    when "00", -- TODO Arbitrate between pe_in and multicast_in
+        x_d <= pe_in    when "00",
                x_in     when "01",
-               pe_in    when "10", -- TODO Arbitrate between pe_in and multicast_in
+               pe_in    when "10",
                x_in     when others;
                
     -- Select Y output 
     with sel select
-        y_d <= pe_in    when "00", -- TODO Arbitrate between pe_in and multicast_in
+        y_d <= pe_in    when "00",
                x_in     when "01",
                y_in     when "10",
                y_in     when others;
@@ -278,7 +256,6 @@ begin
                     multicast_out_valid     <= '1'; 
                     multicast_out           <= x_d;
                     
-                -- TODO Ensure that re-routed multicast packet is kept within the scope of the multicast group
                 elsif (is_valid_multicast_out(y_in_multicast_coord_d, y_in_valid) = True) then
                     multicast_out_valid    <= '1';
                     multicast_out          <= y_d;
