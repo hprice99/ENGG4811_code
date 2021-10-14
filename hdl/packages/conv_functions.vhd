@@ -1,13 +1,8 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
-
--- Uncomment the following library declaration if using
--- arithmetic functions with Signed or Unsigned values
 use IEEE.NUMERIC_STD.ALL;
-
 use ieee.math_real.all;
 
--- Package Declaration Section
 package conv_functions is 
         
     function int_to_slv (num : in integer ; width : in integer)
@@ -17,8 +12,7 @@ package conv_functions is
         return integer;
        
 end package conv_functions;
- 
--- Package Body Section
+
 package body conv_functions is
  
     function int_to_slv (num : integer ; width : integer) return std_logic_vector is
