@@ -48,7 +48,7 @@ void print_matrix(char* matrixName, long* matrix, int rows, int cols) {
     print_string("]\n");
 }
 
-struct MatrixPacket readMatrixPacket(void) {
+struct MatrixPacket read_matrix_packet(void) {
 
     struct MatrixPacket packet;
 
@@ -73,7 +73,7 @@ void createA(void) {
 
         while (aElementsReceived < MATRIX_ELEMENTS) {
 
-            packet = readMatrixPacket();
+            packet = read_matrix_packet();
 
             if (packet.matrixType != A_type) {
 
@@ -126,7 +126,7 @@ void createB(void) {
 
         while (bElementsReceived < MATRIX_ELEMENTS) {
 
-            packet = readMatrixPacket();
+            packet = read_matrix_packet();
 
             if (packet.matrixType != B_type) {
 

@@ -20,7 +20,6 @@ int send_message(int dest_x, int dest_y, long message) {
 
 int receive_message(long* message) {
 
-    // if (MESSAGE_IN_AVAILABLE_INPUT == 0 || MESSAGE_VALID_INPUT == 0) {
     if (MESSAGE_IN_AVAILABLE_INPUT == 0) { 
         
         return NETWORK_ERROR;
