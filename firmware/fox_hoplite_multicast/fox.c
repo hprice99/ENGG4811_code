@@ -23,6 +23,9 @@ int cElementsReceived;
 int aElementsReceived;
 int bElementsReceived;
 
+int aBroadcastNodesReady;
+int bNodesReady;
+
 enum FoxError receive_fox_packet(struct MatrixPacket* packet) {
 
     enum NetworkError networkError = NETWORK_ERROR;
@@ -56,6 +59,25 @@ enum FoxError receive_fox_packet(struct MatrixPacket* packet) {
         print_string("receive_fox_packet network timeout error\n");
 
         return FOX_NETWORK_TIMEOUT_ERROR;
+    }
+
+    // Process the packet as necessary
+    if (packet->doneFlag == 1) {
+        if (packet->matrixType == A_type) {
+
+            aBroadcastNodesReady++;
+        } else if (packet->matrixType == B_type) {
+            
+            bNodesReady++;
+        }
+    } else if (packet->resultFlag == 1) {
+
+        #ifdef RESULT
+        assign_result(*packet);
+        #endif
+    } else {
+        
+        assign_element(*packet);
     }
 
     return FOX_SUCCESS;
@@ -101,26 +123,21 @@ enum FoxError send_ready(int my_x_coord, int my_y_coord,
 
 bool is_a_broadcast_ready(int my_x_coord, int my_y_coord, int fox_cols) {
 
-    int nodesReady = 0;
     int broadcastDestinations = fox_cols - 1;
 
     // Receive ready packets
     struct MatrixPacket packet;
 
-    while (nodesReady < broadcastDestinations) {
+    while (aBroadcastNodesReady < broadcastDestinations) {
 
         receive_fox_packet(&packet);
 
         #ifdef DEBUG_PRINT
         print_matrix_packet("a_broadcast_ready", packet);
         #endif
-
-        // Check if the packet is broadcast
-        if (packet.doneFlag == 1 && packet.matrixType == A_type) {
-
-            nodesReady++;
-        }
     }
+
+    aBroadcastNodesReady = 0;
 
     return true;
 }
@@ -175,26 +192,21 @@ enum FoxError send_A(int my_x_coord, int my_y_coord) {
 
 bool is_b_send_ready(int my_x_coord, int my_y_coord, int fox_rows) {
 
-    int nodesReady = 0;
     int bDestinations = 1;
 
     // Receive ready packets
     struct MatrixPacket packet;
 
-    while (nodesReady < bDestinations) {
+    while (bNodesReady < bDestinations) {
 
         receive_fox_packet(&packet);
 
         #ifdef DEBUG_PRINT
         print_matrix_packet("b_send_ready", packet);
         #endif
-
-        // Check if the packet is broadcast
-        if (packet.doneFlag == 1 && packet.matrixType == B_type) {
-
-            nodesReady++;
-        }
     }
+
+    bNodesReady = 0;
 
     return true;
 }
@@ -389,8 +401,6 @@ enum FoxError receive_matrix(enum MatrixType matrixType) {
         print_matrix_packet("receive_matrix", packet);
         #endif
 
-        assign_element(packet);
-
         #ifdef DEBUG_PRINT
         if (matrixType == A_type) {
 
@@ -461,8 +471,6 @@ enum FoxError receive_result(void) {
         #ifdef DEBUG_PRINT
         print_matrix_packet("receive_matrix", packet);
         #endif
-
-        assign_result(packet);
     }
 
     return FOX_SUCCESS;
@@ -526,6 +534,9 @@ enum FoxError fox_algorithm(int my_x_coord, int my_y_coord) {
 
     aElementsReceived = 0;
     bElementsReceived = 0;
+
+    aBroadcastNodesReady = 0;
+    bNodesReady = 0;
     
     #ifdef RESULT
     cElementsReceived = 0;
