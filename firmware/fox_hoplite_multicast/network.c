@@ -72,10 +72,6 @@ enum NetworkError send_message(struct MatrixPacket packet) {
     MATRIX_Y_COORD_OUTPUT = packet.matrixY;
     MATRIX_ELEMENT_OUTPUT = packet.matrixElement;
 
-    for (int i = 0; i < 12 * packet.destX + 8 * packet.destY; i++) {
-        __asm__("nop");
-    }
-
     // Assert packet complete
     PACKET_COMPLETE_OUTPUT = 1;
 
@@ -87,8 +83,6 @@ enum NetworkError receive_message(struct MatrixPacket* packet) {
     if (MESSAGE_IN_AVAILABLE_INPUT == 0) { 
 
         return NETWORK_MESSAGE_IN_UNAVAILABLE;
-    } else if (NODE_NUMBER_INPUT == 7 || NODE_NUMBER_INPUT == 6) {
-        print_string("receive_message\n");
     }
 
     packet->multicastGroup = MULTICAST_GROUP_INPUT;
@@ -101,10 +95,6 @@ enum NetworkError receive_message(struct MatrixPacket* packet) {
 
     // Move to the next message
     MESSAGE_READ_OUTPUT = 1;
-
-    if (NODE_NUMBER_INPUT == 7 || NODE_NUMBER_INPUT == 6) {
-        print_matrix_packet("receive_message", *packet);
-    }
 
     return NETWORK_SUCCESS;
 }
