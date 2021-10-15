@@ -8,13 +8,13 @@ use xil_defaultlib.packet_defs.all;
 package multicast_defs is 
 
     -- Constants
-    constant MULTICAST_GROUP_NODES  : integer := 2;
+    constant MULTICAST_GROUP_NODES  : integer := 3;
 
-    constant MULTICAST_NETWORK_ROWS     : integer := 2;
+    constant MULTICAST_NETWORK_ROWS     : integer := 3;
     constant MULTICAST_NETWORK_COLS     : integer := 1;
 
     constant USE_MULTICAST          : boolean := True;
-    constant MULTICAST_FIFO_DEPTH   : integer := 2;
+    constant MULTICAST_FIFO_DEPTH   : integer := 3;
 
     -- Custom types
     type t_NodeToMulticastPackets is array (0 to (MULTICAST_GROUP_NODES-1)) of std_logic_vector((BUS_WIDTH-1) downto 0);

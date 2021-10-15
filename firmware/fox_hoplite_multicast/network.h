@@ -100,6 +100,10 @@ enum NetworkError {
 #define MESSAGE_READ_OUTPUT         (*(volatile char*)0x50000090)
 #endif
 
+#ifndef NODE_NUMBER_INPUT
+#define NODE_NUMBER_INPUT         (*(volatile char*)0x50000100)
+#endif
+
 enum MatrixType {
     A_type = 0, 
     B_type = 1

@@ -487,8 +487,8 @@ begin
             x_messages_in(curr_x, curr_y)       <= x_messages_out(prev_x, curr_y);
             x_messages_in_valid(curr_x, curr_y) <= x_messages_out_valid(prev_x, curr_y);
 
-            y_messages_in(curr_x, curr_y)       <= y_messages_out(curr_x, next_y);
-            y_messages_in_valid(curr_x, curr_y) <= y_messages_out_valid(curr_x, next_y);
+            y_messages_in(curr_x, curr_y)       <= y_messages_out(curr_x, prev_y);
+            y_messages_in_valid(curr_x, curr_y) <= y_messages_out_valid(curr_x, prev_y);
                         
             FOX_NETWORK_GEN: if (curr_x < FOX_NETWORK_STAGES and curr_y < FOX_NETWORK_STAGES) generate   
                 constant node_number                    : integer := i * FOX_NETWORK_STAGES + j;

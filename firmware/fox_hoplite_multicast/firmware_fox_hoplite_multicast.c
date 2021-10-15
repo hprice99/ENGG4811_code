@@ -212,15 +212,38 @@ void main() {
 
     foxStages = FOX_NETWORK_STAGES_INPUT;
 
+    print_string("Node coordinates (");
+    print_hex(my_x_coord, 1);
+    print_string(", ");
+    print_hex(my_y_coord, 1);
+    print_string("), node number = ");
+    print_hex(my_node_number, 1);
+    print_string(", Fox stages = ");
+    print_hex(foxStages, 1);
+    print_string(", xOffset = ");
+    print_hex(xOffset, 3);
+    print_string(", yOffset = ");
+    print_hex(yOffset, 3);
+    print_string(", matrix size = ");
+    print_hex(MATRIX_SIZE, 1);
+    print_string(", matrix elements = ");
+    print_hex(MATRIX_ELEMENTS, 1);
+    print_string(", resultXCoord = ");
+    print_hex(resultXCoord, 1);
+    print_string(", resultYCoord = ");
+    print_hex(resultYCoord, 1);
+    print_char('\n');
+    print_char('\n');
+
     create_my_A();
     #ifdef TB_PRINT
-    tb_output_matrix("A", my_A, MATRIX_SIZE, MATRIX_SIZE);
+    output_matrix("A", my_A, MATRIX_SIZE, MATRIX_SIZE);
     print_char('\n');
     #endif
 
     create_initial_stage_B();
     #ifdef TB_PRINT
-    tb_output_matrix("B", stage_B, MATRIX_SIZE, MATRIX_SIZE);
+    output_matrix("B", stage_B, MATRIX_SIZE, MATRIX_SIZE);
     print_char('\n');
     #endif
 
