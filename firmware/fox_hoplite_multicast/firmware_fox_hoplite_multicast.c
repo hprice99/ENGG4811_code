@@ -290,22 +290,6 @@ void main() {
     LED_OUTPUT = ledValue;
     int ledToggles = 0;
 
-    #ifdef RESULT
-    print_string("\nLED ");
-
-    if (ledValue == 0) {
-        
-        print_string("off, ");
-    } else if (ledValue == 1) {
-
-        print_string("on,  ");
-    }
-
-    print_string("ledToggles = ");
-    print_dec(ledToggles);
-    print_char('\n');
-    #endif
-
     while (1) {
 
         if (loopCount > LOOP_DELAY) {
@@ -315,23 +299,6 @@ void main() {
             ledToggles++;
 
             LED_OUTPUT = ledValue;
-
-            #ifdef RESULT
-            print_string("LED ");
-
-            if (ledValue == 0) {
-                
-                print_string("off, ");
-            } else if (ledValue == 1) {
-
-                print_string("on,  ");
-            }
-
-            print_string("ledToggles = ");
-            print_dec(ledToggles);
-            print_char('\n');
-            #endif
-
         }
 
         loopCount++;
