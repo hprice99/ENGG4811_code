@@ -145,6 +145,18 @@ class FoxNetwork:
         return packets
 
     '''
+    Encode a matrix to packet
+    '''
+    def encode_matrix(self, *, nodeCoord, multicastCoord, matrixType, matrix):
+        doneFlag = 0
+        resultFlag = 0
+
+        packets = self.packetFormat.encode_matrix(destCoord=nodeCoord, multicastCoord=multicastCoord, \
+            resultFlag=resultFlag, doneFlag=doneFlag, matrixType=matrixType, matrix=matrix)
+
+        return packets
+
+    '''
     Write a list of packets to a file
     '''
     def write_packets_to_file(self, *, packets, fileName):
@@ -236,7 +248,7 @@ class FoxNetwork:
             matrixType = MatrixTypes.A
 
             # Encode the matrix and write to file
-            newAPackets = self.write_matrix_to_file(matrixFile=matrixFileName, nodeCoord=nodeCoord, multicastCoord=multicastCoord, matrixType=matrixType, matrix=nodeA)
+            newAPackets = self.encode_matrix(nodeCoord=nodeCoord, multicastCoord=multicastCoord, matrixType=matrixType, matrix=nodeA)
 
             aPackets += newAPackets
 
@@ -248,17 +260,11 @@ class FoxNetwork:
             matrixType = MatrixTypes.B
 
             # Encode the matrix and write to file
-            newBPackets = self.write_matrix_to_file(matrixFile=matrixFileName, nodeCoord=nodeCoord, multicastCoord=multicastCoord, matrixType=matrixType, matrix=nodeB)
+            newBPackets = self.encode_matrix(nodeCoord=nodeCoord, multicastCoord=multicastCoord, matrixType=matrixType, matrix=nodeB)
 
             bPackets += newBPackets
 
             elementsWritten += np.size(nodeB)
-
-            # If the node is the result node, pad the remainder of the file
-            if (nodeNumber == self.node_coord_to_node_number(self.resultNodeCoord)):
-                paddingRequired = self.totalMatrixElements - elementsWritten
-
-                self.pad_matrix_file(matrixFile=matrixFileName, nodeCoord=nodeCoord, paddingRequired=paddingRequired)
 
         packets = aPackets + bPackets
         self.write_packets_to_file(packets=packets, fileName=combinedFileName)

@@ -433,8 +433,7 @@ begin
                 probe9      => ila_y_in_1_matrix_element,
                 probe10(0)  => ila_y_in_1_valid
             );
-            
-            
+                        
         ila_x_out_2_dest              <= get_dest_coord(ila_x_out_2);
         ila_x_out_2_multicast_coord   <= get_multicast_coord(ila_x_out_2);
         ila_x_out_2_matrix_coord      <= get_matrix_coord(ila_x_out_2);
