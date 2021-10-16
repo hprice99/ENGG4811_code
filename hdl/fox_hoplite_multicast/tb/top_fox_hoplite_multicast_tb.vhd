@@ -46,14 +46,23 @@ architecture Behavioral of top_tb is
             out_matrix_end_row  : out t_MessageValid;
             out_matrix_end      : out t_MessageValid;
             
-            ila_multicast_out                : out std_logic_vector((BUS_WIDTH-1) downto 0);
-            ila_multicast_out_valid          : out std_logic;
-            
-            ila_x_out            : out std_logic_vector((BUS_WIDTH-1) downto 0);
-            ila_x_out_valid      : out std_logic;
+            ila_multicast_in_1                : out std_logic_vector((BUS_WIDTH-1) downto 0);
+            ila_multicast_in_1_valid          : out std_logic;
            
-            ila_y_out            : out std_logic_vector((BUS_WIDTH-1) downto 0);
-            ila_y_out_valid      : out std_logic
+            ila_x_in_1            : out std_logic_vector((BUS_WIDTH-1) downto 0);
+            ila_x_in_1_valid      : out std_logic;
+           
+            ila_y_in_1            : out std_logic_vector((BUS_WIDTH-1) downto 0);
+            ila_y_in_1_valid      : out std_logic;
+           
+            ila_multicast_out_2                : out std_logic_vector((BUS_WIDTH-1) downto 0);
+            ila_multicast_out_2_valid          : out std_logic;
+           
+            ila_x_out_2            : out std_logic_vector((BUS_WIDTH-1) downto 0);
+            ila_x_out_2_valid      : out std_logic;
+           
+            ila_y_out_2            : out std_logic_vector((BUS_WIDTH-1) downto 0);
+            ila_y_out_2_valid      : out std_logic
         );
     end component top;
     
@@ -115,14 +124,23 @@ architecture Behavioral of top_tb is
     signal out_matrix_end_row   : t_MessageValid;
     signal out_matrix_end       : t_MessageValid;
     
-    signal ila_multicast_out                : std_logic_vector((BUS_WIDTH-1) downto 0);
-    signal ila_multicast_out_valid          : std_logic;
-    
-    signal ila_x_out        : std_logic_vector((BUS_WIDTH-1) downto 0);
-    signal ila_x_out_valid  : std_logic;
-    
-    signal ila_y_out        : std_logic_vector((BUS_WIDTH-1) downto 0);
-    signal ila_y_out_valid  : std_logic;
+    signal ila_multicast_in_1                : std_logic_vector((BUS_WIDTH-1) downto 0);
+    signal ila_multicast_in_1_valid          : std_logic;
+           
+    signal ila_x_in_1            : std_logic_vector((BUS_WIDTH-1) downto 0);
+    signal ila_x_in_1_valid      : std_logic;
+           
+    signal ila_y_in_1            : std_logic_vector((BUS_WIDTH-1) downto 0);
+    signal ila_y_in_1_valid      : std_logic;
+           
+    signal ila_multicast_out_2                : std_logic_vector((BUS_WIDTH-1) downto 0);
+    signal ila_multicast_out_2_valid          : std_logic;
+           
+    signal ila_x_out_2            : std_logic_vector((BUS_WIDTH-1) downto 0);
+    signal ila_x_out_2_valid      : std_logic;
+           
+    signal ila_y_out_2            : std_logic_vector((BUS_WIDTH-1) downto 0);
+    signal ila_y_out_2_valid      : std_logic;
 
 begin
 
@@ -180,14 +198,23 @@ begin
             out_matrix_end_row  => out_matrix_end_row,
             out_matrix_end      => out_matrix_end,
             
-            ila_multicast_out                => ila_multicast_out,
-            ila_multicast_out_valid          => ila_multicast_out_valid,
-            
-            ila_x_out           => ila_x_out,
-            ila_x_out_valid     => ila_x_out_valid,
-            
-            ila_y_out           => ila_y_out,
-            ila_y_out_valid     => ila_y_out_valid
+            ila_multicast_in_1                => ila_multicast_in_1,
+            ila_multicast_in_1_valid          => ila_multicast_in_1_valid,
+           
+            ila_x_in_1            => ila_x_in_1,
+            ila_x_in_1_valid      => ila_x_in_1_valid,
+           
+            ila_y_in_1            => ila_y_in_1,
+            ila_y_in_1_valid      => ila_y_in_1_valid,
+           
+            ila_multicast_out_2                => ila_multicast_out_2,
+            ila_multicast_out_2_valid          => ila_multicast_out_2_valid,
+           
+            ila_x_out_2            => ila_x_out_2,
+            ila_x_out_2_valid      => ila_x_out_2_valid,
+           
+            ila_y_out_2            => ila_y_out_2,
+            ila_y_out_2_valid      => ila_y_out_2_valid
         );
 
     -- Generate prints for Fox's algorithm processing elements
