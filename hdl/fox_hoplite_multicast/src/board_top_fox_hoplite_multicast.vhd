@@ -115,7 +115,6 @@ begin
             out_matrix          => open,
             out_matrix_en       => open,
             out_matrix_end_row  => open,
-            out_matrix_end      => open
         );
 
 end Behavioral;
