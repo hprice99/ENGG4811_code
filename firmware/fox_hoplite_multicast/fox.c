@@ -361,33 +361,6 @@ enum FoxError assign_element(struct MatrixPacket packet) {
     return FOX_SUCCESS;
 }
 
-enum FoxError assign_my_A(void) {
-
-    struct MatrixPacket packet;
-
-    packet.doneFlag = false;
-    packet.resultFlag = false;
-    packet.matrixType = A_type;
-    packet.multicastGroup = 1;
-
-    // Loop through matrix elements
-    for (long x = 0; x < MATRIX_SIZE; x++) {
-        for (long y = 0; y < MATRIX_SIZE; y++) {
-
-            int index = FOX_COORDINATE_TO_INDEX(x, y);
-
-            packet.matrixX = x;
-            packet.matrixY = y;
-            packet.matrixElement = my_A[index];
-
-            assign_element(packet);
-        }
-    }
-
-    // Reset the number of A elements received so that the next stage works
-    aElementsReceived = 0;
-}
-
 enum FoxError receive_matrix(enum MatrixType matrixType) {
 
     struct MatrixPacket packet;
