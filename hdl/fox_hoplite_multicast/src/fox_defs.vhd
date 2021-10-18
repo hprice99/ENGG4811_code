@@ -10,12 +10,12 @@ use xil_defaultlib.math_functions.all;
 package fox_defs is 
 
     -- Constants
-    constant NETWORK_ROWS   : integer := 4;
-    constant NETWORK_COLS   : integer := 3;
+    constant NETWORK_ROWS   : integer := 3;
+    constant NETWORK_COLS   : integer := 2;
     constant NETWORK_NODES  : integer := NETWORK_ROWS * NETWORK_COLS;
 
     -- Fox's algorithm network paramters
-    constant FOX_NETWORK_STAGES  : integer := 3;
+    constant FOX_NETWORK_STAGES  : integer := 2;
     constant FOX_NETWORK_NODES   : integer := FOX_NETWORK_STAGES ** 2;
 
     -- Result node parameters
@@ -24,16 +24,16 @@ package fox_defs is
 
     -- ROM node parameters
     constant ROM_X_COORD  : integer := 0;
-    constant ROM_Y_COORD  : integer := 3;
+    constant ROM_Y_COORD  : integer := 2;
 
     -- NIC parameters
     constant FOX_PE_TO_NETWORK_FIFO_DEPTH   : integer := 8;
-    constant FOX_NETWORK_TO_PE_FIFO_DEPTH   : integer := 1024;
+    constant FOX_NETWORK_TO_PE_FIFO_DEPTH   : integer := 512;
 
     constant RESULT_PE_TO_NETWORK_FIFO_DEPTH    : integer := 8;
     constant RESULT_NETWORK_TO_PE_FIFO_DEPTH    : integer := 1024;
 
-    constant RESULT_UART_FIFO_DEPTH : integer := 32678;
+    constant RESULT_UART_FIFO_DEPTH : integer := 1024;
 
     -- Custom types
     type t_Destination is array(0 to (NETWORK_COLS-1), 0 to (NETWORK_ROWS-1)) of t_Coordinate;
