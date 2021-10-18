@@ -5,4 +5,4 @@ foxFirmware:
 
 resultFirmware:
   name: firmware_fox_hoplite_multicast_result
-  memory_size: 4096
+  memory_size: 5120
