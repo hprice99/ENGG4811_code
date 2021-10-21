@@ -215,8 +215,6 @@ class FoxNetwork:
 
         if os.path.exists(combinedFileName):
             os.remove(combinedFileName)
-        else:
-            print("The file does not exist")
 
         # Loop through the nodes
         for nodeNumber in range(self.foxNetworkNodes):
@@ -227,8 +225,6 @@ class FoxNetwork:
             if os.path.exists(matrixFileName):
                 os.remove(matrixFileName)
             else:
-                print("The file does not exist")
-
                 # Make the memory directory
                 if not os.path.isdir("{directory}/../{hdlFolder}/memory".format(directory=scriptDirectory, hdlFolder=self.hdlFolder)):
                     os.mkdir("{directory}/../{hdlFolder}/memory".format(directory=scriptDirectory, hdlFolder=self.hdlFolder))
