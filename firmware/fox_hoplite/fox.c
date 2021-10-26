@@ -216,6 +216,14 @@ enum FoxError send_B(int my_x_coord, int my_y_coord, int fox_cols) {
     packet.multicastGroup = 0;
     packet.destX = my_x_coord;
 
+    if (my_y_coord == 0) {
+
+        packet.destY = fox_cols - 1;
+    } else {
+
+        packet.destY = my_y_coord - 1;
+    }
+
     // Loop through matrix elements
     for (long x = 0; x < MATRIX_SIZE; x++) {
         for (long y = 0; y < MATRIX_SIZE; y++) {
@@ -229,14 +237,6 @@ enum FoxError send_B(int my_x_coord, int my_y_coord, int fox_cols) {
             #ifdef DEBUG_PRINT
             print_char('s');
             #endif
-
-            if (my_y_coord == 0) {
-
-                packet.destY = fox_cols - 1;
-            } else {
-
-                packet.destY = my_y_coord - 1;
-            }
 
             do {
                 networkError = send_message(packet);
