@@ -111,8 +111,6 @@ void createA(void) {
             }
         }
     }
-
-    print_string("A matrix loaded\n");
 }
 
 void createB(void) {
@@ -164,8 +162,6 @@ void createB(void) {
             }
         }
     }
-
-    print_string("B matrix loaded\n");
 }
 
 void createC(void) {
@@ -181,10 +177,6 @@ void createC(void) {
 }
 
 void main(void) {
-    
-    print_string("Single core ");
-    print_dec(1);
-    print_char('\n');
 
     int ledValue = 1;
     LED_OUTPUT = ledValue;
