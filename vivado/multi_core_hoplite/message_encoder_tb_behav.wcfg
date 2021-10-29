@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="message_encoder_tb_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="conv_functions" />
+            <top_module name="fox_defs" />
+            <top_module name="math_functions" />
+            <top_module name="message_encoder_tb" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="0fs"></ZoomStartTime>
+      <ZoomEndTime time="575fs"></ZoomEndTime>
+      <Cursor1Time time="179fs"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="531"></NameColumnWidth>
+      <ValueColumnWidth column_width="202"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="19" />
+   <wvobject type="logic" fp_name="/message_encoder_tb/clk">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/message_encoder_tb/reset_n">
+      <obj_property name="ElementShortName">reset_n</obj_property>
+      <obj_property name="ObjectShortName">reset_n</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/message_encoder_tb/decoder_packet_in">
+      <obj_property name="ElementShortName">decoder_packet_in[0:1,0:1][53:0]</obj_property>
+      <obj_property name="ObjectShortName">decoder_packet_in[0:1,0:1][53:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/message_encoder_tb/decoder_packet_in_valid">
+      <obj_property name="ElementShortName">decoder_packet_in_valid[0:1,0:1]</obj_property>
+      <obj_property name="ObjectShortName">decoder_packet_in_valid[0:1,0:1]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/message_encoder_tb/decoder_x_coord_out">
+      <obj_property name="ElementShortName">decoder_x_coord_out[0:1,0:1][0:0]</obj_property>
+      <obj_property name="ObjectShortName">decoder_x_coord_out[0:1,0:1][0:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/message_encoder_tb/decoder_y_coord_out">
+      <obj_property name="ElementShortName">decoder_y_coord_out[0:1,0:1][0:0]</obj_property>
+      <obj_property name="ObjectShortName">decoder_y_coord_out[0:1,0:1][0:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/message_encoder_tb/decoder_multicast_group_out">
+      <obj_property name="ElementShortName">decoder_multicast_group_out[0:1,0:1][0:0]</obj_property>
+      <obj_property name="ObjectShortName">decoder_multicast_group_out[0:1,0:1][0:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/message_encoder_tb/decoder_done_flag_out">
+      <obj_property name="ElementShortName">decoder_done_flag_out[0:1,0:1]</obj_property>
+      <obj_property name="ObjectShortName">decoder_done_flag_out[0:1,0:1]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/message_encoder_tb/decoder_result_flag_out">
+      <obj_property name="ElementShortName">decoder_result_flag_out[0:1,0:1]</obj_property>
+      <obj_property name="ObjectShortName">decoder_result_flag_out[0:1,0:1]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/message_encoder_tb/decoder_matrix_type_out">
+      <obj_property name="ElementShortName">decoder_matrix_type_out[0:1,0:1][0:0]</obj_property>
+      <obj_property name="ObjectShortName">decoder_matrix_type_out[0:1,0:1][0:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/message_encoder_tb/decoder_matrix_x_coord_out">
+      <obj_property name="ElementShortName">decoder_matrix_x_coord_out[0:1,0:1][7:0]</obj_property>
+      <obj_property name="ObjectShortName">decoder_matrix_x_coord_out[0:1,0:1][7:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/message_encoder_tb/decoder_matrix_y_coord_out">
+      <obj_property name="ElementShortName">decoder_matrix_y_coord_out[0:1,0:1][7:0]</obj_property>
+      <obj_property name="ObjectShortName">decoder_matrix_y_coord_out[0:1,0:1][7:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/message_encoder_tb/decoder_matrix_element_out">
+      <obj_property name="ElementShortName">decoder_matrix_element_out[0:1,0:1][31:0]</obj_property>
+      <obj_property name="ObjectShortName">decoder_matrix_element_out[0:1,0:1][31:0]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/message_encoder_tb/decoder_packet_out_valid">
+      <obj_property name="ElementShortName">decoder_packet_out_valid[0:1,0:1]</obj_property>
+      <obj_property name="ObjectShortName">decoder_packet_out_valid[0:1,0:1]</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/message_encoder_tb/decoder_packet_read">
+      <obj_property name="ElementShortName">decoder_packet_read[0:1,0:1]</obj_property>
+      <obj_property name="ObjectShortName">decoder_packet_read[0:1,0:1]</obj_property>
+   </wvobject>
+   <wvobject type="group" fp_name="group110">
+      <obj_property name="label">Node 0 (0, 0)</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject type="group" fp_name="group114">
+         <obj_property name="label">Encoder</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <wvobject type="array" fp_name="/message_encoder_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/ENCODER/x_coord_in">
+            <obj_property name="ElementShortName">x_coord_in[0:0]</obj_property>
+            <obj_property name="ObjectShortName">x_coord_in[0:0]</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/message_encoder_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/ENCODER/x_coord_in_valid">
+            <obj_property name="ElementShortName">x_coord_in_valid</obj_property>
+            <obj_property name="ObjectShortName">x_coord_in_valid</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/message_encoder_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/ENCODER/y_coord_in">
+            <obj_property name="ElementShortName">y_coord_in[0:0]</obj_property>
+            <obj_property name="ObjectShortName">y_coord_in[0:0]</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/message_encoder_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/ENCODER/y_coord_in_valid">
+            <obj_property name="ElementShortName">y_coord_in_valid</obj_property>
+            <obj_property name="ObjectShortName">y_coord_in_valid</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/message_encoder_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/ENCODER/multicast_group_in">
+            <obj_property name="ElementShortName">multicast_group_in[0:0]</obj_property>
+            <obj_property name="ObjectShortName">multicast_group_in[0:0]</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/message_encoder_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/ENCODER/multicast_group_in_valid">
+            <obj_property name="ElementShortName">multicast_group_in_valid</obj_property>
+            <obj_property name="ObjectShortName">multicast_group_in_valid</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/message_encoder_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/ENCODER/done_flag_in">
+            <obj_property name="ElementShortName">done_flag_in</obj_property>
+            <obj_property name="ObjectShortName">done_flag_in</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/message_encoder_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/ENCODER/done_flag_in_valid">
+            <obj_property name="ElementShortName">done_flag_in_valid</obj_property>
+            <obj_property name="ObjectShortName">done_flag_in_valid</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/message_encoder_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/ENCODER/result_flag_in">
+            <obj_property name="ElementShortName">result_flag_in</obj_property>
+            <obj_property name="ObjectShortName">result_flag_in</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/message_encoder_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/ENCODER/result_flag_in_valid">
+            <obj_property name="ElementShortName">result_flag_in_valid</obj_property>
+            <obj_property name="ObjectShortName">result_flag_in_valid</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/message_encoder_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/ENCODER/matrix_type_in">
+            <obj_property name="ElementShortName">matrix_type_in[0:0]</obj_property>
+            <obj_property name="ObjectShortName">matrix_type_in[0:0]</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/message_encoder_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/ENCODER/matrix_type_in_valid">
+            <obj_property name="ElementShortName">matrix_type_in_valid</obj_property>
+            <obj_property name="ObjectShortName">matrix_type_in_valid</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/message_encoder_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/ENCODER/matrix_x_coord_in">
+            <obj_property name="ElementShortName">matrix_x_coord_in[7:0]</obj_property>
+            <obj_property name="ObjectShortName">matrix_x_coord_in[7:0]</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/message_encoder_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/ENCODER/matrix_x_coord_in_valid">
+            <obj_property name="ElementShortName">matrix_x_coord_in_valid</obj_property>
+            <obj_property name="ObjectShortName">matrix_x_coord_in_valid</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/message_encoder_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/ENCODER/matrix_y_coord_in">
+            <obj_property name="ElementShortName">matrix_y_coord_in[7:0]</obj_property>
+            <obj_property name="ObjectShortName">matrix_y_coord_in[7:0]</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/message_encoder_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/ENCODER/matrix_y_coord_in_valid">
+            <obj_property name="ElementShortName">matrix_y_coord_in_valid</obj_property>
+            <obj_property name="ObjectShortName">matrix_y_coord_in_valid</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/message_encoder_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/ENCODER/matrix_element_in">
+            <obj_property name="ElementShortName">matrix_element_in[31:0]</obj_property>
+            <obj_property name="ObjectShortName">matrix_element_in[31:0]</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/message_encoder_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/ENCODER/matrix_element_in_valid">
+            <obj_property name="ElementShortName">matrix_element_in_valid</obj_property>
+            <obj_property name="ObjectShortName">matrix_element_in_valid</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/message_encoder_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/ENCODER/packet_complete_in">
+            <obj_property name="ElementShortName">packet_complete_in</obj_property>
+            <obj_property name="ObjectShortName">packet_complete_in</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/message_encoder_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/ENCODER/packet_out">
+            <obj_property name="ElementShortName">packet_out[53:0]</obj_property>
+            <obj_property name="ObjectShortName">packet_out[53:0]</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/message_encoder_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/ENCODER/packet_out_valid">
+            <obj_property name="ElementShortName">packet_out_valid</obj_property>
+            <obj_property name="ObjectShortName">packet_out_valid</obj_property>
+         </wvobject>
+      </wvobject>
+      <wvobject type="group" fp_name="group115">
+         <obj_property name="label">Decoder</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <wvobject type="array" fp_name="/message_encoder_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/DECODER/packet_in">
+            <obj_property name="ElementShortName">packet_in[53:0]</obj_property>
+            <obj_property name="ObjectShortName">packet_in[53:0]</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/message_encoder_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/DECODER/packet_in_valid">
+            <obj_property name="ElementShortName">packet_in_valid</obj_property>
+            <obj_property name="ObjectShortName">packet_in_valid</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/message_encoder_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/DECODER/x_coord_out">
+            <obj_property name="ElementShortName">x_coord_out[0:0]</obj_property>
+            <obj_property name="ObjectShortName">x_coord_out[0:0]</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/message_encoder_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/DECODER/y_coord_out">
+            <obj_property name="ElementShortName">y_coord_out[0:0]</obj_property>
+            <obj_property name="ObjectShortName">y_coord_out[0:0]</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/message_encoder_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/DECODER/multicast_group_out">
+            <obj_property name="ElementShortName">multicast_group_out[0:0]</obj_property>
+            <obj_property name="ObjectShortName">multicast_group_out[0:0]</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/message_encoder_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/DECODER/done_flag_out">
+            <obj_property name="ElementShortName">done_flag_out</obj_property>
+            <obj_property name="ObjectShortName">done_flag_out</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/message_encoder_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/DECODER/result_flag_out">
+            <obj_property name="ElementShortName">result_flag_out</obj_property>
+            <obj_property name="ObjectShortName">result_flag_out</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/message_encoder_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/DECODER/matrix_type_out">
+            <obj_property name="ElementShortName">matrix_type_out[0:0]</obj_property>
+            <obj_property name="ObjectShortName">matrix_type_out[0:0]</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/message_encoder_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/DECODER/matrix_x_coord_out">
+            <obj_property name="ElementShortName">matrix_x_coord_out[7:0]</obj_property>
+            <obj_property name="ObjectShortName">matrix_x_coord_out[7:0]</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/message_encoder_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/DECODER/matrix_y_coord_out">
+            <obj_property name="ElementShortName">matrix_y_coord_out[7:0]</obj_property>
+            <obj_property name="ObjectShortName">matrix_y_coord_out[7:0]</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/message_encoder_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/DECODER/matrix_element_out">
+            <obj_property name="ElementShortName">matrix_element_out[31:0]</obj_property>
+            <obj_property name="ObjectShortName">matrix_element_out[31:0]</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/message_encoder_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/DECODER/packet_out_valid">
+            <obj_property name="ElementShortName">packet_out_valid</obj_property>
+            <obj_property name="ObjectShortName">packet_out_valid</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/message_encoder_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/DECODER/packet_read">
+            <obj_property name="ElementShortName">packet_read</obj_property>
+            <obj_property name="ObjectShortName">packet_read</obj_property>
+         </wvobject>
+      </wvobject>
+      <wvobject type="logic" fp_name="/message_encoder_tb/packet_sent[0,0]">
+         <obj_property name="DisplayName">label</obj_property>
+         <obj_property name="ElementShortName">[0,0]</obj_property>
+         <obj_property name="ObjectShortName">[0,0]</obj_property>
+         <obj_property name="label">packet_sent</obj_property>
+      </wvobject>
+      <wvobject type="other" fp_name="/message_encoder_tb/a_packets_received[0,0]">
+         <obj_property name="DisplayName">label</obj_property>
+         <obj_property name="ElementShortName">[0,0]</obj_property>
+         <obj_property name="ObjectShortName">[0,0]</obj_property>
+         <obj_property name="label">a_packets_received</obj_property>
+      </wvobject>
+      <wvobject type="other" fp_name="/message_encoder_tb/b_packets_received[0,0]">
+         <obj_property name="DisplayName">label</obj_property>
+         <obj_property name="ElementShortName">[0,0]</obj_property>
+         <obj_property name="ObjectShortName">[0,0]</obj_property>
+         <obj_property name="label">b_packets_received</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject type="group" fp_name="group111">
+      <obj_property name="label">Node 1 (1, 0)</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject type="group" fp_name="group112">
+      <obj_property name="label">Node 2 (0, 1)</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject type="group" fp_name="group113">
+      <obj_property name="label">Node 3 (1, 1)</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+</wave_config>

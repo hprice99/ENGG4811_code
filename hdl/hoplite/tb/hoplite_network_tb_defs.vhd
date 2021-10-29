@@ -31,7 +31,6 @@ package hoplite_network_tb_defs is
     constant COORD_BITS     : integer := ceil_log2(max(NETWORK_ROWS, NETWORK_COLS));
     
     constant MULTICAST_COORD_BITS   : integer := ceil_log2(NETWORK_ROWS) + 1;
-    -- constant MULTICAST_COORD_BITS   : integer := 0;
     
     constant BUS_WIDTH      : integer := 4 * COORD_BITS + MESSAGE_BITS + MESSAGE_TYPE_BITS + 2 * MULTICAST_COORD_BITS;
     
