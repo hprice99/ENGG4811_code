@@ -1,0 +1,360 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="hoplite_tb_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="hoplite_network_tb_defs" />
+            <top_module name="hoplite_tb" />
+            <top_module name="math_functions" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="66401fs"></ZoomStartTime>
+      <ZoomEndTime time="129302fs"></ZoomEndTime>
+      <Cursor1Time time="61401fs"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="394"></NameColumnWidth>
+      <ValueColumnWidth column_width="181"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="10" />
+   <wvobject type="logic" fp_name="/hoplite_tb/clk">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/hoplite_tb/reset_n">
+      <obj_property name="ElementShortName">reset_n</obj_property>
+      <obj_property name="ObjectShortName">reset_n</obj_property>
+   </wvobject>
+   <wvobject type="other" fp_name="/hoplite_tb/count">
+      <obj_property name="ElementShortName">count</obj_property>
+      <obj_property name="ObjectShortName">count</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject type="group" fp_name="group362">
+      <obj_property name="label">Node (0, 0)</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <wvobject type="group" fp_name="group378">
+         <obj_property name="label">Input</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+         <wvobject type="array" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/NODE/x_in">
+            <obj_property name="ElementShortName">x_in[36:0]</obj_property>
+            <obj_property name="ObjectShortName">x_in[36:0]</obj_property>
+            <obj_property name="Radix">HEXRADIX</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/NODE/x_in_valid">
+            <obj_property name="ElementShortName">x_in_valid</obj_property>
+            <obj_property name="ObjectShortName">x_in_valid</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/NODE/y_in">
+            <obj_property name="ElementShortName">y_in[36:0]</obj_property>
+            <obj_property name="ObjectShortName">y_in[36:0]</obj_property>
+            <obj_property name="Radix">HEXRADIX</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/NODE/y_in_valid">
+            <obj_property name="ElementShortName">y_in_valid</obj_property>
+            <obj_property name="ObjectShortName">y_in_valid</obj_property>
+         </wvobject>
+      </wvobject>
+      <wvobject type="group" fp_name="group367">
+         <obj_property name="label">Output</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+         <wvobject type="array" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/NODE/x_out">
+            <obj_property name="ElementShortName">x_out[36:0]</obj_property>
+            <obj_property name="ObjectShortName">x_out[36:0]</obj_property>
+            <obj_property name="Radix">HEXRADIX</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/NODE/x_out_valid">
+            <obj_property name="ElementShortName">x_out_valid</obj_property>
+            <obj_property name="ObjectShortName">x_out_valid</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/NODE/y_out">
+            <obj_property name="ElementShortName">y_out[36:0]</obj_property>
+            <obj_property name="ObjectShortName">y_out[36:0]</obj_property>
+            <obj_property name="Radix">HEXRADIX</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/NODE/y_out_valid">
+            <obj_property name="ElementShortName">y_out_valid</obj_property>
+            <obj_property name="ObjectShortName">y_out_valid</obj_property>
+         </wvobject>
+      </wvobject>
+      <wvobject type="array" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/NODE/last_message_sent">
+         <obj_property name="ElementShortName">last_message_sent[36:0]</obj_property>
+         <obj_property name="ObjectShortName">last_message_sent[36:0]</obj_property>
+         <obj_property name="Radix">HEXRADIX</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/NODE/PE/message_sent">
+         <obj_property name="ElementShortName">message_sent</obj_property>
+         <obj_property name="ObjectShortName">message_sent</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/NODE/last_message_received">
+         <obj_property name="ElementShortName">last_message_received[36:0]</obj_property>
+         <obj_property name="ObjectShortName">last_message_received[36:0]</obj_property>
+         <obj_property name="Radix">HEXRADIX</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/NODE/PE/message_received">
+         <obj_property name="ElementShortName">message_received</obj_property>
+         <obj_property name="ObjectShortName">message_received</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject type="group" fp_name="group357">
+      <obj_property name="label">FIFO (0, 0) to (1, 0)</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <wvobject type="logic" fp_name="/hoplite_tb/\FIFO_SRC_ROW_CONTROL(0)\/\FIFO_SRC_COL_CONTROL(0)\/\FIFO_DEST_ROW_CONTROL(0)\/\FIFO_DEST_COL_CONTROL(1)\/CHECK_FIFO/write_en">
+         <obj_property name="ElementShortName">write_en</obj_property>
+         <obj_property name="ObjectShortName">write_en</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/hoplite_tb/\FIFO_SRC_ROW_CONTROL(0)\/\FIFO_SRC_COL_CONTROL(0)\/\FIFO_DEST_ROW_CONTROL(0)\/\FIFO_DEST_COL_CONTROL(1)\/CHECK_FIFO/write_data">
+         <obj_property name="ElementShortName">write_data[36:0]</obj_property>
+         <obj_property name="ObjectShortName">write_data[36:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/hoplite_tb/\FIFO_SRC_ROW_CONTROL(0)\/\FIFO_SRC_COL_CONTROL(0)\/\FIFO_DEST_ROW_CONTROL(0)\/\FIFO_DEST_COL_CONTROL(1)\/CHECK_FIFO/read_en">
+         <obj_property name="ElementShortName">read_en</obj_property>
+         <obj_property name="ObjectShortName">read_en</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/hoplite_tb/\FIFO_SRC_ROW_CONTROL(0)\/\FIFO_SRC_COL_CONTROL(0)\/\FIFO_DEST_ROW_CONTROL(0)\/\FIFO_DEST_COL_CONTROL(1)\/CHECK_FIFO/read_data">
+         <obj_property name="ElementShortName">read_data[36:0]</obj_property>
+         <obj_property name="ObjectShortName">read_data[36:0]</obj_property>
+      </wvobject>
+      <wvobject type="other" fp_name="/hoplite_tb/\FIFO_SRC_ROW_CONTROL(0)\/\FIFO_SRC_COL_CONTROL(0)\/\FIFO_DEST_ROW_CONTROL(0)\/\FIFO_DEST_COL_CONTROL(1)\/CHECK_FIFO/write_index">
+         <obj_property name="ElementShortName">write_index</obj_property>
+         <obj_property name="ObjectShortName">write_index</obj_property>
+      </wvobject>
+      <wvobject type="other" fp_name="/hoplite_tb/\FIFO_SRC_ROW_CONTROL(0)\/\FIFO_SRC_COL_CONTROL(0)\/\FIFO_DEST_ROW_CONTROL(0)\/\FIFO_DEST_COL_CONTROL(1)\/CHECK_FIFO/read_index">
+         <obj_property name="ElementShortName">read_index</obj_property>
+         <obj_property name="ObjectShortName">read_index</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject type="group" fp_name="group494">
+      <obj_property name="label">Node (1, 0)</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <wvobject type="group" fp_name="group495">
+         <obj_property name="label">Input</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+         <wvobject type="array" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(1)\/NODE/x_in">
+            <obj_property name="ElementShortName">x_in[36:0]</obj_property>
+            <obj_property name="ObjectShortName">x_in[36:0]</obj_property>
+            <obj_property name="Radix">HEXRADIX</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(1)\/NODE/x_in_valid">
+            <obj_property name="ElementShortName">x_in_valid</obj_property>
+            <obj_property name="ObjectShortName">x_in_valid</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(1)\/NODE/y_in">
+            <obj_property name="ElementShortName">y_in[36:0]</obj_property>
+            <obj_property name="ObjectShortName">y_in[36:0]</obj_property>
+            <obj_property name="Radix">HEXRADIX</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(1)\/NODE/y_in_valid">
+            <obj_property name="ElementShortName">y_in_valid</obj_property>
+            <obj_property name="ObjectShortName">y_in_valid</obj_property>
+         </wvobject>
+      </wvobject>
+      <wvobject type="group" fp_name="group504">
+         <obj_property name="label">Output</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+         <wvobject type="array" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(1)\/NODE/x_out">
+            <obj_property name="ElementShortName">x_out[36:0]</obj_property>
+            <obj_property name="ObjectShortName">x_out[36:0]</obj_property>
+            <obj_property name="Radix">HEXRADIX</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(1)\/NODE/x_out_valid">
+            <obj_property name="ElementShortName">x_out_valid</obj_property>
+            <obj_property name="ObjectShortName">x_out_valid</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(1)\/NODE/y_out">
+            <obj_property name="ElementShortName">y_out[36:0]</obj_property>
+            <obj_property name="ObjectShortName">y_out[36:0]</obj_property>
+            <obj_property name="Radix">HEXRADIX</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(1)\/NODE/y_out_valid">
+            <obj_property name="ElementShortName">y_out_valid</obj_property>
+            <obj_property name="ObjectShortName">y_out_valid</obj_property>
+         </wvobject>
+      </wvobject>
+      <wvobject type="array" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(1)\/NODE/last_message_sent">
+         <obj_property name="ElementShortName">last_message_sent[36:0]</obj_property>
+         <obj_property name="ObjectShortName">last_message_sent[36:0]</obj_property>
+         <obj_property name="Radix">HEXRADIX</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(1)\/NODE/message_sent">
+         <obj_property name="ElementShortName">message_sent</obj_property>
+         <obj_property name="ObjectShortName">message_sent</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(1)\/NODE/last_message_received">
+         <obj_property name="ElementShortName">last_message_received[36:0]</obj_property>
+         <obj_property name="ObjectShortName">last_message_received[36:0]</obj_property>
+         <obj_property name="Radix">HEXRADIX</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(1)\/NODE/message_received">
+         <obj_property name="ElementShortName">message_received</obj_property>
+         <obj_property name="ObjectShortName">message_received</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject fp_name="divider145" type="divider">
+      <obj_property name="label">Row 1 broadcast</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject type="group" fp_name="group130">
+      <obj_property name="label">Node (1, 1)</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject type="group" fp_name="group131">
+         <obj_property name="label">Input</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+         <wvobject type="array" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(1)\/NODE/x_in">
+            <obj_property name="ElementShortName">x_in[36:0]</obj_property>
+            <obj_property name="ObjectShortName">x_in[36:0]</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(1)\/NODE/x_in_valid">
+            <obj_property name="ElementShortName">x_in_valid</obj_property>
+            <obj_property name="ObjectShortName">x_in_valid</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(1)\/NODE/y_in">
+            <obj_property name="ElementShortName">y_in[36:0]</obj_property>
+            <obj_property name="ObjectShortName">y_in[36:0]</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(1)\/NODE/y_in_valid">
+            <obj_property name="ElementShortName">y_in_valid</obj_property>
+            <obj_property name="ObjectShortName">y_in_valid</obj_property>
+         </wvobject>
+      </wvobject>
+      <wvobject type="group" fp_name="group132">
+         <obj_property name="label">Output</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+         <wvobject type="array" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(1)\/NODE/x_out">
+            <obj_property name="ElementShortName">x_out[36:0]</obj_property>
+            <obj_property name="ObjectShortName">x_out[36:0]</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(1)\/NODE/x_out_valid">
+            <obj_property name="ElementShortName">x_out_valid</obj_property>
+            <obj_property name="ObjectShortName">x_out_valid</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(1)\/NODE/y_out">
+            <obj_property name="ElementShortName">y_out[36:0]</obj_property>
+            <obj_property name="ObjectShortName">y_out[36:0]</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(1)\/NODE/y_out_valid">
+            <obj_property name="ElementShortName">y_out_valid</obj_property>
+            <obj_property name="ObjectShortName">y_out_valid</obj_property>
+         </wvobject>
+      </wvobject>
+      <wvobject type="array" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(1)\/NODE/last_message_sent">
+         <obj_property name="ElementShortName">last_message_sent[36:0]</obj_property>
+         <obj_property name="ObjectShortName">last_message_sent[36:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(1)\/NODE/message_sent">
+         <obj_property name="ElementShortName">message_sent</obj_property>
+         <obj_property name="ObjectShortName">message_sent</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(1)\/NODE/last_message_received">
+         <obj_property name="ElementShortName">last_message_received[36:0]</obj_property>
+         <obj_property name="ObjectShortName">last_message_received[36:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(1)\/NODE/message_received">
+         <obj_property name="ElementShortName">message_received</obj_property>
+         <obj_property name="ObjectShortName">message_received</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject type="group" fp_name="group146">
+      <obj_property name="label">FIFO (1, 1) to (0, 1)</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject type="logic" fp_name="/hoplite_tb/\FIFO_SRC_ROW_CONTROL(1)\/\FIFO_SRC_COL_CONTROL(1)\/\FIFO_DEST_ROW_CONTROL(1)\/\FIFO_DEST_COL_CONTROL(0)\/CHECK_FIFO/write_en">
+         <obj_property name="ElementShortName">write_en</obj_property>
+         <obj_property name="ObjectShortName">write_en</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/hoplite_tb/\FIFO_SRC_ROW_CONTROL(1)\/\FIFO_SRC_COL_CONTROL(1)\/\FIFO_DEST_ROW_CONTROL(1)\/\FIFO_DEST_COL_CONTROL(0)\/CHECK_FIFO/write_data">
+         <obj_property name="ElementShortName">write_data[36:0]</obj_property>
+         <obj_property name="ObjectShortName">write_data[36:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/hoplite_tb/\FIFO_SRC_ROW_CONTROL(1)\/\FIFO_SRC_COL_CONTROL(1)\/\FIFO_DEST_ROW_CONTROL(1)\/\FIFO_DEST_COL_CONTROL(0)\/CHECK_FIFO/read_en">
+         <obj_property name="ElementShortName">read_en</obj_property>
+         <obj_property name="ObjectShortName">read_en</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/hoplite_tb/\FIFO_SRC_ROW_CONTROL(1)\/\FIFO_SRC_COL_CONTROL(1)\/\FIFO_DEST_ROW_CONTROL(1)\/\FIFO_DEST_COL_CONTROL(0)\/CHECK_FIFO/read_data">
+         <obj_property name="ElementShortName">read_data[36:0]</obj_property>
+         <obj_property name="ObjectShortName">read_data[36:0]</obj_property>
+      </wvobject>
+      <wvobject type="other" fp_name="/hoplite_tb/\FIFO_SRC_ROW_CONTROL(1)\/\FIFO_SRC_COL_CONTROL(1)\/\FIFO_DEST_ROW_CONTROL(1)\/\FIFO_DEST_COL_CONTROL(0)\/CHECK_FIFO/write_index">
+         <obj_property name="ElementShortName">write_index</obj_property>
+         <obj_property name="ObjectShortName">write_index</obj_property>
+      </wvobject>
+      <wvobject type="other" fp_name="/hoplite_tb/\FIFO_SRC_ROW_CONTROL(1)\/\FIFO_SRC_COL_CONTROL(1)\/\FIFO_DEST_ROW_CONTROL(1)\/\FIFO_DEST_COL_CONTROL(0)\/CHECK_FIFO/read_index">
+         <obj_property name="ElementShortName">read_index</obj_property>
+         <obj_property name="ObjectShortName">read_index</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject type="group" fp_name="group153">
+      <obj_property name="label">Node (0, 1)</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject type="group" fp_name="group154">
+         <obj_property name="label">Input</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+         <wvobject type="array" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(0)\/NODE/x_in">
+            <obj_property name="ElementShortName">x_in[36:0]</obj_property>
+            <obj_property name="ObjectShortName">x_in[36:0]</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(0)\/NODE/x_in_valid">
+            <obj_property name="ElementShortName">x_in_valid</obj_property>
+            <obj_property name="ObjectShortName">x_in_valid</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(0)\/NODE/y_in">
+            <obj_property name="ElementShortName">y_in[36:0]</obj_property>
+            <obj_property name="ObjectShortName">y_in[36:0]</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(0)\/NODE/y_in_valid">
+            <obj_property name="ElementShortName">y_in_valid</obj_property>
+            <obj_property name="ObjectShortName">y_in_valid</obj_property>
+         </wvobject>
+      </wvobject>
+      <wvobject type="group" fp_name="group155">
+         <obj_property name="label">Output</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+         <wvobject type="array" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(0)\/NODE/x_out">
+            <obj_property name="ElementShortName">x_out[36:0]</obj_property>
+            <obj_property name="ObjectShortName">x_out[36:0]</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(0)\/NODE/x_out_valid">
+            <obj_property name="ElementShortName">x_out_valid</obj_property>
+            <obj_property name="ObjectShortName">x_out_valid</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(0)\/NODE/y_out">
+            <obj_property name="ElementShortName">y_out[36:0]</obj_property>
+            <obj_property name="ObjectShortName">y_out[36:0]</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(0)\/NODE/y_out_valid">
+            <obj_property name="ElementShortName">y_out_valid</obj_property>
+            <obj_property name="ObjectShortName">y_out_valid</obj_property>
+         </wvobject>
+      </wvobject>
+      <wvobject type="array" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(0)\/NODE/last_message_sent">
+         <obj_property name="ElementShortName">last_message_sent[36:0]</obj_property>
+         <obj_property name="ObjectShortName">last_message_sent[36:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(0)\/NODE/message_sent">
+         <obj_property name="ElementShortName">message_sent</obj_property>
+         <obj_property name="ObjectShortName">message_sent</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(0)\/NODE/last_message_received">
+         <obj_property name="ElementShortName">last_message_received[36:0]</obj_property>
+         <obj_property name="ObjectShortName">last_message_received[36:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(0)\/NODE/message_received">
+         <obj_property name="ElementShortName">message_received</obj_property>
+         <obj_property name="ObjectShortName">message_received</obj_property>
+      </wvobject>
+   </wvobject>
+</wave_config>

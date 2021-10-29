@@ -61,7 +61,7 @@ begin
     dest(Y_INDEX) <= y_dest;
 
     -- Message format 0 -- x_dest | y_dest | x_src | y_src | count | type -- (BUS_WIDTH-1)
-    message <= trig_broadcast & std_logic_vector(to_unsigned(count, MESSAGE_BITS)) & src(Y_INDEX) & src(X_INDEX) & dest(Y_INDEX) & dest(X_INDEX);
+    message <= trig_broadcast & trig_broadcast & trig_broadcast & trig_broadcast & trig_broadcast & std_logic_vector(to_unsigned(count, MESSAGE_BITS)) & src(Y_INDEX) & src(X_INDEX) & dest(Y_INDEX) & dest(X_INDEX);
 
     MESSAGE_OUT_FF : process (clk)
     begin
@@ -124,7 +124,7 @@ begin
     received_src(X_INDEX)   <= message_in((3*COORD_BITS-1) downto 2*COORD_BITS);
     received_dest(Y_INDEX)  <= message_in((2*COORD_BITS-1) downto COORD_BITS);
     received_dest(X_INDEX)  <= message_in((COORD_BITS-1) downto 0);
-    received_message        <= message_in((BUS_WIDTH-MESSAGE_TYPE_BITS-1) downto 4*COORD_BITS);
+    received_message        <= message_in((BUS_WIDTH-MESSAGE_TYPE_BITS-1) downto 4*COORD_BITS + 2*MULTICAST_COORD_BITS);
     received_type           <= message_in(BUS_WIDTH-1);
     
     SAVE_MESSAGE_RECEIVED: process(clk)

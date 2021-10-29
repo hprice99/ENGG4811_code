@@ -1,0 +1,984 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="top_tb_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="fox_defs" />
+            <top_module name="glbl" />
+            <top_module name="math_functions" />
+            <top_module name="top_tb" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="4999999980fs"></ZoomStartTime>
+      <ZoomEndTime time="5000000004fs"></ZoomEndTime>
+      <Cursor1Time time="5000000000fs"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="484"></NameColumnWidth>
+      <ValueColumnWidth column_width="203"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="10" />
+   <wvobject type="logic" fp_name="/top_tb/clk">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/top_tb/reset_n">
+      <obj_property name="ElementShortName">reset_n</obj_property>
+      <obj_property name="ObjectShortName">reset_n</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/top_tb/LED">
+      <obj_property name="ElementShortName">LED[3:0]</obj_property>
+      <obj_property name="ObjectShortName">LED[3:0]</obj_property>
+   </wvobject>
+   <wvobject type="other" fp_name="/top_tb/count">
+      <obj_property name="ElementShortName">count</obj_property>
+      <obj_property name="ObjectShortName">count</obj_property>
+   </wvobject>
+   <wvobject type="group" fp_name="group667">
+      <obj_property name="label">Node 0 (0, 0)</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <wvobject type="group" fp_name="group673">
+         <obj_property name="label">Message in</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <wvobject type="array" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/fox_node_gen/FOX_NODE_INITIALISE/PE/multicast_group_in">
+            <obj_property name="ElementShortName">multicast_group_in[0:0]</obj_property>
+            <obj_property name="ObjectShortName">multicast_group_in[0:0]</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/fox_node_gen/FOX_NODE_INITIALISE/PE/done_flag_in">
+            <obj_property name="ElementShortName">done_flag_in</obj_property>
+            <obj_property name="ObjectShortName">done_flag_in</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/fox_node_gen/FOX_NODE_INITIALISE/PE/result_flag_in">
+            <obj_property name="ElementShortName">result_flag_in</obj_property>
+            <obj_property name="ObjectShortName">result_flag_in</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/fox_node_gen/FOX_NODE_INITIALISE/PE/matrix_type_in">
+            <obj_property name="ElementShortName">matrix_type_in[0:0]</obj_property>
+            <obj_property name="ObjectShortName">matrix_type_in[0:0]</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/fox_node_gen/FOX_NODE_INITIALISE/PE/matrix_x_coord_in">
+            <obj_property name="ElementShortName">matrix_x_coord_in[7:0]</obj_property>
+            <obj_property name="ObjectShortName">matrix_x_coord_in[7:0]</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/fox_node_gen/FOX_NODE_INITIALISE/PE/matrix_y_coord_in">
+            <obj_property name="ElementShortName">matrix_y_coord_in[7:0]</obj_property>
+            <obj_property name="ObjectShortName">matrix_y_coord_in[7:0]</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/fox_node_gen/FOX_NODE_INITIALISE/PE/matrix_element_in">
+            <obj_property name="ElementShortName">matrix_element_in[31:0]</obj_property>
+            <obj_property name="ObjectShortName">matrix_element_in[31:0]</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/fox_node_gen/FOX_NODE_INITIALISE/PE/message_in_valid">
+            <obj_property name="ElementShortName">message_in_valid</obj_property>
+            <obj_property name="ObjectShortName">message_in_valid</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/fox_node_gen/FOX_NODE_INITIALISE/PE/message_in_available">
+            <obj_property name="ElementShortName">message_in_available</obj_property>
+            <obj_property name="ObjectShortName">message_in_available</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/fox_node_gen/FOX_NODE_INITIALISE/PE/message_in_read">
+            <obj_property name="ElementShortName">message_in_read</obj_property>
+            <obj_property name="ObjectShortName">message_in_read</obj_property>
+         </wvobject>
+      </wvobject>
+      <wvobject type="group" fp_name="group678">
+         <obj_property name="label">Message out</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <wvobject type="array" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/fox_node_gen/FOX_NODE_INITIALISE/PE/x_coord_out">
+            <obj_property name="ElementShortName">x_coord_out[1:0]</obj_property>
+            <obj_property name="ObjectShortName">x_coord_out[1:0]</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/fox_node_gen/FOX_NODE_INITIALISE/PE/x_coord_out_valid">
+            <obj_property name="ElementShortName">x_coord_out_valid</obj_property>
+            <obj_property name="ObjectShortName">x_coord_out_valid</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/fox_node_gen/FOX_NODE_INITIALISE/PE/y_coord_out">
+            <obj_property name="ElementShortName">y_coord_out[1:0]</obj_property>
+            <obj_property name="ObjectShortName">y_coord_out[1:0]</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/fox_node_gen/FOX_NODE_INITIALISE/PE/y_coord_out_valid">
+            <obj_property name="ElementShortName">y_coord_out_valid</obj_property>
+            <obj_property name="ObjectShortName">y_coord_out_valid</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/fox_node_gen/FOX_NODE_INITIALISE/PE/multicast_group_out">
+            <obj_property name="ElementShortName">multicast_group_out[0:0]</obj_property>
+            <obj_property name="ObjectShortName">multicast_group_out[0:0]</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/fox_node_gen/FOX_NODE_INITIALISE/PE/multicast_group_out_valid">
+            <obj_property name="ElementShortName">multicast_group_out_valid</obj_property>
+            <obj_property name="ObjectShortName">multicast_group_out_valid</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/fox_node_gen/FOX_NODE_INITIALISE/PE/done_flag_out">
+            <obj_property name="ElementShortName">done_flag_out</obj_property>
+            <obj_property name="ObjectShortName">done_flag_out</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/fox_node_gen/FOX_NODE_INITIALISE/PE/done_flag_out_valid">
+            <obj_property name="ElementShortName">done_flag_out_valid</obj_property>
+            <obj_property name="ObjectShortName">done_flag_out_valid</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/fox_node_gen/FOX_NODE_INITIALISE/PE/result_flag_out">
+            <obj_property name="ElementShortName">result_flag_out</obj_property>
+            <obj_property name="ObjectShortName">result_flag_out</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/fox_node_gen/FOX_NODE_INITIALISE/PE/result_flag_out_valid">
+            <obj_property name="ElementShortName">result_flag_out_valid</obj_property>
+            <obj_property name="ObjectShortName">result_flag_out_valid</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/fox_node_gen/FOX_NODE_INITIALISE/PE/matrix_type_out">
+            <obj_property name="ElementShortName">matrix_type_out[0:0]</obj_property>
+            <obj_property name="ObjectShortName">matrix_type_out[0:0]</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/fox_node_gen/FOX_NODE_INITIALISE/PE/matrix_type_out_valid">
+            <obj_property name="ElementShortName">matrix_type_out_valid</obj_property>
+            <obj_property name="ObjectShortName">matrix_type_out_valid</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/fox_node_gen/FOX_NODE_INITIALISE/PE/matrix_x_coord_out">
+            <obj_property name="ElementShortName">matrix_x_coord_out[7:0]</obj_property>
+            <obj_property name="ObjectShortName">matrix_x_coord_out[7:0]</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/fox_node_gen/FOX_NODE_INITIALISE/PE/matrix_x_coord_out_valid">
+            <obj_property name="ElementShortName">matrix_x_coord_out_valid</obj_property>
+            <obj_property name="ObjectShortName">matrix_x_coord_out_valid</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/fox_node_gen/FOX_NODE_INITIALISE/PE/matrix_y_coord_out">
+            <obj_property name="ElementShortName">matrix_y_coord_out[7:0]</obj_property>
+            <obj_property name="ObjectShortName">matrix_y_coord_out[7:0]</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/fox_node_gen/FOX_NODE_INITIALISE/PE/matrix_y_coord_out_valid">
+            <obj_property name="ElementShortName">matrix_y_coord_out_valid</obj_property>
+            <obj_property name="ObjectShortName">matrix_y_coord_out_valid</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/fox_node_gen/FOX_NODE_INITIALISE/PE/matrix_element_out">
+            <obj_property name="ElementShortName">matrix_element_out[31:0]</obj_property>
+            <obj_property name="ObjectShortName">matrix_element_out[31:0]</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/fox_node_gen/FOX_NODE_INITIALISE/PE/matrix_element_out_valid">
+            <obj_property name="ElementShortName">matrix_element_out_valid</obj_property>
+            <obj_property name="ObjectShortName">matrix_element_out_valid</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/fox_node_gen/FOX_NODE_INITIALISE/PE/packet_complete_out">
+            <obj_property name="ElementShortName">packet_complete_out</obj_property>
+            <obj_property name="ObjectShortName">packet_complete_out</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/fox_node_gen/FOX_NODE_INITIALISE/PE/message_out_ready">
+            <obj_property name="ElementShortName">message_out_ready</obj_property>
+            <obj_property name="ObjectShortName">message_out_ready</obj_property>
+         </wvobject>
+      </wvobject>
+      <wvobject type="group" fp_name="group681">
+         <obj_property name="label">Memory</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+      </wvobject>
+      <wvobject type="group" fp_name="group721">
+         <obj_property name="label">NIC</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <wvobject type="group" fp_name="group722">
+            <obj_property name="label">PE to network</obj_property>
+            <obj_property name="DisplayName">label</obj_property>
+            <obj_property name="isExpanded"></obj_property>
+            <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/fox_node_gen/FOX_NODE_INITIALISE/NIC/from_pe_valid">
+               <obj_property name="ElementShortName">from_pe_valid</obj_property>
+               <obj_property name="ObjectShortName">from_pe_valid</obj_property>
+            </wvobject>
+            <wvobject type="array" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/fox_node_gen/FOX_NODE_INITIALISE/NIC/from_pe_data">
+               <obj_property name="ElementShortName">from_pe_data[55:0]</obj_property>
+               <obj_property name="ObjectShortName">from_pe_data[55:0]</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/fox_node_gen/FOX_NODE_INITIALISE/NIC/network_ready">
+               <obj_property name="ElementShortName">network_ready</obj_property>
+               <obj_property name="ObjectShortName">network_ready</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/fox_node_gen/FOX_NODE_INITIALISE/NIC/to_network_valid">
+               <obj_property name="ElementShortName">to_network_valid</obj_property>
+               <obj_property name="ObjectShortName">to_network_valid</obj_property>
+            </wvobject>
+            <wvobject type="array" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/fox_node_gen/FOX_NODE_INITIALISE/NIC/to_network_data">
+               <obj_property name="ElementShortName">to_network_data[55:0]</obj_property>
+               <obj_property name="ObjectShortName">to_network_data[55:0]</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/fox_node_gen/FOX_NODE_INITIALISE/NIC/pe_to_network_full">
+               <obj_property name="ElementShortName">pe_to_network_full</obj_property>
+               <obj_property name="ObjectShortName">pe_to_network_full</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/fox_node_gen/FOX_NODE_INITIALISE/NIC/pe_to_network_empty">
+               <obj_property name="ElementShortName">pe_to_network_empty</obj_property>
+               <obj_property name="ObjectShortName">pe_to_network_empty</obj_property>
+            </wvobject>
+         </wvobject>
+         <wvobject type="group" fp_name="group723">
+            <obj_property name="label">Network to PE</obj_property>
+            <obj_property name="DisplayName">label</obj_property>
+            <obj_property name="isExpanded"></obj_property>
+            <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/fox_node_gen/FOX_NODE_INITIALISE/NIC/from_network_valid">
+               <obj_property name="ElementShortName">from_network_valid</obj_property>
+               <obj_property name="ObjectShortName">from_network_valid</obj_property>
+            </wvobject>
+            <wvobject type="array" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/fox_node_gen/FOX_NODE_INITIALISE/NIC/from_network_data">
+               <obj_property name="ElementShortName">from_network_data[55:0]</obj_property>
+               <obj_property name="ObjectShortName">from_network_data[55:0]</obj_property>
+            </wvobject>
+            <wvobject type="other" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/fox_node_gen/FOX_NODE_INITIALISE/NIC/NETWORK_TO_PE_FIFO/write_index">
+               <obj_property name="ElementShortName">write_index</obj_property>
+               <obj_property name="ObjectShortName">write_index</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/fox_node_gen/FOX_NODE_INITIALISE/NIC/pe_ready">
+               <obj_property name="ElementShortName">pe_ready</obj_property>
+               <obj_property name="ObjectShortName">pe_ready</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/fox_node_gen/FOX_NODE_INITIALISE/NIC/to_pe_valid">
+               <obj_property name="ElementShortName">to_pe_valid</obj_property>
+               <obj_property name="ObjectShortName">to_pe_valid</obj_property>
+            </wvobject>
+            <wvobject type="array" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/fox_node_gen/FOX_NODE_INITIALISE/NIC/to_pe_data">
+               <obj_property name="ElementShortName">to_pe_data[55:0]</obj_property>
+               <obj_property name="ObjectShortName">to_pe_data[55:0]</obj_property>
+            </wvobject>
+            <wvobject type="other" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/fox_node_gen/FOX_NODE_INITIALISE/NIC/NETWORK_TO_PE_FIFO/read_index">
+               <obj_property name="ElementShortName">read_index</obj_property>
+               <obj_property name="ObjectShortName">read_index</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/fox_node_gen/FOX_NODE_INITIALISE/NIC/network_to_pe_full">
+               <obj_property name="ElementShortName">network_to_pe_full</obj_property>
+               <obj_property name="ObjectShortName">network_to_pe_full</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/fox_node_gen/FOX_NODE_INITIALISE/NIC/network_to_pe_empty">
+               <obj_property name="ElementShortName">network_to_pe_empty</obj_property>
+               <obj_property name="ObjectShortName">network_to_pe_empty</obj_property>
+            </wvobject>
+         </wvobject>
+      </wvobject>
+      <wvobject type="group" fp_name="group225">
+         <obj_property name="label">Router</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+         <wvobject type="group" fp_name="group226">
+            <obj_property name="label">Router in</obj_property>
+            <obj_property name="DisplayName">label</obj_property>
+            <obj_property name="isExpanded"></obj_property>
+            <wvobject type="array" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/fox_node_gen/FOX_NODE_INITIALISE/ROUTER/x_in">
+               <obj_property name="ElementShortName">x_in[55:0]</obj_property>
+               <obj_property name="ObjectShortName">x_in[55:0]</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/fox_node_gen/FOX_NODE_INITIALISE/ROUTER/x_in_valid">
+               <obj_property name="ElementShortName">x_in_valid</obj_property>
+               <obj_property name="ObjectShortName">x_in_valid</obj_property>
+            </wvobject>
+            <wvobject type="array" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/fox_node_gen/FOX_NODE_INITIALISE/ROUTER/x_in_dest_d">
+               <obj_property name="ElementShortName">x_in_dest_d[0:1][1:0]</obj_property>
+               <obj_property name="ObjectShortName">x_in_dest_d[0:1][1:0]</obj_property>
+            </wvobject>
+            <wvobject type="array" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/fox_node_gen/FOX_NODE_INITIALISE/ROUTER/y_in">
+               <obj_property name="ElementShortName">y_in[55:0]</obj_property>
+               <obj_property name="ObjectShortName">y_in[55:0]</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/fox_node_gen/FOX_NODE_INITIALISE/ROUTER/y_in_valid">
+               <obj_property name="ElementShortName">y_in_valid</obj_property>
+               <obj_property name="ObjectShortName">y_in_valid</obj_property>
+            </wvobject>
+            <wvobject type="array" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/fox_node_gen/FOX_NODE_INITIALISE/ROUTER/y_in_dest_d">
+               <obj_property name="ElementShortName">y_in_dest_d[0:1][1:0]</obj_property>
+               <obj_property name="ObjectShortName">y_in_dest_d[0:1][1:0]</obj_property>
+            </wvobject>
+            <wvobject type="array" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/fox_node_gen/FOX_NODE_INITIALISE/ROUTER/pe_in">
+               <obj_property name="ElementShortName">pe_in[55:0]</obj_property>
+               <obj_property name="ObjectShortName">pe_in[55:0]</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/fox_node_gen/FOX_NODE_INITIALISE/ROUTER/pe_in_valid">
+               <obj_property name="ElementShortName">pe_in_valid</obj_property>
+               <obj_property name="ObjectShortName">pe_in_valid</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/fox_node_gen/FOX_NODE_INITIALISE/ROUTER/pe_backpressure">
+               <obj_property name="ElementShortName">pe_backpressure</obj_property>
+               <obj_property name="ObjectShortName">pe_backpressure</obj_property>
+            </wvobject>
+         </wvobject>
+         <wvobject type="group" fp_name="group227">
+            <obj_property name="label">Router out</obj_property>
+            <obj_property name="DisplayName">label</obj_property>
+            <obj_property name="isExpanded"></obj_property>
+            <wvobject type="array" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/fox_node_gen/FOX_NODE_INITIALISE/ROUTER/x_out">
+               <obj_property name="ElementShortName">x_out[55:0]</obj_property>
+               <obj_property name="ObjectShortName">x_out[55:0]</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/fox_node_gen/FOX_NODE_INITIALISE/ROUTER/x_out_valid">
+               <obj_property name="ElementShortName">x_out_valid</obj_property>
+               <obj_property name="ObjectShortName">x_out_valid</obj_property>
+            </wvobject>
+            <wvobject type="array" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/fox_node_gen/FOX_NODE_INITIALISE/ROUTER/y_out">
+               <obj_property name="ElementShortName">y_out[55:0]</obj_property>
+               <obj_property name="ObjectShortName">y_out[55:0]</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/fox_node_gen/FOX_NODE_INITIALISE/ROUTER/y_out_valid">
+               <obj_property name="ElementShortName">y_out_valid</obj_property>
+               <obj_property name="ObjectShortName">y_out_valid</obj_property>
+            </wvobject>
+            <wvobject type="array" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/fox_node_gen/FOX_NODE_INITIALISE/ROUTER/pe_out">
+               <obj_property name="ElementShortName">pe_out[55:0]</obj_property>
+               <obj_property name="ObjectShortName">pe_out[55:0]</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/fox_node_gen/FOX_NODE_INITIALISE/ROUTER/pe_out_valid">
+               <obj_property name="ElementShortName">pe_out_valid</obj_property>
+               <obj_property name="ObjectShortName">pe_out_valid</obj_property>
+            </wvobject>
+         </wvobject>
+      </wvobject>
+   </wvobject>
+   <wvobject type="group" fp_name="group668">
+      <obj_property name="label">Node 1 (1, 0)</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <wvobject type="group" fp_name="group740">
+         <obj_property name="label">Message in</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+      </wvobject>
+      <wvobject type="group" fp_name="group741">
+         <obj_property name="label">Message out</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+         <wvobject type="array" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(1)\/fox_node_gen/FOX_NODE_INITIALISE/PE/x_coord_out">
+            <obj_property name="ElementShortName">x_coord_out[1:0]</obj_property>
+            <obj_property name="ObjectShortName">x_coord_out[1:0]</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(1)\/fox_node_gen/FOX_NODE_INITIALISE/PE/x_coord_out_valid">
+            <obj_property name="ElementShortName">x_coord_out_valid</obj_property>
+            <obj_property name="ObjectShortName">x_coord_out_valid</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(1)\/fox_node_gen/FOX_NODE_INITIALISE/PE/y_coord_out">
+            <obj_property name="ElementShortName">y_coord_out[1:0]</obj_property>
+            <obj_property name="ObjectShortName">y_coord_out[1:0]</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(1)\/fox_node_gen/FOX_NODE_INITIALISE/PE/y_coord_out_valid">
+            <obj_property name="ElementShortName">y_coord_out_valid</obj_property>
+            <obj_property name="ObjectShortName">y_coord_out_valid</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(1)\/fox_node_gen/FOX_NODE_INITIALISE/PE/multicast_group_out">
+            <obj_property name="ElementShortName">multicast_group_out[0:0]</obj_property>
+            <obj_property name="ObjectShortName">multicast_group_out[0:0]</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(1)\/fox_node_gen/FOX_NODE_INITIALISE/PE/multicast_group_out_valid">
+            <obj_property name="ElementShortName">multicast_group_out_valid</obj_property>
+            <obj_property name="ObjectShortName">multicast_group_out_valid</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(1)\/fox_node_gen/FOX_NODE_INITIALISE/PE/done_flag_out">
+            <obj_property name="ElementShortName">done_flag_out</obj_property>
+            <obj_property name="ObjectShortName">done_flag_out</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(1)\/fox_node_gen/FOX_NODE_INITIALISE/PE/done_flag_out_valid">
+            <obj_property name="ElementShortName">done_flag_out_valid</obj_property>
+            <obj_property name="ObjectShortName">done_flag_out_valid</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(1)\/fox_node_gen/FOX_NODE_INITIALISE/PE/result_flag_out">
+            <obj_property name="ElementShortName">result_flag_out</obj_property>
+            <obj_property name="ObjectShortName">result_flag_out</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(1)\/fox_node_gen/FOX_NODE_INITIALISE/PE/result_flag_out_valid">
+            <obj_property name="ElementShortName">result_flag_out_valid</obj_property>
+            <obj_property name="ObjectShortName">result_flag_out_valid</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(1)\/fox_node_gen/FOX_NODE_INITIALISE/PE/matrix_type_out">
+            <obj_property name="ElementShortName">matrix_type_out[0:0]</obj_property>
+            <obj_property name="ObjectShortName">matrix_type_out[0:0]</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(1)\/fox_node_gen/FOX_NODE_INITIALISE/PE/matrix_type_out_valid">
+            <obj_property name="ElementShortName">matrix_type_out_valid</obj_property>
+            <obj_property name="ObjectShortName">matrix_type_out_valid</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(1)\/fox_node_gen/FOX_NODE_INITIALISE/PE/matrix_x_coord_out">
+            <obj_property name="ElementShortName">matrix_x_coord_out[7:0]</obj_property>
+            <obj_property name="ObjectShortName">matrix_x_coord_out[7:0]</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(1)\/fox_node_gen/FOX_NODE_INITIALISE/PE/matrix_x_coord_out_valid">
+            <obj_property name="ElementShortName">matrix_x_coord_out_valid</obj_property>
+            <obj_property name="ObjectShortName">matrix_x_coord_out_valid</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(1)\/fox_node_gen/FOX_NODE_INITIALISE/PE/matrix_y_coord_out">
+            <obj_property name="ElementShortName">matrix_y_coord_out[7:0]</obj_property>
+            <obj_property name="ObjectShortName">matrix_y_coord_out[7:0]</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(1)\/fox_node_gen/FOX_NODE_INITIALISE/PE/matrix_y_coord_out_valid">
+            <obj_property name="ElementShortName">matrix_y_coord_out_valid</obj_property>
+            <obj_property name="ObjectShortName">matrix_y_coord_out_valid</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(1)\/fox_node_gen/FOX_NODE_INITIALISE/PE/matrix_element_out">
+            <obj_property name="ElementShortName">matrix_element_out[31:0]</obj_property>
+            <obj_property name="ObjectShortName">matrix_element_out[31:0]</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(1)\/fox_node_gen/FOX_NODE_INITIALISE/PE/matrix_element_out_valid">
+            <obj_property name="ElementShortName">matrix_element_out_valid</obj_property>
+            <obj_property name="ObjectShortName">matrix_element_out_valid</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(1)\/fox_node_gen/FOX_NODE_INITIALISE/PE/packet_complete_out">
+            <obj_property name="ElementShortName">packet_complete_out</obj_property>
+            <obj_property name="ObjectShortName">packet_complete_out</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(1)\/fox_node_gen/FOX_NODE_INITIALISE/PE/message_out_ready">
+            <obj_property name="ElementShortName">message_out_ready</obj_property>
+            <obj_property name="ObjectShortName">message_out_ready</obj_property>
+         </wvobject>
+      </wvobject>
+      <wvobject type="group" fp_name="group772">
+         <obj_property name="label">Memory</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+      </wvobject>
+      <wvobject type="group" fp_name="group782">
+         <obj_property name="label">NIC</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+         <wvobject type="group" fp_name="group783">
+            <obj_property name="label">PE to network</obj_property>
+            <obj_property name="DisplayName">label</obj_property>
+            <obj_property name="isExpanded"></obj_property>
+            <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(1)\/fox_node_gen/FOX_NODE_INITIALISE/NIC/from_pe_valid">
+               <obj_property name="ElementShortName">from_pe_valid</obj_property>
+               <obj_property name="ObjectShortName">from_pe_valid</obj_property>
+            </wvobject>
+            <wvobject type="array" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(1)\/fox_node_gen/FOX_NODE_INITIALISE/NIC/from_pe_data">
+               <obj_property name="ElementShortName">from_pe_data[55:0]</obj_property>
+               <obj_property name="ObjectShortName">from_pe_data[55:0]</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(1)\/fox_node_gen/FOX_NODE_INITIALISE/NIC/network_ready">
+               <obj_property name="ElementShortName">network_ready</obj_property>
+               <obj_property name="ObjectShortName">network_ready</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(1)\/fox_node_gen/FOX_NODE_INITIALISE/NIC/to_network_valid">
+               <obj_property name="ElementShortName">to_network_valid</obj_property>
+               <obj_property name="ObjectShortName">to_network_valid</obj_property>
+            </wvobject>
+            <wvobject type="array" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(1)\/fox_node_gen/FOX_NODE_INITIALISE/NIC/to_network_data">
+               <obj_property name="ElementShortName">to_network_data[55:0]</obj_property>
+               <obj_property name="ObjectShortName">to_network_data[55:0]</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(1)\/fox_node_gen/FOX_NODE_INITIALISE/NIC/pe_to_network_full">
+               <obj_property name="ElementShortName">pe_to_network_full</obj_property>
+               <obj_property name="ObjectShortName">pe_to_network_full</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(1)\/fox_node_gen/FOX_NODE_INITIALISE/NIC/pe_to_network_empty">
+               <obj_property name="ElementShortName">pe_to_network_empty</obj_property>
+               <obj_property name="ObjectShortName">pe_to_network_empty</obj_property>
+            </wvobject>
+         </wvobject>
+         <wvobject type="group" fp_name="group784">
+            <obj_property name="label">Network to PE</obj_property>
+            <obj_property name="DisplayName">label</obj_property>
+            <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(1)\/fox_node_gen/FOX_NODE_INITIALISE/NIC/from_network_valid">
+               <obj_property name="ElementShortName">from_network_valid</obj_property>
+               <obj_property name="ObjectShortName">from_network_valid</obj_property>
+            </wvobject>
+            <wvobject type="array" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(1)\/fox_node_gen/FOX_NODE_INITIALISE/NIC/from_network_data">
+               <obj_property name="ElementShortName">from_network_data[55:0]</obj_property>
+               <obj_property name="ObjectShortName">from_network_data[55:0]</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(1)\/fox_node_gen/FOX_NODE_INITIALISE/NIC/pe_ready">
+               <obj_property name="ElementShortName">pe_ready</obj_property>
+               <obj_property name="ObjectShortName">pe_ready</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(1)\/fox_node_gen/FOX_NODE_INITIALISE/NIC/to_pe_valid">
+               <obj_property name="ElementShortName">to_pe_valid</obj_property>
+               <obj_property name="ObjectShortName">to_pe_valid</obj_property>
+            </wvobject>
+            <wvobject type="array" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(1)\/fox_node_gen/FOX_NODE_INITIALISE/NIC/to_pe_data">
+               <obj_property name="ElementShortName">to_pe_data[55:0]</obj_property>
+               <obj_property name="ObjectShortName">to_pe_data[55:0]</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(1)\/fox_node_gen/FOX_NODE_INITIALISE/NIC/network_to_pe_full">
+               <obj_property name="ElementShortName">network_to_pe_full</obj_property>
+               <obj_property name="ObjectShortName">network_to_pe_full</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(1)\/fox_node_gen/FOX_NODE_INITIALISE/NIC/network_to_pe_empty">
+               <obj_property name="ElementShortName">network_to_pe_empty</obj_property>
+               <obj_property name="ObjectShortName">network_to_pe_empty</obj_property>
+            </wvobject>
+         </wvobject>
+      </wvobject>
+   </wvobject>
+   <wvobject type="group" fp_name="group669">
+      <obj_property name="label">Node 2 (0, 1)</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <wvobject type="group" fp_name="group798">
+         <obj_property name="label">Message in</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+      </wvobject>
+      <wvobject type="group" fp_name="group799">
+         <obj_property name="label">Message out</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+      </wvobject>
+      <wvobject type="group" fp_name="group800">
+         <obj_property name="label">Memory</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+      </wvobject>
+      <wvobject type="group" fp_name="group801">
+         <obj_property name="label">NIC</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+         <wvobject type="group" fp_name="group802">
+            <obj_property name="label">PE to network</obj_property>
+            <obj_property name="DisplayName">label</obj_property>
+            <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(0)\/fox_node_gen/FOX_NODE_INITIALISE/NIC/from_pe_valid">
+               <obj_property name="ElementShortName">from_pe_valid</obj_property>
+               <obj_property name="ObjectShortName">from_pe_valid</obj_property>
+            </wvobject>
+            <wvobject type="array" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(0)\/fox_node_gen/FOX_NODE_INITIALISE/NIC/from_pe_data">
+               <obj_property name="ElementShortName">from_pe_data[55:0]</obj_property>
+               <obj_property name="ObjectShortName">from_pe_data[55:0]</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(0)\/fox_node_gen/FOX_NODE_INITIALISE/NIC/network_ready">
+               <obj_property name="ElementShortName">network_ready</obj_property>
+               <obj_property name="ObjectShortName">network_ready</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(0)\/fox_node_gen/FOX_NODE_INITIALISE/NIC/to_network_valid">
+               <obj_property name="ElementShortName">to_network_valid</obj_property>
+               <obj_property name="ObjectShortName">to_network_valid</obj_property>
+            </wvobject>
+            <wvobject type="array" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(0)\/fox_node_gen/FOX_NODE_INITIALISE/NIC/to_network_data">
+               <obj_property name="ElementShortName">to_network_data[55:0]</obj_property>
+               <obj_property name="ObjectShortName">to_network_data[55:0]</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(0)\/fox_node_gen/FOX_NODE_INITIALISE/NIC/pe_to_network_full">
+               <obj_property name="ElementShortName">pe_to_network_full</obj_property>
+               <obj_property name="ObjectShortName">pe_to_network_full</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(0)\/fox_node_gen/FOX_NODE_INITIALISE/NIC/pe_to_network_empty">
+               <obj_property name="ElementShortName">pe_to_network_empty</obj_property>
+               <obj_property name="ObjectShortName">pe_to_network_empty</obj_property>
+            </wvobject>
+         </wvobject>
+         <wvobject type="group" fp_name="group803">
+            <obj_property name="label">Network to PE</obj_property>
+            <obj_property name="DisplayName">label</obj_property>
+            <obj_property name="isExpanded"></obj_property>
+            <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(0)\/fox_node_gen/FOX_NODE_INITIALISE/NIC/from_network_valid">
+               <obj_property name="ElementShortName">from_network_valid</obj_property>
+               <obj_property name="ObjectShortName">from_network_valid</obj_property>
+            </wvobject>
+            <wvobject type="array" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(0)\/fox_node_gen/FOX_NODE_INITIALISE/NIC/from_network_data">
+               <obj_property name="ElementShortName">from_network_data[55:0]</obj_property>
+               <obj_property name="ObjectShortName">from_network_data[55:0]</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(0)\/fox_node_gen/FOX_NODE_INITIALISE/NIC/pe_ready">
+               <obj_property name="ElementShortName">pe_ready</obj_property>
+               <obj_property name="ObjectShortName">pe_ready</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(0)\/fox_node_gen/FOX_NODE_INITIALISE/NIC/to_pe_valid">
+               <obj_property name="ElementShortName">to_pe_valid</obj_property>
+               <obj_property name="ObjectShortName">to_pe_valid</obj_property>
+            </wvobject>
+            <wvobject type="array" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(0)\/fox_node_gen/FOX_NODE_INITIALISE/NIC/to_pe_data">
+               <obj_property name="ElementShortName">to_pe_data[55:0]</obj_property>
+               <obj_property name="ObjectShortName">to_pe_data[55:0]</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(0)\/fox_node_gen/FOX_NODE_INITIALISE/NIC/network_to_pe_full">
+               <obj_property name="ElementShortName">network_to_pe_full</obj_property>
+               <obj_property name="ObjectShortName">network_to_pe_full</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(0)\/fox_node_gen/FOX_NODE_INITIALISE/NIC/network_to_pe_empty">
+               <obj_property name="ElementShortName">network_to_pe_empty</obj_property>
+               <obj_property name="ObjectShortName">network_to_pe_empty</obj_property>
+            </wvobject>
+         </wvobject>
+      </wvobject>
+   </wvobject>
+   <wvobject type="group" fp_name="group670">
+      <obj_property name="label">Node 3 (1, 1)</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <wvobject type="group" fp_name="group804">
+         <obj_property name="label">Message in</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+         <wvobject type="array" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(1)\/fox_node_gen/FOX_NODE_INITIALISE/DECODER/packet_in">
+            <obj_property name="ElementShortName">packet_in[55:0]</obj_property>
+            <obj_property name="ObjectShortName">packet_in[55:0]</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(1)\/fox_node_gen/FOX_NODE_INITIALISE/PE/multicast_group_in">
+            <obj_property name="ElementShortName">multicast_group_in[0:0]</obj_property>
+            <obj_property name="ObjectShortName">multicast_group_in[0:0]</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(1)\/fox_node_gen/FOX_NODE_INITIALISE/PE/done_flag_in">
+            <obj_property name="ElementShortName">done_flag_in</obj_property>
+            <obj_property name="ObjectShortName">done_flag_in</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(1)\/fox_node_gen/FOX_NODE_INITIALISE/PE/result_flag_in">
+            <obj_property name="ElementShortName">result_flag_in</obj_property>
+            <obj_property name="ObjectShortName">result_flag_in</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(1)\/fox_node_gen/FOX_NODE_INITIALISE/PE/matrix_type_in">
+            <obj_property name="ElementShortName">matrix_type_in[0:0]</obj_property>
+            <obj_property name="ObjectShortName">matrix_type_in[0:0]</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(1)\/fox_node_gen/FOX_NODE_INITIALISE/PE/matrix_x_coord_in">
+            <obj_property name="ElementShortName">matrix_x_coord_in[7:0]</obj_property>
+            <obj_property name="ObjectShortName">matrix_x_coord_in[7:0]</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(1)\/fox_node_gen/FOX_NODE_INITIALISE/PE/matrix_y_coord_in">
+            <obj_property name="ElementShortName">matrix_y_coord_in[7:0]</obj_property>
+            <obj_property name="ObjectShortName">matrix_y_coord_in[7:0]</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(1)\/fox_node_gen/FOX_NODE_INITIALISE/PE/matrix_element_in">
+            <obj_property name="ElementShortName">matrix_element_in[31:0]</obj_property>
+            <obj_property name="ObjectShortName">matrix_element_in[31:0]</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(1)\/fox_node_gen/FOX_NODE_INITIALISE/PE/message_in_valid">
+            <obj_property name="ElementShortName">message_in_valid</obj_property>
+            <obj_property name="ObjectShortName">message_in_valid</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(1)\/fox_node_gen/FOX_NODE_INITIALISE/PE/message_in_available">
+            <obj_property name="ElementShortName">message_in_available</obj_property>
+            <obj_property name="ObjectShortName">message_in_available</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(1)\/fox_node_gen/FOX_NODE_INITIALISE/PE/message_in_read">
+            <obj_property name="ElementShortName">message_in_read</obj_property>
+            <obj_property name="ObjectShortName">message_in_read</obj_property>
+         </wvobject>
+      </wvobject>
+      <wvobject type="group" fp_name="group805">
+         <obj_property name="label">Message out</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+      </wvobject>
+      <wvobject type="group" fp_name="group806">
+         <obj_property name="label">Memory</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+      </wvobject>
+      <wvobject type="group" fp_name="group807">
+         <obj_property name="label">NIC</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+         <wvobject type="group" fp_name="group808">
+            <obj_property name="label">PE to network</obj_property>
+            <obj_property name="DisplayName">label</obj_property>
+            <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(1)\/fox_node_gen/FOX_NODE_INITIALISE/NIC/from_pe_valid">
+               <obj_property name="ElementShortName">from_pe_valid</obj_property>
+               <obj_property name="ObjectShortName">from_pe_valid</obj_property>
+            </wvobject>
+            <wvobject type="array" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(1)\/fox_node_gen/FOX_NODE_INITIALISE/NIC/from_pe_data">
+               <obj_property name="ElementShortName">from_pe_data[55:0]</obj_property>
+               <obj_property name="ObjectShortName">from_pe_data[55:0]</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(1)\/fox_node_gen/FOX_NODE_INITIALISE/NIC/network_ready">
+               <obj_property name="ElementShortName">network_ready</obj_property>
+               <obj_property name="ObjectShortName">network_ready</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(1)\/fox_node_gen/FOX_NODE_INITIALISE/NIC/to_network_valid">
+               <obj_property name="ElementShortName">to_network_valid</obj_property>
+               <obj_property name="ObjectShortName">to_network_valid</obj_property>
+            </wvobject>
+            <wvobject type="array" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(1)\/fox_node_gen/FOX_NODE_INITIALISE/NIC/to_network_data">
+               <obj_property name="ElementShortName">to_network_data[55:0]</obj_property>
+               <obj_property name="ObjectShortName">to_network_data[55:0]</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(1)\/fox_node_gen/FOX_NODE_INITIALISE/NIC/pe_to_network_full">
+               <obj_property name="ElementShortName">pe_to_network_full</obj_property>
+               <obj_property name="ObjectShortName">pe_to_network_full</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(1)\/fox_node_gen/FOX_NODE_INITIALISE/NIC/pe_to_network_empty">
+               <obj_property name="ElementShortName">pe_to_network_empty</obj_property>
+               <obj_property name="ObjectShortName">pe_to_network_empty</obj_property>
+            </wvobject>
+         </wvobject>
+         <wvobject type="group" fp_name="group809">
+            <obj_property name="label">Network to PE</obj_property>
+            <obj_property name="DisplayName">label</obj_property>
+            <obj_property name="isExpanded"></obj_property>
+            <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(1)\/fox_node_gen/FOX_NODE_INITIALISE/NIC/from_network_valid">
+               <obj_property name="ElementShortName">from_network_valid</obj_property>
+               <obj_property name="ObjectShortName">from_network_valid</obj_property>
+            </wvobject>
+            <wvobject type="array" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(1)\/fox_node_gen/FOX_NODE_INITIALISE/NIC/from_network_data">
+               <obj_property name="ElementShortName">from_network_data[55:0]</obj_property>
+               <obj_property name="ObjectShortName">from_network_data[55:0]</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(1)\/fox_node_gen/FOX_NODE_INITIALISE/NIC/pe_ready">
+               <obj_property name="ElementShortName">pe_ready</obj_property>
+               <obj_property name="ObjectShortName">pe_ready</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(1)\/fox_node_gen/FOX_NODE_INITIALISE/NIC/to_pe_valid">
+               <obj_property name="ElementShortName">to_pe_valid</obj_property>
+               <obj_property name="ObjectShortName">to_pe_valid</obj_property>
+            </wvobject>
+            <wvobject type="array" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(1)\/fox_node_gen/FOX_NODE_INITIALISE/NIC/to_pe_data">
+               <obj_property name="ElementShortName">to_pe_data[55:0]</obj_property>
+               <obj_property name="ObjectShortName">to_pe_data[55:0]</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(1)\/fox_node_gen/FOX_NODE_INITIALISE/NIC/network_to_pe_full">
+               <obj_property name="ElementShortName">network_to_pe_full</obj_property>
+               <obj_property name="ObjectShortName">network_to_pe_full</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(1)\/fox_node_gen/FOX_NODE_INITIALISE/NIC/network_to_pe_empty">
+               <obj_property name="ElementShortName">network_to_pe_empty</obj_property>
+               <obj_property name="ObjectShortName">network_to_pe_empty</obj_property>
+            </wvobject>
+         </wvobject>
+      </wvobject>
+   </wvobject>
+   <wvobject type="group" fp_name="group1280">
+      <obj_property name="label">Result node (0, 2)</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject type="group" fp_name="group1281">
+         <obj_property name="label">Router</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+         <wvobject type="group" fp_name="group1282">
+            <obj_property name="label">Router in</obj_property>
+            <obj_property name="DisplayName">label</obj_property>
+            <obj_property name="isExpanded"></obj_property>
+            <wvobject type="array" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(2)\/\NETWORK_COL_GEN(0)\/result_node_gen/RESULT_NODE_INITIALISE/x_in">
+               <obj_property name="ElementShortName">x_in[55:0]</obj_property>
+               <obj_property name="ObjectShortName">x_in[55:0]</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(2)\/\NETWORK_COL_GEN(0)\/result_node_gen/RESULT_NODE_INITIALISE/x_in_valid">
+               <obj_property name="ElementShortName">x_in_valid</obj_property>
+               <obj_property name="ObjectShortName">x_in_valid</obj_property>
+            </wvobject>
+            <wvobject type="array" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(2)\/\NETWORK_COL_GEN(0)\/result_node_gen/RESULT_NODE_INITIALISE/ROUTER/x_in_dest_d">
+               <obj_property name="ElementShortName">x_in_dest_d[0:1][1:0]</obj_property>
+               <obj_property name="ObjectShortName">x_in_dest_d[0:1][1:0]</obj_property>
+            </wvobject>
+            <wvobject type="array" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(2)\/\NETWORK_COL_GEN(0)\/result_node_gen/RESULT_NODE_INITIALISE/ROUTER/y_in_dest_d">
+               <obj_property name="ElementShortName">y_in_dest_d[0:1][1:0]</obj_property>
+               <obj_property name="ObjectShortName">y_in_dest_d[0:1][1:0]</obj_property>
+            </wvobject>
+            <wvobject type="array" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(2)\/\NETWORK_COL_GEN(0)\/result_node_gen/RESULT_NODE_INITIALISE/y_in">
+               <obj_property name="ElementShortName">y_in[55:0]</obj_property>
+               <obj_property name="ObjectShortName">y_in[55:0]</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(2)\/\NETWORK_COL_GEN(0)\/result_node_gen/RESULT_NODE_INITIALISE/y_in_valid">
+               <obj_property name="ElementShortName">y_in_valid</obj_property>
+               <obj_property name="ObjectShortName">y_in_valid</obj_property>
+            </wvobject>
+         </wvobject>
+         <wvobject type="group" fp_name="group1283">
+            <obj_property name="label">Router out</obj_property>
+            <obj_property name="DisplayName">label</obj_property>
+            <obj_property name="isExpanded"></obj_property>
+            <wvobject type="array" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(2)\/\NETWORK_COL_GEN(0)\/result_node_gen/RESULT_NODE_INITIALISE/x_out">
+               <obj_property name="ElementShortName">x_out[55:0]</obj_property>
+               <obj_property name="ObjectShortName">x_out[55:0]</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(2)\/\NETWORK_COL_GEN(0)\/result_node_gen/RESULT_NODE_INITIALISE/x_out_valid">
+               <obj_property name="ElementShortName">x_out_valid</obj_property>
+               <obj_property name="ObjectShortName">x_out_valid</obj_property>
+            </wvobject>
+            <wvobject type="array" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(2)\/\NETWORK_COL_GEN(0)\/result_node_gen/RESULT_NODE_INITIALISE/y_out">
+               <obj_property name="ElementShortName">y_out[55:0]</obj_property>
+               <obj_property name="ObjectShortName">y_out[55:0]</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(2)\/\NETWORK_COL_GEN(0)\/result_node_gen/RESULT_NODE_INITIALISE/y_out_valid">
+               <obj_property name="ElementShortName">y_out_valid</obj_property>
+               <obj_property name="ObjectShortName">y_out_valid</obj_property>
+            </wvobject>
+            <wvobject type="array" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(2)\/\NETWORK_COL_GEN(0)\/result_node_gen/RESULT_NODE_INITIALISE/ROUTER/pe_out">
+               <obj_property name="ElementShortName">pe_out[55:0]</obj_property>
+               <obj_property name="ObjectShortName">pe_out[55:0]</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(2)\/\NETWORK_COL_GEN(0)\/result_node_gen/RESULT_NODE_INITIALISE/ROUTER/pe_out_valid">
+               <obj_property name="ElementShortName">pe_out_valid</obj_property>
+               <obj_property name="ObjectShortName">pe_out_valid</obj_property>
+            </wvobject>
+         </wvobject>
+      </wvobject>
+      <wvobject type="group" fp_name="group1171">
+         <obj_property name="label">Decoder</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+         <wvobject type="array" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(2)\/\NETWORK_COL_GEN(0)\/result_node_gen/RESULT_NODE_INITIALISE/DECODER/packet_in">
+            <obj_property name="ElementShortName">packet_in[55:0]</obj_property>
+            <obj_property name="ObjectShortName">packet_in[55:0]</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(2)\/\NETWORK_COL_GEN(0)\/result_node_gen/RESULT_NODE_INITIALISE/DECODER/packet_in_valid">
+            <obj_property name="ElementShortName">packet_in_valid</obj_property>
+            <obj_property name="ObjectShortName">packet_in_valid</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(2)\/\NETWORK_COL_GEN(0)\/result_node_gen/RESULT_NODE_INITIALISE/DECODER/x_coord_out">
+            <obj_property name="ElementShortName">x_coord_out[1:0]</obj_property>
+            <obj_property name="ObjectShortName">x_coord_out[1:0]</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(2)\/\NETWORK_COL_GEN(0)\/result_node_gen/RESULT_NODE_INITIALISE/DECODER/y_coord_out">
+            <obj_property name="ElementShortName">y_coord_out[1:0]</obj_property>
+            <obj_property name="ObjectShortName">y_coord_out[1:0]</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(2)\/\NETWORK_COL_GEN(0)\/result_node_gen/RESULT_NODE_INITIALISE/DECODER/multicast_group_out">
+            <obj_property name="ElementShortName">multicast_group_out[0:0]</obj_property>
+            <obj_property name="ObjectShortName">multicast_group_out[0:0]</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(2)\/\NETWORK_COL_GEN(0)\/result_node_gen/RESULT_NODE_INITIALISE/DECODER/done_flag_out">
+            <obj_property name="ElementShortName">done_flag_out</obj_property>
+            <obj_property name="ObjectShortName">done_flag_out</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(2)\/\NETWORK_COL_GEN(0)\/result_node_gen/RESULT_NODE_INITIALISE/DECODER/result_flag_out">
+            <obj_property name="ElementShortName">result_flag_out</obj_property>
+            <obj_property name="ObjectShortName">result_flag_out</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(2)\/\NETWORK_COL_GEN(0)\/result_node_gen/RESULT_NODE_INITIALISE/DECODER/matrix_type_out">
+            <obj_property name="ElementShortName">matrix_type_out[0:0]</obj_property>
+            <obj_property name="ObjectShortName">matrix_type_out[0:0]</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(2)\/\NETWORK_COL_GEN(0)\/result_node_gen/RESULT_NODE_INITIALISE/DECODER/matrix_x_coord_out">
+            <obj_property name="ElementShortName">matrix_x_coord_out[7:0]</obj_property>
+            <obj_property name="ObjectShortName">matrix_x_coord_out[7:0]</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(2)\/\NETWORK_COL_GEN(0)\/result_node_gen/RESULT_NODE_INITIALISE/DECODER/matrix_y_coord_out">
+            <obj_property name="ElementShortName">matrix_y_coord_out[7:0]</obj_property>
+            <obj_property name="ObjectShortName">matrix_y_coord_out[7:0]</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(2)\/\NETWORK_COL_GEN(0)\/result_node_gen/RESULT_NODE_INITIALISE/DECODER/matrix_element_out">
+            <obj_property name="ElementShortName">matrix_element_out[31:0]</obj_property>
+            <obj_property name="ObjectShortName">matrix_element_out[31:0]</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(2)\/\NETWORK_COL_GEN(0)\/result_node_gen/RESULT_NODE_INITIALISE/DECODER/packet_out_valid">
+            <obj_property name="ElementShortName">packet_out_valid</obj_property>
+            <obj_property name="ObjectShortName">packet_out_valid</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(2)\/\NETWORK_COL_GEN(0)\/result_node_gen/RESULT_NODE_INITIALISE/DECODER/packet_read">
+            <obj_property name="ElementShortName">packet_read</obj_property>
+            <obj_property name="ObjectShortName">packet_read</obj_property>
+         </wvobject>
+      </wvobject>
+      <wvobject type="group" fp_name="group1186">
+         <obj_property name="label">Results</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+         <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(2)\/\NETWORK_COL_GEN(0)\/result_node_gen/RESULT_NODE_INITIALISE/RESULTS/memory_ready">
+            <obj_property name="ElementShortName">memory_ready</obj_property>
+            <obj_property name="ObjectShortName">memory_ready</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(2)\/\NETWORK_COL_GEN(0)\/result_node_gen/RESULT_NODE_INITIALISE/RESULTS/multicast_group_in">
+            <obj_property name="ElementShortName">multicast_group_in[0:0]</obj_property>
+            <obj_property name="ObjectShortName">multicast_group_in[0:0]</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(2)\/\NETWORK_COL_GEN(0)\/result_node_gen/RESULT_NODE_INITIALISE/RESULTS/done_flag_in">
+            <obj_property name="ElementShortName">done_flag_in</obj_property>
+            <obj_property name="ObjectShortName">done_flag_in</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(2)\/\NETWORK_COL_GEN(0)\/result_node_gen/RESULT_NODE_INITIALISE/RESULTS/result_flag_in">
+            <obj_property name="ElementShortName">result_flag_in</obj_property>
+            <obj_property name="ObjectShortName">result_flag_in</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(2)\/\NETWORK_COL_GEN(0)\/result_node_gen/RESULT_NODE_INITIALISE/RESULTS/matrix_x_coord_in">
+            <obj_property name="ElementShortName">matrix_x_coord_in[7:0]</obj_property>
+            <obj_property name="ObjectShortName">matrix_x_coord_in[7:0]</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(2)\/\NETWORK_COL_GEN(0)\/result_node_gen/RESULT_NODE_INITIALISE/RESULTS/matrix_y_coord_in">
+            <obj_property name="ElementShortName">matrix_y_coord_in[7:0]</obj_property>
+            <obj_property name="ObjectShortName">matrix_y_coord_in[7:0]</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(2)\/\NETWORK_COL_GEN(0)\/result_node_gen/RESULT_NODE_INITIALISE/RESULTS/matrix_element_in">
+            <obj_property name="ElementShortName">matrix_element_in[31:0]</obj_property>
+            <obj_property name="ObjectShortName">matrix_element_in[31:0]</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(2)\/\NETWORK_COL_GEN(0)\/result_node_gen/RESULT_NODE_INITIALISE/RESULTS/output_ready">
+            <obj_property name="ElementShortName">output_ready</obj_property>
+            <obj_property name="ObjectShortName">output_ready</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(2)\/\NETWORK_COL_GEN(0)\/result_node_gen/RESULT_NODE_INITIALISE/RESULTS/matrix_element_out">
+            <obj_property name="ElementShortName">matrix_element_out[31:0]</obj_property>
+            <obj_property name="ObjectShortName">matrix_element_out[31:0]</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(2)\/\NETWORK_COL_GEN(0)\/result_node_gen/RESULT_NODE_INITIALISE/RESULTS/matrix_element_out_valid">
+            <obj_property name="ElementShortName">matrix_element_out_valid</obj_property>
+            <obj_property name="ObjectShortName">matrix_element_out_valid</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(2)\/\NETWORK_COL_GEN(0)\/result_node_gen/RESULT_NODE_INITIALISE/RESULTS/matrix_row_end_out">
+            <obj_property name="ElementShortName">matrix_row_end_out</obj_property>
+            <obj_property name="ObjectShortName">matrix_row_end_out</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(2)\/\NETWORK_COL_GEN(0)\/result_node_gen/RESULT_NODE_INITIALISE/RESULTS/matrix_end_out">
+            <obj_property name="ElementShortName">matrix_end_out</obj_property>
+            <obj_property name="ObjectShortName">matrix_end_out</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(2)\/\NETWORK_COL_GEN(0)\/result_node_gen/RESULT_NODE_INITIALISE/RESULTS/matrix_result_elements">
+            <obj_property name="ElementShortName">matrix_result_elements[0:3,0:3][31:0]</obj_property>
+            <obj_property name="ObjectShortName">matrix_result_elements[0:3,0:3][31:0]</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(2)\/\NETWORK_COL_GEN(0)\/result_node_gen/RESULT_NODE_INITIALISE/RESULTS/done_flags_received">
+            <obj_property name="ElementShortName">done_flags_received[0:1,0:2]</obj_property>
+            <obj_property name="ObjectShortName">done_flags_received[0:1,0:2]</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(2)\/\NETWORK_COL_GEN(0)\/result_node_gen/RESULT_NODE_INITIALISE/RESULTS/all_done">
+            <obj_property name="ElementShortName">all_done</obj_property>
+            <obj_property name="ObjectShortName">all_done</obj_property>
+         </wvobject>
+         <wvobject type="other" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(2)\/\NETWORK_COL_GEN(0)\/result_node_gen/RESULT_NODE_INITIALISE/RESULTS/assign_x_coord">
+            <obj_property name="ElementShortName">assign_x_coord</obj_property>
+            <obj_property name="ObjectShortName">assign_x_coord</obj_property>
+         </wvobject>
+         <wvobject type="other" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(2)\/\NETWORK_COL_GEN(0)\/result_node_gen/RESULT_NODE_INITIALISE/RESULTS/assign_y_coord">
+            <obj_property name="ElementShortName">assign_y_coord</obj_property>
+            <obj_property name="ObjectShortName">assign_y_coord</obj_property>
+         </wvobject>
+         <wvobject type="other" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(2)\/\NETWORK_COL_GEN(0)\/result_node_gen/RESULT_NODE_INITIALISE/RESULTS/done_x_coord">
+            <obj_property name="ElementShortName">done_x_coord</obj_property>
+            <obj_property name="ObjectShortName">done_x_coord</obj_property>
+         </wvobject>
+         <wvobject type="other" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(2)\/\NETWORK_COL_GEN(0)\/result_node_gen/RESULT_NODE_INITIALISE/RESULTS/done_y_coord">
+            <obj_property name="ElementShortName">done_y_coord</obj_property>
+            <obj_property name="ObjectShortName">done_y_coord</obj_property>
+         </wvobject>
+         <wvobject type="other" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(2)\/\NETWORK_COL_GEN(0)\/result_node_gen/RESULT_NODE_INITIALISE/RESULTS/current_output_x">
+            <obj_property name="ElementShortName">current_output_x</obj_property>
+            <obj_property name="ObjectShortName">current_output_x</obj_property>
+         </wvobject>
+         <wvobject type="other" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(2)\/\NETWORK_COL_GEN(0)\/result_node_gen/RESULT_NODE_INITIALISE/RESULTS/current_output_y">
+            <obj_property name="ElementShortName">current_output_y</obj_property>
+            <obj_property name="ObjectShortName">current_output_y</obj_property>
+         </wvobject>
+      </wvobject>
+   </wvobject>
+   <wvobject type="group" fp_name="group1326">
+      <obj_property name="label">Router node (1, 2)</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <wvobject type="group" fp_name="group1327">
+         <obj_property name="label">Router in</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+         <wvobject type="array" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(2)\/\NETWORK_COL_GEN(1)\/router_node_gen/ROUTER_NODE_INITIALISE/x_in">
+            <obj_property name="ElementShortName">x_in[55:0]</obj_property>
+            <obj_property name="ObjectShortName">x_in[55:0]</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(2)\/\NETWORK_COL_GEN(1)\/router_node_gen/ROUTER_NODE_INITIALISE/x_in_valid">
+            <obj_property name="ElementShortName">x_in_valid</obj_property>
+            <obj_property name="ObjectShortName">x_in_valid</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(2)\/\NETWORK_COL_GEN(1)\/router_node_gen/ROUTER_NODE_INITIALISE/ROUTER/x_in_dest_d">
+            <obj_property name="ElementShortName">x_in_dest_d[0:1][1:0]</obj_property>
+            <obj_property name="ObjectShortName">x_in_dest_d[0:1][1:0]</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(2)\/\NETWORK_COL_GEN(1)\/router_node_gen/ROUTER_NODE_INITIALISE/y_in">
+            <obj_property name="ElementShortName">y_in[55:0]</obj_property>
+            <obj_property name="ObjectShortName">y_in[55:0]</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(2)\/\NETWORK_COL_GEN(1)\/router_node_gen/ROUTER_NODE_INITIALISE/y_in_valid">
+            <obj_property name="ElementShortName">y_in_valid</obj_property>
+            <obj_property name="ObjectShortName">y_in_valid</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(2)\/\NETWORK_COL_GEN(1)\/router_node_gen/ROUTER_NODE_INITIALISE/ROUTER/y_in_dest_d">
+            <obj_property name="ElementShortName">y_in_dest_d[0:1][1:0]</obj_property>
+            <obj_property name="ObjectShortName">y_in_dest_d[0:1][1:0]</obj_property>
+         </wvobject>
+      </wvobject>
+      <wvobject type="group" fp_name="group1328">
+         <obj_property name="label">Router out</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+         <wvobject type="array" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(2)\/\NETWORK_COL_GEN(1)\/router_node_gen/ROUTER_NODE_INITIALISE/x_out">
+            <obj_property name="ElementShortName">x_out[55:0]</obj_property>
+            <obj_property name="ObjectShortName">x_out[55:0]</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(2)\/\NETWORK_COL_GEN(1)\/router_node_gen/ROUTER_NODE_INITIALISE/x_out_valid">
+            <obj_property name="ElementShortName">x_out_valid</obj_property>
+            <obj_property name="ObjectShortName">x_out_valid</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(2)\/\NETWORK_COL_GEN(1)\/router_node_gen/ROUTER_NODE_INITIALISE/y_out">
+            <obj_property name="ElementShortName">y_out[55:0]</obj_property>
+            <obj_property name="ObjectShortName">y_out[55:0]</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/top_tb/FOX_TOP/\NETWORK_ROW_GEN(2)\/\NETWORK_COL_GEN(1)\/router_node_gen/ROUTER_NODE_INITIALISE/y_out_valid">
+            <obj_property name="ElementShortName">y_out_valid</obj_property>
+            <obj_property name="ObjectShortName">y_out_valid</obj_property>
+         </wvobject>
+      </wvobject>
+   </wvobject>
+</wave_config>
