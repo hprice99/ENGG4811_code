@@ -1,0 +1,710 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="hoplite_tb_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="glbl" />
+            <top_module name="hoplite_network_tb_defs" />
+            <top_module name="hoplite_tb" />
+            <top_module name="math_functions" />
+            <top_module name="multicast_defs" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="1624261fs"></ZoomStartTime>
+      <ZoomEndTime time="1707862fs"></ZoomEndTime>
+      <Cursor1Time time="1631161fs"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="501"></NameColumnWidth>
+      <ValueColumnWidth column_width="128"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="8" />
+   <wvobject type="logic" fp_name="/hoplite_tb/clk">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/hoplite_tb/reset_n">
+      <obj_property name="ElementShortName">reset_n</obj_property>
+      <obj_property name="ObjectShortName">reset_n</obj_property>
+   </wvobject>
+   <wvobject type="other" fp_name="/hoplite_tb/count">
+      <obj_property name="ElementShortName">count</obj_property>
+      <obj_property name="ObjectShortName">count</obj_property>
+   </wvobject>
+   <wvobject type="group" fp_name="group118">
+      <obj_property name="label">PE (0, 0)</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/NODE/PE/trig">
+         <obj_property name="ElementShortName">trig</obj_property>
+         <obj_property name="ObjectShortName">trig</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/NODE/PE/trig_broadcast">
+         <obj_property name="ElementShortName">trig_broadcast</obj_property>
+         <obj_property name="ObjectShortName">trig_broadcast</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/NODE/last_message_sent">
+         <obj_property name="ElementShortName">last_message_sent[16:0]</obj_property>
+         <obj_property name="ObjectShortName">last_message_sent[16:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/NODE/message_sent">
+         <obj_property name="ElementShortName">message_sent</obj_property>
+         <obj_property name="ObjectShortName">message_sent</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/NODE/PE/multicast_dest">
+         <obj_property name="ElementShortName">multicast_dest[0:1][1:0]</obj_property>
+         <obj_property name="ObjectShortName">multicast_dest[0:1][1:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/NODE/last_message_received">
+         <obj_property name="ElementShortName">last_message_received[16:0]</obj_property>
+         <obj_property name="ObjectShortName">last_message_received[16:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/NODE/message_received">
+         <obj_property name="ElementShortName">message_received</obj_property>
+         <obj_property name="ObjectShortName">message_received</obj_property>
+      </wvobject>
+      <wvobject type="group" fp_name="group226">
+         <obj_property name="label">Router</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+         <wvobject type="group" fp_name="group227">
+            <obj_property name="label">Router in</obj_property>
+            <obj_property name="DisplayName">label</obj_property>
+            <wvobject type="array" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/NODE/ROUTER/x_in">
+               <obj_property name="ElementShortName">x_in[16:0]</obj_property>
+               <obj_property name="ObjectShortName">x_in[16:0]</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/NODE/ROUTER/x_in_valid">
+               <obj_property name="ElementShortName">x_in_valid</obj_property>
+               <obj_property name="ObjectShortName">x_in_valid</obj_property>
+            </wvobject>
+            <wvobject type="array" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/NODE/ROUTER/y_in">
+               <obj_property name="ElementShortName">y_in[16:0]</obj_property>
+               <obj_property name="ObjectShortName">y_in[16:0]</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/NODE/ROUTER/y_in_valid">
+               <obj_property name="ElementShortName">y_in_valid</obj_property>
+               <obj_property name="ObjectShortName">y_in_valid</obj_property>
+            </wvobject>
+            <wvobject type="array" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/NODE/ROUTER/pe_in">
+               <obj_property name="ElementShortName">pe_in[16:0]</obj_property>
+               <obj_property name="ObjectShortName">pe_in[16:0]</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/NODE/ROUTER/pe_in_valid">
+               <obj_property name="ElementShortName">pe_in_valid</obj_property>
+               <obj_property name="ObjectShortName">pe_in_valid</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/NODE/ROUTER/pe_backpressure">
+               <obj_property name="ElementShortName">pe_backpressure</obj_property>
+               <obj_property name="ObjectShortName">pe_backpressure</obj_property>
+            </wvobject>
+            <wvobject type="array" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/NODE/ROUTER/multicast_in">
+               <obj_property name="ElementShortName">multicast_in[16:0]</obj_property>
+               <obj_property name="ObjectShortName">multicast_in[16:0]</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/NODE/ROUTER/multicast_in_valid">
+               <obj_property name="ElementShortName">multicast_in_valid</obj_property>
+               <obj_property name="ObjectShortName">multicast_in_valid</obj_property>
+            </wvobject>
+         </wvobject>
+         <wvobject type="group" fp_name="group228">
+            <obj_property name="label">Router out</obj_property>
+            <obj_property name="DisplayName">label</obj_property>
+            <wvobject type="array" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/NODE/ROUTER/x_out">
+               <obj_property name="ElementShortName">x_out[16:0]</obj_property>
+               <obj_property name="ObjectShortName">x_out[16:0]</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/NODE/ROUTER/x_out_valid">
+               <obj_property name="ElementShortName">x_out_valid</obj_property>
+               <obj_property name="ObjectShortName">x_out_valid</obj_property>
+            </wvobject>
+            <wvobject type="array" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/NODE/ROUTER/y_out">
+               <obj_property name="ElementShortName">y_out[16:0]</obj_property>
+               <obj_property name="ObjectShortName">y_out[16:0]</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/NODE/ROUTER/y_out_valid">
+               <obj_property name="ElementShortName">y_out_valid</obj_property>
+               <obj_property name="ObjectShortName">y_out_valid</obj_property>
+            </wvobject>
+            <wvobject type="array" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/NODE/ROUTER/pe_out">
+               <obj_property name="ElementShortName">pe_out[16:0]</obj_property>
+               <obj_property name="ObjectShortName">pe_out[16:0]</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/NODE/ROUTER/pe_out_valid">
+               <obj_property name="ElementShortName">pe_out_valid</obj_property>
+               <obj_property name="ObjectShortName">pe_out_valid</obj_property>
+            </wvobject>
+            <wvobject type="array" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/NODE/ROUTER/multicast_out">
+               <obj_property name="ElementShortName">multicast_out[16:0]</obj_property>
+               <obj_property name="ObjectShortName">multicast_out[16:0]</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/NODE/ROUTER/multicast_out_valid">
+               <obj_property name="ElementShortName">multicast_out_valid</obj_property>
+               <obj_property name="ObjectShortName">multicast_out_valid</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(0)\/NODE/ROUTER/multicast_backpressure">
+               <obj_property name="ElementShortName">multicast_backpressure</obj_property>
+               <obj_property name="ObjectShortName">multicast_backpressure</obj_property>
+            </wvobject>
+         </wvobject>
+      </wvobject>
+   </wvobject>
+   <wvobject type="group" fp_name="group65">
+      <obj_property name="label">Multicast row 0</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <wvobject type="group" fp_name="group66">
+         <obj_property name="label">Multicast in</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+         <wvobject type="array" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/multicast_router_gen/MULTICAST_ROUTER/x_in">
+            <obj_property name="ElementShortName">x_in[16:0]</obj_property>
+            <obj_property name="ObjectShortName">x_in[16:0]</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/multicast_router_gen/MULTICAST_ROUTER/x_in_valid">
+            <obj_property name="ElementShortName">x_in_valid</obj_property>
+            <obj_property name="ObjectShortName">x_in_valid</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/multicast_router_gen/MULTICAST_ROUTER/y_in">
+            <obj_property name="ElementShortName">y_in[16:0]</obj_property>
+            <obj_property name="ObjectShortName">y_in[16:0]</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/multicast_router_gen/MULTICAST_ROUTER/y_in_valid">
+            <obj_property name="ElementShortName">y_in_valid</obj_property>
+            <obj_property name="ObjectShortName">y_in_valid</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/multicast_router_gen/MULTICAST_ROUTER/active_multicast_in">
+            <obj_property name="ElementShortName">active_multicast_in[16:0]</obj_property>
+            <obj_property name="ObjectShortName">active_multicast_in[16:0]</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/multicast_router_gen/MULTICAST_ROUTER/active_multicast_in_valid">
+            <obj_property name="ElementShortName">active_multicast_in_valid</obj_property>
+            <obj_property name="ObjectShortName">active_multicast_in_valid</obj_property>
+         </wvobject>
+         <wvobject type="group" fp_name="group116">
+            <obj_property name="label">multicast_in[0]</obj_property>
+            <obj_property name="DisplayName">label</obj_property>
+            <wvobject type="array" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/multicast_router_gen/MULTICAST_ROUTER/multicast_in[0]">
+               <obj_property name="DisplayName">label</obj_property>
+               <obj_property name="ElementShortName">[0][16:0]</obj_property>
+               <obj_property name="ObjectShortName">[0][16:0]</obj_property>
+               <obj_property name="label">multicast_in[0]</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/multicast_router_gen/MULTICAST_ROUTER/multicast_in_valid[0]">
+               <obj_property name="DisplayName">label</obj_property>
+               <obj_property name="ElementShortName">[0]</obj_property>
+               <obj_property name="ObjectShortName">[0]</obj_property>
+               <obj_property name="label">multicast_in_valid[0]</obj_property>
+            </wvobject>
+         </wvobject>
+         <wvobject type="group" fp_name="group117">
+            <obj_property name="label">multicast_in[1]</obj_property>
+            <obj_property name="DisplayName">label</obj_property>
+            <wvobject type="array" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/multicast_router_gen/MULTICAST_ROUTER/multicast_in[1]">
+               <obj_property name="DisplayName">label</obj_property>
+               <obj_property name="ElementShortName">[1][16:0]</obj_property>
+               <obj_property name="ObjectShortName">[1][16:0]</obj_property>
+               <obj_property name="label">multicast_in[1]</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/multicast_router_gen/MULTICAST_ROUTER/multicast_in_valid[1]">
+               <obj_property name="DisplayName">label</obj_property>
+               <obj_property name="ElementShortName">[1]</obj_property>
+               <obj_property name="ObjectShortName">[1]</obj_property>
+               <obj_property name="label">multicast_in_valid[1]</obj_property>
+            </wvobject>
+         </wvobject>
+      </wvobject>
+      <wvobject type="group" fp_name="group73">
+         <obj_property name="label">Multicast out</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+         <wvobject type="array" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/multicast_router_gen/MULTICAST_ROUTER/x_out">
+            <obj_property name="ElementShortName">x_out[16:0]</obj_property>
+            <obj_property name="ObjectShortName">x_out[16:0]</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/multicast_router_gen/MULTICAST_ROUTER/x_out_valid">
+            <obj_property name="ElementShortName">x_out_valid</obj_property>
+            <obj_property name="ObjectShortName">x_out_valid</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/multicast_router_gen/MULTICAST_ROUTER/y_out">
+            <obj_property name="ElementShortName">y_out[16:0]</obj_property>
+            <obj_property name="ObjectShortName">y_out[16:0]</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/multicast_router_gen/MULTICAST_ROUTER/y_out_valid">
+            <obj_property name="ElementShortName">y_out_valid</obj_property>
+            <obj_property name="ObjectShortName">y_out_valid</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/multicast_router_gen/MULTICAST_ROUTER/multicast_out">
+            <obj_property name="ElementShortName">multicast_out[16:0]</obj_property>
+            <obj_property name="ObjectShortName">multicast_out[16:0]</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/multicast_router_gen/MULTICAST_ROUTER/multicast_out_valid">
+            <obj_property name="ElementShortName">multicast_out_valid</obj_property>
+            <obj_property name="ObjectShortName">multicast_out_valid</obj_property>
+         </wvobject>
+      </wvobject>
+      <wvobject type="group" fp_name="group84">
+         <obj_property name="label">Multicast router</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+         <wvobject type="group" fp_name="group85">
+            <obj_property name="label">Input</obj_property>
+            <obj_property name="DisplayName">label</obj_property>
+            <obj_property name="isExpanded"></obj_property>
+            <wvobject type="array" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/multicast_router_gen/MULTICAST_ROUTER/ROUTER/x_in">
+               <obj_property name="ElementShortName">x_in[16:0]</obj_property>
+               <obj_property name="ObjectShortName">x_in[16:0]</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/multicast_router_gen/MULTICAST_ROUTER/ROUTER/x_in_valid">
+               <obj_property name="ElementShortName">x_in_valid</obj_property>
+               <obj_property name="ObjectShortName">x_in_valid</obj_property>
+            </wvobject>
+            <wvobject type="array" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/multicast_router_gen/MULTICAST_ROUTER/ROUTER/y_in">
+               <obj_property name="ElementShortName">y_in[16:0]</obj_property>
+               <obj_property name="ObjectShortName">y_in[16:0]</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/multicast_router_gen/MULTICAST_ROUTER/ROUTER/y_in_valid">
+               <obj_property name="ElementShortName">y_in_valid</obj_property>
+               <obj_property name="ObjectShortName">y_in_valid</obj_property>
+            </wvobject>
+            <wvobject type="array" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/multicast_router_gen/MULTICAST_ROUTER/ROUTER/multicast_in">
+               <obj_property name="ElementShortName">multicast_in[16:0]</obj_property>
+               <obj_property name="ObjectShortName">multicast_in[16:0]</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/multicast_router_gen/MULTICAST_ROUTER/ROUTER/multicast_in_valid">
+               <obj_property name="ElementShortName">multicast_in_valid</obj_property>
+               <obj_property name="ObjectShortName">multicast_in_valid</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/multicast_router_gen/MULTICAST_ROUTER/ROUTER/multicast_backpressure">
+               <obj_property name="ElementShortName">multicast_backpressure</obj_property>
+               <obj_property name="ObjectShortName">multicast_backpressure</obj_property>
+            </wvobject>
+         </wvobject>
+         <wvobject type="group" fp_name="group86">
+            <obj_property name="label">Output</obj_property>
+            <obj_property name="DisplayName">label</obj_property>
+            <obj_property name="isExpanded"></obj_property>
+            <wvobject type="array" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/multicast_router_gen/MULTICAST_ROUTER/ROUTER/x_out">
+               <obj_property name="ElementShortName">x_out[16:0]</obj_property>
+               <obj_property name="ObjectShortName">x_out[16:0]</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/multicast_router_gen/MULTICAST_ROUTER/ROUTER/x_out_valid">
+               <obj_property name="ElementShortName">x_out_valid</obj_property>
+               <obj_property name="ObjectShortName">x_out_valid</obj_property>
+            </wvobject>
+            <wvobject type="array" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/multicast_router_gen/MULTICAST_ROUTER/ROUTER/y_out">
+               <obj_property name="ElementShortName">y_out[16:0]</obj_property>
+               <obj_property name="ObjectShortName">y_out[16:0]</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/multicast_router_gen/MULTICAST_ROUTER/ROUTER/y_out_valid">
+               <obj_property name="ElementShortName">y_out_valid</obj_property>
+               <obj_property name="ObjectShortName">y_out_valid</obj_property>
+            </wvobject>
+            <wvobject type="array" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/multicast_router_gen/MULTICAST_ROUTER/ROUTER/multicast_out">
+               <obj_property name="ElementShortName">multicast_out[16:0]</obj_property>
+               <obj_property name="ObjectShortName">multicast_out[16:0]</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/multicast_router_gen/MULTICAST_ROUTER/ROUTER/multicast_out_valid">
+               <obj_property name="ElementShortName">multicast_out_valid</obj_property>
+               <obj_property name="ObjectShortName">multicast_out_valid</obj_property>
+            </wvobject>
+         </wvobject>
+      </wvobject>
+      <wvobject type="group" fp_name="group100">
+         <obj_property name="label">Buffer</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+         <wvobject type="array" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/multicast_router_gen/MULTICAST_ROUTER/buffer_fifo_write_en">
+            <obj_property name="ElementShortName">buffer_fifo_write_en[0:1]</obj_property>
+            <obj_property name="ObjectShortName">buffer_fifo_write_en[0:1]</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/multicast_router_gen/MULTICAST_ROUTER/buffer_fifo_write_data">
+            <obj_property name="ElementShortName">buffer_fifo_write_data[0:1][16:0]</obj_property>
+            <obj_property name="ObjectShortName">buffer_fifo_write_data[0:1][16:0]</obj_property>
+            <obj_property name="isExpanded"></obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/multicast_router_gen/MULTICAST_ROUTER/buffer_fifo_read_en">
+            <obj_property name="ElementShortName">buffer_fifo_read_en[0:1]</obj_property>
+            <obj_property name="ObjectShortName">buffer_fifo_read_en[0:1]</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/multicast_router_gen/MULTICAST_ROUTER/buffer_fifo_read_data">
+            <obj_property name="ElementShortName">buffer_fifo_read_data[0:1][16:0]</obj_property>
+            <obj_property name="ObjectShortName">buffer_fifo_read_data[0:1][16:0]</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/multicast_router_gen/MULTICAST_ROUTER/buffer_fifo_full">
+            <obj_property name="ElementShortName">buffer_fifo_full[0:1]</obj_property>
+            <obj_property name="ObjectShortName">buffer_fifo_full[0:1]</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/multicast_router_gen/MULTICAST_ROUTER/buffer_fifo_empty">
+            <obj_property name="ElementShortName">buffer_fifo_empty[0:1]</obj_property>
+            <obj_property name="ObjectShortName">buffer_fifo_empty[0:1]</obj_property>
+         </wvobject>
+         <wvobject type="other" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/multicast_router_gen/MULTICAST_ROUTER/source_select">
+            <obj_property name="ElementShortName">source_select</obj_property>
+            <obj_property name="ObjectShortName">source_select</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/multicast_router_gen/MULTICAST_ROUTER/active_multicast_in">
+            <obj_property name="ElementShortName">active_multicast_in[16:0]</obj_property>
+            <obj_property name="ObjectShortName">active_multicast_in[16:0]</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/multicast_router_gen/MULTICAST_ROUTER/active_multicast_in_valid">
+            <obj_property name="ElementShortName">active_multicast_in_valid</obj_property>
+            <obj_property name="ObjectShortName">active_multicast_in_valid</obj_property>
+         </wvobject>
+      </wvobject>
+      <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/multicast_router_gen/MULTICAST_ROUTER/multicast_backpressure">
+         <obj_property name="ElementShortName">multicast_backpressure</obj_property>
+         <obj_property name="ObjectShortName">multicast_backpressure</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/multicast_router_gen/MULTICAST_ROUTER/multicast_ready">
+         <obj_property name="ElementShortName">multicast_ready</obj_property>
+         <obj_property name="ObjectShortName">multicast_ready</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject type="group" fp_name="group1412">
+      <obj_property name="label">PE (1, 0)</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(1)\/NODE/trig">
+         <obj_property name="ElementShortName">trig</obj_property>
+         <obj_property name="ObjectShortName">trig</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(1)\/NODE/trig_broadcast">
+         <obj_property name="ElementShortName">trig_broadcast</obj_property>
+         <obj_property name="ObjectShortName">trig_broadcast</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(1)\/NODE/last_message_sent">
+         <obj_property name="ElementShortName">last_message_sent[16:0]</obj_property>
+         <obj_property name="ObjectShortName">last_message_sent[16:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(1)\/NODE/message_sent">
+         <obj_property name="ElementShortName">message_sent</obj_property>
+         <obj_property name="ObjectShortName">message_sent</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(1)\/NODE/last_message_received">
+         <obj_property name="ElementShortName">last_message_received[16:0]</obj_property>
+         <obj_property name="ObjectShortName">last_message_received[16:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(1)\/NODE/message_received">
+         <obj_property name="ElementShortName">message_received</obj_property>
+         <obj_property name="ObjectShortName">message_received</obj_property>
+      </wvobject>
+      <wvobject type="group" fp_name="group1419">
+         <obj_property name="label">Router</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+         <wvobject type="group" fp_name="group1420">
+            <obj_property name="label">Router in</obj_property>
+            <obj_property name="DisplayName">label</obj_property>
+            <wvobject type="array" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(1)\/NODE/ROUTER/x_in">
+               <obj_property name="ElementShortName">x_in[16:0]</obj_property>
+               <obj_property name="ObjectShortName">x_in[16:0]</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(1)\/NODE/ROUTER/x_in_valid">
+               <obj_property name="ElementShortName">x_in_valid</obj_property>
+               <obj_property name="ObjectShortName">x_in_valid</obj_property>
+            </wvobject>
+            <wvobject type="array" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(1)\/NODE/ROUTER/y_in">
+               <obj_property name="ElementShortName">y_in[16:0]</obj_property>
+               <obj_property name="ObjectShortName">y_in[16:0]</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(1)\/NODE/ROUTER/y_in_valid">
+               <obj_property name="ElementShortName">y_in_valid</obj_property>
+               <obj_property name="ObjectShortName">y_in_valid</obj_property>
+            </wvobject>
+            <wvobject type="array" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(1)\/NODE/ROUTER/pe_in">
+               <obj_property name="ElementShortName">pe_in[16:0]</obj_property>
+               <obj_property name="ObjectShortName">pe_in[16:0]</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(1)\/NODE/ROUTER/pe_in_valid">
+               <obj_property name="ElementShortName">pe_in_valid</obj_property>
+               <obj_property name="ObjectShortName">pe_in_valid</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(1)\/NODE/ROUTER/pe_backpressure">
+               <obj_property name="ElementShortName">pe_backpressure</obj_property>
+               <obj_property name="ObjectShortName">pe_backpressure</obj_property>
+            </wvobject>
+            <wvobject type="array" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(1)\/NODE/ROUTER/multicast_in">
+               <obj_property name="ElementShortName">multicast_in[16:0]</obj_property>
+               <obj_property name="ObjectShortName">multicast_in[16:0]</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(1)\/NODE/ROUTER/multicast_in_valid">
+               <obj_property name="ElementShortName">multicast_in_valid</obj_property>
+               <obj_property name="ObjectShortName">multicast_in_valid</obj_property>
+            </wvobject>
+         </wvobject>
+         <wvobject type="group" fp_name="group1421">
+            <obj_property name="label">Router out</obj_property>
+            <obj_property name="DisplayName">label</obj_property>
+            <obj_property name="isExpanded"></obj_property>
+            <wvobject type="array" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(1)\/NODE/ROUTER/x_out">
+               <obj_property name="ElementShortName">x_out[16:0]</obj_property>
+               <obj_property name="ObjectShortName">x_out[16:0]</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(1)\/NODE/ROUTER/x_out_valid">
+               <obj_property name="ElementShortName">x_out_valid</obj_property>
+               <obj_property name="ObjectShortName">x_out_valid</obj_property>
+            </wvobject>
+            <wvobject type="array" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(1)\/NODE/ROUTER/y_out">
+               <obj_property name="ElementShortName">y_out[16:0]</obj_property>
+               <obj_property name="ObjectShortName">y_out[16:0]</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(1)\/NODE/ROUTER/y_out_valid">
+               <obj_property name="ElementShortName">y_out_valid</obj_property>
+               <obj_property name="ObjectShortName">y_out_valid</obj_property>
+            </wvobject>
+            <wvobject type="array" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(1)\/NODE/ROUTER/pe_out">
+               <obj_property name="ElementShortName">pe_out[16:0]</obj_property>
+               <obj_property name="ObjectShortName">pe_out[16:0]</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(1)\/NODE/ROUTER/pe_out_valid">
+               <obj_property name="ElementShortName">pe_out_valid</obj_property>
+               <obj_property name="ObjectShortName">pe_out_valid</obj_property>
+            </wvobject>
+            <wvobject type="array" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(1)\/NODE/ROUTER/multicast_out">
+               <obj_property name="ElementShortName">multicast_out[16:0]</obj_property>
+               <obj_property name="ObjectShortName">multicast_out[16:0]</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(1)\/NODE/ROUTER/multicast_out_valid">
+               <obj_property name="ElementShortName">multicast_out_valid</obj_property>
+               <obj_property name="ObjectShortName">multicast_out_valid</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(0)\/\NETWORK_COL_GEN(1)\/NODE/ROUTER/multicast_backpressure">
+               <obj_property name="ElementShortName">multicast_backpressure</obj_property>
+               <obj_property name="ObjectShortName">multicast_backpressure</obj_property>
+            </wvobject>
+         </wvobject>
+      </wvobject>
+   </wvobject>
+   <wvobject type="group" fp_name="group1440">
+      <obj_property name="label">PE (0, 1)</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(0)\/NODE/trig">
+         <obj_property name="ElementShortName">trig</obj_property>
+         <obj_property name="ObjectShortName">trig</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(0)\/NODE/trig_broadcast">
+         <obj_property name="ElementShortName">trig_broadcast</obj_property>
+         <obj_property name="ObjectShortName">trig_broadcast</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(0)\/NODE/last_message_sent">
+         <obj_property name="ElementShortName">last_message_sent[16:0]</obj_property>
+         <obj_property name="ObjectShortName">last_message_sent[16:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(0)\/NODE/message_sent">
+         <obj_property name="ElementShortName">message_sent</obj_property>
+         <obj_property name="ObjectShortName">message_sent</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(0)\/NODE/last_message_received">
+         <obj_property name="ElementShortName">last_message_received[16:0]</obj_property>
+         <obj_property name="ObjectShortName">last_message_received[16:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(0)\/NODE/message_received">
+         <obj_property name="ElementShortName">message_received</obj_property>
+         <obj_property name="ObjectShortName">message_received</obj_property>
+      </wvobject>
+      <wvobject type="group" fp_name="group1447">
+         <obj_property name="label">Router</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+         <wvobject type="group" fp_name="group1448">
+            <obj_property name="label">Router in</obj_property>
+            <obj_property name="DisplayName">label</obj_property>
+            <wvobject type="array" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(0)\/NODE/ROUTER/x_in">
+               <obj_property name="ElementShortName">x_in[16:0]</obj_property>
+               <obj_property name="ObjectShortName">x_in[16:0]</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(0)\/NODE/ROUTER/x_in_valid">
+               <obj_property name="ElementShortName">x_in_valid</obj_property>
+               <obj_property name="ObjectShortName">x_in_valid</obj_property>
+            </wvobject>
+            <wvobject type="array" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(0)\/NODE/ROUTER/y_in">
+               <obj_property name="ElementShortName">y_in[16:0]</obj_property>
+               <obj_property name="ObjectShortName">y_in[16:0]</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(0)\/NODE/ROUTER/y_in_valid">
+               <obj_property name="ElementShortName">y_in_valid</obj_property>
+               <obj_property name="ObjectShortName">y_in_valid</obj_property>
+            </wvobject>
+            <wvobject type="array" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(0)\/NODE/ROUTER/pe_in">
+               <obj_property name="ElementShortName">pe_in[16:0]</obj_property>
+               <obj_property name="ObjectShortName">pe_in[16:0]</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(0)\/NODE/ROUTER/pe_in_valid">
+               <obj_property name="ElementShortName">pe_in_valid</obj_property>
+               <obj_property name="ObjectShortName">pe_in_valid</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(0)\/NODE/ROUTER/pe_backpressure">
+               <obj_property name="ElementShortName">pe_backpressure</obj_property>
+               <obj_property name="ObjectShortName">pe_backpressure</obj_property>
+            </wvobject>
+            <wvobject type="array" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(0)\/NODE/ROUTER/multicast_in">
+               <obj_property name="ElementShortName">multicast_in[16:0]</obj_property>
+               <obj_property name="ObjectShortName">multicast_in[16:0]</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(0)\/NODE/ROUTER/multicast_in_valid">
+               <obj_property name="ElementShortName">multicast_in_valid</obj_property>
+               <obj_property name="ObjectShortName">multicast_in_valid</obj_property>
+            </wvobject>
+         </wvobject>
+         <wvobject type="group" fp_name="group1449">
+            <obj_property name="label">Router out</obj_property>
+            <obj_property name="DisplayName">label</obj_property>
+            <wvobject type="array" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(0)\/NODE/ROUTER/x_out">
+               <obj_property name="ElementShortName">x_out[16:0]</obj_property>
+               <obj_property name="ObjectShortName">x_out[16:0]</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(0)\/NODE/ROUTER/x_out_valid">
+               <obj_property name="ElementShortName">x_out_valid</obj_property>
+               <obj_property name="ObjectShortName">x_out_valid</obj_property>
+            </wvobject>
+            <wvobject type="array" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(0)\/NODE/ROUTER/y_out">
+               <obj_property name="ElementShortName">y_out[16:0]</obj_property>
+               <obj_property name="ObjectShortName">y_out[16:0]</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(0)\/NODE/ROUTER/y_out_valid">
+               <obj_property name="ElementShortName">y_out_valid</obj_property>
+               <obj_property name="ObjectShortName">y_out_valid</obj_property>
+            </wvobject>
+            <wvobject type="array" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(0)\/NODE/ROUTER/pe_out">
+               <obj_property name="ElementShortName">pe_out[16:0]</obj_property>
+               <obj_property name="ObjectShortName">pe_out[16:0]</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(0)\/NODE/ROUTER/pe_out_valid">
+               <obj_property name="ElementShortName">pe_out_valid</obj_property>
+               <obj_property name="ObjectShortName">pe_out_valid</obj_property>
+            </wvobject>
+            <wvobject type="array" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(0)\/NODE/ROUTER/multicast_out">
+               <obj_property name="ElementShortName">multicast_out[16:0]</obj_property>
+               <obj_property name="ObjectShortName">multicast_out[16:0]</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(0)\/NODE/ROUTER/multicast_out_valid">
+               <obj_property name="ElementShortName">multicast_out_valid</obj_property>
+               <obj_property name="ObjectShortName">multicast_out_valid</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(0)\/NODE/ROUTER/multicast_backpressure">
+               <obj_property name="ElementShortName">multicast_backpressure</obj_property>
+               <obj_property name="ObjectShortName">multicast_backpressure</obj_property>
+            </wvobject>
+         </wvobject>
+      </wvobject>
+   </wvobject>
+   <wvobject type="group" fp_name="group1468">
+      <obj_property name="label">PE (1, 1)</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(1)\/NODE/trig">
+         <obj_property name="ElementShortName">trig</obj_property>
+         <obj_property name="ObjectShortName">trig</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(1)\/NODE/trig_broadcast">
+         <obj_property name="ElementShortName">trig_broadcast</obj_property>
+         <obj_property name="ObjectShortName">trig_broadcast</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(1)\/NODE/last_message_sent">
+         <obj_property name="ElementShortName">last_message_sent[16:0]</obj_property>
+         <obj_property name="ObjectShortName">last_message_sent[16:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(1)\/NODE/message_sent">
+         <obj_property name="ElementShortName">message_sent</obj_property>
+         <obj_property name="ObjectShortName">message_sent</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(1)\/NODE/last_message_received">
+         <obj_property name="ElementShortName">last_message_received[16:0]</obj_property>
+         <obj_property name="ObjectShortName">last_message_received[16:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(1)\/NODE/message_received">
+         <obj_property name="ElementShortName">message_received</obj_property>
+         <obj_property name="ObjectShortName">message_received</obj_property>
+      </wvobject>
+      <wvobject type="group" fp_name="group1475">
+         <obj_property name="label">Router</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+         <wvobject type="group" fp_name="group1476">
+            <obj_property name="label">Router in</obj_property>
+            <obj_property name="DisplayName">label</obj_property>
+            <obj_property name="isExpanded"></obj_property>
+            <wvobject type="array" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(1)\/NODE/ROUTER/x_in">
+               <obj_property name="ElementShortName">x_in[16:0]</obj_property>
+               <obj_property name="ObjectShortName">x_in[16:0]</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(1)\/NODE/ROUTER/x_in_valid">
+               <obj_property name="ElementShortName">x_in_valid</obj_property>
+               <obj_property name="ObjectShortName">x_in_valid</obj_property>
+            </wvobject>
+            <wvobject type="array" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(1)\/NODE/ROUTER/y_in">
+               <obj_property name="ElementShortName">y_in[16:0]</obj_property>
+               <obj_property name="ObjectShortName">y_in[16:0]</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(1)\/NODE/ROUTER/y_in_valid">
+               <obj_property name="ElementShortName">y_in_valid</obj_property>
+               <obj_property name="ObjectShortName">y_in_valid</obj_property>
+            </wvobject>
+            <wvobject type="array" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(1)\/NODE/ROUTER/pe_in">
+               <obj_property name="ElementShortName">pe_in[16:0]</obj_property>
+               <obj_property name="ObjectShortName">pe_in[16:0]</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(1)\/NODE/ROUTER/pe_in_valid">
+               <obj_property name="ElementShortName">pe_in_valid</obj_property>
+               <obj_property name="ObjectShortName">pe_in_valid</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(1)\/NODE/ROUTER/pe_backpressure">
+               <obj_property name="ElementShortName">pe_backpressure</obj_property>
+               <obj_property name="ObjectShortName">pe_backpressure</obj_property>
+            </wvobject>
+            <wvobject type="array" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(1)\/NODE/ROUTER/multicast_in">
+               <obj_property name="ElementShortName">multicast_in[16:0]</obj_property>
+               <obj_property name="ObjectShortName">multicast_in[16:0]</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(1)\/NODE/ROUTER/multicast_in_valid">
+               <obj_property name="ElementShortName">multicast_in_valid</obj_property>
+               <obj_property name="ObjectShortName">multicast_in_valid</obj_property>
+            </wvobject>
+         </wvobject>
+         <wvobject type="group" fp_name="group1477">
+            <obj_property name="label">Router out</obj_property>
+            <obj_property name="DisplayName">label</obj_property>
+            <obj_property name="isExpanded"></obj_property>
+            <wvobject type="array" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(1)\/NODE/ROUTER/x_out">
+               <obj_property name="ElementShortName">x_out[16:0]</obj_property>
+               <obj_property name="ObjectShortName">x_out[16:0]</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(1)\/NODE/ROUTER/x_out_valid">
+               <obj_property name="ElementShortName">x_out_valid</obj_property>
+               <obj_property name="ObjectShortName">x_out_valid</obj_property>
+            </wvobject>
+            <wvobject type="array" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(1)\/NODE/ROUTER/y_out">
+               <obj_property name="ElementShortName">y_out[16:0]</obj_property>
+               <obj_property name="ObjectShortName">y_out[16:0]</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(1)\/NODE/ROUTER/y_out_valid">
+               <obj_property name="ElementShortName">y_out_valid</obj_property>
+               <obj_property name="ObjectShortName">y_out_valid</obj_property>
+            </wvobject>
+            <wvobject type="array" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(1)\/NODE/ROUTER/pe_out">
+               <obj_property name="ElementShortName">pe_out[16:0]</obj_property>
+               <obj_property name="ObjectShortName">pe_out[16:0]</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(1)\/NODE/ROUTER/pe_out_valid">
+               <obj_property name="ElementShortName">pe_out_valid</obj_property>
+               <obj_property name="ObjectShortName">pe_out_valid</obj_property>
+            </wvobject>
+            <wvobject type="array" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(1)\/NODE/ROUTER/multicast_out">
+               <obj_property name="ElementShortName">multicast_out[16:0]</obj_property>
+               <obj_property name="ObjectShortName">multicast_out[16:0]</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(1)\/NODE/ROUTER/multicast_out_valid">
+               <obj_property name="ElementShortName">multicast_out_valid</obj_property>
+               <obj_property name="ObjectShortName">multicast_out_valid</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/hoplite_tb/\NETWORK_ROW_GEN(1)\/\NETWORK_COL_GEN(1)\/NODE/ROUTER/multicast_backpressure">
+               <obj_property name="ElementShortName">multicast_backpressure</obj_property>
+               <obj_property name="ObjectShortName">multicast_backpressure</obj_property>
+            </wvobject>
+         </wvobject>
+      </wvobject>
+   </wvobject>
+</wave_config>
