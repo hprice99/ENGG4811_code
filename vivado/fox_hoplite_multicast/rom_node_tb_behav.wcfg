@@ -1,0 +1,501 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="rom_node_tb_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="conv_functions" />
+            <top_module name="fox_defs" />
+            <top_module name="glbl" />
+            <top_module name="math_functions" />
+            <top_module name="matrix_config" />
+            <top_module name="packet_defs" />
+            <top_module name="rom_node_tb" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="0fs"></ZoomStartTime>
+      <ZoomEndTime time="105fs"></ZoomEndTime>
+      <Cursor1Time time="56fs"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="563"></NameColumnWidth>
+      <ValueColumnWidth column_width="234"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="7" />
+   <wvobject type="logic" fp_name="/rom_node_tb/clk">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/rom_node_tb/reset_n">
+      <obj_property name="ElementShortName">reset_n</obj_property>
+      <obj_property name="ObjectShortName">reset_n</obj_property>
+   </wvobject>
+   <wvobject type="other" fp_name="/rom_node_tb/count">
+      <obj_property name="ElementShortName">count</obj_property>
+      <obj_property name="ObjectShortName">count</obj_property>
+   </wvobject>
+   <wvobject type="other" fp_name="/rom_node_tb/ready_packets_sent">
+      <obj_property name="ElementShortName">ready_packets_sent</obj_property>
+      <obj_property name="ObjectShortName">ready_packets_sent</obj_property>
+   </wvobject>
+   <wvobject type="other" fp_name="/rom_node_tb/total_packets_received">
+      <obj_property name="ElementShortName">total_packets_received</obj_property>
+      <obj_property name="ObjectShortName">total_packets_received</obj_property>
+   </wvobject>
+   <wvobject type="group" fp_name="group43">
+      <obj_property name="label">Ports</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <wvobject type="array" fp_name="/rom_node_tb/x_in">
+         <obj_property name="ElementShortName">x_in[58:0]</obj_property>
+         <obj_property name="ObjectShortName">x_in[58:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/rom_node_tb/y_in">
+         <obj_property name="ElementShortName">y_in[58:0]</obj_property>
+         <obj_property name="ObjectShortName">y_in[58:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/rom_node_tb/x_in_valid">
+         <obj_property name="ElementShortName">x_in_valid</obj_property>
+         <obj_property name="ObjectShortName">x_in_valid</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/rom_node_tb/y_in_valid">
+         <obj_property name="ElementShortName">y_in_valid</obj_property>
+         <obj_property name="ObjectShortName">y_in_valid</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/rom_node_tb/x_out">
+         <obj_property name="ElementShortName">x_out[58:0]</obj_property>
+         <obj_property name="ObjectShortName">x_out[58:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/rom_node_tb/y_out">
+         <obj_property name="ElementShortName">y_out[58:0]</obj_property>
+         <obj_property name="ObjectShortName">y_out[58:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/rom_node_tb/x_out_valid">
+         <obj_property name="ElementShortName">x_out_valid</obj_property>
+         <obj_property name="ObjectShortName">x_out_valid</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/rom_node_tb/y_out_valid">
+         <obj_property name="ElementShortName">y_out_valid</obj_property>
+         <obj_property name="ObjectShortName">y_out_valid</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/rom_node_tb/x_decoder_packet_in">
+         <obj_property name="ElementShortName">x_decoder_packet_in[58:0]</obj_property>
+         <obj_property name="ObjectShortName">x_decoder_packet_in[58:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/rom_node_tb/x_decoder_packet_in_valid">
+         <obj_property name="ElementShortName">x_decoder_packet_in_valid</obj_property>
+         <obj_property name="ObjectShortName">x_decoder_packet_in_valid</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/rom_node_tb/x_decoder_x_coord_out">
+         <obj_property name="ElementShortName">x_decoder_x_coord_out[1:0]</obj_property>
+         <obj_property name="ObjectShortName">x_decoder_x_coord_out[1:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/rom_node_tb/x_decoder_y_coord_out">
+         <obj_property name="ElementShortName">x_decoder_y_coord_out[1:0]</obj_property>
+         <obj_property name="ObjectShortName">x_decoder_y_coord_out[1:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/rom_node_tb/x_decoder_multicast_group_out">
+         <obj_property name="ElementShortName">x_decoder_multicast_group_out[0:0]</obj_property>
+         <obj_property name="ObjectShortName">x_decoder_multicast_group_out[0:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/rom_node_tb/x_decoder_done_flag_out">
+         <obj_property name="ElementShortName">x_decoder_done_flag_out</obj_property>
+         <obj_property name="ObjectShortName">x_decoder_done_flag_out</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/rom_node_tb/x_decoder_result_flag_out">
+         <obj_property name="ElementShortName">x_decoder_result_flag_out</obj_property>
+         <obj_property name="ObjectShortName">x_decoder_result_flag_out</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/rom_node_tb/x_decoder_matrix_type_out">
+         <obj_property name="ElementShortName">x_decoder_matrix_type_out[0:0]</obj_property>
+         <obj_property name="ObjectShortName">x_decoder_matrix_type_out[0:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/rom_node_tb/x_decoder_matrix_x_coord_out">
+         <obj_property name="ElementShortName">x_decoder_matrix_x_coord_out[7:0]</obj_property>
+         <obj_property name="ObjectShortName">x_decoder_matrix_x_coord_out[7:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/rom_node_tb/x_decoder_matrix_y_coord_out">
+         <obj_property name="ElementShortName">x_decoder_matrix_y_coord_out[7:0]</obj_property>
+         <obj_property name="ObjectShortName">x_decoder_matrix_y_coord_out[7:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/rom_node_tb/x_decoder_matrix_element_out">
+         <obj_property name="ElementShortName">x_decoder_matrix_element_out[31:0]</obj_property>
+         <obj_property name="ObjectShortName">x_decoder_matrix_element_out[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/rom_node_tb/x_decoder_packet_out_valid">
+         <obj_property name="ElementShortName">x_decoder_packet_out_valid</obj_property>
+         <obj_property name="ObjectShortName">x_decoder_packet_out_valid</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/rom_node_tb/x_decoder_packet_read">
+         <obj_property name="ElementShortName">x_decoder_packet_read</obj_property>
+         <obj_property name="ObjectShortName">x_decoder_packet_read</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/rom_node_tb/y_decoder_packet_in">
+         <obj_property name="ElementShortName">y_decoder_packet_in[58:0]</obj_property>
+         <obj_property name="ObjectShortName">y_decoder_packet_in[58:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/rom_node_tb/y_decoder_packet_in_valid">
+         <obj_property name="ElementShortName">y_decoder_packet_in_valid</obj_property>
+         <obj_property name="ObjectShortName">y_decoder_packet_in_valid</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/rom_node_tb/y_decoder_x_coord_out">
+         <obj_property name="ElementShortName">y_decoder_x_coord_out[1:0]</obj_property>
+         <obj_property name="ObjectShortName">y_decoder_x_coord_out[1:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/rom_node_tb/y_decoder_y_coord_out">
+         <obj_property name="ElementShortName">y_decoder_y_coord_out[1:0]</obj_property>
+         <obj_property name="ObjectShortName">y_decoder_y_coord_out[1:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/rom_node_tb/y_decoder_multicast_group_out">
+         <obj_property name="ElementShortName">y_decoder_multicast_group_out[0:0]</obj_property>
+         <obj_property name="ObjectShortName">y_decoder_multicast_group_out[0:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/rom_node_tb/y_decoder_done_flag_out">
+         <obj_property name="ElementShortName">y_decoder_done_flag_out</obj_property>
+         <obj_property name="ObjectShortName">y_decoder_done_flag_out</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/rom_node_tb/y_decoder_result_flag_out">
+         <obj_property name="ElementShortName">y_decoder_result_flag_out</obj_property>
+         <obj_property name="ObjectShortName">y_decoder_result_flag_out</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/rom_node_tb/y_decoder_matrix_type_out">
+         <obj_property name="ElementShortName">y_decoder_matrix_type_out[0:0]</obj_property>
+         <obj_property name="ObjectShortName">y_decoder_matrix_type_out[0:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/rom_node_tb/y_decoder_matrix_x_coord_out">
+         <obj_property name="ElementShortName">y_decoder_matrix_x_coord_out[7:0]</obj_property>
+         <obj_property name="ObjectShortName">y_decoder_matrix_x_coord_out[7:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/rom_node_tb/y_decoder_matrix_y_coord_out">
+         <obj_property name="ElementShortName">y_decoder_matrix_y_coord_out[7:0]</obj_property>
+         <obj_property name="ObjectShortName">y_decoder_matrix_y_coord_out[7:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/rom_node_tb/y_decoder_matrix_element_out">
+         <obj_property name="ElementShortName">y_decoder_matrix_element_out[31:0]</obj_property>
+         <obj_property name="ObjectShortName">y_decoder_matrix_element_out[31:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/rom_node_tb/y_decoder_packet_out_valid">
+         <obj_property name="ElementShortName">y_decoder_packet_out_valid</obj_property>
+         <obj_property name="ObjectShortName">y_decoder_packet_out_valid</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/rom_node_tb/y_decoder_packet_read">
+         <obj_property name="ElementShortName">y_decoder_packet_read</obj_property>
+         <obj_property name="ObjectShortName">y_decoder_packet_read</obj_property>
+      </wvobject>
+      <wvobject type="other" fp_name="/rom_node_tb/clk_period">
+         <obj_property name="ElementShortName">clk_period</obj_property>
+         <obj_property name="ObjectShortName">clk_period</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/rom_node_tb/matrix_file">
+         <obj_property name="ElementShortName">matrix_file[1:12]</obj_property>
+         <obj_property name="ObjectShortName">matrix_file[1:12]</obj_property>
+      </wvobject>
+      <wvobject type="other" fp_name="/rom_node_tb/matrix_file_length">
+         <obj_property name="ElementShortName">matrix_file_length</obj_property>
+         <obj_property name="ObjectShortName">matrix_file_length</obj_property>
+      </wvobject>
+      <wvobject type="other" fp_name="/rom_node_tb/ADDRESS_WIDTH">
+         <obj_property name="ElementShortName">ADDRESS_WIDTH</obj_property>
+         <obj_property name="ObjectShortName">ADDRESS_WIDTH</obj_property>
+      </wvobject>
+      <wvobject type="other" fp_name="/rom_node_tb/X_COORD">
+         <obj_property name="ElementShortName">X_COORD</obj_property>
+         <obj_property name="ObjectShortName">X_COORD</obj_property>
+      </wvobject>
+      <wvobject type="other" fp_name="/rom_node_tb/Y_COORD">
+         <obj_property name="ElementShortName">Y_COORD</obj_property>
+         <obj_property name="ObjectShortName">Y_COORD</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject type="group" fp_name="group48">
+      <obj_property name="label">ROM node</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject type="group" fp_name="group44">
+         <obj_property name="label">ROM</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+         <wvobject type="logic" fp_name="/rom_node_tb/ROM/ROM_MEMORY/read_en">
+            <obj_property name="ElementShortName">read_en</obj_property>
+            <obj_property name="ObjectShortName">read_en</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/rom_node_tb/ROM/ROM_MEMORY/read_addr">
+            <obj_property name="ElementShortName">read_addr[10:0]</obj_property>
+            <obj_property name="ObjectShortName">read_addr[10:0]</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/rom_node_tb/ROM/ROM_MEMORY/read_data">
+            <obj_property name="ElementShortName">read_data[58:0]</obj_property>
+            <obj_property name="ObjectShortName">read_data[58:0]</obj_property>
+         </wvobject>
+      </wvobject>
+      <wvobject type="other" fp_name="/rom_node_tb/ROM/read_address">
+         <obj_property name="ElementShortName">read_address</obj_property>
+         <obj_property name="ObjectShortName">read_address</obj_property>
+      </wvobject>
+      <wvobject type="other" fp_name="/rom_node_tb/ROM/rom_burst_read">
+         <obj_property name="ElementShortName">rom_burst_read</obj_property>
+         <obj_property name="ObjectShortName">rom_burst_read</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/rom_node_tb/ROM/rom_read_ready">
+         <obj_property name="ElementShortName">rom_read_ready</obj_property>
+         <obj_property name="ObjectShortName">rom_read_ready</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/rom_node_tb/ROM/node_coord_received">
+         <obj_property name="ElementShortName">node_coord_received[0:1][7:0]</obj_property>
+         <obj_property name="ObjectShortName">node_coord_received[0:1][7:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/rom_node_tb/ROM/node_ready_received">
+         <obj_property name="ElementShortName">node_ready_received</obj_property>
+         <obj_property name="ObjectShortName">node_ready_received</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/rom_node_tb/ROM/receiver_nodes_ready">
+         <obj_property name="ElementShortName">receiver_nodes_ready[0:1,0:1]</obj_property>
+         <obj_property name="ObjectShortName">receiver_nodes_ready[0:1,0:1]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/rom_node_tb/ROM/rom_read_address">
+         <obj_property name="ElementShortName">rom_read_address[10:0]</obj_property>
+         <obj_property name="ObjectShortName">rom_read_address[10:0]</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/rom_node_tb/ROM/rom_read_data">
+         <obj_property name="ElementShortName">rom_read_data[58:0]</obj_property>
+         <obj_property name="ObjectShortName">rom_read_data[58:0]</obj_property>
+      </wvobject>
+      <wvobject type="group" fp_name="group103">
+         <obj_property name="label">NIC</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <wvobject type="logic" fp_name="/rom_node_tb/ROM/NIC/from_pe_valid">
+            <obj_property name="ElementShortName">from_pe_valid</obj_property>
+            <obj_property name="ObjectShortName">from_pe_valid</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/rom_node_tb/ROM/NIC/from_pe_data">
+            <obj_property name="ElementShortName">from_pe_data[58:0]</obj_property>
+            <obj_property name="ObjectShortName">from_pe_data[58:0]</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/rom_node_tb/ROM/NIC/network_ready">
+            <obj_property name="ElementShortName">network_ready</obj_property>
+            <obj_property name="ObjectShortName">network_ready</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/rom_node_tb/ROM/NIC/to_network_valid">
+            <obj_property name="ElementShortName">to_network_valid</obj_property>
+            <obj_property name="ObjectShortName">to_network_valid</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/rom_node_tb/ROM/NIC/to_network_data">
+            <obj_property name="ElementShortName">to_network_data[58:0]</obj_property>
+            <obj_property name="ObjectShortName">to_network_data[58:0]</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/rom_node_tb/ROM/NIC/pe_to_network_full">
+            <obj_property name="ElementShortName">pe_to_network_full</obj_property>
+            <obj_property name="ObjectShortName">pe_to_network_full</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/rom_node_tb/ROM/NIC/pe_to_network_empty">
+            <obj_property name="ElementShortName">pe_to_network_empty</obj_property>
+            <obj_property name="ObjectShortName">pe_to_network_empty</obj_property>
+         </wvobject>
+         <wvobject type="other" fp_name="/rom_node_tb/ROM/NIC/PE_TO_NETWORK_FIFO/uninitialised_fifo_gen/UNINITIALISED_FIFO/entries">
+            <obj_property name="ElementShortName">entries</obj_property>
+            <obj_property name="ObjectShortName">entries</obj_property>
+         </wvobject>
+      </wvobject>
+      <wvobject type="group" fp_name="group111">
+         <obj_property name="label">Router</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+         <wvobject type="group" fp_name="group112">
+            <obj_property name="label">Router in</obj_property>
+            <obj_property name="DisplayName">label</obj_property>
+            <obj_property name="isExpanded"></obj_property>
+            <wvobject type="array" fp_name="/rom_node_tb/ROM/ROUTER/x_in">
+               <obj_property name="ElementShortName">x_in[58:0]</obj_property>
+               <obj_property name="ObjectShortName">x_in[58:0]</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/rom_node_tb/ROM/ROUTER/x_in_valid">
+               <obj_property name="ElementShortName">x_in_valid</obj_property>
+               <obj_property name="ObjectShortName">x_in_valid</obj_property>
+            </wvobject>
+            <wvobject type="array" fp_name="/rom_node_tb/ROM/ROUTER/y_in">
+               <obj_property name="ElementShortName">y_in[58:0]</obj_property>
+               <obj_property name="ObjectShortName">y_in[58:0]</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/rom_node_tb/ROM/ROUTER/y_in_valid">
+               <obj_property name="ElementShortName">y_in_valid</obj_property>
+               <obj_property name="ObjectShortName">y_in_valid</obj_property>
+            </wvobject>
+            <wvobject type="array" fp_name="/rom_node_tb/ROM/ROUTER/pe_in">
+               <obj_property name="ElementShortName">pe_in[58:0]</obj_property>
+               <obj_property name="ObjectShortName">pe_in[58:0]</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/rom_node_tb/ROM/ROUTER/pe_in_valid">
+               <obj_property name="ElementShortName">pe_in_valid</obj_property>
+               <obj_property name="ObjectShortName">pe_in_valid</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/rom_node_tb/ROM/ROUTER/pe_backpressure">
+               <obj_property name="ElementShortName">pe_backpressure</obj_property>
+               <obj_property name="ObjectShortName">pe_backpressure</obj_property>
+            </wvobject>
+            <wvobject type="array" fp_name="/rom_node_tb/ROM/ROUTER/multicast_in">
+               <obj_property name="ElementShortName">multicast_in[58:0]</obj_property>
+               <obj_property name="ObjectShortName">multicast_in[58:0]</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/rom_node_tb/ROM/ROUTER/multicast_in_valid">
+               <obj_property name="ElementShortName">multicast_in_valid</obj_property>
+               <obj_property name="ObjectShortName">multicast_in_valid</obj_property>
+            </wvobject>
+         </wvobject>
+         <wvobject type="group" fp_name="group113">
+            <obj_property name="label">Router out</obj_property>
+            <obj_property name="DisplayName">label</obj_property>
+            <obj_property name="isExpanded"></obj_property>
+            <wvobject type="array" fp_name="/rom_node_tb/ROM/ROUTER/x_out">
+               <obj_property name="ElementShortName">x_out[58:0]</obj_property>
+               <obj_property name="ObjectShortName">x_out[58:0]</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/rom_node_tb/ROM/ROUTER/x_out_valid">
+               <obj_property name="ElementShortName">x_out_valid</obj_property>
+               <obj_property name="ObjectShortName">x_out_valid</obj_property>
+            </wvobject>
+            <wvobject type="array" fp_name="/rom_node_tb/ROM/ROUTER/y_out">
+               <obj_property name="ElementShortName">y_out[58:0]</obj_property>
+               <obj_property name="ObjectShortName">y_out[58:0]</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/rom_node_tb/ROM/ROUTER/y_out_valid">
+               <obj_property name="ElementShortName">y_out_valid</obj_property>
+               <obj_property name="ObjectShortName">y_out_valid</obj_property>
+            </wvobject>
+            <wvobject type="array" fp_name="/rom_node_tb/ROM/ROUTER/pe_out">
+               <obj_property name="ElementShortName">pe_out[58:0]</obj_property>
+               <obj_property name="ObjectShortName">pe_out[58:0]</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/rom_node_tb/ROM/ROUTER/pe_out_valid">
+               <obj_property name="ElementShortName">pe_out_valid</obj_property>
+               <obj_property name="ObjectShortName">pe_out_valid</obj_property>
+            </wvobject>
+            <wvobject type="array" fp_name="/rom_node_tb/ROM/ROUTER/multicast_out">
+               <obj_property name="ElementShortName">multicast_out[58:0]</obj_property>
+               <obj_property name="ObjectShortName">multicast_out[58:0]</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/rom_node_tb/ROM/ROUTER/multicast_out_valid">
+               <obj_property name="ElementShortName">multicast_out_valid</obj_property>
+               <obj_property name="ObjectShortName">multicast_out_valid</obj_property>
+            </wvobject>
+            <wvobject type="logic" fp_name="/rom_node_tb/ROM/ROUTER/multicast_backpressure">
+               <obj_property name="ElementShortName">multicast_backpressure</obj_property>
+               <obj_property name="ObjectShortName">multicast_backpressure</obj_property>
+            </wvobject>
+         </wvobject>
+      </wvobject>
+      <wvobject type="group" fp_name="group1586">
+         <obj_property name="label">X Decoder</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <wvobject type="array" fp_name="/rom_node_tb/X_DECODER/packet_in">
+            <obj_property name="ElementShortName">packet_in[58:0]</obj_property>
+            <obj_property name="ObjectShortName">packet_in[58:0]</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/rom_node_tb/X_DECODER/packet_in_valid">
+            <obj_property name="ElementShortName">packet_in_valid</obj_property>
+            <obj_property name="ObjectShortName">packet_in_valid</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/rom_node_tb/X_DECODER/x_coord_out">
+            <obj_property name="ElementShortName">x_coord_out[1:0]</obj_property>
+            <obj_property name="ObjectShortName">x_coord_out[1:0]</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/rom_node_tb/X_DECODER/y_coord_out">
+            <obj_property name="ElementShortName">y_coord_out[1:0]</obj_property>
+            <obj_property name="ObjectShortName">y_coord_out[1:0]</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/rom_node_tb/X_DECODER/multicast_group_out">
+            <obj_property name="ElementShortName">multicast_group_out[0:0]</obj_property>
+            <obj_property name="ObjectShortName">multicast_group_out[0:0]</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/rom_node_tb/X_DECODER/done_flag_out">
+            <obj_property name="ElementShortName">done_flag_out</obj_property>
+            <obj_property name="ObjectShortName">done_flag_out</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/rom_node_tb/X_DECODER/result_flag_out">
+            <obj_property name="ElementShortName">result_flag_out</obj_property>
+            <obj_property name="ObjectShortName">result_flag_out</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/rom_node_tb/X_DECODER/matrix_type_out">
+            <obj_property name="ElementShortName">matrix_type_out[0:0]</obj_property>
+            <obj_property name="ObjectShortName">matrix_type_out[0:0]</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/rom_node_tb/X_DECODER/matrix_x_coord_out">
+            <obj_property name="ElementShortName">matrix_x_coord_out[7:0]</obj_property>
+            <obj_property name="ObjectShortName">matrix_x_coord_out[7:0]</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/rom_node_tb/X_DECODER/matrix_y_coord_out">
+            <obj_property name="ElementShortName">matrix_y_coord_out[7:0]</obj_property>
+            <obj_property name="ObjectShortName">matrix_y_coord_out[7:0]</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/rom_node_tb/X_DECODER/matrix_element_out">
+            <obj_property name="ElementShortName">matrix_element_out[31:0]</obj_property>
+            <obj_property name="ObjectShortName">matrix_element_out[31:0]</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/rom_node_tb/X_DECODER/packet_out_valid">
+            <obj_property name="ElementShortName">packet_out_valid</obj_property>
+            <obj_property name="ObjectShortName">packet_out_valid</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/rom_node_tb/X_DECODER/packet_read">
+            <obj_property name="ElementShortName">packet_read</obj_property>
+            <obj_property name="ObjectShortName">packet_read</obj_property>
+         </wvobject>
+      </wvobject>
+      <wvobject type="group" fp_name="group1587">
+         <obj_property name="label">Y Decoder</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <wvobject type="array" fp_name="/rom_node_tb/Y_DECODER/packet_in">
+            <obj_property name="ElementShortName">packet_in[58:0]</obj_property>
+            <obj_property name="ObjectShortName">packet_in[58:0]</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/rom_node_tb/Y_DECODER/packet_in_valid">
+            <obj_property name="ElementShortName">packet_in_valid</obj_property>
+            <obj_property name="ObjectShortName">packet_in_valid</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/rom_node_tb/Y_DECODER/x_coord_out">
+            <obj_property name="ElementShortName">x_coord_out[1:0]</obj_property>
+            <obj_property name="ObjectShortName">x_coord_out[1:0]</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/rom_node_tb/Y_DECODER/y_coord_out">
+            <obj_property name="ElementShortName">y_coord_out[1:0]</obj_property>
+            <obj_property name="ObjectShortName">y_coord_out[1:0]</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/rom_node_tb/Y_DECODER/multicast_group_out">
+            <obj_property name="ElementShortName">multicast_group_out[0:0]</obj_property>
+            <obj_property name="ObjectShortName">multicast_group_out[0:0]</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/rom_node_tb/Y_DECODER/done_flag_out">
+            <obj_property name="ElementShortName">done_flag_out</obj_property>
+            <obj_property name="ObjectShortName">done_flag_out</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/rom_node_tb/Y_DECODER/result_flag_out">
+            <obj_property name="ElementShortName">result_flag_out</obj_property>
+            <obj_property name="ObjectShortName">result_flag_out</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/rom_node_tb/Y_DECODER/matrix_type_out">
+            <obj_property name="ElementShortName">matrix_type_out[0:0]</obj_property>
+            <obj_property name="ObjectShortName">matrix_type_out[0:0]</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/rom_node_tb/Y_DECODER/matrix_x_coord_out">
+            <obj_property name="ElementShortName">matrix_x_coord_out[7:0]</obj_property>
+            <obj_property name="ObjectShortName">matrix_x_coord_out[7:0]</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/rom_node_tb/Y_DECODER/matrix_y_coord_out">
+            <obj_property name="ElementShortName">matrix_y_coord_out[7:0]</obj_property>
+            <obj_property name="ObjectShortName">matrix_y_coord_out[7:0]</obj_property>
+         </wvobject>
+         <wvobject type="array" fp_name="/rom_node_tb/Y_DECODER/matrix_element_out">
+            <obj_property name="ElementShortName">matrix_element_out[31:0]</obj_property>
+            <obj_property name="ObjectShortName">matrix_element_out[31:0]</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/rom_node_tb/Y_DECODER/packet_out_valid">
+            <obj_property name="ElementShortName">packet_out_valid</obj_property>
+            <obj_property name="ObjectShortName">packet_out_valid</obj_property>
+         </wvobject>
+         <wvobject type="logic" fp_name="/rom_node_tb/Y_DECODER/packet_read">
+            <obj_property name="ElementShortName">packet_read</obj_property>
+            <obj_property name="ObjectShortName">packet_read</obj_property>
+         </wvobject>
+      </wvobject>
+   </wvobject>
+</wave_config>
