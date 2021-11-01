@@ -9,7 +9,7 @@ use IEEE.std_logic_textio.all;
 library xil_defaultlib;
 use xil_defaultlib.hoplite_network_tb_defs.all;
 
-entity hoplite_tb_pe is
+entity hoplite_unicast_tb_pe is
     Generic (
         X_COORD     : integer := 0;
         Y_COORD     : integer := 0;
@@ -39,9 +39,9 @@ entity hoplite_tb_pe is
         last_message_received   : out STD_LOGIC_VECTOR ((BUS_WIDTH-1) downto 0);
         message_received        : out STD_LOGIC
    );
-end hoplite_tb_pe;
+end hoplite_unicast_tb_pe;
 
-architecture Behavioral of hoplite_tb_pe is
+architecture Behavioral of hoplite_unicast_tb_pe is
 
     constant x_src : std_logic_vector((COORD_BITS-1) downto 0) := std_logic_vector(to_unsigned(X_COORD, COORD_BITS));
     constant y_src : std_logic_vector((COORD_BITS-1) downto 0) := std_logic_vector(to_unsigned(Y_COORD, COORD_BITS));
@@ -86,7 +86,7 @@ begin
         variable my_line : line;
     begin
         if (rising_edge(clk) and reset_n = '1' and trig = '1') then
-            write(my_line, string'(HT & "hoplite_tb_pe: "));
+            write(my_line, string'(HT & "hoplite_unicast_tb_pe: "));
         
             write(my_line, string'("Node ("));
             write(my_line, X_COORD);
@@ -144,7 +144,7 @@ begin
         variable my_line : line;
     begin
         if (rising_edge(clk) and reset_n = '1' and message_in_valid = '1') then
-            write(my_line, string'(HT & "hoplite_tb_pe: "));
+            write(my_line, string'(HT & "hoplite_unicast_tb_pe: "));
         
             write(my_line, string'("Node ("));
             write(my_line, X_COORD);

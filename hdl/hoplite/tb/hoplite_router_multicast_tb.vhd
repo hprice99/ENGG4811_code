@@ -13,10 +13,10 @@ use xil_defaultlib.math_functions.all;
 use std.env.finish;
 use std.env.stop;
 
-entity hoplite_router_tb is
-end hoplite_router_tb;
+entity hoplite_router_multicast_tb is
+end hoplite_router_multicast_tb;
 
-architecture Behavioral of hoplite_router_tb is
+architecture Behavioral of hoplite_router_multicast_tb is
     
     component hoplite_router_multicast
         generic (

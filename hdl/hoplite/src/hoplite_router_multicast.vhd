@@ -272,11 +272,11 @@ begin
     x_out <= x_q;
     y_out <= y_q;
 
-     NEXT_VALID: process (x_in_valid_d, x_in_dest_d, x_in_multicast_coord_d,
+    NEXT_VALID: process (x_in_valid_d, x_in_dest_d, x_in_multicast_coord_d,
                             y_in_valid_d, y_in_dest_d, y_in_multicast_coord_d,
                             pe_in_valid_d, pe_in_dest_d, pe_in_multicast_coord_d,
                             multicast_in_valid_d, multicast_in_multicast_coord_d)
-     begin
+    begin
         x_next  <= '0';
         y_next  <= '0';
      
@@ -299,7 +299,7 @@ begin
             x_next <= pe_in_valid_d;
             
         end if;
-        
+
         -- Only route multicast packet out of y_out if multicast_out is already used
         if (y_in_valid_d = '0' and x_in_valid_d = '1' and is_valid_packet_in(x_in_dest_d, x_in_valid_d) = False
                 and is_valid_multicast_in(x_in_multicast_coord_d, x_in_valid_d) = True) then
