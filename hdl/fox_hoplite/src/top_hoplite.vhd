@@ -256,7 +256,7 @@ architecture Behavioral of top is
         );
     end component rom_node;
 
-    component hoplite_router
+    component hoplite_router_unicast
         generic (
             BUS_WIDTH   : integer := 32;
             X_COORD     : integer := 0;
@@ -282,7 +282,7 @@ architecture Behavioral of top is
             pe_out_valid    : out STD_LOGIC;
             pe_backpressure : out STD_LOGIC
         );
-    end component hoplite_router;
+    end component hoplite_router_unicast;
     
     -- Array of message interfaces between nodes
     signal x_messages_out, y_messages_out : t_Message;
@@ -548,7 +548,7 @@ begin
                 end generate ROM_GEN;
                 
                 ROUTER_GEN: if (curr_x /= ROM_X_COORD or curr_y /= ROM_Y_COORD) generate
-                    ROUTER: hoplite_router
+                    ROUTER: hoplite_router_unicast
                         generic map (
                             BUS_WIDTH   => BUS_WIDTH,
                             X_COORD     => curr_x,

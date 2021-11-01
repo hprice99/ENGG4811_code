@@ -13,12 +13,12 @@ use xil_defaultlib.math_functions.all;
 use std.env.finish;
 use std.env.stop;
 
-entity hoplite_router_tb is
-end hoplite_router_tb;
+entity hoplite_router_unicast_tb is
+end hoplite_router_unicast_tb;
 
-architecture Behavioral of hoplite_router_tb is
+architecture Behavioral of hoplite_router_unicast_tb is
     
-    component hoplite_router
+    component hoplite_router_unicast
         generic (
             BUS_WIDTH   : integer := 32;
             X_COORD     : integer := 0;
@@ -42,7 +42,7 @@ architecture Behavioral of hoplite_router_tb is
             pe_out_valid    : out STD_LOGIC;
             pe_backpressure : out STD_LOGIC
         );
-    end component hoplite_router;
+    end component hoplite_router_unicast;
 
     component fifo_sync
         generic (
@@ -301,7 +301,7 @@ begin
         empty               => open
     );
     
-    DUT: hoplite_router
+    DUT: hoplite_router_unicast
     generic map (
         BUS_WIDTH   => BUS_WIDTH,
         X_COORD     => X_COORD,

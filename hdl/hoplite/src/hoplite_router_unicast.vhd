@@ -2,7 +2,7 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
 
-entity hoplite_router is
+entity hoplite_router_unicast is
     Generic (
         BUS_WIDTH   : integer := 32;
         X_COORD     : integer := 0;
@@ -30,9 +30,9 @@ entity hoplite_router is
         pe_out          : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
         pe_out_valid    : out STD_LOGIC
     );
-end hoplite_router;
+end hoplite_router_unicast;
 
-architecture Behavioral of hoplite_router is
+architecture Behavioral of hoplite_router_unicast is
     
     signal x_d, x_q, y_d, y_q, pe_d : std_logic_vector((BUS_WIDTH-1) downto 0);
     signal sel : std_logic_vector(1 downto 0);
@@ -147,11 +147,13 @@ begin
     x_out <= x_q;
     y_out <= y_q;
 
-     NEXT_VALID: process (x_in_valid_d, y_in_valid_d, x_in_dest_d, y_in_dest_d, pe_in_valid_d, pe_in_dest_d)
-     begin
+    NEXT_VALID: process (x_in_valid_d, y_in_valid_d, 
+                         x_in_dest_d, y_in_dest_d, 
+                         pe_in_valid_d, pe_in_dest_d)
+    begin
         x_next  <= '0';
         y_next  <= '0';
-     
+
         if (x_in_valid_d = '1' and is_valid_packet_in(x_in_dest_d, x_in_valid) = False) then
             x_next <= '1';
         elsif (pe_in_valid_d = '1' and is_valid_packet_in(pe_in_dest_d, pe_in_valid_d) = True) then
@@ -186,8 +188,8 @@ begin
             
         end if;
     end process NEXT_VALID;
-    
-    -- Valid signal routing    
+
+    -- Valid signal routing
     OUTPUT_VALID_FF: process(clk)
     begin
         if (rising_edge(clk)) then
@@ -211,6 +213,6 @@ begin
                 end if;
             end if;
         end if;
-    end process OUTPUT_VALID_FF;     
+    end process OUTPUT_VALID_FF;
     
 end Behavioral;

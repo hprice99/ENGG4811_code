@@ -9,7 +9,7 @@ use IEEE.std_logic_textio.all;
 library xil_defaultlib;
 use xil_defaultlib.hoplite_network_tb_defs.all;
 
-entity hoplite_tb_node is
+entity hoplite_unicast_tb_node is
     Generic (
         X_COORD     : integer := 0;
         Y_COORD     : integer := 0;
@@ -42,11 +42,11 @@ entity hoplite_tb_node is
         last_message_received   : out STD_LOGIC_VECTOR ((BUS_WIDTH-1) downto 0);
         message_received        : out STD_LOGIC
     );
-end hoplite_tb_node;
+end hoplite_unicast_tb_node;
 
-architecture Behavioral of hoplite_tb_node is
+architecture Behavioral of hoplite_unicast_tb_node is
 
-    component hoplite_router
+    component hoplite_router_unicast
         generic (
             BUS_WIDTH   : integer := 32;
             X_COORD     : integer := 0;
@@ -72,7 +72,7 @@ architecture Behavioral of hoplite_tb_node is
             pe_out_valid    : out STD_LOGIC;
             pe_backpressure : out STD_LOGIC
         );
-    end component hoplite_router;
+    end component hoplite_router_unicast;
     
     component nic_dual
         generic (
@@ -112,7 +112,7 @@ architecture Behavioral of hoplite_tb_node is
         );
     end component nic_dual;
 
-    component hoplite_tb_pe
+    component hoplite_unicast_tb_pe
         generic (
             BUS_WIDTH   : integer := 32;
             X_COORD     : integer := 0;
@@ -142,7 +142,7 @@ architecture Behavioral of hoplite_tb_node is
             last_message_received   : out STD_LOGIC_VECTOR ((BUS_WIDTH-1) downto 0);
             message_received        : out STD_LOGIC
         );
-    end component hoplite_tb_pe; 
+    end component hoplite_unicast_tb_pe; 
     
     constant FIFO_DEPTH : integer := 100;
     
@@ -177,7 +177,7 @@ architecture Behavioral of hoplite_tb_node is
 
 begin
 
-    ROUTER: hoplite_router
+    ROUTER: hoplite_router_unicast
         generic map (
             BUS_WIDTH   => BUS_WIDTH,
             X_COORD     => X_COORD,
@@ -268,7 +268,7 @@ begin
     begin
         if (rising_edge(clk) and reset_n = '1') then
             if (print_valid = '1') then
-                write(my_line, string'(HT & "hoplite_tb_node: "));
+                write(my_line, string'(HT & "hoplite_unicast_tb_node: "));
                
                 write(my_line, string'("Node ("));
                 write(my_line, X_COORD);
@@ -374,7 +374,7 @@ begin
         end if;
     end process PRINT;
     
-    PE : hoplite_tb_pe
+    PE : hoplite_unicast_tb_pe
         generic map (
             BUS_WIDTH   => BUS_WIDTH,
             X_COORD     => X_COORD,

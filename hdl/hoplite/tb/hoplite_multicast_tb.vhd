@@ -14,10 +14,10 @@ use xil_defaultlib.hoplite_network_tb_defs.all;
 use xil_defaultlib.multicast_defs.all;
 use xil_defaultlib.math_functions.all;
 
-entity hoplite_tb is
-end hoplite_tb;
+entity hoplite_multicast_tb is
+end hoplite_multicast_tb;
 
-architecture Behavioral of hoplite_tb is
+architecture Behavioral of hoplite_multicast_tb is
 
     component hoplite_multicast_tb_node
     Generic (
@@ -513,7 +513,7 @@ begin
                                 column_messages_received(src_x, src_y)(dest_x, dest_y)  <= 0;
                             elsif (messages_received(dest_x, dest_y) = '1') then
                                 if (expected_messages_received(src_x, src_y)(dest_x, dest_y) = last_messages_received(dest_x, dest_y)) then
-                                    write(my_line, string'(HT & "hoplite_tb: "));
+                                    write(my_line, string'(HT & "hoplite_unicast_tb: "));
         
                                     write(my_line, string'("Node ("));
                                     write(my_line, dest_x);
@@ -538,7 +538,7 @@ begin
                                 elsif (last_messages_received_src(dest_x, dest_y)(X_INDEX) = src_x_signal
                                             and last_messages_received_src(dest_x, dest_y)(Y_INDEX) = src_y_signal
                                             and expected_messages_received(src_x, src_y)(dest_x, dest_y) /= last_messages_received(dest_x, dest_y)) then
-                                    write(my_line, string'(CR & LF & HT & "hoplite_tb: "));
+                                    write(my_line, string'(CR & LF & HT & "hoplite_unicast_tb: "));
         
                                     write(my_line, string'("Node ("));
                                     write(my_line, dest_x);

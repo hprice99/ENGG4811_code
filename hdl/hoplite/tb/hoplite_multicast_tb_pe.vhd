@@ -170,7 +170,7 @@ begin
         variable my_line : line;
     begin
         if (rising_edge(clk) and reset_n = '1' and trig = '1') then
-            write(my_line, string'(HT & "hoplite_tb_pe: "));
+            write(my_line, string'(HT & "hoplite_multicast_tb_pe: "));
         
             write(my_line, string'("Node ("));
             write(my_line, X_COORD);
