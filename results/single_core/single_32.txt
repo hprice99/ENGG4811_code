@@ -1,0 +1,46 @@
+Copyright 1986-2020 Xilinx, Inc. All Rights Reserved.
+------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2020.2 (lin64) Build 3064766 Wed Nov 18 09:12:47 MST 2020
+| Date         : Thu Oct  7 16:58:01 2021
+| Host         : parallels-Parallels-Virtual-Platform running 64-bit Ubuntu 20.04.3 LTS
+| Command      : report_utilization -hierarchical -file /home/parallels/Desktop/PicoRV/ENGG4811_code/demo/single_32.txt
+| Design       : board_top
+| Device       : 7a100tcsg324-1
+| Design State : Routed
+------------------------------------------------------------------------------------------------------------------------
+
+Utilization Design Information
+
+Table of Contents
+-----------------
+1. Utilization by Hierarchy
+
+1. Utilization by Hierarchy
+---------------------------
+
++----------------------------+-------------------------------------+------------+------------+---------+------+-----+--------+--------+------------+
+|          Instance          |                Module               | Total LUTs | Logic LUTs | LUTRAMs | SRLs | FFs | RAMB36 | RAMB18 | DSP Blocks |
++----------------------------+-------------------------------------+------------+------------+---------+------+-----+--------+--------+------------+
+| board_top                  |                               (top) |      10773 |       2533 |    8240 |    0 | 941 |      1 |      2 |          4 |
+|   (board_top)              |                               (top) |          0 |          0 |       0 |    0 |   0 |      0 |      0 |          0 |
+|   DIVIDER                  |                       clock_divider |          0 |          0 |       0 |    0 |   0 |      0 |      0 |          0 |
+|     inst                   | clock_divider_clock_divider_clk_wiz |          0 |          0 |       0 |    0 |   0 |      0 |      0 |          0 |
+|   SINGLE_CORE_TOP          |                     top_single_core |      10773 |       2533 |    8240 |    0 | 941 |      1 |      2 |          4 |
+|     (SINGLE_CORE_TOP)      |                     top_single_core |          7 |          7 |       0 |    0 |  12 |      1 |      1 |          0 |
+|     CORE                   |                  system_single_core |      10672 |       2432 |    8240 |    0 | 857 |      0 |      0 |          4 |
+|       (CORE)               |                  system_single_core |       8207 |         15 |    8192 |    0 |  42 |      0 |      0 |          0 |
+|       picorv32_core        |                            picorv32 |       2466 |       2418 |      48 |    0 | 815 |      0 |      0 |          4 |
+|         (picorv32_core)    |                            picorv32 |       1895 |       1847 |      48 |    0 | 578 |      0 |      0 |          0 |
+|         pcpi_div           |                   picorv32_pcpi_div |        371 |        371 |       0 |    0 | 200 |      0 |      0 |          0 |
+|         pcpi_mul           |              picorv32_pcpi_fast_mul |        207 |        207 |       0 |    0 |  37 |      0 |      0 |          4 |
+|     UART_GEN.UART_TX_NODE  |                    UART_tx_buffered |         94 |         94 |       0 |    0 |  72 |      0 |      1 |          0 |
+|       UART_BUFFER          |                           fifo_sync |         78 |         78 |       0 |    0 |  52 |      0 |      1 |          0 |
+|       UART_INITIALISE      |                                UART |         16 |         16 |       0 |    0 |  20 |      0 |      0 |          0 |
+|         os_clk_divider_i   |                        UART_CLK_DIV |          4 |          4 |       0 |    0 |   6 |      0 |      0 |          0 |
+|         uart_tx_i          |                             UART_TX |         12 |         12 |       0 |    0 |  14 |      0 |      0 |          0 |
+|           (uart_tx_i)      |                             UART_TX |          4 |          4 |       0 |    0 |   9 |      0 |      0 |          0 |
+|           tx_clk_divider_i |        UART_CLK_DIV__parameterized3 |          8 |          8 |       0 |    0 |   5 |      0 |      0 |          0 |
++----------------------------+-------------------------------------+------------+------------+---------+------+-----+--------+--------+------------+
+* Note: The sum of lower-level cells may be larger than their parent cells total, due to cross-hierarchy LUT combining
+
+
