@@ -8,10 +8,10 @@ use xil_defaultlib.math_functions.all;
 
 entity top is
     Port ( 
-           CPU_RESETN   : in STD_LOGIC;
-           CLK_100MHZ   : in STD_LOGIC;
-           SW           : in STD_LOGIC_VECTOR(3 downto 0);
-           LED          : out STD_LOGIC_VECTOR(3 downto 0)
+           CPU_RESETN   : in std_logic;
+           CLK_100MHZ   : in std_logic;
+           SW           : in std_logic_vector(3 downto 0);
+           LED          : out std_logic_vector(3 downto 0)
     );
 end top;
 
@@ -43,15 +43,15 @@ architecture Behavioral of top is
             switch              : in std_logic;
             LED                 : out std_logic_vector((NETWORK_NODES-1) downto 0);
             
-            x_in                : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
-            x_in_valid          : in STD_LOGIC;
-            y_in                : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
-            y_in_valid          : in STD_LOGIC;
+            x_in                : in std_logic_vector((BUS_WIDTH-1) downto 0);
+            x_in_valid          : in std_logic;
+            y_in                : in std_logic_vector((BUS_WIDTH-1) downto 0);
+            y_in_valid          : in std_logic;
             
-            x_out               : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
-            x_out_valid         : out STD_LOGIC;
-            y_out               : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
-            y_out_valid         : out STD_LOGIC
+            x_out               : out std_logic_vector((BUS_WIDTH-1) downto 0);
+            x_out_valid         : out std_logic;
+            y_out               : out std_logic_vector((BUS_WIDTH-1) downto 0);
+            y_out_valid         : out std_logic
         );
     end component node;
 

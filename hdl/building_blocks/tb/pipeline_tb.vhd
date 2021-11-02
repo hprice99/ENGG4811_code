@@ -13,9 +13,9 @@ architecture Behavioral of pipeline_tb is
              STAGES : integer := 10
         );
         port (
-            clk     : in STD_LOGIC;
-            d_in    : in STD_LOGIC;
-            d_out   : out STD_LOGIC
+            clk     : in std_logic;
+            d_in    : in std_logic;
+            d_out   : out std_logic
         );
     end component pipeline;
 

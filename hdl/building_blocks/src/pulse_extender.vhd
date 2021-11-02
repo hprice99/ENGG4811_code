@@ -3,11 +3,11 @@ use IEEE.STD_LOGIC_1164.ALL;
 
 entity pulse_extender is
     Port ( 
-        clk         : in STD_LOGIC;
-        reset_n     : in STD_LOGIC;
-        trigger     : in STD_LOGIC;
-        release     : in STD_LOGIC;
-        pulse       : out STD_LOGIC
+        clk         : in std_logic;
+        reset_n     : in std_logic;
+        trigger     : in std_logic;
+        release     : in std_logic;
+        pulse       : out std_logic
     );
 end pulse_extender;
 

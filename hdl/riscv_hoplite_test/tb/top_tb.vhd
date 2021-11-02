@@ -15,10 +15,10 @@ architecture Behavioral of top_tb is
 
     component top
         port ( 
-               CPU_RESETN   : in STD_LOGIC;
-               CLK_100MHZ   : in STD_LOGIC;
-               SW           : in STD_LOGIC_VECTOR(3 downto 0);
-               LED          : out STD_LOGIC_VECTOR(3 downto 0)
+               CPU_RESETN   : in std_logic;
+               CLK_100MHZ   : in std_logic;
+               SW           : in std_logic_vector(3 downto 0);
+               LED          : out std_logic_vector(3 downto 0)
         );
     end component top;
     

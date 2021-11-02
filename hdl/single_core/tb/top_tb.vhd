@@ -26,7 +26,7 @@ architecture Behavioral of top_tb is
             clk                 : in std_logic;
             reset_n             : in std_logic;
             
-            LED                 : out STD_LOGIC;
+            LED                 : out std_logic;
             
             out_char            : out std_logic_vector(7 downto 0);
             out_char_en         : out std_logic;

@@ -33,7 +33,7 @@ architecture Behavioral of top_tb is
             clk                 : in std_logic;
             reset_n             : in std_logic;
             
-            LED                 : out STD_LOGIC_VECTOR((FOX_NETWORK_NODES-1) downto 0);
+            LED                 : out std_logic_vector((FOX_NETWORK_NODES-1) downto 0);
             
             out_char            : out t_Char;
             out_char_en         : out t_MessageValid;

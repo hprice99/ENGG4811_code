@@ -12,9 +12,9 @@ use xil_defaultlib.fox_defs.all;
 
 entity board_top is
     Port ( 
-           CPU_RESETN   : in STD_LOGIC;
-           clk          : in STD_LOGIC;
-           LED          : out STD_LOGIC_VECTOR(3 downto 0);
+           CPU_RESETN   : in std_logic;
+           clk          : in std_logic;
+           LED          : out std_logic_vector(3 downto 0);
            UART_RXD_OUT : out std_logic
     );
 end board_top;
@@ -40,7 +40,7 @@ architecture Behavioral of board_top is
             clk                 : in std_logic;
             reset_n             : in std_logic;
             
-            LED                 : out STD_LOGIC_VECTOR((FOX_NETWORK_NODES-1) downto 0);
+            LED                 : out std_logic_vector((FOX_NETWORK_NODES-1) downto 0);
             
             out_char            : out t_Char;
             out_char_en         : out t_MessageValid;
@@ -56,10 +56,10 @@ architecture Behavioral of board_top is
     
     component clock_divider 
         Port ( 
-            CLK_50MHZ   : out STD_LOGIC;
-            reset       : in STD_LOGIC;
-            locked      : out STD_LOGIC;
-            clk_in1     : in STD_LOGIC
+            CLK_50MHZ   : out std_logic;
+            reset       : in std_logic;
+            locked      : out std_logic;
+            clk_in1     : in std_logic
         );
     end component clock_divider;
         

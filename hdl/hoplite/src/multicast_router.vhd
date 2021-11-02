@@ -15,25 +15,25 @@ entity multicast_router is
         MULTICAST_Y_COORD       : integer := 1
     );
     Port ( 
-        clk             : in STD_LOGIC;
-        reset_n         : in STD_LOGIC;
+        clk             : in std_logic;
+        reset_n         : in std_logic;
         
         -- Input
-        x_in                    : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
-        x_in_valid              : in STD_LOGIC;
-        y_in                    : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
-        y_in_valid              : in STD_LOGIC;
-        multicast_in            : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
-        multicast_in_valid      : in STD_LOGIC;
-        multicast_backpressure  : out STD_LOGIC;
+        x_in                    : in std_logic_vector((BUS_WIDTH-1) downto 0);
+        x_in_valid              : in std_logic;
+        y_in                    : in std_logic_vector((BUS_WIDTH-1) downto 0);
+        y_in_valid              : in std_logic;
+        multicast_in            : in std_logic_vector((BUS_WIDTH-1) downto 0);
+        multicast_in_valid      : in std_logic;
+        multicast_backpressure  : out std_logic;
         
         -- Output
-        x_out                   : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
-        x_out_valid             : out STD_LOGIC;
-        y_out                   : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
-        y_out_valid             : out STD_LOGIC;
-        multicast_out           : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
-        multicast_out_valid     : out STD_LOGIC
+        x_out                   : out std_logic_vector((BUS_WIDTH-1) downto 0);
+        x_out_valid             : out std_logic;
+        y_out                   : out std_logic_vector((BUS_WIDTH-1) downto 0);
+        y_out_valid             : out std_logic;
+        multicast_out           : out std_logic_vector((BUS_WIDTH-1) downto 0);
+        multicast_out_valid     : out std_logic
     );
 end multicast_router;
 
