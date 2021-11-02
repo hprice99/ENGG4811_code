@@ -7,18 +7,18 @@ class MatrixTypes(enum.Enum):
     B = 1
 
 class FoxPacket:
-    def __init__(self, *, coordBits, multicastCoordBits, multicastGroupBits, doneFlagBits, resultFlagBits, matrixTypeBits, matrixCoordBits, matrixElementBits):
+    def __init__(self, *, coordBits, multicastCoordBits, multicastGroupBits, readyFlagBits, resultFlagBits, matrixTypeBits, matrixCoordBits, matrixElementBits):
 
         self.coordBits = coordBits
         self.multicastCoordBits = multicastCoordBits
         self.multicastGroupBits = multicastGroupBits
-        self.doneFlagBits = doneFlagBits
+        self.readyFlagBits = readyFlagBits
         self.resultFlagBits = resultFlagBits
         self.matrixTypeBits = matrixTypeBits
         self.matrixCoordBits = matrixCoordBits
         self.matrixElementBits = matrixElementBits
         
-        self.busWidth =  2 * self.coordBits + 2*self.multicastCoordBits + self.doneFlagBits + self.resultFlagBits + self.matrixTypeBits + 2 * self.matrixCoordBits + self.matrixElementBits
+        self.busWidth =  2 * self.coordBits + 2*self.multicastCoordBits + self.readyFlagBits + self.resultFlagBits + self.matrixTypeBits + 2 * self.matrixCoordBits + self.matrixElementBits
 
     '''
     Convert a given value to a packet field
@@ -32,7 +32,7 @@ class FoxPacket:
     '''
     Encode a matrix packet to a string
     '''
-    def create_matrix_packet(self, *, destCoord, multicastCoord, doneFlag, resultFlag, matrixType, matrixCoord, matrixElement):
+    def create_matrix_packet(self, *, destCoord, multicastCoord, readyFlag, resultFlag, matrixType, matrixCoord, matrixElement):
 
         destXCoordField = FoxPacket.create_packet_field(destCoord['x'], self.coordBits)
         destYCoordField = FoxPacket.create_packet_field(destCoord['y'], self.coordBits)
@@ -40,7 +40,7 @@ class FoxPacket:
         multicastXCoordField = FoxPacket.create_packet_field(multicastCoord['x'], self.multicastCoordBits)
         multicastYCoordField = FoxPacket.create_packet_field(multicastCoord['y'], self.multicastCoordBits)
 
-        doneFlagField = FoxPacket.create_packet_field(doneFlag, self.doneFlagBits)
+        readyFlagField = FoxPacket.create_packet_field(readyFlag, self.readyFlagBits)
         resultFlagField = FoxPacket.create_packet_field(resultFlag, self.resultFlagBits)
 
         matrixTypeField = FoxPacket.create_packet_field(matrixType.value, self.matrixTypeBits)
@@ -51,14 +51,14 @@ class FoxPacket:
         matrixElementField = FoxPacket.create_packet_field(matrixElement, self.matrixElementBits)
 
         # Put the fields together
-        packet = matrixElementField + matrixYCoordField + matrixXCoordField + matrixTypeField + resultFlagField + doneFlagField + multicastYCoordField + multicastXCoordField + destYCoordField + destXCoordField + '\n'
+        packet = matrixElementField + matrixYCoordField + matrixXCoordField + matrixTypeField + resultFlagField + readyFlagField + multicastYCoordField + multicastXCoordField + destYCoordField + destXCoordField + '\n'
 
         return packet
 
     '''
     Encode a matrix to a list of packets
     '''
-    def encode_matrix(self, *, destCoord, multicastCoord, doneFlag, resultFlag, matrixType, matrix):
+    def encode_matrix(self, *, destCoord, multicastCoord, readyFlag, resultFlag, matrixType, matrix):
 
         packets = []
 
@@ -67,7 +67,7 @@ class FoxPacket:
                 matrixCoord = {'x' : matrixX, 'y' : matrixY}
                 matrixElement = matrix[matrixY, matrixX]
 
-                packet = self.create_matrix_packet(destCoord=destCoord, multicastCoord=multicastCoord, resultFlag=resultFlag, doneFlag=doneFlag, matrixType=matrixType, matrixCoord=matrixCoord, matrixElement=matrixElement)
+                packet = self.create_matrix_packet(destCoord=destCoord, multicastCoord=multicastCoord, resultFlag=resultFlag, readyFlag=readyFlag, matrixType=matrixType, matrixCoord=matrixCoord, matrixElement=matrixElement)
 
                 packets.append(packet)
 

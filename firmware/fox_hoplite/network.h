@@ -31,8 +31,8 @@ enum NetworkError {
 #define MULTICAST_GROUP_OUTPUT      (*(volatile char*)0x20000030)
 #endif
 
-#ifndef DONE_FLAG_OUTPUT
-#define DONE_FLAG_OUTPUT            (*(volatile char*)0x20000040)
+#ifndef READY_FLAG_OUTPUT
+#define READY_FLAG_OUTPUT            (*(volatile char*)0x20000040)
 #endif
 
 #ifndef RESULT_FLAG_OUTPUT
@@ -72,8 +72,8 @@ enum NetworkError {
 #define MULTICAST_GROUP_INPUT       (*(volatile char*)0x50000020)
 #endif
 
-#ifndef DONE_FLAG_INPUT
-#define DONE_FLAG_INPUT             (*(volatile char*)0x50000030)
+#ifndef READY_FLAG_INPUT
+#define READY_FLAG_INPUT             (*(volatile char*)0x50000030)
 #endif
 
 #ifndef RESULT_FLAG_INPUT
@@ -109,7 +109,7 @@ struct MatrixPacket {
     int destX;
     int destY;
     int multicastGroup;
-    bool doneFlag;
+    bool readyFlag;
     bool resultFlag;
     enum MatrixType matrixType;
     int matrixX;
@@ -118,7 +118,7 @@ struct MatrixPacket {
 };
 
 struct MatrixPacket create_matrix_packet(int destX, int destY, 
-        int multicastGroup, bool doneFlag, bool resultFlag, 
+        int multicastGroup, bool readyFlag, bool resultFlag, 
         enum MatrixType matrixType, int matrixX, int matrixY, 
         long matrixElement);
 

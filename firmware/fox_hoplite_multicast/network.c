@@ -2,7 +2,7 @@
 #include "print.h"
 
 struct MatrixPacket create_matrix_packet(int destX, int destY, 
-        int multicastGroup, bool doneFlag, bool resultFlag, 
+        int multicastGroup, bool readyFlag, bool resultFlag, 
         enum MatrixType matrixType, int matrixX, int matrixY, 
         long matrixElement) {
 
@@ -11,7 +11,7 @@ struct MatrixPacket create_matrix_packet(int destX, int destY,
     packet.destX = destX;
     packet.destY = destY;
     packet.multicastGroup = multicastGroup;
-    packet.doneFlag = doneFlag;
+    packet.readyFlag = readyFlag;
     packet.resultFlag = resultFlag;
     packet.matrixType = matrixType;
     packet.matrixX = matrixX;
@@ -65,7 +65,7 @@ enum NetworkError send_message(struct MatrixPacket packet) {
     X_COORD_OUTPUT = packet.destX;
     Y_COORD_OUTPUT = packet.destY;
     MULTICAST_GROUP_OUTPUT = packet.multicastGroup;
-    DONE_FLAG_OUTPUT = packet.doneFlag;
+    READY_FLAG_OUTPUT = packet.readyFlag;
     RESULT_FLAG_OUTPUT = packet.resultFlag;
     MATRIX_TYPE_OUTPUT = packet.matrixType;
     MATRIX_X_COORD_OUTPUT = packet.matrixX;
@@ -86,7 +86,7 @@ enum NetworkError receive_message(struct MatrixPacket* packet) {
     }
 
     packet->multicastGroup = MULTICAST_GROUP_INPUT;
-    packet->doneFlag = DONE_FLAG_INPUT;
+    packet->readyFlag = READY_FLAG_INPUT;
     packet->resultFlag = RESULT_FLAG_INPUT;
     packet->matrixType = MATRIX_TYPE_INPUT;
     packet->matrixX = MATRIX_X_COORD_INPUT;

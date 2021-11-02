@@ -89,7 +89,7 @@ architecture Behavioral of rom_node_tb is
             x_coord_out         : out std_logic_vector((COORD_BITS-1) downto 0);
             y_coord_out         : out std_logic_vector((COORD_BITS-1) downto 0);
             multicast_group_out : out std_logic_vector((MULTICAST_GROUP_BITS-1) downto 0);
-            done_flag_out       : out std_logic;
+            ready_flag_out       : out std_logic;
             result_flag_out     : out std_logic;
             matrix_type_out     : out std_logic_vector((MATRIX_TYPE_BITS-1) downto 0);
             matrix_x_coord_out  : out std_logic_vector((MATRIX_COORD_BITS-1) downto 0);
@@ -134,7 +134,7 @@ architecture Behavioral of rom_node_tb is
     signal x_decoder_x_coord_out          : std_logic_vector((COORD_BITS-1) downto 0);
     signal x_decoder_y_coord_out          : std_logic_vector((COORD_BITS-1) downto 0);
     signal x_decoder_multicast_group_out  : std_logic_vector((MULTICAST_GROUP_BITS-1) downto 0);
-    signal x_decoder_done_flag_out        : std_logic;
+    signal x_decoder_ready_flag_out        : std_logic;
     signal x_decoder_result_flag_out      : std_logic;
     signal x_decoder_matrix_type_out      : std_logic_vector((MATRIX_TYPE_BITS-1) downto 0);
     signal x_decoder_matrix_x_coord_out   : std_logic_vector((MATRIX_COORD_BITS-1) downto 0);
@@ -150,7 +150,7 @@ architecture Behavioral of rom_node_tb is
     signal y_decoder_x_coord_out          : std_logic_vector((COORD_BITS-1) downto 0);
     signal y_decoder_y_coord_out          : std_logic_vector((COORD_BITS-1) downto 0);
     signal y_decoder_multicast_group_out  : std_logic_vector((MULTICAST_GROUP_BITS-1) downto 0);
-    signal y_decoder_done_flag_out        : std_logic;
+    signal y_decoder_ready_flag_out        : std_logic;
     signal y_decoder_result_flag_out      : std_logic;
     signal y_decoder_matrix_type_out      : std_logic_vector((MATRIX_TYPE_BITS-1) downto 0);
     signal y_decoder_matrix_x_coord_out   : std_logic_vector((MATRIX_COORD_BITS-1) downto 0);
@@ -166,7 +166,7 @@ architecture Behavioral of rom_node_tb is
     signal ready_decoder_x_coord_out          : std_logic_vector((COORD_BITS-1) downto 0);
     signal ready_decoder_y_coord_out          : std_logic_vector((COORD_BITS-1) downto 0);
     signal ready_decoder_multicast_group_out  : std_logic_vector((MULTICAST_GROUP_BITS-1) downto 0);
-    signal ready_decoder_done_flag_out        : std_logic;
+    signal ready_decoder_ready_flag_out        : std_logic;
     signal ready_decoder_result_flag_out      : std_logic;
     signal ready_decoder_matrix_type_out      : std_logic_vector((MATRIX_TYPE_BITS-1) downto 0);
     signal ready_decoder_matrix_x_coord_out   : std_logic_vector((MATRIX_COORD_BITS-1) downto 0);
@@ -181,7 +181,7 @@ architecture Behavioral of rom_node_tb is
                                            x_coord          : in std_logic_vector;
                                            y_coord          : in std_logic_vector;
                                            multicast_group  : in std_logic_vector;
-                                           done_flag        : in std_logic;
+                                           ready_flag        : in std_logic;
                                            result_flag      : in std_logic;
                                            matrix_type      : in std_logic_vector;
                                            matrix_x_coord   : in std_logic_vector;
@@ -208,7 +208,7 @@ architecture Behavioral of rom_node_tb is
         write(my_line, slv_to_int(multicast_group));
         
         write(my_line, string'(", done flag = "));
-        write(my_line, done_flag);
+        write(my_line, ready_flag);
         
         write(my_line, string'(", result flag = "));
         write(my_line, result_flag);
@@ -286,7 +286,7 @@ begin
                 
                     x_in(MATRIX_X_COORD_END downto MATRIX_X_COORD_START)  <= std_logic_vector(to_unsigned(node_ready_x, MATRIX_COORD_BITS));
                     x_in(MATRIX_Y_COORD_END downto MATRIX_Y_COORD_START)  <= std_logic_vector(to_unsigned(node_ready_y, MATRIX_COORD_BITS));
-                    x_in(DONE_FLAG_BIT) <= '1';
+                    x_in(READY_FLAG_BIT) <= '1';
                     
                     x_in_valid  <= '1';
                     
@@ -308,7 +308,7 @@ begin
                 
                     x_in(MATRIX_X_COORD_END downto MATRIX_X_COORD_START)  <= std_logic_vector(to_unsigned(node_ready_x, MATRIX_COORD_BITS));
                     x_in(MATRIX_Y_COORD_END downto MATRIX_Y_COORD_START)  <= std_logic_vector(to_unsigned(node_ready_y, MATRIX_COORD_BITS));
-                    x_in(DONE_FLAG_BIT) <= '1';
+                    x_in(READY_FLAG_BIT) <= '1';
                     
                     x_in_valid  <= '1';
                     
@@ -357,7 +357,7 @@ begin
             x_coord_out         => ready_decoder_x_coord_out,
             y_coord_out         => ready_decoder_y_coord_out,
             multicast_group_out => ready_decoder_multicast_group_out,
-            done_flag_out       => ready_decoder_done_flag_out,
+            ready_flag_out       => ready_decoder_ready_flag_out,
             result_flag_out     => ready_decoder_result_flag_out,
             matrix_type_out     => ready_decoder_matrix_type_out,
             matrix_x_coord_out  => ready_decoder_matrix_x_coord_out,
@@ -388,7 +388,7 @@ begin
                     my_decoder_line := print_decoded_message(count, ready_decoder_packet_in, 
                                           ready_decoder_x_coord_out, ready_decoder_y_coord_out,
                                           ready_decoder_multicast_group_out,
-                                          ready_decoder_done_flag_out, ready_decoder_result_flag_out,
+                                          ready_decoder_ready_flag_out, ready_decoder_result_flag_out,
                                           ready_decoder_matrix_type_out,
                                           ready_decoder_matrix_x_coord_out, ready_decoder_matrix_y_coord_out,
                                           ready_decoder_matrix_element_out);
@@ -474,7 +474,7 @@ begin
             x_coord_out         => x_decoder_x_coord_out,
             y_coord_out         => x_decoder_y_coord_out,
             multicast_group_out => x_decoder_multicast_group_out,
-            done_flag_out       => x_decoder_done_flag_out,
+            ready_flag_out       => x_decoder_ready_flag_out,
             result_flag_out     => x_decoder_result_flag_out,
             matrix_type_out     => x_decoder_matrix_type_out,
             matrix_x_coord_out  => x_decoder_matrix_x_coord_out,
@@ -512,7 +512,7 @@ begin
                     my_decoder_line := print_decoded_message(count, x_decoder_packet_in, 
                                           x_decoder_x_coord_out, x_decoder_y_coord_out,
                                           x_decoder_multicast_group_out,
-                                          x_decoder_done_flag_out, x_decoder_result_flag_out,
+                                          x_decoder_ready_flag_out, x_decoder_result_flag_out,
                                           x_decoder_matrix_type_out,
                                           x_decoder_matrix_x_coord_out, x_decoder_matrix_y_coord_out,
                                           x_decoder_matrix_element_out);
@@ -545,7 +545,7 @@ begin
             x_coord_out         => y_decoder_x_coord_out,
             y_coord_out         => y_decoder_y_coord_out,
             multicast_group_out => y_decoder_multicast_group_out,
-            done_flag_out       => y_decoder_done_flag_out,
+            ready_flag_out       => y_decoder_ready_flag_out,
             result_flag_out     => y_decoder_result_flag_out,
             matrix_type_out     => y_decoder_matrix_type_out,
             matrix_x_coord_out  => y_decoder_matrix_x_coord_out,
@@ -583,7 +583,7 @@ begin
                     my_decoder_line := print_decoded_message(count, y_decoder_packet_in, 
                                           y_decoder_x_coord_out, y_decoder_y_coord_out,
                                           y_decoder_multicast_group_out,
-                                          y_decoder_done_flag_out, y_decoder_result_flag_out,
+                                          y_decoder_ready_flag_out, y_decoder_result_flag_out,
                                           y_decoder_matrix_type_out,
                                           y_decoder_matrix_x_coord_out, y_decoder_matrix_y_coord_out,
                                           y_decoder_matrix_element_out);

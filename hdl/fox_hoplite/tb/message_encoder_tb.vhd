@@ -39,8 +39,8 @@ architecture Behavioral of message_encoder_tb is
             multicast_group_in          : in std_logic_vector((MULTICAST_GROUP_BITS-1) downto 0);
             multicast_group_in_valid    : in std_logic;
 
-            done_flag_in                : in std_logic;
-            done_flag_in_valid          : in std_logic;
+            ready_flag_in                : in std_logic;
+            ready_flag_in_valid          : in std_logic;
 
             result_flag_in              : in std_logic;
             result_flag_in_valid        : in std_logic;
@@ -83,7 +83,7 @@ architecture Behavioral of message_encoder_tb is
             x_coord_out         : out std_logic_vector((COORD_BITS-1) downto 0);
             y_coord_out         : out std_logic_vector((COORD_BITS-1) downto 0);
             multicast_group_out : out std_logic_vector((MULTICAST_GROUP_BITS-1) downto 0);
-            done_flag_out       : out std_logic;
+            ready_flag_out       : out std_logic;
             result_flag_out     : out std_logic;
             matrix_type_out     : out std_logic_vector((MATRIX_TYPE_BITS-1) downto 0);
             matrix_x_coord_out  : out std_logic_vector((MATRIX_COORD_BITS-1) downto 0);
@@ -180,8 +180,8 @@ architecture Behavioral of message_encoder_tb is
     signal multicast_group          : t_MulticastGroup;
     signal multicast_group_valid    : t_MessageValid;
     
-    signal done_flag        : t_MessageValid;
-    signal done_flag_valid  : t_MessageValid;
+    signal ready_flag        : t_MessageValid;
+    signal ready_flag_valid  : t_MessageValid;
     
     signal result_flag          : t_MessageValid;
     signal result_flag_valid    : t_MessageValid;
@@ -226,7 +226,7 @@ architecture Behavioral of message_encoder_tb is
     signal decoder_x_coord_out          : t_DestCoord;
     signal decoder_y_coord_out          : t_DestCoord;
     signal decoder_multicast_group_out  : t_MulticastGroup;
-    signal decoder_done_flag_out        : t_MessageValid;
+    signal decoder_ready_flag_out        : t_MessageValid;
     signal decoder_result_flag_out      : t_MessageValid;
     signal decoder_matrix_type_out      : t_MatrixType;
     signal decoder_matrix_x_coord_out   : t_MatrixCoord;
@@ -333,7 +333,7 @@ begin
                 x_dest_valid(curr_x, curr_y)            <= '0';
                 y_dest_valid(curr_x, curr_y)            <= '0';
                 multicast_group_valid(curr_x, curr_y)   <= '0';
-                done_flag_valid(curr_x, curr_y)         <= '0';
+                ready_flag_valid(curr_x, curr_y)         <= '0';
                 result_flag_valid(curr_x, curr_y)       <= '0';
                 matrix_type_valid(curr_x, curr_y)       <= '0';
                 matrix_x_coord_valid(curr_x, curr_y)    <= '0';
@@ -348,7 +348,7 @@ begin
                         x_dest_valid(curr_x, curr_y)            <= '0';
                         y_dest_valid(curr_x, curr_y)            <= '0';
                         multicast_group_valid(curr_x, curr_y)   <= '0';
-                        done_flag_valid(curr_x, curr_y)         <= '0';
+                        ready_flag_valid(curr_x, curr_y)         <= '0';
                         result_flag_valid(curr_x, curr_y)       <= '0';
                         matrix_type_valid(curr_x, curr_y)       <= '0';
                         matrix_x_coord_valid(curr_x, curr_y)    <= '0';
@@ -368,8 +368,8 @@ begin
                         multicast_group(curr_x, curr_y)         <= "1";
                         multicast_group_valid(curr_x, curr_y)   <= '1';
 
-                        done_flag(curr_x, curr_y)               <= '0';
-                        done_flag_valid(curr_x, curr_y)         <= '1';
+                        ready_flag(curr_x, curr_y)               <= '0';
+                        ready_flag_valid(curr_x, curr_y)         <= '1';
 
                         result_flag(curr_x, curr_y)             <= '0';
                         result_flag_valid(curr_x, curr_y)       <= '1';
@@ -396,8 +396,8 @@ begin
                         multicast_group(curr_x, curr_y)         <= "0";
                         multicast_group_valid(curr_x, curr_y)   <= '1';
 
-                        done_flag(curr_x, curr_y)               <= '0';
-                        done_flag_valid(curr_x, curr_y)         <= '1';
+                        ready_flag(curr_x, curr_y)               <= '0';
+                        ready_flag_valid(curr_x, curr_y)         <= '1';
 
                         result_flag(curr_x, curr_y)             <= '0';
                         result_flag_valid(curr_x, curr_y)       <= '1';
@@ -428,7 +428,7 @@ begin
                         x_dest_valid(curr_x, curr_y)            <= '0';
                         y_dest_valid(curr_x, curr_y)            <= '0';
                         multicast_group_valid(curr_x, curr_y)   <= '0';
-                        done_flag_valid(curr_x, curr_y)         <= '0';
+                        ready_flag_valid(curr_x, curr_y)         <= '0';
                         result_flag_valid(curr_x, curr_y)       <= '0';
                         matrix_type_valid(curr_x, curr_y)       <= '0';
                         matrix_x_coord_valid(curr_x, curr_y)    <= '0';
@@ -479,8 +479,8 @@ begin
                     multicast_group_in          => multicast_group(curr_x, curr_y),
                     multicast_group_in_valid    => multicast_group_valid(curr_x, curr_y),
         
-                    done_flag_in                => done_flag(curr_x, curr_y),
-                    done_flag_in_valid          => done_flag_valid(curr_x, curr_y),
+                    ready_flag_in                => ready_flag(curr_x, curr_y),
+                    ready_flag_in_valid          => ready_flag_valid(curr_x, curr_y),
         
                     result_flag_in              => result_flag(curr_x, curr_y),
                     result_flag_in_valid        => result_flag_valid(curr_x, curr_y),
@@ -525,7 +525,7 @@ begin
                     x_coord_out         => decoder_x_coord_out(curr_x, curr_y),
                     y_coord_out         => decoder_y_coord_out(curr_x, curr_y),
                     multicast_group_out => decoder_multicast_group_out(curr_x, curr_y),
-                    done_flag_out       => decoder_done_flag_out(curr_x, curr_y),
+                    ready_flag_out       => decoder_ready_flag_out(curr_x, curr_y),
                     result_flag_out     => decoder_result_flag_out(curr_x, curr_y),
                     matrix_type_out     => decoder_matrix_type_out(curr_x, curr_y),
                     matrix_x_coord_out  => decoder_matrix_x_coord_out(curr_x, curr_y),
@@ -587,7 +587,7 @@ begin
                         write(my_decoder_output_line, slv_to_int(decoder_multicast_group_out(curr_x, curr_y)));
                         
                         write(my_decoder_output_line, string'(", done flag = "));
-                        write(my_decoder_output_line, decoder_done_flag_out(curr_x, curr_y));
+                        write(my_decoder_output_line, decoder_ready_flag_out(curr_x, curr_y));
                         
                         write(my_decoder_output_line, string'(", result flag = "));
                         write(my_decoder_output_line, decoder_result_flag_out(curr_x, curr_y));
@@ -628,7 +628,7 @@ begin
                         write(my_decoder_file_line, slv_to_int(decoder_multicast_group_out(curr_x, curr_y)));
                         
                         write(my_decoder_file_line, string'(", done flag = "));
-                        write(my_decoder_file_line, decoder_done_flag_out(curr_x, curr_y));
+                        write(my_decoder_file_line, decoder_ready_flag_out(curr_x, curr_y));
                         
                         write(my_decoder_file_line, string'(", result flag = "));
                         write(my_decoder_file_line, decoder_result_flag_out(curr_x, curr_y));

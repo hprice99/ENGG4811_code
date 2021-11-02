@@ -178,8 +178,8 @@ architecture Behavioral of fox_node is
             multicast_group_in          : in std_logic_vector((MULTICAST_GROUP_BITS-1) downto 0);
             multicast_group_in_valid    : in std_logic;
 
-            done_flag_in                : in std_logic;
-            done_flag_in_valid          : in std_logic;
+            ready_flag_in                : in std_logic;
+            ready_flag_in_valid          : in std_logic;
 
             result_flag_in              : in std_logic;
             result_flag_in_valid        : in std_logic;
@@ -223,7 +223,7 @@ architecture Behavioral of fox_node is
             x_coord_out         : out std_logic_vector((COORD_BITS-1) downto 0);
             y_coord_out         : out std_logic_vector((COORD_BITS-1) downto 0);
             multicast_group_out : out std_logic_vector((MULTICAST_GROUP_BITS-1) downto 0);
-            done_flag_out       : out std_logic;
+            ready_flag_out       : out std_logic;
             result_flag_out     : out std_logic;
             matrix_type_out     : out std_logic_vector((MATRIX_TYPE_BITS-1) downto 0);
             matrix_x_coord_out  : out std_logic_vector((MATRIX_COORD_BITS-1) downto 0);
@@ -295,8 +295,8 @@ architecture Behavioral of fox_node is
             multicast_group_out         : out std_logic_vector((MULTICAST_GROUP_BITS-1) downto 0);
             multicast_group_out_valid   : out std_logic;
 
-            done_flag_out               : out std_logic;
-            done_flag_out_valid         : out std_logic;
+            ready_flag_out               : out std_logic;
+            ready_flag_out_valid         : out std_logic;
 
             result_flag_out             : out std_logic;
             result_flag_out_valid       : out std_logic;
@@ -318,7 +318,7 @@ architecture Behavioral of fox_node is
             message_out_ready       : in std_logic;
             
             multicast_group_in      : in std_logic_vector((MULTICAST_GROUP_BITS-1) downto 0);
-            done_flag_in            : in std_logic;
+            ready_flag_in            : in std_logic;
             result_flag_in          : in std_logic;
             matrix_type_in          : in std_logic_vector((MATRIX_TYPE_BITS-1) downto 0);
             matrix_x_coord_in       : in std_logic_vector((MATRIX_COORD_BITS-1) downto 0);
@@ -371,8 +371,8 @@ architecture Behavioral of fox_node is
     signal processor_out_multicast_group  : std_logic_vector((MULTICAST_GROUP_BITS-1) downto 0);
     signal processor_out_multicast_group_valid : std_logic;
 
-    signal processor_out_done_flag, processor_out_result_flag   : std_logic;
-    signal processor_out_done_flag_valid, processor_out_result_flag_valid : std_logic;
+    signal processor_out_ready_flag, processor_out_result_flag   : std_logic;
+    signal processor_out_ready_flag_valid, processor_out_result_flag_valid : std_logic;
 
     signal processor_out_matrix_type        : std_logic_vector((MATRIX_TYPE_BITS-1) downto 0);
     signal processor_out_matrix_type_valid  : std_logic;
@@ -387,7 +387,7 @@ architecture Behavioral of fox_node is
     
     -- Message decoder signals
     signal processor_in_multicast_group : std_logic_vector((MULTICAST_GROUP_BITS-1) downto 0);
-    signal processor_in_done_flag       : std_logic;
+    signal processor_in_ready_flag       : std_logic;
     signal processor_in_result_flag     : std_logic;
     signal processor_in_matrix_type     : std_logic_vector((MATRIX_TYPE_BITS-1) downto 0);
     signal processor_in_matrix_x_coord  : std_logic_vector((MATRIX_COORD_BITS-1) downto 0);
@@ -500,8 +500,8 @@ begin
             multicast_group_in          => processor_out_multicast_group,
             multicast_group_in_valid    => processor_out_multicast_group_valid,
 
-            done_flag_in                => processor_out_done_flag,
-            done_flag_in_valid          => processor_out_done_flag_valid,
+            ready_flag_in                => processor_out_ready_flag,
+            ready_flag_in_valid          => processor_out_ready_flag_valid,
 
             result_flag_in              => processor_out_result_flag,
             result_flag_in_valid        => processor_out_result_flag_valid,
@@ -544,7 +544,7 @@ begin
             x_coord_out         => open,
             y_coord_out         => open,
             multicast_group_out => processor_in_multicast_group,
-            done_flag_out       => processor_in_done_flag,
+            ready_flag_out       => processor_in_ready_flag,
             result_flag_out     => processor_in_result_flag,
             matrix_type_out     => processor_in_matrix_type,
             matrix_x_coord_out  => processor_in_matrix_x_coord,
@@ -609,8 +609,8 @@ begin
             multicast_group_out         => processor_out_multicast_group,
             multicast_group_out_valid   => processor_out_multicast_group_valid,
 
-            done_flag_out               => processor_out_done_flag,
-            done_flag_out_valid         => processor_out_done_flag_valid,
+            ready_flag_out               => processor_out_ready_flag,
+            ready_flag_out_valid         => processor_out_ready_flag_valid,
 
             result_flag_out             => processor_out_result_flag,
             result_flag_out_valid       => processor_out_result_flag_valid,
@@ -632,7 +632,7 @@ begin
             message_out_ready       => message_out_ready,
 
             multicast_group_in      => processor_in_multicast_group,
-            done_flag_in            => processor_in_done_flag,
+            ready_flag_in            => processor_in_ready_flag,
             result_flag_in          => processor_in_result_flag,
             matrix_type_in          => processor_in_matrix_type,
             matrix_x_coord_in       => processor_in_matrix_x_coord,

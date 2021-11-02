@@ -45,7 +45,7 @@ enum FoxError send_burst_ready(int my_x_coord, int my_y_coord,
 
     struct MatrixPacket packet;
 
-    packet.doneFlag = true;
+    packet.readyFlag = true;
     packet.resultFlag = false;
     packet.matrixType = matrixType;
     packet.multicastGroup = 0;

@@ -72,7 +72,7 @@ architecture Behavioral of rom_tb is
             x_coord_out         : out std_logic_vector((COORD_BITS-1) downto 0);
             y_coord_out         : out std_logic_vector((COORD_BITS-1) downto 0);
             multicast_group_out : out std_logic_vector((MULTICAST_GROUP_BITS-1) downto 0);
-            done_flag_out       : out std_logic;
+            ready_flag_out       : out std_logic;
             result_flag_out     : out std_logic;
             matrix_type_out     : out std_logic_vector((MATRIX_TYPE_BITS-1) downto 0);
             matrix_x_coord_out  : out std_logic_vector((MATRIX_COORD_BITS-1) downto 0);
@@ -92,7 +92,7 @@ architecture Behavioral of rom_tb is
     signal decoder_x_coord_out          : std_logic_vector((COORD_BITS-1) downto 0);
     signal decoder_y_coord_out          : std_logic_vector((COORD_BITS-1) downto 0);
     signal decoder_multicast_group_out  : std_logic_vector((MULTICAST_GROUP_BITS-1) downto 0);
-    signal decoder_done_flag_out        : std_logic;
+    signal decoder_ready_flag_out        : std_logic;
     signal decoder_result_flag_out      : std_logic;
     signal decoder_matrix_type_out      : std_logic_vector((MATRIX_TYPE_BITS-1) downto 0);
     signal decoder_matrix_x_coord_out   : std_logic_vector((MATRIX_COORD_BITS-1) downto 0);
@@ -169,7 +169,7 @@ begin
             x_coord_out         => decoder_x_coord_out,
             y_coord_out         => decoder_y_coord_out,
             multicast_group_out => decoder_multicast_group_out,
-            done_flag_out       => decoder_done_flag_out,
+            ready_flag_out       => decoder_ready_flag_out,
             result_flag_out     => decoder_result_flag_out,
             matrix_type_out     => decoder_matrix_type_out,
             matrix_x_coord_out  => decoder_matrix_x_coord_out,
@@ -270,7 +270,7 @@ begin
                 write(my_decoder_output_line, slv_to_int(decoder_multicast_group_out));
                 
                 write(my_decoder_output_line, string'(", done flag = "));
-                write(my_decoder_output_line, decoder_done_flag_out);
+                write(my_decoder_output_line, decoder_ready_flag_out);
                 
                 write(my_decoder_output_line, string'(", result flag = "));
                 write(my_decoder_output_line, decoder_result_flag_out);

@@ -30,8 +30,8 @@ entity message_encoder is
         multicast_group_in          : in std_logic_vector((MULTICAST_GROUP_BITS-1) downto 0);
         multicast_group_in_valid    : in std_logic;
 
-        done_flag_in                : in std_logic;
-        done_flag_in_valid          : in std_logic;
+        ready_flag_in                : in std_logic;
+        ready_flag_in_valid          : in std_logic;
 
         result_flag_in              : in std_logic;
         result_flag_in_valid        : in std_logic;
@@ -60,7 +60,7 @@ architecture Behavioral of message_encoder is
     signal dest_x_coord, dest_y_coord : std_logic_vector((COORD_BITS-1) downto 0);
     signal multicast_group  : std_logic_vector((MULTICAST_GROUP_BITS-1) downto 0);
     signal dest_multicast_x_coord, dest_multicast_y_coord : std_logic_vector((MULTICAST_COORD_BITS-1) downto 0); 
-    signal done_flag, result_flag   : std_logic;
+    signal ready_flag, result_flag   : std_logic;
     signal matrix_type      : std_logic_vector((MATRIX_TYPE_BITS-1) downto 0);
     signal matrix_x_coord, matrix_y_coord   : std_logic_vector((MATRIX_COORD_BITS-1) downto 0);
     signal matrix_element   : std_logic_vector((MATRIX_ELEMENT_BITS-1) downto 0);
@@ -69,7 +69,7 @@ begin
 
     -- Message format 0 -- x_dest | y_dest | dest_multicast_x_coord | dest_multicast_y_coord | done | result | matrix | matrix_x_coord | matrix_y_coord | matrix_element -- (BUS_WIDTH-1)
     packet_out          <= matrix_element & matrix_y_coord & matrix_x_coord & 
-                            matrix_type & result_flag & done_flag & 
+                            matrix_type & result_flag & ready_flag & 
                             dest_multicast_y_coord & dest_multicast_x_coord & dest_y_coord & dest_x_coord;
     packet_out_valid    <= packet_complete_in; 
     
@@ -82,7 +82,7 @@ begin
                 multicast_group         <= (others => '0');
                 dest_multicast_x_coord  <= (others => '0');
                 dest_multicast_y_coord  <= (others => '0');
-                done_flag               <= '0';
+                ready_flag               <= '0';
                 result_flag             <= '0';
                 matrix_type             <= (others => '0');
                 matrix_x_coord          <= (others => '0');
@@ -109,8 +109,8 @@ begin
                     end if;
                 end if;
 
-                if (done_flag_in_valid = '1') then
-                    done_flag <= done_flag_in;
+                if (ready_flag_in_valid = '1') then
+                    ready_flag <= ready_flag_in;
                 end if;
 
                 if (result_flag_in_valid = '1') then

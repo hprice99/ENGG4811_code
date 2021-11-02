@@ -62,8 +62,8 @@ module system #(
     output reg[MULTICAST_GROUP_BITS-1:0]    multicast_group_out,
     output reg                              multicast_group_out_valid,
 
-    output reg  done_flag_out,
-    output reg  done_flag_out_valid,
+    output reg  ready_flag_out,
+    output reg  ready_flag_out_valid,
 
     output reg  result_flag_out,
     output reg  result_flag_out_valid,
@@ -85,7 +85,7 @@ module system #(
     input wire          message_out_ready,
 
     input wire[MULTICAST_GROUP_BITS-1:0]    multicast_group_in,
-    input wire  done_flag_in,
+    input wire  ready_flag_in,
     input wire  result_flag_in,
     input wire[MATRIX_TYPE_BITS-1:0]    matrix_type_in,
     input wire[MATRIX_COORD_BITS-1:0]   matrix_x_coord_in,
@@ -165,7 +165,7 @@ module system #(
             x_coord_out_valid           <= 0;
             y_coord_out_valid           <= 0;
             multicast_group_out_valid   <= 0;
-            done_flag_out_valid         <= 0;
+            ready_flag_out_valid         <= 0;
             result_flag_out_valid       <= 0;
             matrix_type_out_valid       <= 0;
             matrix_x_coord_out_valid    <= 0;
@@ -210,9 +210,9 @@ module system #(
                     multicast_group_out_valid   <= 1;
                     multicast_group_out         <= mem_la_wdata;
                 end
-                `DONE_FLAG_OUTPUT: begin
-                    done_flag_out_valid   <= 1;
-                    done_flag_out         <= mem_la_wdata;
+                `READY_FLAG_OUTPUT: begin
+                    ready_flag_out_valid   <= 1;
+                    ready_flag_out         <= mem_la_wdata;
                 end
                 `RESULT_FLAG_OUTPUT: begin
                     result_flag_out_valid   <= 1;
@@ -280,8 +280,8 @@ module system #(
                 `MULTICAST_GROUP_INPUT: begin
                     mem_rdata   <= multicast_group_in;
                 end
-                `DONE_FLAG_INPUT: begin
-                    mem_rdata   <= done_flag_in;
+                `READY_FLAG_INPUT: begin
+                    mem_rdata   <= ready_flag_in;
                 end
                 `RESULT_FLAG_INPUT: begin
                     mem_rdata   <= result_flag_in;
