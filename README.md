@@ -1,6 +1,6 @@
 # ENGG4811 RISC-V multi-softcore processor project
 
-## Designing a resource-efficient network-on-chip with support for multicast communication between processing elements on an FPGA
+## Implementing multicast communication in a resource-efficient network-on-chip
 
 ## Student details
 
@@ -14,7 +14,7 @@ Student ID: s4409241
 This repository contains the code written by Harrison Price (student number 44092410) for the completion of ENGG4811 at the University of Queensland in Semesters One and Two, 2021, as part of the completion of a Bachelor of Engineering (Honours) majoring in Computer and Electrical Engineering.
 The field of study for this project was a RISC-V multi-softcore processor system implemented on an FPGA.
 The chosen topic for this project was
-> Designing a resource-efficient network-on-chip with support for multicast communication between processing elements on an FPGA
+> Implementing multicast communication in a resource-efficient network-on-chip
 
 ### Network-on-chip
 This project involved designing a network-on-chip to facilitate communication between RISC-V softcore processors implemented on an FPGA.
@@ -24,7 +24,7 @@ This network was then augmented with optional multicast clusters, allowing for m
 
 ### RISC-V softcore processor
 This project was implemented on a Nexys 4 DDR FPGA Development Board, which has a Xilinx XC7A-1CSG324C FPGA.
-This FPGA has 101,440 logic cells, which is small relative to other FPGAs that have been used for network-on-chip design.
+This FPGA has 15,850 logic slices, which is small relative to other FPGAs that have been used for network-on-chip design.
 Furthermore, in this system, the processing elements that communicate with one another are RISC-V softcore processors.
 These processors can require large amounts of FPGA resources to implement.
 
@@ -41,20 +41,23 @@ In each stage one processor in each row broadcasts its **A** submatrix to all pr
 The product **AB** of the submatrices in each processor is then calculated and added to the existing result.
 At the end of the stage, each processor sends its **B** submatrix up its column.
 
-This project implemented Fox's algorithm on a network of PicoRV32 RISC-V softcore processors, which communicate through the network-on-chip designed.
-This was tested with networks-on-chip with and without multicast commuincation functionality, and the performance of each system was analysed both in terms of computation time and FPGA resource utilisation. 
+This project implemented Fox's algorithm on a network of PicoRV32 RISC-V softcore processors which communicate through the network-on-chip that was designed.
+Networks-on-chip with and without multicast commuincation functionality were both tested, and the performance of each system was analysed both in terms of computation time and FPGA resource utilisation. 
 
 ## Folder structure
 This repository is organised into the following directories
 ### `constraints`
-This directory contains the constraint files used to connect the ports of the VHDL top modules for each design to the pins and ports on the Nexys 4 DDR FPGA Development Board.
+This directory contains the constraint files used to connect the ports of the VHDL top modules for each design (saved in files named `*_board_top.vhd`) to the pins and ports on the Nexys 4 DDR FPGA Development Board.
 
 ### `firmware`
 This directory contains all files related to the firmware run on each PicoRV32 RISC-V softcore processor.
 These files include the C code used to implement Fox's algorithm and define common library functions, linker scripts to map the `.memory` section of the firmware to a memory address, and assembly scripts to set the stack pointer when the cores are initialised. 
 
 ### `hdl`
-This directory contains all hardware components developed in this project.
+This directory contains all hardware components developed in this project, as well as the testbenches used to simulate the behaviour of these modules.
+
+### `results`
+This directory contains the simulation and implementation results used to evaluate each of the systems that was designed. 
 
 ### `scripts`
 This directory contains Python scripts used to generate the memory initialisation files and configuration headers used by the project.
@@ -63,13 +66,14 @@ These scripts are used to create a memory initialisation file containing the **A
 
 ### `vivado`
 This directory contains the `.tcl` scripts that may be used to generate the Vivado projects required to synthesise and implement each design.
+Waveform configuration files used in simulations are also saved in this directory.
 
 
 ## Build instructions
 ### Vivado project
 This project was created with the Vivado 2020.2 Design Suite.
 To build the project in Vivado, open the Vivado GUI and open the TCL console.
-In the TCl console, navigate to the `vivado` folder in the repository and run `source <project>.tcl`.
+In the TCl console, navigate to the `vivado/<project>` folder in the repository (using `cd`) and run `source build.tcl`.
 
 ### RISC-V GNU toolchain installation
 Building the firmware for this project requires the RISC-V GNU toolchain with the RV32IM instruction set architecture to be installed.
