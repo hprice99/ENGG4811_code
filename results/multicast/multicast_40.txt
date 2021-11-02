@@ -1,0 +1,123 @@
+Copyright 1986-2020 Xilinx, Inc. All Rights Reserved.
+-------------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2020.2 (lin64) Build 3064766 Wed Nov 18 09:12:47 MST 2020
+| Date         : Mon Oct 18 15:00:41 2021
+| Host         : parallels-Parallels-Virtual-Platform running 64-bit Ubuntu 20.04.3 LTS
+| Command      : report_utilization -hierarchical -file /home/parallels/Desktop/PicoRV/ENGG4811_code/demo/utilisation/multicast/multicast_40.txt
+| Design       : board_top
+| Device       : 7a100tcsg324-1
+| Design State : Routed
+-------------------------------------------------------------------------------------------------------------------------------------------------
+
+Utilization Design Information
+
+Table of Contents
+-----------------
+1. Utilization by Hierarchy
+
+1. Utilization by Hierarchy
+---------------------------
+
++-------------------------------------------------------------------------------------------------+------------------------------------------+------------+------------+---------+------+------+--------+--------+------------+
+|                                             Instance                                            |                  Module                  | Total LUTs | Logic LUTs | LUTRAMs | SRLs |  FFs | RAMB36 | RAMB18 | DSP Blocks |
++-------------------------------------------------------------------------------------------------+------------------------------------------+------------+------------+---------+------+------+--------+--------+------------+
+| board_top                                                                                       |                                    (top) |      22884 |      10140 |   12744 |    0 | 6264 |      4 |      1 |         16 |
+|   (board_top)                                                                                   |                                    (top) |          0 |          0 |       0 |    0 |    0 |      0 |      0 |          0 |
+|   DIVIDER                                                                                       |                            clock_divider |          0 |          0 |       0 |    0 |    0 |      0 |      0 |          0 |
+|     inst                                                                                        |      clock_divider_clock_divider_clk_wiz |          0 |          0 |       0 |    0 |    0 |      0 |      0 |          0 |
+|   FOX_TOP                                                                                       |                                      top |      22884 |      10140 |   12744 |    0 | 6264 |      4 |      1 |         16 |
+|     (FOX_TOP)                                                                                   |                                      top |       2116 |          0 |    2116 |    0 |    0 |      0 |      0 |          0 |
+|     NETWORK_ROW_GEN[0].MULTICAST_ROUTER_GEN.MULTICAST_ROUTER                                    |                    multicast_router_node |        239 |        151 |      88 |    0 |  253 |      0 |      0 |          0 |
+|       (NETWORK_ROW_GEN[0].MULTICAST_ROUTER_GEN.MULTICAST_ROUTER)                                |                    multicast_router_node |          2 |          2 |       0 |    0 |  126 |      0 |      0 |          0 |
+|       BUFFER_GEN[0].BUFFER_FIFO                                                                 |                     fifo_sync_wrapper_23 |        118 |         74 |      44 |    0 |   34 |      0 |      0 |          0 |
+|         UNINITIALISED_FIFO_GEN.UNINITIALISED_FIFO                                               |                             fifo_sync_26 |        118 |         74 |      44 |    0 |   34 |      0 |      0 |          0 |
+|       BUFFER_GEN[1].BUFFER_FIFO                                                                 |                     fifo_sync_wrapper_24 |         90 |         46 |      44 |    0 |   34 |      0 |      0 |          0 |
+|         UNINITIALISED_FIFO_GEN.UNINITIALISED_FIFO                                               |                             fifo_sync_25 |         90 |         46 |      44 |    0 |   34 |      0 |      0 |          0 |
+|       ROUTER                                                                                    |                         multicast_router |         29 |         29 |       0 |    0 |   59 |      0 |      0 |          0 |
+|     NETWORK_ROW_GEN[0].NETWORK_COL_GEN[0].FOX_NETWORK_GEN.RESULT_GEN.RESULT_NODE_INITIALISE     |                              result_node |       7578 |       2976 |    4602 |    0 | 1591 |      0 |      1 |          4 |
+|       (NETWORK_ROW_GEN[0].NETWORK_COL_GEN[0].FOX_NETWORK_GEN.RESULT_GEN.RESULT_NODE_INITIALISE) |                              result_node |        285 |        285 |       0 |    0 |    0 |      0 |      0 |          0 |
+|       ENABLE_UART_GEN.BUFFERED_UART                                                             |                         UART_tx_buffered |         65 |         65 |       0 |    0 |   72 |      0 |      1 |          0 |
+|         UART_BUFFER                                                                             |                fifo_sync__parameterized5 |         20 |         20 |       0 |    0 |   52 |      0 |      1 |          0 |
+|         UART_INITIALISE                                                                         |                                     UART |         46 |         46 |       0 |    0 |   20 |      0 |      0 |          0 |
+|           os_clk_divider_i                                                                      |                             UART_CLK_DIV |          3 |          3 |       0 |    0 |    6 |      0 |      0 |          0 |
+|           uart_tx_i                                                                             |                                  UART_TX |         43 |         43 |       0 |    0 |   14 |      0 |      0 |          0 |
+|             (uart_tx_i)                                                                         |                                  UART_TX |         36 |         36 |       0 |    0 |    9 |      0 |      0 |          0 |
+|             tx_clk_divider_i                                                                    |             UART_CLK_DIV__parameterized3 |          7 |          7 |       0 |    0 |    5 |      0 |      0 |          0 |
+|       FOX_NODE_INITIALISE                                                                       |                                 fox_node |       7321 |       2719 |    4602 |    0 | 1519 |      0 |      0 |          4 |
+|         ENCODER                                                                                 |                       message_encoder_19 |          2 |          2 |       0 |    0 |   56 |      0 |      0 |          0 |
+|         NIC                                                                                     |                                 nic_dual |       2559 |        565 |    1994 |    0 |  310 |      0 |      0 |          0 |
+|           (NIC)                                                                                 |                                 nic_dual |          0 |          0 |       0 |    0 |  116 |      0 |      0 |          0 |
+|           NETWORK_TO_PE_FIFO                                                                    |        fifo_sync_wrapper__parameterized4 |       2455 |        505 |    1950 |    0 |  156 |      0 |      0 |          0 |
+|             UNINITIALISED_FIFO_GEN.UNINITIALISED_FIFO                                           |                fifo_sync__parameterized3 |       2455 |        505 |    1950 |    0 |  156 |      0 |      0 |          0 |
+|           PE_TO_NETWORK_FIFO                                                                    |     fifo_sync_wrapper__parameterized2_21 |        104 |         60 |      44 |    0 |   38 |      0 |      0 |          0 |
+|             UNINITIALISED_FIFO_GEN.UNINITIALISED_FIFO                                           |             fifo_sync__parameterized1_22 |        104 |         60 |      44 |    0 |   38 |      0 |      0 |          0 |
+|         PE                                                                                      |                                   system |       4578 |       1970 |    2608 |    0 |  907 |      0 |      0 |          4 |
+|           (PE)                                                                                  |                                   system |       2578 |         18 |    2560 |    0 |  108 |      0 |      0 |          0 |
+|           picorv32_core                                                                         |                                 picorv32 |       2000 |       1952 |      48 |    0 |  799 |      0 |      0 |          4 |
+|             (picorv32_core)                                                                     |                                 picorv32 |       1422 |       1374 |      48 |    0 |  562 |      0 |      0 |          0 |
+|             pcpi_div                                                                            |                        picorv32_pcpi_div |        374 |        374 |       0 |    0 |  200 |      0 |      0 |          0 |
+|             pcpi_mul                                                                            |                picorv32_pcpi_fast_mul_20 |        211 |        211 |       0 |    0 |   37 |      0 |      0 |          4 |
+|         ROUTER                                                                                  |                 hoplite_router_multicast |        184 |        184 |       0 |    0 |  246 |      0 |      0 |          0 |
+|     NETWORK_ROW_GEN[0].NETWORK_COL_GEN[1].FOX_NETWORK_GEN.FOX_GEN.FOX_NODE_INITIALISE           |                 fox_node__parameterized1 |       4856 |       2214 |    2642 |    0 | 1257 |      0 |      0 |          4 |
+|       ENCODER                                                                                   |                          message_encoder |          2 |          2 |       0 |    0 |   56 |      0 |      0 |          0 |
+|       NIC                                                                                       |              nic_dual__parameterized1_12 |       1492 |        434 |    1058 |    0 |  257 |      0 |      0 |          0 |
+|         (NIC)                                                                                   |              nic_dual__parameterized1_12 |          0 |          0 |       0 |    0 |  116 |      0 |      0 |          0 |
+|         NETWORK_TO_PE_FIFO                                                                      |     fifo_sync_wrapper__parameterized6_15 |       1389 |        375 |    1014 |    0 |  103 |      0 |      0 |          0 |
+|           UNINITIALISED_FIFO_GEN.UNINITIALISED_FIFO                                             |             fifo_sync__parameterized7_18 |       1389 |        375 |    1014 |    0 |  103 |      0 |      0 |          0 |
+|         PE_TO_NETWORK_FIFO                                                                      |     fifo_sync_wrapper__parameterized2_16 |        103 |         59 |      44 |    0 |   38 |      0 |      0 |          0 |
+|           UNINITIALISED_FIFO_GEN.UNINITIALISED_FIFO                                             |             fifo_sync__parameterized1_17 |        103 |         59 |      44 |    0 |   38 |      0 |      0 |          0 |
+|       PE                                                                                        |                   system__parameterized1 |       3147 |       1563 |    1584 |    0 |  698 |      0 |      0 |          4 |
+|         (PE)                                                                                    |                   system__parameterized1 |       1557 |         21 |    1536 |    0 |   99 |      0 |      0 |          0 |
+|         picorv32_core                                                                           |              picorv32__parameterized0_13 |       1590 |       1542 |      48 |    0 |  599 |      0 |      0 |          4 |
+|           (picorv32_core)                                                                       |              picorv32__parameterized0_13 |       1369 |       1321 |      48 |    0 |  562 |      0 |      0 |          0 |
+|           pcpi_mul                                                                              |                picorv32_pcpi_fast_mul_14 |        226 |        226 |       0 |    0 |   37 |      0 |      0 |          4 |
+|       ROUTER                                                                                    | hoplite_router_multicast__parameterized1 |        215 |        215 |       0 |    0 |  246 |      0 |      0 |          0 |
+|     NETWORK_ROW_GEN[1].MULTICAST_ROUTER_GEN.MULTICAST_ROUTER                                    |    multicast_router_node__parameterized1 |        259 |        171 |      88 |    0 |  253 |      0 |      0 |          0 |
+|       (NETWORK_ROW_GEN[1].MULTICAST_ROUTER_GEN.MULTICAST_ROUTER)                                |    multicast_router_node__parameterized1 |          2 |          2 |       0 |    0 |  126 |      0 |      0 |          0 |
+|       BUFFER_GEN[0].BUFFER_FIFO                                                                 |                        fifo_sync_wrapper |        117 |         73 |      44 |    0 |   34 |      0 |      0 |          0 |
+|         UNINITIALISED_FIFO_GEN.UNINITIALISED_FIFO                                               |                             fifo_sync_11 |        117 |         73 |      44 |    0 |   34 |      0 |      0 |          0 |
+|       BUFFER_GEN[1].BUFFER_FIFO                                                                 |                     fifo_sync_wrapper_10 |         92 |         48 |      44 |    0 |   34 |      0 |      0 |          0 |
+|         UNINITIALISED_FIFO_GEN.UNINITIALISED_FIFO                                               |                                fifo_sync |         92 |         48 |      44 |    0 |   34 |      0 |      0 |          0 |
+|       ROUTER                                                                                    |         multicast_router__parameterized1 |         48 |         48 |       0 |    0 |   59 |      0 |      0 |          0 |
+|     NETWORK_ROW_GEN[1].NETWORK_COL_GEN[0].FOX_NETWORK_GEN.FOX_GEN.FOX_NODE_INITIALISE           |                 fox_node__parameterized3 |       3726 |       2142 |    1584 |    0 | 1247 |      0 |      0 |          4 |
+|       ENCODER                                                                                   |        message_encoder__parameterized2_2 |          2 |          2 |       0 |    0 |   56 |      0 |      0 |          0 |
+|       NIC                                                                                       |               nic_dual__parameterized1_3 |        429 |        429 |       0 |    0 |  250 |      0 |      0 |          0 |
+|         (NIC)                                                                                   |               nic_dual__parameterized1_3 |          0 |          0 |       0 |    0 |  116 |      0 |      0 |          0 |
+|         NETWORK_TO_PE_FIFO                                                                      |      fifo_sync_wrapper__parameterized6_6 |        371 |        371 |       0 |    0 |   96 |      0 |      0 |          0 |
+|           UNINITIALISED_FIFO_GEN.UNINITIALISED_FIFO                                             |              fifo_sync__parameterized7_9 |        371 |        371 |       0 |    0 |   96 |      0 |      0 |          0 |
+|         PE_TO_NETWORK_FIFO                                                                      |      fifo_sync_wrapper__parameterized2_7 |         58 |         58 |       0 |    0 |   38 |      0 |      0 |          0 |
+|           UNINITIALISED_FIFO_GEN.UNINITIALISED_FIFO                                             |              fifo_sync__parameterized1_8 |         58 |         58 |       0 |    0 |   38 |      0 |      0 |          0 |
+|       PE                                                                                        |                   system__parameterized3 |       3156 |       1572 |    1584 |    0 |  698 |      0 |      0 |          4 |
+|         (PE)                                                                                    |                   system__parameterized3 |       1557 |         21 |    1536 |    0 |   99 |      0 |      0 |          0 |
+|         picorv32_core                                                                           |               picorv32__parameterized0_4 |       1599 |       1551 |      48 |    0 |  599 |      0 |      0 |          4 |
+|           (picorv32_core)                                                                       |               picorv32__parameterized0_4 |       1379 |       1331 |      48 |    0 |  562 |      0 |      0 |          0 |
+|           pcpi_mul                                                                              |                 picorv32_pcpi_fast_mul_5 |        226 |        226 |       0 |    0 |   37 |      0 |      0 |          4 |
+|       ROUTER                                                                                    | hoplite_router_multicast__parameterized3 |        140 |        140 |       0 |    0 |  243 |      0 |      0 |          0 |
+|     NETWORK_ROW_GEN[1].NETWORK_COL_GEN[1].FOX_NETWORK_GEN.FOX_GEN.FOX_NODE_INITIALISE           |                 fox_node__parameterized5 |       3747 |       2163 |    1584 |    0 | 1248 |      0 |      0 |          4 |
+|       ENCODER                                                                                   |          message_encoder__parameterized2 |          2 |          2 |       0 |    0 |   56 |      0 |      0 |          0 |
+|       NIC                                                                                       |                 nic_dual__parameterized1 |        407 |        407 |       0 |    0 |  251 |      0 |      0 |          0 |
+|         (NIC)                                                                                   |                 nic_dual__parameterized1 |          0 |          0 |       0 |    0 |  116 |      0 |      0 |          0 |
+|         NETWORK_TO_PE_FIFO                                                                      |        fifo_sync_wrapper__parameterized6 |        355 |        355 |       0 |    0 |   97 |      0 |      0 |          0 |
+|           UNINITIALISED_FIFO_GEN.UNINITIALISED_FIFO                                             |                fifo_sync__parameterized7 |        355 |        355 |       0 |    0 |   97 |      0 |      0 |          0 |
+|         PE_TO_NETWORK_FIFO                                                                      |      fifo_sync_wrapper__parameterized2_0 |         52 |         52 |       0 |    0 |   38 |      0 |      0 |          0 |
+|           UNINITIALISED_FIFO_GEN.UNINITIALISED_FIFO                                             |              fifo_sync__parameterized1_1 |         52 |         52 |       0 |    0 |   38 |      0 |      0 |          0 |
+|       PE                                                                                        |                   system__parameterized5 |       3151 |       1567 |    1584 |    0 |  698 |      0 |      0 |          4 |
+|         (PE)                                                                                    |                   system__parameterized5 |       1557 |         21 |    1536 |    0 |   99 |      0 |      0 |          0 |
+|         picorv32_core                                                                           |                 picorv32__parameterized0 |       1594 |       1546 |      48 |    0 |  599 |      0 |      0 |          4 |
+|           (picorv32_core)                                                                       |                 picorv32__parameterized0 |       1373 |       1325 |      48 |    0 |  562 |      0 |      0 |          0 |
+|           pcpi_mul                                                                              |                   picorv32_pcpi_fast_mul |        226 |        226 |       0 |    0 |   37 |      0 |      0 |          4 |
+|       ROUTER                                                                                    | hoplite_router_multicast__parameterized5 |        188 |        188 |       0 |    0 |  243 |      0 |      0 |          0 |
+|     NETWORK_ROW_GEN[2].NETWORK_COL_GEN[0].PERIPHERAL_NODE_GEN.ROM_GEN.ROM                       |                                 rom_node |        316 |        276 |      40 |    0 |  320 |      4 |      0 |          0 |
+|       BURST_ROM                                                                                 |                                ROM_burst |         50 |         50 |       0 |    0 |   70 |      4 |      0 |          0 |
+|       NIC                                                                                       |                 nic_dual__parameterized3 |        139 |         99 |      40 |    0 |  131 |      0 |      0 |          0 |
+|         (NIC)                                                                                   |                 nic_dual__parameterized3 |          0 |          0 |       0 |    0 |   57 |      0 |      0 |          0 |
+|         NETWORK_TO_PE_FIFO                                                                      |        fifo_sync_wrapper__parameterized8 |         68 |         52 |      16 |    0 |   36 |      0 |      0 |          0 |
+|           UNINITIALISED_FIFO_GEN.UNINITIALISED_FIFO                                             |                fifo_sync__parameterized9 |         68 |         52 |      16 |    0 |   36 |      0 |      0 |          0 |
+|         PE_TO_NETWORK_FIFO                                                                      |        fifo_sync_wrapper__parameterized2 |         71 |         47 |      24 |    0 |   38 |      0 |      0 |          0 |
+|           UNINITIALISED_FIFO_GEN.UNINITIALISED_FIFO                                             |                fifo_sync__parameterized1 |         71 |         47 |      24 |    0 |   38 |      0 |      0 |          0 |
+|       ROUTER                                                                                    | hoplite_router_multicast__parameterized7 |        128 |        128 |       0 |    0 |  119 |      0 |      0 |          0 |
+|     NETWORK_ROW_GEN[2].NETWORK_COL_GEN[1].PERIPHERAL_NODE_GEN.ROUTER_GEN.ROUTER                 | hoplite_router_multicast__parameterized9 |         48 |         48 |       0 |    0 |   95 |      0 |      0 |          0 |
++-------------------------------------------------------------------------------------------------+------------------------------------------+------------+------------+---------+------+------+--------+--------+------------+
+* Note: The sum of lower-level cells may be larger than their parent cells total, due to cross-hierarchy LUT combining
+
+
