@@ -26,21 +26,21 @@ architecture Behavioral of hoplite_router_unicast_tb is
             COORD_BITS  : integer := 1
         );
         port (
-            clk             : in STD_LOGIC;
-            reset_n         : in STD_LOGIC;
-            x_in            : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
-            x_in_valid      : in STD_LOGIC;
-            y_in            : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
-            y_in_valid      : in STD_LOGIC;
-            pe_in           : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
-            pe_in_valid     : in STD_LOGIC;
-            x_out           : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
-            x_out_valid     : out STD_LOGIC;
-            y_out           : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
-            y_out_valid     : out STD_LOGIC;
-            pe_out          : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
-            pe_out_valid    : out STD_LOGIC;
-            pe_backpressure : out STD_LOGIC
+            clk             : in std_logic;
+            reset_n         : in std_logic;
+            x_in            : in std_logic_vector((BUS_WIDTH-1) downto 0);
+            x_in_valid      : in std_logic;
+            y_in            : in std_logic_vector((BUS_WIDTH-1) downto 0);
+            y_in_valid      : in std_logic;
+            pe_in           : in std_logic_vector((BUS_WIDTH-1) downto 0);
+            pe_in_valid     : in std_logic;
+            x_out           : out std_logic_vector((BUS_WIDTH-1) downto 0);
+            x_out_valid     : out std_logic;
+            y_out           : out std_logic_vector((BUS_WIDTH-1) downto 0);
+            y_out_valid     : out std_logic;
+            pe_out          : out std_logic_vector((BUS_WIDTH-1) downto 0);
+            pe_out_valid    : out std_logic;
+            pe_backpressure : out std_logic
         );
     end component hoplite_router_unicast;
 

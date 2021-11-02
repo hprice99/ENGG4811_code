@@ -82,20 +82,20 @@ entity result_node is
 
         uart_tx             : out std_logic;
         
-        x_in                : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
-        x_in_valid          : in STD_LOGIC;
-        y_in                : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
-        y_in_valid          : in STD_LOGIC;
-        multicast_in        : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
-        multicast_in_valid  : in STD_LOGIC;
+        x_in                : in std_logic_vector((BUS_WIDTH-1) downto 0);
+        x_in_valid          : in std_logic;
+        y_in                : in std_logic_vector((BUS_WIDTH-1) downto 0);
+        y_in_valid          : in std_logic;
+        multicast_in        : in std_logic_vector((BUS_WIDTH-1) downto 0);
+        multicast_in_valid  : in std_logic;
         
-        x_out               : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
-        x_out_valid         : out STD_LOGIC;
-        y_out               : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
-        y_out_valid         : out STD_LOGIC;
-        multicast_out       : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
-        multicast_out_valid : out STD_LOGIC;
-        multicast_backpressure  : in STD_LOGIC;
+        x_out               : out std_logic_vector((BUS_WIDTH-1) downto 0);
+        x_out_valid         : out std_logic;
+        y_out               : out std_logic_vector((BUS_WIDTH-1) downto 0);
+        y_out_valid         : out std_logic;
+        multicast_out       : out std_logic_vector((BUS_WIDTH-1) downto 0);
+        multicast_out_valid : out std_logic;
+        multicast_backpressure  : in std_logic;
 
         out_matrix          : out std_logic_vector(31 downto 0);
         out_matrix_en       : out std_logic;
@@ -175,20 +175,20 @@ architecture Behavioral of result_node is
             out_char_en         : out std_logic;
             out_char_ready      : in std_logic;
             
-            x_in                : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
-            x_in_valid          : in STD_LOGIC;
-            y_in                : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
-            y_in_valid          : in STD_LOGIC;
-            multicast_in        : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
-            multicast_in_valid  : in STD_LOGIC;
+            x_in                : in std_logic_vector((BUS_WIDTH-1) downto 0);
+            x_in_valid          : in std_logic;
+            y_in                : in std_logic_vector((BUS_WIDTH-1) downto 0);
+            y_in_valid          : in std_logic;
+            multicast_in        : in std_logic_vector((BUS_WIDTH-1) downto 0);
+            multicast_in_valid  : in std_logic;
             
-            x_out               : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
-            x_out_valid         : out STD_LOGIC;
-            y_out               : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
-            y_out_valid         : out STD_LOGIC;
-            multicast_out       : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
-            multicast_out_valid : out STD_LOGIC;
-            multicast_backpressure  : in STD_LOGIC;
+            x_out               : out std_logic_vector((BUS_WIDTH-1) downto 0);
+            x_out_valid         : out std_logic;
+            y_out               : out std_logic_vector((BUS_WIDTH-1) downto 0);
+            y_out_valid         : out std_logic;
+            multicast_out       : out std_logic_vector((BUS_WIDTH-1) downto 0);
+            multicast_out_valid : out std_logic;
+            multicast_backpressure  : in std_logic;
 
             out_matrix          : out std_logic_vector(31 downto 0);
             out_matrix_en       : out std_logic;

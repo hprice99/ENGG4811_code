@@ -22,27 +22,27 @@ entity hoplite_multicast_tb_pe is
         USE_MULTICAST           : boolean := False
     );
     Port ( 
-        clk                     : in STD_LOGIC;
-        reset_n                 : in STD_LOGIC;
+        clk                     : in std_logic;
+        reset_n                 : in std_logic;
         
         count                   : in integer;
-        trig                    : in STD_LOGIC;
-        trig_broadcast          : in STD_LOGIC;
+        trig                    : in std_logic;
+        trig_broadcast          : in std_logic;
         
-        x_dest                  : in STD_LOGIC_VECTOR((COORD_BITS-1) downto 0);
-        y_dest                  : in STD_LOGIC_VECTOR((COORD_BITS-1) downto 0);
+        x_dest                  : in std_logic_vector((COORD_BITS-1) downto 0);
+        y_dest                  : in std_logic_vector((COORD_BITS-1) downto 0);
         
-        message_out             : out STD_LOGIC_VECTOR ((BUS_WIDTH-1) downto 0);
-        message_out_valid       : out STD_LOGIC;
+        message_out             : out std_logic_vector ((BUS_WIDTH-1) downto 0);
+        message_out_valid       : out std_logic;
         
-        message_in              : in STD_LOGIC_VECTOR ((BUS_WIDTH-1) downto 0);
-        message_in_valid        : in STD_LOGIC;
+        message_in              : in std_logic_vector ((BUS_WIDTH-1) downto 0);
+        message_in_valid        : in std_logic;
         
-        last_message_sent       : out STD_LOGIC_VECTOR ((BUS_WIDTH-1) downto 0);
-        message_sent            : out STD_LOGIC;
+        last_message_sent       : out std_logic_vector ((BUS_WIDTH-1) downto 0);
+        message_sent            : out std_logic;
         
-        last_message_received   : out STD_LOGIC_VECTOR ((BUS_WIDTH-1) downto 0);
-        message_received        : out STD_LOGIC
+        last_message_received   : out std_logic_vector ((BUS_WIDTH-1) downto 0);
+        message_received        : out std_logic
    );
 end hoplite_multicast_tb_pe;
 

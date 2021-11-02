@@ -32,11 +32,11 @@ entity ROM_burst is
         
         rom_read_complete   : out std_logic;
 
-        message_in          : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
-        message_in_valid    : in STD_LOGIC;
+        message_in          : in std_logic_vector((BUS_WIDTH-1) downto 0);
+        message_in_valid    : in std_logic;
         
-        message_out         : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
-        message_out_valid   : out STD_LOGIC;
+        message_out         : out std_logic_vector((BUS_WIDTH-1) downto 0);
+        message_out_valid   : out std_logic;
         message_out_ready   : in std_logic
     );
 end ROM_burst;

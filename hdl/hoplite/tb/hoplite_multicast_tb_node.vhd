@@ -22,42 +22,42 @@ entity hoplite_multicast_tb_node is
         USE_MULTICAST           : boolean := False
     );
     Port ( 
-        clk                 : in STD_LOGIC;
-        reset_n             : in STD_LOGIC;
+        clk                 : in std_logic;
+        reset_n             : in std_logic;
         count               : in INTEGER;
         
-        x_dest              : in STD_LOGIC_VECTOR((COORD_BITS-1) downto 0);
-        y_dest              : in STD_LOGIC_VECTOR((COORD_BITS-1) downto 0);
-        trig                : in STD_LOGIC;
-        trig_broadcast      : in STD_LOGIC;
+        x_dest              : in std_logic_vector((COORD_BITS-1) downto 0);
+        y_dest              : in std_logic_vector((COORD_BITS-1) downto 0);
+        trig                : in std_logic;
+        trig_broadcast      : in std_logic;
         
         -- Input (messages received by node)
-        x_in                : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
-        x_in_valid          : in STD_LOGIC;
+        x_in                : in std_logic_vector((BUS_WIDTH-1) downto 0);
+        x_in_valid          : in std_logic;
         
-        y_in                : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
-        y_in_valid          : in STD_LOGIC;
+        y_in                : in std_logic_vector((BUS_WIDTH-1) downto 0);
+        y_in_valid          : in std_logic;
         
-        multicast_in        : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
-        multicast_in_valid  : in STD_LOGIC;
+        multicast_in        : in std_logic_vector((BUS_WIDTH-1) downto 0);
+        multicast_in_valid  : in std_logic;
         
         -- Output (messages sent by node)
-        x_out               : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
-        x_out_valid         : out STD_LOGIC;
+        x_out               : out std_logic_vector((BUS_WIDTH-1) downto 0);
+        x_out_valid         : out std_logic;
         
-        y_out               : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
-        y_out_valid         : out STD_LOGIC;
+        y_out               : out std_logic_vector((BUS_WIDTH-1) downto 0);
+        y_out_valid         : out std_logic;
         
-        multicast_out           : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
-        multicast_out_valid     : out STD_LOGIC;
-        multicast_backpressure  : in STD_LOGIC;
+        multicast_out           : out std_logic_vector((BUS_WIDTH-1) downto 0);
+        multicast_out_valid     : out std_logic;
+        multicast_backpressure  : in std_logic;
         
         -- Message checking signals
-        last_message_sent       : out STD_LOGIC_VECTOR ((BUS_WIDTH-1) downto 0);
-        message_sent            : out STD_LOGIC;
+        last_message_sent       : out std_logic_vector ((BUS_WIDTH-1) downto 0);
+        message_sent            : out std_logic;
         
-        last_message_received   : out STD_LOGIC_VECTOR ((BUS_WIDTH-1) downto 0);
-        message_received        : out STD_LOGIC
+        last_message_received   : out std_logic_vector ((BUS_WIDTH-1) downto 0);
+        message_received        : out std_logic
     );
 end hoplite_multicast_tb_node;
 
@@ -76,36 +76,36 @@ architecture Behavioral of hoplite_multicast_tb_node is
             USE_MULTICAST           : boolean := False
         );
         Port ( 
-            clk             : in STD_LOGIC;
-            reset_n         : in STD_LOGIC;
+            clk             : in std_logic;
+            reset_n         : in std_logic;
             
             -- Input (messages received by router)
-            x_in            : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
-            x_in_valid      : in STD_LOGIC;
+            x_in            : in std_logic_vector((BUS_WIDTH-1) downto 0);
+            x_in_valid      : in std_logic;
             
-            y_in            : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
-            y_in_valid      : in STD_LOGIC;
+            y_in            : in std_logic_vector((BUS_WIDTH-1) downto 0);
+            y_in_valid      : in std_logic;
             
-            pe_in           : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
-            pe_in_valid     : in STD_LOGIC;
-            pe_backpressure : out STD_LOGIC;
+            pe_in           : in std_logic_vector((BUS_WIDTH-1) downto 0);
+            pe_in_valid     : in std_logic;
+            pe_backpressure : out std_logic;
             
-            multicast_in            : in STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
-            multicast_in_valid      : in STD_LOGIC;
+            multicast_in            : in std_logic_vector((BUS_WIDTH-1) downto 0);
+            multicast_in_valid      : in std_logic;
             
             -- Output (messages sent out of router)
-            x_out           : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
-            x_out_valid     : out STD_LOGIC;
+            x_out           : out std_logic_vector((BUS_WIDTH-1) downto 0);
+            x_out_valid     : out std_logic;
             
-            y_out           : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
-            y_out_valid     : out STD_LOGIC;
+            y_out           : out std_logic_vector((BUS_WIDTH-1) downto 0);
+            y_out_valid     : out std_logic;
             
-            pe_out          : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
-            pe_out_valid    : out STD_LOGIC;
+            pe_out          : out std_logic_vector((BUS_WIDTH-1) downto 0);
+            pe_out_valid    : out std_logic;
             
-            multicast_out           : out STD_LOGIC_VECTOR((BUS_WIDTH-1) downto 0);
-            multicast_out_valid     : out STD_LOGIC;
-            multicast_backpressure  : in STD_LOGIC
+            multicast_out           : out std_logic_vector((BUS_WIDTH-1) downto 0);
+            multicast_out_valid     : out std_logic;
+            multicast_backpressure  : in std_logic
         );
     end component hoplite_router_multicast;
     
@@ -161,60 +161,60 @@ architecture Behavioral of hoplite_multicast_tb_node is
             USE_MULTICAST           : boolean := False
         );
         port (
-            clk                 : in STD_LOGIC;
-            reset_n             : in STD_LOGIC;
+            clk                 : in std_logic;
+            reset_n             : in std_logic;
             
             count               : in integer;
-            trig                : in STD_LOGIC;
-            trig_broadcast      : in STD_LOGIC;
+            trig                : in std_logic;
+            trig_broadcast      : in std_logic;
             
-            x_dest               : in STD_LOGIC_VECTOR((COORD_BITS-1) downto 0);
-            y_dest               : in STD_LOGIC_VECTOR((COORD_BITS-1) downto 0);
+            x_dest               : in std_logic_vector((COORD_BITS-1) downto 0);
+            y_dest               : in std_logic_vector((COORD_BITS-1) downto 0);
             
-            message_out          : out STD_LOGIC_VECTOR ((BUS_WIDTH-1) downto 0);
-            message_out_valid    : out STD_LOGIC;
+            message_out          : out std_logic_vector ((BUS_WIDTH-1) downto 0);
+            message_out_valid    : out std_logic;
             
-            message_in           : in STD_LOGIC_VECTOR ((BUS_WIDTH-1) downto 0);
-            message_in_valid     : in STD_LOGIC;
+            message_in           : in std_logic_vector ((BUS_WIDTH-1) downto 0);
+            message_in_valid     : in std_logic;
             
-            last_message_sent       : out STD_LOGIC_VECTOR ((BUS_WIDTH-1) downto 0);
-            message_sent            : out STD_LOGIC;
+            last_message_sent       : out std_logic_vector ((BUS_WIDTH-1) downto 0);
+            message_sent            : out std_logic;
             
-            last_message_received   : out STD_LOGIC_VECTOR ((BUS_WIDTH-1) downto 0);
-            message_received        : out STD_LOGIC
+            last_message_received   : out std_logic_vector ((BUS_WIDTH-1) downto 0);
+            message_received        : out std_logic
         );
     end component hoplite_multicast_tb_pe; 
     
     constant FIFO_DEPTH : integer := 100;
     
     -- Messages from PE to network
-    signal pe_message_out       : STD_LOGIC_VECTOR ((BUS_WIDTH-1) downto 0);
-    signal pe_message_out_valid : STD_LOGIC;
+    signal pe_message_out       : std_logic_vector ((BUS_WIDTH-1) downto 0);
+    signal pe_message_out_valid : std_logic;
     
-    signal pe_to_network_message    : STD_LOGIC_VECTOR ((BUS_WIDTH-1) downto 0);
-    signal pe_to_network_valid      : STD_LOGIC;
+    signal pe_to_network_message    : std_logic_vector ((BUS_WIDTH-1) downto 0);
+    signal pe_to_network_valid      : std_logic;
     
-    signal pe_backpressure      : STD_LOGIC;
-    signal router_ready         : STD_LOGIC;
+    signal pe_backpressure      : std_logic;
+    signal router_ready         : std_logic;
     
-    signal pe_to_network_full, pe_to_network_empty   : STD_LOGIC;
+    signal pe_to_network_full, pe_to_network_empty   : std_logic;
     
     -- Messages from network to PE
-    signal pe_message_in        : STD_LOGIC_VECTOR ((BUS_WIDTH-1) downto 0);
-    signal pe_message_in_valid  : STD_LOGIC;
+    signal pe_message_in        : std_logic_vector ((BUS_WIDTH-1) downto 0);
+    signal pe_message_in_valid  : std_logic;
     
-    signal network_to_pe_message    : STD_LOGIC_VECTOR ((BUS_WIDTH-1) downto 0);
-    signal network_to_pe_valid      : STD_LOGIC;
+    signal network_to_pe_message    : std_logic_vector ((BUS_WIDTH-1) downto 0);
+    signal network_to_pe_valid      : std_logic;
     
-    signal pe_ready : STD_LOGIC;
+    signal pe_ready : std_logic;
     
-    signal network_to_pe_full, network_to_pe_empty  : STD_LOGIC;
+    signal network_to_pe_full, network_to_pe_empty  : std_logic;
     
     -- Packets routed out
-    signal x_out_d, y_out_d             : STD_LOGIC_VECTOR ((BUS_WIDTH-1) downto 0);
-    signal x_out_valid_d, y_out_valid_d : STD_LOGIC;
+    signal x_out_d, y_out_d             : std_logic_vector ((BUS_WIDTH-1) downto 0);
+    signal x_out_valid_d, y_out_valid_d : std_logic;
     
-    signal print_valid : STD_LOGIC;
+    signal print_valid : std_logic;
 
 begin
 

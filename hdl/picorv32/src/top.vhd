@@ -34,14 +34,14 @@ use IEEE.STD_LOGIC_1164.ALL;
 
 entity top is
     Port ( 
-           CPU_RESETN   : in STD_LOGIC;
-           CLK_100MHZ   : in STD_LOGIC;
-           SW           : in STD_LOGIC_VECTOR(3 downto 0);
-           LED          : out STD_LOGIC_VECTOR(15 downto 0);
-           LED16_B      : out STD_LOGIC;
-           LED16_G      : out STD_LOGIC;
-           LED17_R      : out STD_LOGIC;
-           LED17_B      : out STD_LOGIC
+           CPU_RESETN   : in std_logic;
+           CLK_100MHZ   : in std_logic;
+           SW           : in std_logic_vector(3 downto 0);
+           LED          : out std_logic_vector(15 downto 0);
+           LED16_B      : out std_logic;
+           LED16_G      : out std_logic;
+           LED17_R      : out std_logic;
+           LED17_B      : out std_logic
     );
 end top;
 
@@ -82,9 +82,9 @@ architecture Behavioral of top is
             STAGES  : integer := 10
         );
         port (
-            clk     : in STD_LOGIC;
-            d_in    : in STD_LOGIC;
-            d_out   : out STD_LOGIC
+            clk     : in std_logic;
+            d_in    : in std_logic;
+            d_out   : out std_logic
         );
     end component pipeline;
     
