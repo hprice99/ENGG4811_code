@@ -40,25 +40,7 @@ entity top is
            out_matrix           : out t_MatrixOut;
            out_matrix_en        : out t_MessageValid;
            out_matrix_end_row   : out t_MessageValid;
-           out_matrix_end       : out t_MessageValid;
-           
-           ila_multicast_in_1                : out std_logic_vector((BUS_WIDTH-1) downto 0);
-           ila_multicast_in_1_valid          : out std_logic;
-           
-           ila_x_in_1            : out std_logic_vector((BUS_WIDTH-1) downto 0);
-           ila_x_in_1_valid      : out std_logic;
-           
-           ila_y_in_1            : out std_logic_vector((BUS_WIDTH-1) downto 0);
-           ila_y_in_1_valid      : out std_logic;
-           
-           ila_multicast_out_2                : out std_logic_vector((BUS_WIDTH-1) downto 0);
-           ila_multicast_out_2_valid          : out std_logic;
-           
-           ila_x_out_2            : out std_logic_vector((BUS_WIDTH-1) downto 0);
-           ila_x_out_2_valid      : out std_logic;
-           
-           ila_y_out_2            : out std_logic_vector((BUS_WIDTH-1) downto 0);
-           ila_y_out_2_valid      : out std_logic
+           out_matrix_end       : out t_MessageValid
     );
 end top;
 
@@ -412,24 +394,6 @@ architecture Behavioral of top is
     constant BURST_LENGTH           : integer := matrix_file_length / 2;
 
 begin
-
-    ila_multicast_in_1       <= multicast_messages_in(0, 0);
-    ila_multicast_in_1_valid <= multicast_messages_in_valid(0, 0);
-    
-    ila_x_in_1       <= x_messages_in(1, 0);
-    ila_x_in_1_valid <= x_messages_in_valid(1, 0);
-    
-    ila_y_in_1       <= y_messages_in(1, 0);
-    ila_y_in_1_valid <= y_messages_in_valid(1, 0);
-    
-    ila_multicast_out_2       <= multicast_to_node_messages_out(1, 1);
-    ila_multicast_out_2_valid <= multicast_to_node_messages_out_valid(1, 1);
-    
-    ila_x_out_2       <= x_messages_out(0, 0);
-    ila_x_out_2_valid <= x_messages_out_valid(0, 0);
-    
-    ila_y_out_2       <= y_messages_out(1, 1);
-    ila_y_out_2_valid <= y_messages_out_valid(1, 1);
 
     -- Generate the network
     NETWORK_ROW_GEN: for i in 0 to (NETWORK_ROWS-1) generate
