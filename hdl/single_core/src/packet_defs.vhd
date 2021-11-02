@@ -9,13 +9,13 @@ package packet_defs is
     -- Size of message data in packets
     constant COORD_BITS             : integer := 0;
     constant MULTICAST_COORD_BITS   : integer := 1;
-    constant DONE_FLAG_BITS         : integer := 1;
+    constant READY_FLAG_BITS         : integer := 1;
     constant RESULT_FLAG_BITS       : integer := 1;
     constant MATRIX_TYPE_BITS       : integer := 1;
     constant MATRIX_COORD_BITS      : integer := 8;
     constant MATRIX_ELEMENT_BITS    : integer := 32;
     constant BUS_WIDTH              : integer := 
-            2*COORD_BITS + 2*MULTICAST_COORD_BITS + DONE_FLAG_BITS + 
+            2*COORD_BITS + 2*MULTICAST_COORD_BITS + READY_FLAG_BITS + 
             RESULT_FLAG_BITS + MATRIX_TYPE_BITS + 2*MATRIX_COORD_BITS + 
             MATRIX_ELEMENT_BITS;
 
@@ -39,9 +39,9 @@ package packet_defs is
     constant MULTICAST_Y_COORD_START  : integer := MULTICAST_X_COORD_END + 1;
     constant MULTICAST_Y_COORD_END    : integer := MULTICAST_Y_COORD_START + MULTICAST_COORD_BITS - 1;
 
-    constant DONE_FLAG_BIT          : integer := MULTICAST_Y_COORD_END + 1;
+    constant READY_FLAG_BIT          : integer := MULTICAST_Y_COORD_END + 1;
 
-    constant RESULT_FLAG_BIT        : integer := DONE_FLAG_BIT + 1;
+    constant RESULT_FLAG_BIT        : integer := READY_FLAG_BIT + 1;
 
     constant MATRIX_TYPE_START      : integer := RESULT_FLAG_BIT + 1;
     constant MATRIX_TYPE_END        : integer := MATRIX_TYPE_START + MATRIX_TYPE_BITS - 1;
@@ -62,7 +62,7 @@ package packet_defs is
     function get_multicast_coord (packet : in std_logic_vector)
         return t_MulticastCoordinate;
         
-    function get_done_flag (packet : in std_logic_vector)
+    function get_ready_flag (packet : in std_logic_vector)
         return std_logic;
         
     function get_result_flag (packet : in std_logic_vector)
@@ -100,13 +100,13 @@ package body packet_defs is
         return multicastCoord;
     end function get_multicast_coord;
 
-    function get_done_flag (packet : in std_logic_vector) return std_logic is
-        variable doneFlag : std_logic;
+    function get_ready_flag (packet : in std_logic_vector) return std_logic is
+        variable readyFlag : std_logic;
     begin
-        doneFlag  := packet(DONE_FLAG_BIT);
+        readyFlag  := packet(READY_FLAG_BIT);
 
-        return doneFlag;
-    end function get_done_flag;
+        return readyFlag;
+    end function get_ready_flag;
     
     function get_result_flag (packet : in std_logic_vector) return std_logic is
         variable resultFlag : std_logic;

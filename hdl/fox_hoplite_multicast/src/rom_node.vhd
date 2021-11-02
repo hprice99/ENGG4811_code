@@ -202,7 +202,7 @@ architecture Behavioral of rom_node is
     signal network_to_pe_full, network_to_pe_empty  : std_logic;
     
     signal rom_receive_ready    : std_logic;
-
+    
 begin
 
     ROUTER: hoplite_router_multicast

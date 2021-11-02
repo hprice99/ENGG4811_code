@@ -68,7 +68,7 @@ enum FoxError send_ready(int my_x_coord, int my_y_coord,
 
     struct MatrixPacket packet;
 
-    packet.doneFlag = true;
+    packet.readyFlag = true;
     packet.resultFlag = false;
     packet.matrixType = matrixType;
 
@@ -117,7 +117,7 @@ bool is_a_broadcast_ready(int my_x_coord, int my_y_coord, int fox_rows) {
         #endif
 
         // Check if the packet is broadcast
-        if (packet.doneFlag == 1 && packet.matrixType == A_type) {
+        if (packet.readyFlag == 1 && packet.matrixType == A_type) {
 
             nodesReady++;
         }
@@ -132,7 +132,7 @@ enum FoxError send_A(int my_x_coord, int my_y_coord, int fox_rows) {
 
     struct MatrixPacket packet;
 
-    packet.doneFlag = false;
+    packet.readyFlag = false;
     packet.resultFlag = false;
     packet.matrixType = A_type;
     packet.multicastGroup = 1;
@@ -195,7 +195,7 @@ bool is_b_send_ready(int my_x_coord, int my_y_coord, int fox_cols) {
         #endif
 
         // Check if the packet is broadcast
-        if (packet.doneFlag == 1 && packet.matrixType == B_type) {
+        if (packet.readyFlag == 1 && packet.matrixType == B_type) {
 
             nodesReady++;
         }
@@ -210,7 +210,7 @@ enum FoxError send_B(int my_x_coord, int my_y_coord, int fox_cols) {
 
     struct MatrixPacket packet;
 
-    packet.doneFlag = false;
+    packet.readyFlag = false;
     packet.resultFlag = false;
     packet.matrixType = B_type;
     packet.multicastGroup = 0;
@@ -264,7 +264,7 @@ enum FoxError send_C(int my_x_coord, int my_y_coord) {
 
     struct MatrixPacket packet;
 
-    packet.doneFlag = false;
+    packet.readyFlag = false;
     packet.resultFlag = true;
     packet.matrixType = A_type;
     packet.multicastGroup = 0;
@@ -391,7 +391,7 @@ enum FoxError assign_my_C(void) {
 
     struct MatrixPacket packet;
 
-    packet.doneFlag = false;
+    packet.readyFlag = false;
     packet.resultFlag = true;
     packet.matrixType = A_type;
     packet.multicastGroup = 0;

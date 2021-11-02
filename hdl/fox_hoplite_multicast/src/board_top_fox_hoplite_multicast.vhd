@@ -121,7 +121,7 @@ architecture Behavioral of board_top is
     signal ila_multicast_in_1_y_dest         : std_logic_vector((COORD_BITS-1) downto 0);
     signal ila_multicast_in_1_multicast_x    : std_logic_vector((MULTICAST_COORD_BITS-1) downto 0);
     signal ila_multicast_in_1_multicast_y    : std_logic_vector((MULTICAST_COORD_BITS-1) downto 0);
-    signal ila_multicast_in_1_ready          : std_logic_vector((DONE_FLAG_BITS-1) downto 0);
+    signal ila_multicast_in_1_ready          : std_logic_vector((READY_FLAG_BITS-1) downto 0);
     signal ila_multicast_in_1_result         : std_logic_vector((RESULT_FLAG_BITS-1) downto 0);
     signal ila_multicast_in_1_matrix_type    : std_logic_vector((MATRIX_TYPE_BITS-1) downto 0);
     signal ila_multicast_in_1_matrix_x       : std_logic_vector((MATRIX_COORD_BITS-1) downto 0);
@@ -139,7 +139,7 @@ architecture Behavioral of board_top is
     signal ila_multicast_out_2_y_dest         : std_logic_vector((COORD_BITS-1) downto 0);
     signal ila_multicast_out_2_multicast_x    : std_logic_vector((MULTICAST_COORD_BITS-1) downto 0);
     signal ila_multicast_out_2_multicast_y    : std_logic_vector((MULTICAST_COORD_BITS-1) downto 0);
-    signal ila_multicast_out_2_ready          : std_logic_vector((DONE_FLAG_BITS-1) downto 0);
+    signal ila_multicast_out_2_ready          : std_logic_vector((READY_FLAG_BITS-1) downto 0);
     signal ila_multicast_out_2_result         : std_logic_vector((RESULT_FLAG_BITS-1) downto 0);
     signal ila_multicast_out_2_matrix_type    : std_logic_vector((MATRIX_TYPE_BITS-1) downto 0);
     signal ila_multicast_out_2_matrix_x       : std_logic_vector((MATRIX_COORD_BITS-1) downto 0);
@@ -177,7 +177,7 @@ architecture Behavioral of board_top is
     signal ila_x_in_1_y_dest         : std_logic_vector((COORD_BITS-1) downto 0);
     signal ila_x_in_1_multicast_x    : std_logic_vector((MULTICAST_COORD_BITS-1) downto 0);
     signal ila_x_in_1_multicast_y    : std_logic_vector((MULTICAST_COORD_BITS-1) downto 0);
-    signal ila_x_in_1_ready          : std_logic_vector((DONE_FLAG_BITS-1) downto 0);
+    signal ila_x_in_1_ready          : std_logic_vector((READY_FLAG_BITS-1) downto 0);
     signal ila_x_in_1_result         : std_logic_vector((RESULT_FLAG_BITS-1) downto 0);
     signal ila_x_in_1_matrix_type    : std_logic_vector((MATRIX_TYPE_BITS-1) downto 0);
     signal ila_x_in_1_matrix_x       : std_logic_vector((MATRIX_COORD_BITS-1) downto 0);
@@ -195,7 +195,7 @@ architecture Behavioral of board_top is
     signal ila_y_in_1_y_dest         : std_logic_vector((COORD_BITS-1) downto 0);
     signal ila_y_in_1_multicast_x    : std_logic_vector((MULTICAST_COORD_BITS-1) downto 0);
     signal ila_y_in_1_multicast_y    : std_logic_vector((MULTICAST_COORD_BITS-1) downto 0);
-    signal ila_y_in_1_ready          : std_logic_vector((DONE_FLAG_BITS-1) downto 0);
+    signal ila_y_in_1_ready          : std_logic_vector((READY_FLAG_BITS-1) downto 0);
     signal ila_y_in_1_result         : std_logic_vector((RESULT_FLAG_BITS-1) downto 0);
     signal ila_y_in_1_matrix_type    : std_logic_vector((MATRIX_TYPE_BITS-1) downto 0);
     signal ila_y_in_1_matrix_x       : std_logic_vector((MATRIX_COORD_BITS-1) downto 0);
@@ -213,7 +213,7 @@ architecture Behavioral of board_top is
     signal ila_x_out_2_y_dest         : std_logic_vector((COORD_BITS-1) downto 0);
     signal ila_x_out_2_multicast_x    : std_logic_vector((MULTICAST_COORD_BITS-1) downto 0);
     signal ila_x_out_2_multicast_y    : std_logic_vector((MULTICAST_COORD_BITS-1) downto 0);
-    signal ila_x_out_2_ready          : std_logic_vector((DONE_FLAG_BITS-1) downto 0);
+    signal ila_x_out_2_ready          : std_logic_vector((READY_FLAG_BITS-1) downto 0);
     signal ila_x_out_2_result         : std_logic_vector((RESULT_FLAG_BITS-1) downto 0);
     signal ila_x_out_2_matrix_type    : std_logic_vector((MATRIX_TYPE_BITS-1) downto 0);
     signal ila_x_out_2_matrix_x       : std_logic_vector((MATRIX_COORD_BITS-1) downto 0);
@@ -231,7 +231,7 @@ architecture Behavioral of board_top is
     signal ila_y_out_2_y_dest         : std_logic_vector((COORD_BITS-1) downto 0);
     signal ila_y_out_2_multicast_x    : std_logic_vector((MULTICAST_COORD_BITS-1) downto 0);
     signal ila_y_out_2_multicast_y    : std_logic_vector((MULTICAST_COORD_BITS-1) downto 0);
-    signal ila_y_out_2_ready          : std_logic_vector((DONE_FLAG_BITS-1) downto 0);
+    signal ila_y_out_2_ready          : std_logic_vector((READY_FLAG_BITS-1) downto 0);
     signal ila_y_out_2_result         : std_logic_vector((RESULT_FLAG_BITS-1) downto 0);
     signal ila_y_out_2_matrix_type    : std_logic_vector((MATRIX_TYPE_BITS-1) downto 0);
     signal ila_y_out_2_matrix_x       : std_logic_vector((MATRIX_COORD_BITS-1) downto 0);
@@ -312,7 +312,7 @@ begin
         ila_multicast_in_1_y_dest         <= ila_multicast_in_1_dest(Y_INDEX);
         ila_multicast_in_1_multicast_x    <= ila_multicast_in_1_multicast_coord(X_INDEX);
         ila_multicast_in_1_multicast_y    <= ila_multicast_in_1_multicast_coord(Y_INDEX);
-        ila_multicast_in_1_ready(0)       <= get_done_flag(ila_multicast_in_1);
+        ila_multicast_in_1_ready(0)       <= get_ready_flag(ila_multicast_in_1);
         ila_multicast_in_1_result(0)      <= get_result_flag(ila_multicast_in_1);
         ila_multicast_in_1_matrix_type    <= get_matrix_type(ila_multicast_in_1);
         ila_multicast_in_1_matrix_x       <= ila_multicast_in_1_matrix_coord(X_INDEX);
@@ -344,7 +344,7 @@ begin
         ila_multicast_out_2_y_dest         <= ila_multicast_out_2_dest(Y_INDEX);
         ila_multicast_out_2_multicast_x    <= ila_multicast_out_2_multicast_coord(X_INDEX);
         ila_multicast_out_2_multicast_y    <= ila_multicast_out_2_multicast_coord(Y_INDEX);
-        ila_multicast_out_2_ready(0)       <= get_done_flag(ila_multicast_out_2);
+        ila_multicast_out_2_ready(0)       <= get_ready_flag(ila_multicast_out_2);
         ila_multicast_out_2_result(0)      <= get_result_flag(ila_multicast_out_2);
         ila_multicast_out_2_matrix_type    <= get_matrix_type(ila_multicast_out_2);
         ila_multicast_out_2_matrix_x       <= ila_multicast_out_2_matrix_coord(X_INDEX);
@@ -378,7 +378,7 @@ begin
         ila_x_in_1_y_dest         <= ila_x_in_1_dest(Y_INDEX);
         ila_x_in_1_multicast_x    <= ila_x_in_1_multicast_coord(X_INDEX);
         ila_x_in_1_multicast_y    <= ila_x_in_1_multicast_coord(Y_INDEX);
-        ila_x_in_1_ready(0)       <= get_done_flag(ila_x_in_1);
+        ila_x_in_1_ready(0)       <= get_ready_flag(ila_x_in_1);
         ila_x_in_1_result(0)      <= get_result_flag(ila_x_in_1);
         ila_x_in_1_matrix_type    <= get_matrix_type(ila_x_in_1);
         ila_x_in_1_matrix_x       <= ila_x_in_1_matrix_coord(X_INDEX);
@@ -410,7 +410,7 @@ begin
         ila_y_in_1_y_dest         <= ila_y_in_1_dest(Y_INDEX);
         ila_y_in_1_multicast_x    <= ila_y_in_1_multicast_coord(X_INDEX);
         ila_y_in_1_multicast_y    <= ila_y_in_1_multicast_coord(Y_INDEX);
-        ila_y_in_1_ready(0)       <= get_done_flag(ila_y_in_1);
+        ila_y_in_1_ready(0)       <= get_ready_flag(ila_y_in_1);
         ila_y_in_1_result(0)      <= get_result_flag(ila_y_in_1);
         ila_y_in_1_matrix_type    <= get_matrix_type(ila_y_in_1);
         ila_y_in_1_matrix_x       <= ila_y_in_1_matrix_coord(X_INDEX);
@@ -442,7 +442,7 @@ begin
         ila_x_out_2_y_dest         <= ila_x_out_2_dest(Y_INDEX);
         ila_x_out_2_multicast_x    <= ila_x_out_2_multicast_coord(X_INDEX);
         ila_x_out_2_multicast_y    <= ila_x_out_2_multicast_coord(Y_INDEX);
-        ila_x_out_2_ready(0)       <= get_done_flag(ila_x_out_2);
+        ila_x_out_2_ready(0)       <= get_ready_flag(ila_x_out_2);
         ila_x_out_2_result(0)      <= get_result_flag(ila_x_out_2);
         ila_x_out_2_matrix_type    <= get_matrix_type(ila_x_out_2);
         ila_x_out_2_matrix_x       <= ila_x_out_2_matrix_coord(X_INDEX);
@@ -474,7 +474,7 @@ begin
         ila_y_out_2_y_dest         <= ila_y_out_2_dest(Y_INDEX);
         ila_y_out_2_multicast_x    <= ila_y_out_2_multicast_coord(X_INDEX);
         ila_y_out_2_multicast_y    <= ila_y_out_2_multicast_coord(Y_INDEX);
-        ila_y_out_2_ready(0)       <= get_done_flag(ila_y_out_2);
+        ila_y_out_2_ready(0)       <= get_ready_flag(ila_y_out_2);
         ila_y_out_2_result(0)      <= get_result_flag(ila_y_out_2);
         ila_y_out_2_matrix_type    <= get_matrix_type(ila_y_out_2);
         ila_y_out_2_matrix_x       <= ila_y_out_2_matrix_coord(X_INDEX);

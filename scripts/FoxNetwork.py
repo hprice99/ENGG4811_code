@@ -13,7 +13,7 @@ class FoxNetwork:
             romNodeCoord, \
             totalMatrixSize, foxNetworkStages, multicastGroupBits, \
             multicastCoordBits, \
-            doneFlagBits, resultFlagBits, matrixTypeBits, matrixCoordBits, \
+            readyFlagBits, resultFlagBits, matrixTypeBits, matrixCoordBits, \
             foxFirmware, resultFirmware, A=None, B=None, \
             useMatrixInitFile=True, multicastAvailable, useMulticast, multicastGroupNodes, \
             multicastNetworkRows, multicastNetworkCols, \
@@ -36,7 +36,7 @@ class FoxNetwork:
         coordBits = math.ceil(math.log2(max(self.networkRows, self.networkCols)))
         matrixElementBits = 32
 
-        self.packetFormat = FoxPacket(coordBits=coordBits, multicastCoordBits=multicastCoordBits, multicastGroupBits=multicastGroupBits, doneFlagBits=doneFlagBits, resultFlagBits=resultFlagBits, matrixTypeBits=matrixTypeBits, matrixCoordBits=matrixCoordBits, matrixElementBits=matrixElementBits)
+        self.packetFormat = FoxPacket(coordBits=coordBits, multicastCoordBits=multicastCoordBits, multicastGroupBits=multicastGroupBits, readyFlagBits=readyFlagBits, resultFlagBits=resultFlagBits, matrixTypeBits=matrixTypeBits, matrixCoordBits=matrixCoordBits, matrixElementBits=matrixElementBits)
 
         # Matrix details
         self.totalMatrixSize = totalMatrixSize
@@ -128,11 +128,11 @@ class FoxNetwork:
     Encode a matrix to packets and write to file
     '''
     def write_matrix_to_file(self, *, matrixFile, nodeCoord, multicastCoord, matrixType, matrix):
-        doneFlag = 0
+        readyFlag = 0
         resultFlag = 0
 
         packets = self.packetFormat.encode_matrix(destCoord=nodeCoord, multicastCoord=multicastCoord, \
-            resultFlag=resultFlag, doneFlag=doneFlag, matrixType=matrixType, matrix=matrix)
+            resultFlag=resultFlag, readyFlag=readyFlag, matrixType=matrixType, matrix=matrix)
 
         # Append each packet to a file
         file = open(matrixFile, "a")
@@ -148,11 +148,11 @@ class FoxNetwork:
     Encode a matrix to packet
     '''
     def encode_matrix(self, *, nodeCoord, multicastCoord, matrixType, matrix):
-        doneFlag = 0
+        readyFlag = 0
         resultFlag = 0
 
         packets = self.packetFormat.encode_matrix(destCoord=nodeCoord, multicastCoord=multicastCoord, \
-            resultFlag=resultFlag, doneFlag=doneFlag, matrixType=matrixType, matrix=matrix)
+            resultFlag=resultFlag, readyFlag=readyFlag, matrixType=matrixType, matrix=matrix)
 
         return packets
 
@@ -178,7 +178,7 @@ class FoxNetwork:
 
         for _ in range(paddingRequired):
             padding.append(self.packetFormat.create_matrix_packet(destCoord=nodeCoord, multicastCoord=multicastCoord, \
-                doneFlag=0, resultFlag=0, matrixType=MatrixTypes.A, matrixCoord={'x' : 0, 'y' : 0}, matrixElement=0))
+                readyFlag=0, resultFlag=0, matrixType=MatrixTypes.A, matrixCoord={'x' : 0, 'y' : 0}, matrixElement=0))
 
         # Append padding to a file
         file = open(matrixFile, "a")

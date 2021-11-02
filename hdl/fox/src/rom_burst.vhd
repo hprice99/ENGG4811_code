@@ -103,7 +103,7 @@ begin
 
     ROM_BURST_READY_GEN: if (USE_BURST = True) generate
         node_coord_received <= get_matrix_coord(message_in);
-        node_ready_received <= get_done_flag(message_in);
+        node_ready_received <= get_ready_flag(message_in);
         
         NODE_READY_X_GEN: for x in 0 to (FOX_NETWORK_STAGES-1) generate
             NODE_READY_Y_GEN: for y in 0 to (FOX_NETWORK_STAGES-1) generate

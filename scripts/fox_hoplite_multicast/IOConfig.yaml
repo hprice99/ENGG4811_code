@@ -20,7 +20,7 @@ peToNetworkIo:
   - name: multicast_group
     direction: output
     width: 8
-  - name: done_flag
+  - name: ready_flag
     direction: output
     width: 8
   - name: result_flag
@@ -57,7 +57,7 @@ networkToPeIo:
   - name: multicast_group
     direction: input
     width: 8
-  - name: done_flag
+  - name: ready_flag
     direction: input
     width: 8
   - name: result_flag

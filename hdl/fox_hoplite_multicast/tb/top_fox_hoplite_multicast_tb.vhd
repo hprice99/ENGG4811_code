@@ -1,9 +1,9 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
+use IEEE.std_logic_textio.all;
 
 use STD.textio.all;
-use IEEE.std_logic_textio.all;
 
 library xil_defaultlib;
 use xil_defaultlib.fox_defs.all;

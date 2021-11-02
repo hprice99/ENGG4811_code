@@ -25,7 +25,7 @@ entity message_decoder is
         x_coord_out         : out std_logic_vector((COORD_BITS-1) downto 0);
         y_coord_out         : out std_logic_vector((COORD_BITS-1) downto 0);
         multicast_group_out : out std_logic_vector((MULTICAST_GROUP_BITS-1) downto 0);
-        done_flag_out       : out std_logic;
+        ready_flag_out       : out std_logic;
         result_flag_out     : out std_logic;
         matrix_type_out     : out std_logic_vector((MATRIX_TYPE_BITS-1) downto 0);
         matrix_x_coord_out  : out std_logic_vector((MATRIX_COORD_BITS-1) downto 0);
@@ -65,7 +65,7 @@ begin
         multicast_group_out <= "0" when "00",
                                "1" when others;
     
-    done_flag_out       <= get_done_flag(latest_packet);
+    ready_flag_out       <= get_ready_flag(latest_packet);
     result_flag_out     <= get_result_flag(latest_packet);
     matrix_type_out     <= get_matrix_type(latest_packet);
     

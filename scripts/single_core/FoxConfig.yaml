@@ -25,7 +25,7 @@ romNodeCoord:
 packetFormat:
   multicastGroupBits: 1
   multicastCoordBits: 1
-  doneFlagBits: 1
+  readyFlagBits: 1
   resultFlagBits: 1
   matrixTypeBits: 1
   matrixCoordBits: 8
