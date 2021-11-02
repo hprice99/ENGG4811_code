@@ -87,7 +87,6 @@ class FoxPacket:
         # fileLoader = FileSystemLoader('templates')
         env = Environment(loader=fileLoader, trim_blocks=True, lstrip_blocks=True)
 
-        # TODO Separate packet format from Fox's algorithm details
         template = env.get_template('packet_defs.vhd')
         output = template.render(packetFormat=self)
 
