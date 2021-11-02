@@ -76,8 +76,8 @@ Waveform configuration files used in simulations are also saved in this director
 ## Build instructions
 ### Vivado project
 This project was created with the Vivado 2020.2 Design Suite.
-To build the project in Vivado, open the Vivado GUI and open the TCL console.
-In the TCl console, navigate to the `vivado/<project>` folder in the repository (using `cd`) and run `source build.tcl`.
+To build the project in Vivado, open the Vivado GUI and open the TCL console (accessible through the Window menu).
+In the TCL console, navigate to the `vivado/<project>` folder in the repository (using `cd`) and run `source build.tcl`.
 
 ### RISC-V GNU toolchain installation
 Building the firmware for this project requires the RISC-V GNU toolchain with the RV32IM instruction set architecture to be installed.
