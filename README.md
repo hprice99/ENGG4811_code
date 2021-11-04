@@ -12,7 +12,7 @@ Name: Harrison Price
 
 Student number: 44092410
 
-Student ID: s4409241
+Supervisor: Dr Matthew D’Souza
 
 ## Project overview
 This repository contains the code written by Harrison Price (student number 44092410) for the completion of ENGG4811 at the University of Queensland in Semesters One and Two, 2021, as part of the completion of a Bachelor of Engineering (Honours) majoring in Computer and Electrical Engineering.
