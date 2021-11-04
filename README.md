@@ -1,7 +1,3 @@
-# fpga-lattice
-
-FPGA lattice
-
 # ENGG4811 RISC-V multi-softcore processor project
 
 ## Implementing multicast communication in a resource-efficient network-on-chip
@@ -112,5 +108,4 @@ With the RISC-V GNU toolchain installed, all firmware, HDL packages and headers,
 
 
 [3] P. S. Pacheco, Parallel programming with MPI. San Francisco, Calif.: Morgan Kaufmann Publishers, 1997.
-
 
